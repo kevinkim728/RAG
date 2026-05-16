@@ -1,0 +1,163 @@
+Well, what a moment.
+You've made it.
+You've made it to the second half of the course and you've made it to rag week.
+Week five.
+Let's just quickly review what you can do.
+You can already code with frontier models.
+You can build AI assistants with tools.
+You can work with open source models.
+You can confidently choose the right model for your project, which you can back up with facts, with
+benchmarks, with metrics.
+And you can build solutions that generate code using both frontier and open source models.
+Today, it's going to be an ideas day.
+You're going to understand the big, the big ideas, the small idea first, and then the big idea behind
+Rag.
+We're going to walk through the high level flow and implement a toy, a kind of fake rag, as a way
+of giving intuition before we build the real rag tomorrow.
+But before we start this, let me just just check something.
+Did you skip some weeks?
+Did you jump straight ahead to week five because you were so into the idea of learning all about rag?
+Have I caught you?
+Have I caught you trying to skip ahead?
+If so, then you are busted.
+I have found you.
+You're busted.
+This is.
+This is bad.
+I am going to spend one second to tell you why this is bad.
+So first of all, you are right.
+Week five is a fabulous week.
+You have definitely got the right thinking.
+Moving straight to one of the most exciting weeks.
+Not the most exciting weeks, but one of the most exciting weeks on this course.
+But here's some of the stuff that you've missed.
+If you jump straight to week five, you have missed the first week.
+When we built some foundational understanding, we worked with the Chat Completions API.
+In the second week, we built UIs and we used Multi-modality to really understand frontier model APIs.
+The third week is when we went open source with Hugging Face and worked with different open source models.
+And the fourth week was when we covered this super important question of how do you go about picking
+the best model for the particular task at hand?
+So I'm not gonna lie, it's possible to jump straight to week five, as you may have done, particularly
+if you know some of the stuff already.
+But for those that did go through all of this, they will back me up.
+There's been some really great material that we've covered, and it's helped build up your skills and
+expertise so that you are most ready for week five.
+So, you know, I mean, if you're gonna jump straight to week five, then I'm not going to stop you.
+I'm just gonna say there's some really great stuff that you're missing out on.
+So what is ahead?
+We've got this week, which is all about understanding Wragg and using it to build an expert question
+answerer, which is like the standard go to use case for Wragg.
+Then then we get to talking about building.
+It becomes the capstone project for week six, seven and eight.
+And in week six we do it with Frontier Models and we fine tune a frontier model.
+In week seven we go open source.
+We fine tune our own open source model to try and compete with the biggest, smartest models on the
+planet.
+And week eight, it all comes together with a finale with agents, with with models, with just great
+stuff.
+You don't want to miss it.
+That's what I have ahead for you.
+And at the end of all of that, you will be able to say, I am an LLM engineer.
+Okay, so now let's talk about Wragg First up, I want to motivate what is going on?
+What is this thing?
+You probably know it stands for retrieval augmented generation.
+And I got to tell you, when you know everything about it, you're left with a sense of it's really
+very simple.
+It's it's not a very complicated idea.
+It's kind of obvious.
+And it's probably something that you've already thought of yourself, even if you didn't know that it
+was called rag, at least much of it, the sort of core ideas.
+So let's go through that.
+First up, we've already been doing a bunch of different techniques to improve, prompting different
+inference time techniques to get better outcomes.
+So Multi-shot prompting is when we put lots of example questions and answers in the context.
+We've used things like tools.
+Tools are very effective with finding ticket prices of course, to allow, but basically it's just all
+about prompting.
+It's about equipping an LLM to be able to to answer our questions better, and just generally putting
+extra context in the prompts.
+The more information we put in the prompts, the more expertise we get from our Lem.
+And so really the motivation for Rag is just to say, okay, let's just take this further.
+Let's keep thinking about how we can put relevant information in the prompt to best equip a model to
+answer a business question.
+So, for example, we could let let's just say we could build a database full of useful information
+that we would like our model to know about.
+If we're dealing with with with travel, it could be a database about ticket prices to any location
+and activities that you do at the location.
+If this is for our airline, you know, then it could have all of that detail and the different different
+flights and timing and so on.
+Every time the user asks a question, we could just first, when we're building the prompts, just run
+a few SQL queries and pull out from the database anything that's relevant to what the user has just
+asked.
+So for example, we could look see if there's a city in the name of in the user's question.
+Just literally look for the string London in their question.
+And if we find the string London, we could do a SQL query.
+A database query for anything pertaining to London.
+And whatever we get out, we could just shove that in the prompt.
+Here is some background information on London and then all of the stuff or New York or Tokyo or whatever
+it is, just doing a query from our knowledge base.
+And when you have like a database full of background information like that, it's called a knowledge
+base, just a fancy term for a database.
+And basically when we when we put this in place, we just always take whatever information we can and
+we shove it in the prompt.
+And I said here we put relevant details in the prompt.
+Maybe some of it isn't relevant, but but the LM doesn't mind.
+You say to it, here's some extra information.
+Maybe the question pertains to this.
+If so, then then use this when you're answering your question, and then you just shove the relevant
+information in there in the prompt.
+That is the basic motivation behind Rag.
+Nothing more complicated than that.
+And you probably thought of that already.
+So I like to describe this as the small idea behind rag.
+And once we've done this, we'll then talk about the big idea behind the small idea behind Rag, which
+is essentially what I just said is, okay, just imagine this.
+So we've got this set up in the middle there where it says code.
+That is our Python code that we are writing on the right where it says LM, that's the LM we're calling,
+and the knowledge base below the code there.
+That knowledge base is just a database of useful information.
+So look the user asks us a question.
+In comes the question to our code.
+We get a question.
+We got to answer it.
+We could just send that question straight to the LM or okay, we could just do a query of the knowledge
+base of anything that could be relevant.
+If the question has the word London in it, we do a query for anything about London, and then we just
+shove that in the prompt to the LM.
+We say the user has asked this question what's ticket prices to London?
+Here is some data that might be relevant.
+And then tons of stuff, including the ticket prices to London.
+Now please answer the question the LM will answer.
+And in its response, as as we all know, it's likely to be able to replay that information that is
+relevant because we are sort of biasing the model when it's when it's generating tokens.
+They are they are likely to be tokens that are coherent and consistent with the stuff in the input prompt.
+So it's likely to to introduce the ticket prices to London.
+And that goes back to the user.
+And they get their answer as if the LM has this expertise.
+It's obvious this is the small idea behind Rag.
+Again, you probably already got this.
+So what I'm going to do now is I want to make this small idea come to life for you, even though most
+of you probably already completely get it.
+But let's just go through a little exercise, a small example of the small idea.
+So what we're going to do is we're going to imagine that we are working for an insurance tech startup.
+This is going to be something in the insurance tech industry.
+And the insurance tech startup, by the way, is going to be called insurance insurer, which is going
+to be insure Lem.
+That will be the name of a very fictitious insurance tax start up.
+We are going to have a knowledge base.
+It's going to be basically the company's share drive.
+We're going to imagine we have a company share drive, and it's going to have a ton of information about
+the company.
+And our task is to build a knowledge worker like like an AI that is knowledgeable about insurance.
+It's going to know all about this company, and it's going to be able to answer expert questions pertaining
+to the company.
+And we're going to start with a small, trivial way of doing it, and then build up during the week
+to something quite advanced.
+So the blunt instrument, as I say, the basic simplistic approach, we are going to simply read the
+files.
+In this share drive, we're going to find the names of products and employees, and we're going to do
+something really janky when the user asks a question, we're just going to see whether that question
+contains any names of products or employees.
+And if so, we're just going to shove the whole document in the prompt.
+Super easy.
+We'll see if that works for us.

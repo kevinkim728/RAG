@@ -1,0 +1,670 @@
+--- Lecture 1 ---
+And it's week four, day three, and it's a day when we are going to go back to the labs at last.
+It's been an age you can already code with frontier models.
+You can build solutions with open source llms, and you can now choose the right LLM for the task at
+hand based on metrics and leaderboards.
+Today, we're going to assess models for how good they are at coding, and we're going to use frontier
+models to generate code and will be building, building, building and cursor.
+But before we start, I do have a couple more announcements to make.
+Uh, but just just hear me out here.
+There is something incredibly important that every AI engineer needs to know.
+And it is your sworn duty as an AI engineer, as an LLM engineer, that this is something that that
+you hold yourself to.
+And it's about pushing back on your business, and it's about finding the business problem.
+This is a situation that I find myself in a lot.
+I find that people come to me and they say things like, I want an AI agent for my organization or something
+like that.
+It's very common for me to get people approaching me with questions like that, including senior people,
+including senior execs, including people from all sorts of different backgrounds.
+And the question that I say back to them, which is what you all need to say back to people that say
+this to you is sure for sure, but but what business problem are you solving?
+Bring people back to the business problem.
+Don't let business people talk in terms of solutions.
+And sometimes I find that I that I say that back to somebody, and the question I get is sort of puzzled
+face.
+They don't really understand.
+And they say something like, I want to be able to speak to my phone and say, what are my sales numbers
+today?
+So give me an agent.
+And of course, your answer to that, please, should be yes.
+Great.
+Um, and so what business problem is that solving?
+The key thing being that we are in a world where the hype around gen AI and Agentic AI is, is so tremendous
+that everyone wants a bit of it, and that's great and that's exciting, but we need to always ground
+people back in the actual thing that's being solved.
+You need to understand the problem first and foremost, how you're going to measure success and use
+that as your way to determine the right solution to the business problem at hand.
+It has to start from the problem and you'll see in the guys folder.
+Guide 12 I believe it is has a good set of advice for what you then do next.
+Once you've got to a point when you have a clear business objective and sometimes agentic AI or gen
+AI might not be the right solution.
+In the case of someone wanting their sales numbers today on their phone, maybe a Google doc that opens
+up that shows you your sales numbers might be easier than having something that you talk to or whatever.
+So always come back to that.
+And I have another pet peeve as well.
+And it's also covered on guide 12.
+And this is relevant to picking the right alum.
+I'm not I'm not going off on some tangent.
+As an AI engineer.
+You wear two different hats.
+You have two jobs in one, you are a data scientist and you're also a software engineer.
+You're right at that intersection, and I tend to find that 80% of the questions that I get about projects
+through Udemy or in industry relate to engineering concerns.
+People ask me, what architecture should I use?
+How am I going to do my integrations?
+What's my what are my data pipes going to be?
+Which frameworks should I use?
+Should I use lang chain?
+Should I use light lamp?
+Which vector database should I be using an open source one like Croma, or should I be using pinecone
+or V8?
+These are all the questions people ask, and I feel like people ask those questions a lot because it's
+in their comfort zone.
+These are engineering concerns that a lot of people come from an AI, from a from a software engineering
+background.
+And this is the kind of question they're used to asking.
+But by in my opinion, it's not the most important question, and it's not the question that will make
+or break your project.
+So what will set your solution apart?
+What really matters?
+In my opinion, 80% of the questions that I ask are related to the science part of the story.
+What business problem are you solving as we just covered?
+And how will you measure that?
+You've solved that business problem.
+How will you measure success and what data do you have and what are the gaps?
+What data do you need?
+Because remember data that that is what will help you differentiate yourself.
+That is how your LM can outperform others.
+So those are the hard questions.
+And those are the ones that you should ask first and foremost and spend the most time on because the
+different architectures, the different frameworks, you pick which vector database.
+It's important.
+It's a decision you have to make, but it's not the most important.
+It's secondary to the science.
+And this leads to the five steps that you should take to select and then train and apply an LM to a
+commercial problem.
+And we're going to cover these five steps in week six in detail.
+When we go through a real capstone project, a real case of applying an LM to solve a difficult business
+problem.
+But just to tell you, the five steps now, so that I've planted that seed for later, you first of
+all need to understand your business requirements, the business problem you're solving, and how you
+will measure success in detail.
+You then need to prepare by selecting candidate models using the leaderboards, perhaps looking at the
+basic facts about the models to understand which is going to be the right one for the task at hand.
+Then you select the model you're going to choose by building prototypes, testing your business metric
+against the prototypes you customize it by, by building things like Rag that we do next week, fine
+tuning that we do in the following two weeks, and perhaps a genetic AI in the last week.
+And then you productionize you roll out and deploy to production.
+So these are the five steps that you go through.
+And of course, what we've spent this week focusing on is prepare, which is looking at the leaderboards,
+identifying the right selection, the candidate models.
+And you can see hopefully now how that fits after understanding your business requirements and before
+actually building your prototypes.
+But hold that thought.
+We're going to come back to it in two weeks time and we're going to play it through.
+For now, we're getting on to our technical challenge, building a product that converts Python code
+to fast C++ code to boost performance.
+Assuming that we don't know how to write C++, we know how to write Python, we want to translate it.
+And you can see how this can be extended to be any kind of porting code platform.
+And obviously, we all know this is a great use case for like an agentic solution that's able to take
+a whole code base and port it from one technology to another.
+And we're not going to be working on an in an authentic way.
+We're going to be assuming we've just got one script in Python, and we want to convert it to a script
+in C++.
+But you could be thinking if you've already taken some agentic courses like my one, or maybe you already
+know about it, you could extend this to be a full agentic platform yourself, and if not, then after
+week eight when we build out a little agentic process, you could come back and apply it there and that
+would be really cool.
+But for now, we're just focusing on the LM selection and on coming up with like, how are we going
+to test the business objective and how are we going to validate it for different models.
+And of course, the business problem that we're trying to solve here is all about performance.
+We've got this need for business purposes.
+This code that we're writing needs to run faster, and that gives us a simple way to measure success.
+We can make sure that the answer is accurate and that it comes quickly.
+So that's the challenge.
+Let's get to solving it.
+And the specific test that we'll use to see if we have solved it or not is we've got a little bit of
+Python code here.
+That's that's our tests that we'll use to validate.
+It is something which does a number of calculations.
+It takes it's a mathematical formula and a loop maths like this and loops Python is famously bad at
+because it's all interpreted and it's something which is iterating over a loop.
+And you can if you look through the code, you can see that it's basically doing one minus a third plus
+a fifth, minus a seventh plus a ninth, and it's going on and it's doing all of that 100,000 times.
+And at the end of it, it's taking the results and multiplying it by four and printing it along with
+how long it took.
+So that that is our test.
+That's what we will do and we will see how we perform.
+--- Lecture 2 ---
+
+Our task today is going to be to select frontier closed source models and try them out.
+Tomorrow we're going to change to open source models.
+But so far it's closed source frontier models, paid models.
+And we need to look somewhere to give us a sense of which models are best at coding.
+And I wonder where we're going to look for that.
+Um, we would of course go straight to artificial analysis and we can look at these general charts,
+or we can scroll down and look particularly at some of the coding benchmarks.
+And in particular, I think that the live code bench is going to be a good place for us to start.
+We could also look at C code because, uh, because we are going to be these are going to be scientific.
+But let's have a look at what we've got here.
+GPT five high is top of the list.
+So let's write that down.
+GPT five on high reasoning mode.
+Uh, grok four does well, grok four fast, uh, for some reason, seems to be the one that they've
+got really far up there.
+And grok four does slightly less well than grok for fast, but that seems like that might.
+That seems very surprising to me.
+Uh, and then, uh, Gemini 2.5 Pro and then, uh, then we're into open source land at that point.
+Uh, and interestingly, it looks like Claude 4.5 doesn't feature in their top list here.
+Uh, let's scroll down here and see what else we've got.
+The in the coding one.
+Oh, in the code in the scientific coding one though Claude 4.5 sonnet features very high indeed.
+Yeah, it's way down there.
+So if we were to take a look at these two, it looks like we're going to want to look at GPT five.
+Uh grok four.
+That's top of this one.
+And Claude 4.5 sonnet.
+These are clearly the frontrunners.
+Maybe Gemini two five Pro as well.
+So that gives us our subset of the strongest coding models that we will try.
+Now we we won't look at the Agentic one because, uh, it's we're not going to be using it in an agentic
+mode.
+Okay, that's our models selected.
+We could also look at some some other leaderboards, but I'll let you do that.
+They will be broadly consistent.
+Let's go to cursor.
+It's been waiting for us for so long.
+Let's go and do some coding.
+Well welcome back to cursor.
+Welcome to week four.
+To day three.
+Have you missed cursor.
+Of course.
+So this notebook this lab today it's really one for for for for us nerds.
+It's one for the nerds here.
+If you're a nerd, you're going to enjoy this one.
+If you're not a nerd, you're like, oh, I'm sort of not not really with you on that.
+Then you just have to give this one to me.
+You know, you can roll your eyes a few times if I nerd out.
+It's a bit of a geeky one.
+It's still going to be fun, I assure you.
+Okay, quick reminder you do need to fetch latest code regularly because I'm constantly pushing updates
+to the labs, so be sure to do a git pull.
+Look in the guides for instructions, make sure you've got the latest code, and do a UV sync afterwards
+to make sure that you've got all the latest packages as well.
+And an important note is that in this lab, I'm going to use some of the best frontier models on the
+planet, and they have a price associated with them.
+It's still going to be cents at the most, but if you are price sensitive, then I've also got cheap
+models you could use instead.
+And also tomorrow we're going to be doing this for open source models.
+So you could just wait for tomorrow and spend nothing at all completely up to you.
+Your choice.
+But we're going to get started now with the frontier models.
+So start with some imports.
+And next we're going to load the environment variables.
+I'm going to load in the keys for OpenAI anthropic, Google and Grok.
+With a k grok you don't need to you can pick any ones that you've got.
+If you've got OpenAI and you want to, you could give these a skip.
+If you've got open router you could use that instead.
+Substitute whatever ones you wish.
+I've loaded them in.
+I'm now going to connect to the Python client libraries.
+I'm creating an OpenAI instance here, and then I'm doing the usual trick for anthropic Gemini and Grok.
+I'm using the OpenAI client library and switching in the base URL, and off it goes.
+It's done.
+These are the four models that I'm picking GPT five Claude Sonnet 45, grok for the large one, not
+not grok for fast.
+And we're going with grok four because we saw on artificial analysis AI that that did better in these
+scientific Python tests.
+And Gemini 2.5 Pro, if you want to keep costs super slim, here are some cheaper variants that you
+could try instead.
+Just remember to use these again tomorrow when we when we look at some of the models then okay, so
+we are now going to get started with the main part of this.
+So look we're going to be writing a solution that ports Python into efficient, high performance optimized
+C++ code for your machine.
+It can then be compiled on your machine to native machine code.
+And that machine code can be run as an executable.
+If you're not familiar with all of that stuff, if you.
+You know when I say that Python is an interpreted language, if you're not completely sure what that
+means, and that you compile C++ and run machine code natively, you could you could ask ChatGPT to
+explain it, or you could just just like just watch and let it wash over you.
+It doesn't matter that much.
+It's not the point of the exercise.
+The point is not about compiling languages and running machine code.
+The point is that an LLM is able to do this porting from one technology to another, even if we don't
+know how to use that other one.
+It's the kind of thing an LLM can do, but different Llms can do it with different abilities.
+So, you know, uh, the the actual step of compiling this C++ to native machine code and executing
+it on your machine, that is completely optional.
+If you're a nerd like me and you want to do it, and you want to see the bare metal running and have
+that sense that you're using your computer to the max, then you should definitely do it.
+But it's not the main point.
+The main point is about porting code, so feel free just to ignore the part that actually does the conversion.
+And I will.
+Also, thanks to a student that sent this to me, I will show you that there's a website you can go
+to which will run C++ code that you paste in the website.
+So you could not do the whole compiling and building and instead just use this website.
+That's a perfectly good way of doing it.
+All right.
+Let's get started with with with figuring out how we're going to compile if you want to do that.
+So I've written a little helper function retrieve system info.
+And when I say I've written I got I got an LLM to write it because it's like boring stuff, which just
+prints out everything about your computer.
+And they're very good at this kind of thing.
+So if you run this, it prints out this JSON blob that tells me that I'm on a mac with the Darwin operating
+system.
+It's got all of these details about it, and it shows that I've got various things installed.
+And I'm now going to use an LLM as a way to tell me what I need to do to be able to run.
+Compile and run C++ on my computer.
+So my my message is.
+Here's a report of the system information for my computer.
+I want to run a C++ compiler to compile a C++ file and execute it.
+Uh, please tell me exactly what I need to do and then how what I should use for the compile command
+and the run command.
+And then I tell it my system information, and I'm sending this instruction to OpenAI to GPT five.
+And so in doing this, I'm not uh, this is not to do with our project.
+This is just setting up our environment.
+And I'm asking GPT five to give us a hand because I don't know what computer you're running on.
+You might have all sorts of weird configurations.
+The thing about running C++ code is that it's super system dependent because you're you're making it
+native and it's going to run locally.
+So what we'll print out here is it's going to tell you if you need to set up a C++ compiler, it will
+tell you exactly what you need to do.
+And it's telling me that I'm already ready.
+I don't need to do anything.
+And it's telling me here that I need two commands.
+The compile command should look like that, and the run command should look like that.
+And you can see that in the next cell.
+I've put the compile command and the run command, which I'm taking exactly from what GPT five told
+me.
+So that's what you need to do should you wish to do the native compilation stuff, if that, if that
+interests you.
+Uh, which definitely interests me.
+Uh, so, so follow the instructions if needed, to install a C++ compiler and then make sure that you
+change these two lines.
+This is for Mac.
+You would want to change it.
+And I could put down things like the instructions for PC and and so on.
+But it's so dependent on your platform that what I put there is likely to to break for some people.
+Better for you to find it out through through an LLM using your current system configuration.
+So once you've done that and you have that there, we'll test it out in a second.
+Let's get on to the main task of porting code.
+--- Lecture 3 ---
+Okay, let's go ahead and port some code with LMS.
+I should mention I did actually change this compile command to a more efficient version.
+After going backwards and forwards with GPT five a couple of times, you might want to do that to just
+make sure you've got a really good, efficient compile command.
+All right.
+Onwards.
+So here is my system prompt.
+Your task is to convert Python into high performance C++.
+Respond only with C++, do not provide any other explanation.
+It needs to produce the identical output.
+Fastest time.
+That's just a constant system prompt.
+The user prompt is going to depend on the python that we want to change.
+So.
+So we want port.
+So it's a function user prompt for the python that's passed in.
+And I say port this Python code to C++.
+This is the type of system we're on.
+This is the command we will use to compile the code and now respond only with the C++.
+This is the code to port, and that is where I put in the prompt the Python code that we're working
+with Okay.
+So I execute that.
+And now I've got another simple function messages for that takes Python.
+This is just something that returns the usual list of dicts that you know so well.
+It has a system prompt put in there, and for the user prompt it is using this function that we just
+wrote.
+So there we go.
+It's done.
+And then another little utility function write output that takes some C++ code.
+And we'll just write it to a file called main and we'll run that.
+And now we are ready for the big guy for port a function called port.
+And what does the function called port do?
+Well, it takes a client like OpenAI or any client library model, a model name and the Python code
+to port.
+There's just something a bit hacky here that if GPT is in the model name for using an OpenAI model,
+a GPT series, then take the reasoning effort to be high.
+That is a flag that's used for the GPT.
+JPGs and then we will call client completions dot create.
+We pass in the model, we pass in the messages, the one that comes straight from this function right
+here.
+And then if we're using a GPT series we pass in the reasoning effort.
+And what do we do with the response that comes back.
+Well, I think you know exactly what we do with the response.
+We do response .0. content.
+And then there's just something here to strip out.
+If it's responded with any of those three tick marks and then get rid of it and get rid of any other
+three tick marks just to clean up the output and then write that to the file.
+And that is our port function right there.
+Okay.
+And now I'm defining a string.
+I've got some Python code here but I'm not running it.
+I'm not showing it as Python code.
+I'm putting it in a text variable.
+You may wonder why it will become clear.
+So what does this function do?
+Well, it calculates something.
+It does this little math formula that I've shown you before that, that it counts and does.
+It does like one minus a third plus a fifth, minus a seventh plus a ninth, minus an 11th plus a 13th,
+and so on for odd numbers going, going off and off.
+And I think I've made this number up a bit since the slide I showed you last time.
+I think I said 100,000, and I think I was misreading from the slide it's 100 million and I've made
+that now 200 million.
+So a lot of iterations of this, we want to really give Python some work.
+So we're doing all of that.
+We're taking the answer.
+We're multiplying it by four and then printing the result.
+That's the game we're playing.
+That's what this string does.
+So I run that.
+So I have that string in there.
+And then if I run this here, this is something which allows you to run a string in Python.
+It interprets that string as Python code.
+And the Python interpreter will run it.
+That is what exac here does exac.
+So if you do like exac.
+Two plus two, uh, it will it will do that exac.
+Two plus two.
+Or I suppose we should say print two plus two like so.
+And run this then you see four.
+That's what exac does.
+Uh, takes a string.
+And this, this stuff here makes sure that it handles things like globals and locals properly.
+So that's that.
+And with with all of that introduction we can run this Python function called py which is a string as
+text.
+It will interpret this as code and it will carry it out.
+And at the end it will print.
+The result of doing this along with the execution time.
+And from the title of the string, you might already have a hint about what it's going to come up with.
+Yes, it turns out that taking one minus the third plus fifth, blah blah blah blah times four is a
+way to approximate pi.
+It's a really slow formula for pi.
+It takes a long time to converge, and you can see that after 200 Million iterations, where 3.14159265
+and that digit should be three.
+So.
+So it's gone wrong there, but still it got it done.
+It took 19 seconds to do it.
+And that that is where the bar is set for us to optimize.
+And so we're going to start with with the top model.
+We're going to start with the best with GPT five, the one that was on the top of the artificial analysis
+leaderboard for this kind of thing.
+And so what we're doing is we're calling our function port.
+We pass in the OpenAI client library, the OpenAI model, which is GPT five, and the string py.
+Let me kick that off while I'm talking.
+Uh, so what that is doing, if we just remind ourselves going back to port, it's calling this, it
+will have reasoning effort as high.
+It's then going to to be um, calling messages for messages for takes the system prompt and that we
+define up here and user prompt for which is this.
+And that drops the Python code in there and it asks it to port.
+Rewrite this Python code as efficient C++ code.
+And of course, the exercise.
+The purpose of this is not not to particularly, uh, poor code.
+It's more to show you that we can take a business task, a business task that we can measure.
+We can select a model like GPT five that should be good at that task, and then we can carry out the
+task and put it to the test.
+Now, because we've got it on high reasoning mode, it's going to take its time over it, uh, as it
+should.
+And I will see you on the other side when it has completed its thinking and has ported our code.
+Okay, GPT five finished.
+It took just under two minutes and it rewrote our Python code as C++.
+Let's take a look at the results.
+It's here in Main.cpp and it's quite a file.
+The first time you see this, you might think that seems like a lot of code for that short Python code.
+And the answer is it's done something a bit clever here.
+It's done something known as unrolling a loop where it manually does several steps of the loop all in
+one iteration.
+It's not clear that that's necessarily a good idea, because compilers are meant to be good at that
+anyway, but we'll see how it how it fares.
+And by the way, it doesn't always do it this way.
+This is I've I've run this experiment a few times.
+This is a pretty interesting version of it, but you might have different results.
+But this is the one that's done this time.
+So that's that's what we'll go with.
+Uh, and you can see it does appear to be doing the right kind of thing.
+So it looks like good code, everything, as far as I could tell from, from my slightly rusty C++ knowledge
+looks decent to me.
+So now it's time for us to actually compile this and execute it.
+All right.
+We're now going to compile this code natively for my machine.
+And then execute it as machine code on my machine.
+And you can do this too.
+But you don't need to.
+The point is about porting code, not about running high performance C++.
+It's fun, but you don't need to.
+And in a second, we'll also do this on a website so that you really you could you could do it without
+ever touching your box.
+But should you wish to, we have of course taken, if you remember earlier, we took this command from
+GPT five.
+In fact, I iterated over this.
+But this is like an efficient way to compile and run C++.
+And so what we're going to do now is we will I've written this function compile and run.
+It compiles main.cpp into an executable main, which for you might be mesnex if you're on a PC or main
+if you're on a mac or Linux.
+And then I'm going to run it three times and print the results.
+You don't need that.
+There we go.
+Here we have it.
+So now we're going to do this.
+Drumroll please.
+Remember 19 seconds is how long it took in Python land up there.
+Let's run this and poof here we go.
+There.
+There is the result.
+You can see it is somewhat faster in native machine code.
+Uh, and let's just figure out how much faster that is.
+So that is uh, and I realize this is only one test here, so it's not hugely scientific.
+But you'll forgive me for just doing this a little bit.
+Hand-wavy.
+We'll pick this one here.
+The first is that the.
+That's the, uh.
+We'll pick the middle one.
+So I'm not cherry picking.
+We'll pick the middle of the road.
+89 two 2089 200, I'm so sorry.
+I think this one is the middle of the road.
+This one here is one we will pick and we will see.
+Put a decimal point in there.
+There we go.
+And we will see that.
+Ha ha.
+Fantastic.
+Uh, GPT five has been an amazing 230 times faster.
+230 times faster is impressive stuff.
+And now I will say that that it wasn't always this much faster.
+Many of the times it's about 45 times faster.
+The code it generates, which is more of the sort of standard, uh, almost sort of translation directly
+from Python to C++ without doing that unrolling stuff.
+But with that unrolling stuff that it did this time it has been 230 times faster.
+Congratulations GPT five.
+No wonder you are top of the Artificial Analysis leaderboard.
+And should you not wish to do this on your computer like that, we can also do it on the website.
+Let's just quickly grab this C++ code, copy it into the clipboard.
+Go back to the lab, launch this website here and select all of this.
+On the left hand side.
+You paste in the C++ here, and you just press the run button to run this and see what it does.
+And there we have it.
+It runs.
+It's obviously slower when you're running it on a, on a like a remote processor, but it's still significantly
+faster than the 19 seconds that it took in Python land.
+It's like more than 20 times the speed.
+That is impressive stuff.
+Uh, especially given given the how we're running it on online.
+So very exciting indeed.
+Great to see this performance speed up, uh, with GPT five porting our code from Python to C++.
+--- Lecture 4 ---
+Let's see how the other models fare.
+So we're going to run Claude sonnet 4.5, grok four from Mr. Musk.
+Gemini 2.5 Pro.
+Let's kick all three off.
+They are going to first use this model to port the code.
+Then they're going to, uh, call uh, the the, uh, compile and run code.
+Now let's see, we've already got an answer from anthropic and we can see how is it compared.
+It's it's, uh, it's it's clearly, uh, in the same league, uh, but not as fast.
+Let's have a look.
+Yeah.
+It looks like this is reasonably ordinary style code, so it hasn't done that loop unrolling that that
+we'd seen before.
+Uh, and so if we go back to the lab, we'll see that, that as a result, it does.
+Well, but not quite as well as, uh, as GPT five that was able to just slightly edge out anthropic.
+But it's perfectly credible porting of the code running nice and fast, a decent result.
+I think we can be happy with that.
+And now Grock and Gemini are going to take quite a bit longer.
+They do a lot more thinking about it, so I'm going to break and see you in a second when they are finished
+so we can get the final scores.
+Okay, so some time has passed and actually I've run this a few times now, which of course I've done
+in the interests of your learning rather than because I enjoy it.
+Uh, and uh, yeah, this, this this run right now is probably the most consistent sort of performance
+I've been getting from the models, but it has varied, so you may get different results.
+We will start by revealing anthropic's that sorry, we've already seen Anthropic's.
+We just looked at, uh, anthropic did better than GPT five by a bit because of the way that it did
+some unrolling.
+Now let's look at Grock.
+Mr. Musk's one that really went to town.
+It fought thought for five minutes, 5.5 minutes on this and this.
+This is the result a spectacular result, a spectacular result from Grock.
+Look at this.
+That is amazing.
+It is?
+Yeah.
+Another huge amount.
+Faster.
+Uh, we can, uh, let's first look at the code itself.
+So I've got the grox runs here and you can see that that how it's compiled the code that's faster is
+that it is made use of threading libraries.
+So there's some pretty hefty code here as it brings in threading libraries.
+And it makes sure that it kicks off something that is using operating system level threads and running
+things in a multi-threaded way.
+Now, of course, I know what you're thinking.
+The Python code, the original Python code wasn't written to be multithreaded and could have been,
+but that's okay.
+That's part of the challenge for the model.
+It doesn't just need to port the code to a different programming language.
+We told it to do everything that it could to get the same outcome faster.
+So making taking advantage of threads is absolutely allowed.
+That's within the rules.
+And I made up the rules so I can say so.
+So I'd say good job, grok.
+Well done.
+That's a very impressive performance.
+Speed up.
+But let's go back to the lab to see then if Gemini can keep up with grok, or does it fall behind even
+GPT five?
+Or does it in fact not even get the answer right?
+We'll find out in a second.
+And so revealing.
+Gemini 2.5 Pro.
+Here we have it.
+Gemini 2.5 Pro absolutely killed it.
+It crushed it.
+Look at these times.
+It did better materially better than grok which did better than GPT five, which did better than Claude.
+So Gemini is in first place with terrific results.
+They're super fast, and I can assure you that I ran it multiple times.
+And Gemini almost always, except for one time in my test runs out of 5 or 6.
+Gemini got these results really great.
+You should run this too and see if you get the same.
+What are you looking for?
+Well, if we look at the code that Gemini wrote, you can see it's quite complex.
+There's quite a lot to it.
+And what's happening here is really multiple things.
+First of all, it is also definitely doing the threading code.
+And I'm no expert, but it appears to be doing something even more sophisticated.
+I think both of them, both Grock and Gemini, were careful to look for the number of threads to maximize
+parallel abilities.
+Uh, you can see that it's done that here, and it does a whole lot of threading stuff, and then it
+ends up calling calculate chunk in this multithreaded way concurrently.
+And the key thing here is that it has also identified some improvements to the algorithm by simplifying
+the algebra, doing the same calculation in a more efficient way, reducing in leading to reduced floating
+point calculations, fewer calculations, faster performance.
+And that's definitely sticking to the rules.
+It's doing the same calc, so it gets the same answer.
+It's just doing it with fewer math operations.
+So so great.
+Good for it.
+And that means that really Gemini has done three things.
+It's translated the code from Python to C++, which is great.
+It's also improved the formula.
+It's found a way to simplify the formula to do better a better job of calculating the same answer.
+And then thirdly, it's also done this design improvement to the structure of the code to allow it to
+be multithreaded and run multiple calculations in parallel.
+So those three different changes have all added up together to give us this superb performance of this,
+this tiny time on the middle time that I'll be picking is, uh, 0.013 seconds compared to 19 seconds
+in Python land.
+And actually I just look back and see that grok hard coded the number of threads where Gemini calculated
+it.
+So that might be another reason why Gemini did did better.
+So very exciting stuff.
+At least I think it's very exciting.
+And I've done the quick calculation here just to see what kind of speed ups we're getting, and hard
+coding in my numbers so that you can see what I got.
+If we run this, we will see that from this analysis.
+In fourth place was Claude Sonnet 4.5 with an 148 times speed up, which is still very impressive.
+And you may have noticed that Claude wasn't actually because I was.
+I was going through the OpenAI's API.
+It wasn't actually using a significant thinking mode.
+And so, you know, maybe that was handicapping it.
+And GPT five in third place with a also a stonking 233 times speed up, which anyone would be pleased
+with.
+But then grock for Wow with a 1060 times speed up.
+That's just crazy.
+And it didn't always achieve that.
+In my tests it was hit and miss, but I thought I'd capture captured this one.
+That did, and that's great.
+And then in first place, in first place, winning the crown.
+Gemini 2.5 Pro A surprise.
+A controversial first place wasn't top of the artificial analysis leaderboard, but it's top of our
+experiment speeding up our Python code by 1440 times.
+That is superb.
+I'm very happy about this.
+One of the great things about it is that this experiment feels so tangible because we get a real business
+outcome.
+We had a business objective to speed up some code and wow, have we achieved it.
+And of course we should go to the website that I showed you before to see if this C++ code from Gemini
+does well there.
+Now, of course, it's not going to be running in a multi-threaded way when it's out on the cloud,
+but still we should we should get to see something.
+So let's see.
+Here it is.
+Remember this website?
+I've copied Gemini's code to my clipboard.
+I can press paste.
+Here it is with all this fancy stuff with a number of threads and this hardware concurrency stuff.
+Goodness knows what this all does.
+Let's try running it on the cloud and see what we get.
+Uh, you know, it's it's it's fast.
+But as I thought, it's, uh, I don't think that's significantly faster than we'd seen from the from
+GPT five version.
+Uh, so it's still it's still around 20 times, uh, faster.
+Um, but, uh, I think that's actually a little bit slower, isn't it, than the previous version.
+Uh, it's possible that all of this stuff ends up running, adding overhead when it's running on the
+cloud, which is fine, because the instructions that we gave Gemini was to optimize for my platform.
+We even put the system details in there.
+Let's let's go back and remind myself, uh, exactly what GPT came up with.
+This was GPT unrolled stuff.
+Copy that.
+Let's put that back in the website.
+So we were at 0.9 nine seconds here, put back in GPT five and run that and remind ourselves what we
+get.
+Yep.
+There you go.
+GPT five I remembered, right?
+It is slightly faster.
+Interestingly, when it's deployed on a different box on the internet, but that still works in Gemini's
+favor because it shows that Gemini took took the challenge, understood the assignments, and got it
+perfect for my box.
+Congrats again Gemini.
+Well, as I say, I'm a bit worried that this has been very self-indulgent, that I've thoroughly enjoyed
+myself, but I hope that you enjoyed some of it as well.
+It is fun to put these kind of complex challenges to models, especially when there's such very concrete
+output from it.
+So tomorrow we now move to open source models.
+We have a whole ton of them to look at.
+The idea is to use this as a way of assessing open source models for coding ability, and then evaluate
+open source models alongside paid models for their ability to achieve a business objective, and also
+just building a solution that uses open source models to generate code.
+That's what I've got in store for you tomorrow.
+I'll see you then.

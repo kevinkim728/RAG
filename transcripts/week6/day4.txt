@@ -1,0 +1,951 @@
+--- Lecture 1 ---
+Well, it's week six, day four.
+And what a day do I have in store for you today I can't wait.
+As always, we have to start with with where we are.
+You can generate code.
+You can generate text with open and closed source models.
+You can build Rag solutions and evaluate them.
+And now you can follow a five step process to solve problems.
+You can create a data set, and you can build a baseline model with traditional ML from linear regression
+all the way through to random forests and XGBoost.
+And you can visualize the results.
+And you are now familiar with the y hat y chart.
+What we're going to do today, we're going to build a vanilla neural network.
+And we're going to do more than build it.
+We're going to train it.
+We're actually going to train a neural network from scratch to do this problem.
+And then we're going to use a frontier model.
+And then we're going to compare a bunch of frontier models against a task using our wonderful eval chart,
+our y hat y.
+All right, let's get to it.
+But again, to give you good context for what we're doing here.
+A reminder of the order of events.
+What we're doing this week is all about curating data, evaluating models, and then working with frontier
+models.
+On the first day we did that data curation stuff, all of those charts, we made sure that we had,
+uh, products with the right price that we took from a scrape of Amazon data that was on hugging face.
+Then the next day, we pre-processed the data.
+We sent each of the product descriptions to an LLM.
+We use GPT OSS to TB to rewrite them into something short and tight and high in signal.
+Then we built some baseline models a silly model that gets a random number, something that gets the
+average straight line guess.
+And then we used traditional machine learning.
+We built a simple linear regression with some bad features.
+And then we built one with with natural language processing, with some good features with common words.
+And then we went to to Random Forest.
+And then we used XGBoost and got some decent results today it's neural networks.
+We're going to build a vanilla neural network and we're going to train it.
+We're going to train a neural network and see how that performs.
+And then we're going to move to frontier LMS.
+And frontier LMS are of course neural networks, but using a much more complicated architecture involving
+self-attention layers, part of the transformer architecture.
+And you saw a glimpse of that in week three when we dug into what a model actually looks like.
+So we'll move to neural networks, to frontier models and try them out.
+And that really paves the way for tomorrow, when we will then fine tune frontier Model next week.
+Of course, we're fine tuning an open source model and then we're going to bring it all together.
+We're going to add in rag Agentic and have a great finale.
+That's the plan.
+And I now want to do a little bit on training models.
+And I want to emphasize that next week is when we really get into this.
+And so I want you to consider this a preview.
+This is a teaser.
+You are not expected to understand all of this.
+Maybe you already know about all this.
+In which case you could just rush me along, put me on two acts.
+But if you are new to training, if you've never trained a model before, consider this.
+Just give you some, get you some some intuition for some of the terminology, some of what we're going
+to be doing because we're going to use training now with a vanilla neural network.
+Just so we've had our first experiment with it.
+So what is training?
+Again I expect by this point this is pretty clear to you.
+But training is saying, okay, we've got a machine learning model.
+It contains within it parameters.
+These parameters decide how it's going to make a prediction based on some inputs.
+And traditional ML.
+You have typically like 2 to 20 of these parameters with modern with deep learning deep neural networks.
+Llms you have millions or even billions, sometimes trillions of these parameters, and the parameters
+are tweaked during training so that it gets better and better at predicting the outputs given the The
+inputs.
+But it's not just about predicting the outputs in the training data, it's about doing it in a way that
+should generalize so that not only is it able to predict outputs, but then after training at inference
+time when it's given some new input, it still does well on that too.
+And the way that you go about training should lend itself.
+It should encourage this ability for the model to generalize, because it's seeing general patterns
+in the data, rather than overly solving for exactly what the input is.
+And that would result in in overfitting.
+Okay.
+Hopefully that's that's clear.
+So when you actually go about training, you do it by carrying out four different steps.
+And you do these four steps many, many times over with little, little bits of data, you could do
+it one data point at a time, but typically you group your data into chunks called batches.
+And then for each batch you go through these four steps.
+So what are the four steps in training?
+They go by by some names.
+I'm going to throw some terminology at you.
+And later on in the course we will get more into what they all mean.
+The first of the four steps is called the forward pass, and it's a fancy name for something very simple,
+which is you're given some inputs in your training data and you simply calculate, you go through your
+neural network to say what is the prediction given these inputs.
+That's known as the forward pass.
+And the second step is then known as the loss calculation.
+And this is when you've got this prediction.
+But because it's the training data you also have the ground truth.
+This is y hat.
+You also have y given to you.
+And you can say how different are these.
+How wrong was I.
+How badly did I do.
+And that is known as the loss.
+And that is the second key step in training.
+And the third step is known as the backward pass.
+And the backward pass is saying, okay, now that we've got this loss, it came out of doing the forward
+pass.
+We got a loss at the end of it.
+What we're now going to do is work our way back through the neural network and figure out if we twiddle
+each of the parameters by a little bit.
+Does it make the loss bigger or smaller?
+Does it improve the situation or make it worse?
+And doing that is also called calculating the gradients.
+It probably sounds it sounds a little bit familiar to you.
+It should have slight shades of calculus from high school math.
+And it is.
+It's some calculus calculations that happen to figure out how sensitive is each parameter, or how sensitive
+is the loss to changing each parameter in turn, calculating that for the whole neural network.
+And then the fourth step when you've done that is called optimization.
+It's about taking a small step in the direction, changing each of the parameters by a tiny amount,
+so that you're now going to do a little bit better next time you change it in the direction that would
+make loss lower.
+And that that also known as stochastic gradient descent.
+At least that's one of the ways that you can do it.
+One of the simplest ways is about making this small step in a direction that is going to make your loss
+smaller if you get the same inputs again.
+That's the idea.
+These four steps forward pass loss calculation, backward pass optimization.
+And you do this for each of your little chunks of data, your batches again and again and again.
+And every time you do it, you're just tweaking all the weights in your neural network so that next
+time it's going to do a little bit better.
+And if you knew this already, you probably know that I'm oversimplifying here and there.
+But the idea is just to give you a general sense of this.
+And you might be thinking, I don't even know what a neural network is, let alone what what these these
+steps mean.
+In which case, don't worry about it.
+We'll do more over time.
+The idea this is a practical course.
+First and foremost we're going to be doing stuff.
+And I'm hoping that that some of this kind of theory will, will rub off on you as you go.
+That's the way that I like to learn things.
+I like to learn things by doing, and then by picking stuff up like this and just getting a little,
+a little tease of theory from time to time.
+And that's what this is.
+So the reason I show you these four steps is that we are going to go into some code and train a neural
+network, and you're going to see these four steps.
+And it's one line of code literally for each of the four steps.
+It's that simple.
+So you now know what to expect.
+And one final point to make about this is that there are some settings that relate to to the whole setup
+of your, your training or of your neural network that aren't parameters in the model that get tweaked
+as part of training.
+They're just overall settings that control everything you're doing.
+One of them, for example, is the size of these batches.
+I mentioned that your data is is chunked into these batches.
+How many bits of data go in each batch is one of these like it's like a parameter, but it's not one
+of the parameters that gets tweaked.
+And these kinds of parameters that aren't aren't real model parameters.
+They're just sort of extra parameters.
+They are called the hyperparameters.
+They're kind of general.
+They affect everything, the hyperparameters.
+And I mentioned that word before in the context of something called hyperparameter optimization.
+And that is taking some of these hyperparameters.
+And I mentioned a couple here.
+Epoch and learning rate.
+Epoch is how many times you go through your entire data set.
+Because typically you don't you don't just go through all of your data once during training, you do
+it another another couple of times, sometimes like 10 or 20 times, to see if you get more and more
+benefit each time you do it.
+Uh, so epoch is another hyperparameter.
+How many epochs learning rate, which is, uh, how much, uh how much is that tiny step when you make
+that tiny step in optimization, how big is that step?
+You can make it really, really, really tiny.
+Or you can make it, you know, a little bit bigger.
+And there are tricks to doing things like starting with quite big steps and gradually reducing them,
+uh, so that so that you start to take a finer and finer steps.
+So changing all of these epoch and learning rates is called hyperparameter optimization because you
+are optimizing your hyperparameters.
+And that sounds like like super high tech hyper parameter optimization.
+Uh, and uh, yeah, it's basically, uh, a way of experimenting in order to get the best set of hyper
+parameters that gets you the best results.
+And the point is that the way that everybody does this essentially is trial and error, that people
+come up with lots of fancy approaches for, for searching through all the possible values.
+But at the end of the day, it is just trial and error.
+And so when you hear a data scientist telling you that they're very busy because they're doing hyper
+parameter optimization, you know that it's just fancy talk for they're just doing trial and error.
+They're like, oh, let's try this batch size and this batch size and see what happens.
+And so that's it.
+That's hyper parameters.
+That's hyper parameter optimization.
+Try saying that three times.
+And uh we are going to do some of that in just a moment.
+And with that let's go do it.
+Let's go to let's go to the frontier.
+Let's see how different models can perform with our problem of predicting product prices.
+Let's go.
+--- Lecture 2 ---
+Okay, here we are in Cursa.
+Let's go to week six.
+Let's go to day four.
+It's already day four.
+Here we have it.
+Ah, the price is right.
+Capstone project.
+Uh, order of play.
+We're in, uh, day four, deep learning and al Alam's.
+Check this out.
+We've got a bunch of different imports here, and you can see some exciting stuff.
+There's an import torch.
+We're going to be using PyTorch.
+Uh, and uh, so today is going to get get quite juicy.
+Uh hang on I'm going to clear all that.
+But so we're starting from scratch okay.
+So again as before you can choose the light mode to be false or true.
+I recommend you start with true.
+We've got a lot more on our plates today, uh, when we do some training.
+But I'm going to do false I'm going to go with a full big 800,000 data points.
+Remember to ignore this note here.
+It's not important.
+We've logged into hugging face.
+And we're now going to load in the, uh, the full data set.
+Um, and you will presumably be loading in the light data set at this point.
+Let's let's have it load right here.
+Okay, so while that's happening, let me introduce you to the next section.
+The next section is a bit of a surprise for you.
+A little surprise which you may not have been expecting.
+Um, so, uh, we're about to launch into artificial neural networks when we compare, uh, how a neural
+network works against traditional machine learning.
+And it occurred to me that before we do that, there is another kind of neural network that we might
+want to to put to the test first before we see how artificial neural networks perform on this, it seems
+like it would be a good idea to put a distinctly less artificial neural network to the test.
+We should see how humans perform on this task.
+I've been telling you that it's a difficult task.
+It's not as easy as you might think to guess the price of a product.
+And and, you know, it's easy for me to just say that, but we don't know for sure unless we try.
+So it seemed to me that the sensible thing to do would be for me to go out and canvass a group of people,
+to take some descriptions of products and estimate how much it would cost based just on the description
+of the product.
+Uh, and so I went out to do that, and I quickly discovered that no human, no human is willing to
+put themselves through the indignity of coming up with prices of products based on the description,
+at least no human.
+That's, uh, that's a good enough friend of mine to do it.
+Uh, and so eventually, after a lot of time, I managed to find one human that was willing to to put
+put themselves through this, uh, and that one human, of course, is me.
+Uh, no one else would do it.
+I had to do it.
+Um, and and so.
+So first of all, you should please, uh, uh, pre pre-work.
+You should get your piece of paper and pen that you that we did before with the model so far.
+We need to have that we're going to be able to add a human, uh, one particular human onto this list
+to see what this task is like.
+So the first thing I did was, was I wrote a little bit of code that takes the first 100 test items.
+I maybe I should do 200 to be consistent with everything else.
+But I gotta tell you, this almost killed me.
+100 was the most I was willing to do.
+If you if you were willing to do 200 yourself and put yourself through the human challenge, then by
+all means do it.
+So I wrote a CSV file out called Human Human in CSV.
+And this is if we open this up, it looks like this.
+It's just a set of descriptions in a comma delimited file that you can then load into something like
+Microsoft Excel or Google Sheets and use that as, as a way to, um, sorry, as a way to, to have
+a file that you can then populate, go through and populate your guess as to the price of that product.
+And I encourage you to do it, but I certainly won't force you to do it.
+And I will now read in what I put in there.
+Uh, so I put myself through it.
+It took me ages.
+It's much harder than it sounds.
+It's much harder.
+And I should reveal that I did this a year ago.
+And when I did it a year ago, I did it to the full.
+I guess I think it was 250 products I did it to.
+And, and I can tell you that my score has improved year on year.
+Uh, but, uh, let's without I won't give the game away.
+You know, you can give a guess.
+Where do you think I do?
+How far off am I going to be?
+And and where will I compare to just, uh, like a regression models and traditional ML.
+And then we'll see whether or not I can be beaten by by deep neural networks.
+Uh, so I've got this a function, human pricer a function just like our other functions.
+And what it does is it looks up the index of the item that's passed in, and then it looks that up in
+the CSV file that I've just written out, you see.
+So it's just basically doing just a lookup.
+That's it.
+And as a result, uh, we'll be able to see our results side by side.
+And let's first just take a look at the first test item.
+Let's see what I said.
+And we'll print the actual price.
+And then what this human predicted for the price.
+The actual price I predicted $120 and it actually cost $219.
+This does not bode well.
+And well, without further ado, let's run it.
+I've got size equals equals 100.
+Sorry.
+Get rid of that.
+I've got size equals 100.
+We're going to call it evaluate just as before.
+Let's see what happens.
+Here we go.
+Here are the results.
+Uh, make this a bit smaller.
+Um yeah.
+I mean, it's pretty hopeless.
+It's pretty hopeless, I'm afraid.
+I let the team down.
+I let down Team Human.
+I did a horrible job.
+I was off on average by $87.
+So, uh, take out your piece of paper and put human or editor, because maybe you can do better.
+We better put editor down representing humanity.
+I scored $87.62.
+That was how wrong I was.
+And if we compare that, that means that, okay, I beat random numbers.
+Uh, and I did beat just guessing the average, uh, and, uh, I did just beat linear regression,
+just the traditional linear regression.
+But I was beaten by natural language linear regression, which was 76.8 Eight, beaten handily by Random
+Forest and obviously easily by XGBoost, which is kind of embarrassing that like a traditional machine
+learning would be better than than me.
+I would love to hear if anyone no one has yet taken me up on this.
+Let me tell you.
+But if anyone feels like they would be willing to go through and try it out, then I would love to hear
+whether it's just me that's hopeless or not, but one that I do want to tell you.
+I want to tell you that when I did this last year, my error was, I think 126.
+So, so disappointing and terrible, though this, this, this score is I've at least improved.
+I've learned something over the year.
+I'm slightly better at guessing the price of something based on the description.
+But also what you'll notice here is that I get a very slight r squared.
+I'm slightly more useful than just getting the average.
+And again, I want to tell you that when I did this last year, embarrassingly, humiliatingly, I scored
+a negative r squared.
+Which means that if you went shopping with me and you saw something like, oh, I'm interested in getting
+that, you'd be better off guessing the average than asking me to try and say how much that costs.
+I would be worse than just guessing the average as of last year, but this year it's a new me.
+I've learned something.
+I am just slightly better than guessing the average, and I should mention that it is in fact a different
+test set than it was last year.
+If you were just thinking, but you already had this like a second shot at the same thing, it was different.
+Different test and I did better.
+You can see some of the things that I really flubbed by looking over here.
+Canon EOS rebel.
+So oh wow, I see, I see I thought that would cost $400.
+Uh, that's like a, I guess a DSLR, like a really pro camera.
+And it actually costs $800.
+And I thought 400, I don't know.
+Uh, uh, there we go, there we go.
+You can hover over and see the, the despicable, uh, guesses that I made.
+Okay.
+That's it.
+That's our human.
+That's where the bar is set.
+And in all seriousness, this was a bit of silliness, but it is actually a good practice to understand
+what is human level performance so that you can see how models compare.
+It's now time for us to look at our first neural network.
+--- Lecture 3 ---
+So obviously we're not going to go deep into vanilla neural networks because that's not what this course
+is about.
+It's about LMS.
+But we do this as a way of having our first look at training a model and our first look at, um, uh,
+operating neural networks before we do proper training next week.
+And of course, we've done some training already because we trained some traditional models before,
+like like linear regression.
+But now we're going to train a neural network.
+So the first thing we do is we take our training data, and we are going to, to take, uh, the price
+of every item, make it into a numpy array and call that y, which is what you normally call your your
+ground truth, your results.
+And I'm going to make a file called documents, which is going to be all of the summaries of all of
+the items.
+So we've now got documents and y okay.
+So we're going to use the Countvectorizer again to make a vector of uh, each of the, each of our documents,
+a vector that is just composed of numbers to represent whether or not the product is in there.
+I'm not going to use the Countvectorizer actually, even though it says they're using them.
+Let me change that using the hashing Vectorizer hashing Vectorizer is the same as the Countvectorizer.
+It's just more efficient.
+It's much faster.
+And uh, you might say, then why, why, why would you?
+Why don't you always use the hashing vectorizer?
+The the only disadvantage is that the hashing vectorizer it can't tell you which words it's selected.
+It turns everything into hashes and everything is done with just numbers instead.
+Uh, and you can't go back.
+You can't see what were the English words that were picked.
+And before I wanted to show you what the actual English words were.
+So now we don't need to know that anymore.
+We trust it to be picking the most popular words.
+And we'll use the hashing vectorizer, which is faster.
+And we're going to use 5000 words, not 2000, so that we've got a bigger vocabulary.
+And also I've got this here.
+This binary equals true.
+Binary equals true means don't count the number of times that a word like luxury or Samsung or whatever
+appears in there rather just have zero if it's not there, and one if it's there any number of times.
+And it's traditional to use this sort of binary 0 or 1 when you're working with with neural networks
+that are obviously there are pros and cons you can experiment with both.
+I did it with a smaller version of this, and the binary is true was just slightly better.
+And generally speaking it's considered uh, more, more common practice to, to to use binary like this.
+It's sometimes called a one hot vector.
+When you have a vector which just contains zeros or ones, depending on whether that that is present
+or not present.
+Okay.
+And so then we do this Vectorizer Fittransform.
+And that's the thing which is going to go through now.
+And it's going to come up with it's going to replace every document with something which has, uh,
+five, 5000 different zeros or ones relating to the 5000 most popular words.
+So it's what we did before with linear regression.
+It's run much faster now.
+And we've got 5000 of them.
+Okay.
+Time to unveil a neural network.
+So here it is.
+Here is our neural network.
+It's a class that is a subclass of of a PyTorch class called module.
+And this is the whole extent of it.
+You might be thinking, wow, there must be a lot of engineering to build a neural network.
+PyTorch makes this stuff unbelievably easy.
+This is an eight layer neural network, which is just something that I've constructed.
+Uh, eight layers, I think.
+There's no there's no fixed definition to what makes a neural network become a deep neural network.
+Deep neural network means there's many layers, but there's not much of a definition for what makes
+it deep.
+Uh, eight layers is probably not enough to be deep.
+You could say it's deep.
+Like.
+Like you could say anything more than a few layers is deep, but probably eight layers is still just
+a shallow or just a neural network.
+Um, so that's what we've got here.
+Eight layers.
+And now I'm not going to go into how these layers are made up.
+But for people that know that already experienced with this, they're basically linear layers with a
+ReLU activation function after each one.
+And that's the set up all of your layers in the constructor in the init function, and then you have
+this one function forward.
+You may remember that word because it's what we call the forward pass the working through the model
+to get the output.
+And that simply gets output of each layer of the neural network by calling the previous layer and then
+putting it through a ReLU activation.
+Do that eight times.
+Out comes the output.
+If you don't know about this, it doesn't matter.
+The idea is to get some intuition.
+We have something that is that is eight layers of calculation.
+Each of these calculations are like lots of little linear regressions, lots of Little Mix's.
+If you've seen my YouTube video, eight layers of them and out comes the output at the end of it.
+That is it.
+We have just defined our own neural network.
+It's very vanilla.
+You call this a vanilla neural network?
+There's nothing too fancy really straight out of the box.
+And the big the sort of the big thing, the important thing about building neural networks like this
+is that you don't particularly engineer features.
+You don't give it anything specific to work with you let it through.
+All of its parameters work out itself.
+What matters through training?
+Okay.
+Uh, and so now I've got some stuff that turns our our numpy arrays into PyTorch tensors, which is
+the PyTorch object that it can work with.
+And I break it up into a training and validation set within the the training data and get everything
+ready.
+And then I have something called the data loader I'm using from PyTorch, which is where you can specify
+a batch which is a batch of 64 data points.
+We're going to clump everything into.
+And we put that into this train loader thing.
+And then this final line here model equals neural network input size.
+That is when we create our neural network.
+This is going to take a really long time.
+It doesn't take any time at all.
+It's going to be done in a matter of seconds.
+And we will have our very own neural network.
+And I'm going to then print out how many parameters do we have in this homemade neural network.
+So it's taking longer than I thought because it's loading in all of the PyTorch classes.
+There we go.
+18 seconds.
+So it wasn't that quick.
+Uh, let's print it out.
+The number of parameters in this model is 669,000 parameters.
+So it's not many parameters by like, like LM standards.
+But when you think of traditional ML, like the several hundred parameters at the most, this is a pretty
+enormous thing.
+All right.
+It's time for us to do some training.
+You ready for training?
+Okay, here we go.
+I'm going to kick off the training.
+And while it's running, I'm going to talk to you about what it does.
+Off it goes.
+It's it's off.
+So you specify how will we calculate the loss.
+Remember the loss is this important thing.
+We're going to use the mean squared error I think I told you before that that while we look at absolute
+error is the number we're focusing on because it's so tangible, so concrete.
+It's common in data science to use mean squared error.
+And we have this optimizer is how will it do its step.
+I mentioned stochastic gradient descent.
+This is a slightly more more advanced type of optimizer.
+This thing here is the learning rate.
+That's the other hyperparameter which is the small step.
+again.
+You don't need to remember any of this.
+This is just to give you some intuition.
+Okay.
+Two epochs I mentioned.
+Epoch is a hyperparameter.
+It's how many times do we go through the entire data.
+So for epoch in range.
+So so we're going to do all of this twice uh go through all of our batches.
+And then there are four lines of code.
+And these four lines of code represent the four steps in training.
+Hopefully you kept that noted down somewhere.
+You remember the four steps.
+What were they?
+The first step.
+The first step is doing the forward pass.
+And this is the expression outputs equals model pass in the batch x.
+And that's going to give you some outputs.
+That's going to go through this forward pass here.
+It's going to do all of that.
+Okay.
+So that's the first step.
+The second step calculate the loss call the loss function with the outputs and with the true the batch
+y which is the actual price of these items.
+Loss dot backward is when you go back through the whole network and calculate the gradients, all of
+these parameters.
+How much would the loss change if we tweaked each of them by a little amount?
+And then optimizer.step is when we then take a tiny step by this much 0.001 of a step in the direction,
+that would make loss a little bit lower.
+Why don't we take a massive great step?
+Because if we did that, we might overfit or we might go too far.
+There's lots of things that could go wrong.
+You just want to make a tiny step each time.
+And that ends up usually generalizing really nicely.
+And then we'll do some printing.
+And it's just completed.
+It's done.
+We just trained our own neural network.
+And you could be running this too.
+You'd have done it as well.
+Congratulations.
+And now it remains for us to actually run this thing.
+Inference.
+Which is super easy.
+Here it is.
+This this is our neural network inference.
+We tell it that we're not training.
+We tell it.
+You're in.
+You're not in training mode anymore.
+And then we take in an item.
+We turn it back into its vector of 5000 zeros or ones, and then we turn it into a to a PyTorch object.
+And we just call our model with this object.
+And that's the result.
+That's that's it.
+That's going to run our neural network.
+Let's see the results okay.
+Here we have it.
+Here is a a artificial neural network an eight layer vanilla neural network.
+Super simple without us doing hardly anything at all.
+It ran super fast.
+And the results we got are our best results so far, by quite a way.
+Write it down.
+A vanilla neural network got 63.97.
+That is pretty cool.
+And R-squared look has just crossed crossed the 50% mark.
+We're doing pretty well visually.
+It looks great.
+It looks really good.
+Uh, we've made tons of progress.
+That's so cool.
+And hopefully, uh, you've got some intuition for some of what's going on.
+You don't need to understand it all, but you've got a decent sense that it's really quite easy to set
+up a vanilla neural network and train it and get pretty good results, just like that.
+Nice.
+Okay, now it's time for us to to move on to LMS.
+I'll see you in the next video.
+--- Lecture 4 ---
+So you already have some intuition for how and how we go from a neural network into an LLM, because
+we we pointed out the model in week three and we saw that it's it's basically something which which
+has many layers.
+And it's a bit like the vanilla neural network we just built, except it's got more sophisticated layers
+that do things like attention, figuring out which part of the layer above matter.
+It's got lots of stuff to do with things like embeddings at the top, which is basically vector embeddings.
+The same thing we use for Rag is like the first layer of one of these llms.
+You've got the attention layers, and then you've got lots of other stuff to make it be really good
+at generalizing.
+That's all built into the neural network architecture called the transformer, which is a good deal
+more sophisticated than this, this simplistic thing we have right here.
+I mean, it's not like hugely more sophisticated, but it's a it's a fair bit more.
+And of course it's they're much, much bigger.
+They have they have billions or trillions of parameters, not a few hundred thousand.
+So that is what we're going to do next.
+We're going to go and extend this to look at a real LM and try and run the same analysis with that.
+But the key difference is that we're not going to be training anything.
+We're just going to be taking an LM off the shelf and saying without any training, any extra training,
+just using your base training, the world knowledge you already have as part of the $100 million that
+OpenAI spent on you, how good can you do at this task?
+So this is saying off the shelf, LM no fine tuning.
+How can it perform on this task?
+Let's see.
+Okay, so here we go to the frontier.
+We're going to see how frontier models do out of the box.
+No training just inference just using their world knowledge okay.
+So first up let's let's write a little function that if it's given an item it will come up with a prompt
+to the LM.
+And the prompt we'll use here is guess the price of this product.
+Respond with the price.
+No explanation.
+Uh, maybe I'll make that estimate rather than guess that might do better.
+Uh, there's definitely mileage to be had by experimenting with this prompt and crafting it to be just
+right for each model.
+I've just come up with something quick here.
+If you want to spend some time experimenting with this and see if you can do better, that would be
+really great.
+And students have done this and have got better outcomes by giving it some sort of some smarts, some
+context here.
+Uh, and one thing I would suggest is that I think that that even though all of the test data is priced
+between 0 and $1000, I don't think we should limit it and say that nothing costs more than $1,000,
+because we do want this to to represent being able to price anything.
+It's just that we've constrained our training data, but we want to have the general expertise to be
+able to price anything.
+So that's a subtle point.
+But apart from that, we can we can run this.
+So now if I look at the first of our test items, let's look at its summary.
+Um, this oh let's print that.
+So we get to see it properly.
+See what this is.
+This looks like something quite interesting.
+Uh, so it's actually, it's it's a guitar pedal.
+A pedal that you use to distort the sound if you're playing an electric guitar and, uh, it's, uh,
+called an excess V2 distortion modulation pedal.
+The brand, the makers of it is a brand called Old Blood Noise.
+I'm.
+If you're a guitar player, you might know if that's a great brand or not.
+You feel free to comment.
+Um, and it's got a description about it.
+So this is what we need to price.
+So if we if we look at what is the messages that we get for that, we get of course a list of dictionaries.
+Just one dictionary role is user.
+The content is estimate the price of this product, respond with the price.
+No explanation.
+And there's the details of it.
+So we can now write a function called like GPT 41 nano.
+So it's a function like the functions we wrote before that do that, make a prediction.
+And we're going to run this through our evaluator.
+But instead of just calling a model or doing doing, guessing the average or whatever, what this does
+is it calls an LM.
+It makes an API call.
+I'm using light LM.
+You could of course, instead use OpenAI create.
+We're going to go with the model GPT 4.1 nano.
+And you might be wondering why why that when when there's there's five one already.
+And maybe for you there's GPT six or GPT seven.
+But for me there's five one I'm picking GPT four one because I want something very fast which which
+it is.
+And also because when we get to fine tuning, we're going to want quite a cheap model to start with.
+And this is a good candidate for fine tuning.
+And we want to compare it with this.
+So that is our function which works out the, the uh, the value of uh of this.
+And now let's run it for the first test item.
+And we get back $180 is it's guess what was the actual cost of this.
+Let's see $219.
+So GPT four one nano isn't far off.
+Okay.
+That's exciting.
+Let's now run the full evaluation.
+Let's see what happens.
+Off it goes.
+You can see it's running where you see results.
+You see them in green, yellow or red.
+If you get a rate limit error when you run this, then remember that you can always change this to um
+uh workers equals one or workers equals two to stop it doing things in parallel if you get rate limit
+errors.
+And here's the results, you're probably already seeing it ahead of me.
+This is the chart 62.51 62.51 is what we get from GPT 4.1 nano.
+Write that down 62.51 uh and a ticking up R squared.
+And here it looks visually look it gave a lot of things this this number it guessed quite often $150.
+Exactly for lots of stuff.
+Uh, and it thought something's a steering wheel, it thought would be 1200.
+So, look, you might feel like $62 isn't isn't what you were hoping for.
+It might sound sound quite high to you.
+It did, of course, beat our vanilla neural network, but only slightly.
+Only by $1.
+But here's the thing.
+The vanilla neural network is something that we trained with 400 with 400 with 800,000 data points.
+So it was something that we really trained to be good at this task with tons of data.
+This is GPT four one nano out of the box.
+No training, nothing.
+Just using its world knowledge, using common sense, not using trained model.
+And it's already superior to a trained neural network which has been given product prices.
+And it's clearly significantly superior to a human level performance, which was a miserable $87.62.
+So I would say this is actually a pretty good result, pretty respectable going by GPT 41 nano.
+Okay, so what we're now going to do is just do this again for lots of models and lots of pricey models
+too.
+But you don't need to because I've done it.
+You can you can take take all of the glory of my results without having to run it yourself.
+But if you wish to, you can do so.
+even with the expensive models, it's not particularly expensive because these are very, very small
+tasks.
+And the you can also, instead of having size be 200 points, you can make it just be ten points and
+then it's insanely cheap.
+It's not.
+It's off the radar.
+So we're going to try Claude opus 4.5, which as of right now for me is the most powerful model from
+anthropic and arguably one of the most the most powerful model on the planet.
+But everyone seems to disagree on this one how it rates compared with GPT five one and Gemini three,
+which are the big, big ones for me right now.
+I'm sure every week something new happens.
+So no doubt you are many, many steps ahead of me and you should try it for the latest models, of course.
+So this is where we can evaluate Claude for opus, I want to remind you, you can say size equals and
+make this like ten.
+If you want to limit it, you'll get bigger error bars.
+But that's fine.
+And you can also say workers equals one.
+If you haven't subscribed to one of the if you haven't paid to be on one of the higher tiers.
+Um, then I will kick this off.
+And off it goes.
+It's going to be a little bit slower because this is a bigger model, but it is working at it.
+And yeah, just to clarify there, when I said if you haven't paid to be on the higher tiers, you may
+wonder what I'm talking about.
+The way that these, these frontier providers typically work is that depending on how much money you
+have spent in total on their API, they move you to a different tier and you can look up their rate
+limits.
+There's tables where they'll show you what are the different tiers, how much must you have spent to
+be in that tier?
+And at higher tiers you're able to to spend more and to have more things running in parallel.
+And the reason that they do this is, is to try and encourage you to spend more money.
+Well, maybe it is, but at least on the face of it, the reason they do it is because they just want
+to make sure that that you really do intend to spend this much money.
+They want to make sure that only people who are more professional get to spend, uh, get to do things
+like lots in parallel to avoid someone spending more than they meant to, and to avoid people getting
+in trouble with APIs and so on.
+So I'm sure there's lots of reasons for it, but that at least is one of them that they want to make
+sure that you've got a track record of spending this.
+It's what you like to do before they say, okay, you can move to a higher tier rate limit.
+We trust that you know what you're doing, that you intend to spend this much and that you're not going
+to get caught off guard.
+So that's that's the theory behind it.
+Uh, and, uh, it's allowed me to prattle away about that while while, uh, Claude, opus 4.5 finishes
+off, uh, if you ever want to move to a higher tier with OpenAI or anthropic, just look at the rate
+limit section on their website.
+It makes it super clear what's needed.
+Bam!
+Here are our results.
+Opus 4.5 scores $47.10 47.10.
+That is pretty remarkable.
+Claude 4.7.
+That's called 4.7.
+Claude 4.5.
+Scores 47.10.
+And for people that took my course last year, you will know that this was the number that I got to
+as the very best.
+Like this was this was the sort of the incredible finale moment.
+So Claude, opus 45, has already beaten last year's absolute best, best, best.
+Uh, and here we have it.
+And, you know, if you're thinking to yourself, guessing the price of a product and being off, on
+average by $47, that doesn't sound so impressive.
+Then I challenge you.
+Go try it yourself.
+Go, go do that and I'll wipe that smile off your face.
+It's much harder than you expect.
+Much harder.
+Uh uh, you can you can message me and say, no, you're wrong.
+I was within $3.
+But but but I don't believe it.
+Uh uh.
+So, Claude, opus 45.
+Uh, really?
+Stonkingly good results here.
+$47.
+Fantastic to see this.
+Congratulations to anthropic.
+Congratulations.
+47 is now our running best.
+And we can see.
+Of course, we should always be disciplined and realize there is an error bar associated with this,
+but still terrific result.
+--- Lecture 5 ---
+Okay, it's time for Gemini three, which as of this time is considered most epic in artificial analysis.
+This is the number one smartest model as of right now.
+For me.
+Again, this is this is more pricey and it's slower.
+So only run this if you wish to.
+I'm I've got here size is 20 and I had to put workers down to two.
+Otherwise I was getting, uh errors.
+So we're only going to run 20 data points.
+Oh, I suppose this is the real one.
+Let's make it 50.
+Uh, and I'll go off and get a coffee and come back.
+We'll set this running.
+We'll get 50 results so we can see how Gemini fares.
+And I will put you, uh, on, on, on hold because this is going to take you can see it's just done
+one and it took ages.
+Uh, but it did quite well.
+Uh, but we will see the results in a second.
+Okay.
+So running it with 50 items took five minutes.
+So it wasn't exactly zippy.
+But here are our results.
+Gemini three Pro Preview scores a very decent number.
+$50.
+Not as good as Claude 4.5.
+Gemini three Pro gets 50.54.
+Uh, and a very high R squared there.
+What was the R squared from?
+From Claude again.
+Let's have a look.
+Uh, that's interesting, isn't it, that the r squared is slightly higher?
+Uh, not slightly.
+Quite a lot higher.
+Just just meaning that it did a better job of getting the sort of trends right.
+But the main number we're looking at is the absolute error.
+Gemini three scored close to Claude, but not as good as Claude at its knowledge of estimating the price
+of a product based only on its description.
+And I've also got Gemini two five flash.
+Um, there's this flash.
+There's also actually what we might do is do flash lights because that's really fast.
+And that will give us a nice way of doing it.
+Let's see what happens here.
+Oh, and now change this to flash lights.
+Uh, and let's see what we get.
+Hang on, uh, from this light, simple, powerful model from Gemini.
+It's nice and quick.
+Look at that.
+Uh, and it can run in parallel.
+They don't have such strict rate limits.
+Slamming through our 200.
+See how flash light does.
+And here's the results 58.68.
+Pretty respectable.
+Better than GPT four one nano, only slightly better.
+But that is possibly.
+It's, uh, it's it's, um, its rival in this field.
+Gemini 2.5 flash scored 58.68.
+Uh, so so far are by far our winner right now is Claude 4.5.
+What else?
+How about Grock 4.1?
+The latest model for me from Mr. Musk.
+Uh, maybe you might have a newer version of Grock again.
+I'm using, uh, I'm going through light.
+LM I've already set up a grock key, which I've got in my Em file as Xai API key, which is what you
+need to have to be able to run this.
+I'm using grok for one fast non reasoning, and I'm going to run that in this function.
+And we'll see how that does in a second.
+Here we go.
+Run that function.
+And now it evaluates off.
+It goes nice and fast.
+So again as always the evaluate function you pass in a function to be tested.
+And it goes through each of these test points.
+It calls this function each item in turn.
+And it's up to our implementation of this function to decide what it is that's getting tested.
+I don't know if you noticed, but also I've got some some cunning code there that gives the heading
+of the chart based on the name of the function, so that it calls it grok 4.1 fast.
+And it took that from the name of the function.
+So here are the results.
+Uh, 57.
+Uh, so grok, Mr. Musk, uh, when it comes to, to uh, he doesn't do as well as the, as the big
+frontier models.
+But this is the fast version of grok 4.1, and it does just slightly better than Gemini 2.5 flash with
+7.62.
+Okay.
+And finally, GPT 5.1, the full big version reasoning effort as none.
+You can choose reasoning effort.
+None.
+Minimal, low and high.
+And actually I found that none did best in this in my pre-testing.
+So giving it the opportunity to reason didn't actually help it.
+It made it make make mistakes.
+So it does best with none.
+And with that, we can kick this off.
+Uh, and I think it's going to be super close whether how this competes with Claude 4.7.
+So this is this is a battle of the Titans.
+Uh, Claude.
+Claude 4.7.
+Claude 4.5, which scored 47, uh, against GPT 5.1, which for me is OpenAI's strongest model at the
+current time.
+This is the battle of the Titans, these two very strong models.
+We are going to find out which one takes the prize for today when this line gets to the end coming right
+up now.
+And the answer is GPT 5.1.
+Wow.
+With a really staggering result there 44.74 that's that is remarkable.
+This is the result really really fantastic outcome here.
+It's done very, very well.
+The um yeah.
+The the um, I mean, the visualization speaks for itself.
+You can see that GPT five one, um, which is in many, in many places considered the most powerful
+model on the planet right now, just without any training, just off the shelf, it is able to get within
+$44.74 of guessing the value of a product based on its description, which is significantly better than
+the best of any of my models, including everything last year.
+So it's it's really staggering to see how far we've come.
+This is a fabulous result and a fitting way to wrap up our model research for today, but you can keep
+going.
+Explore other models.
+Whatever you have access to, you can use Olama to run models locally.
+They don't tend to do so well, but you can do that and see what you get.
+Experiment with some local models with this, um, experiment I ran it with with with OSS and I got
+quite a high number like it was 100 and something, actually, uh, but you could try it with some yourself
+with free models.
+You can also, if you have access to open router, you can try out a ton of different models on open
+router.
+It's great fun.
+Uh, figure out find your own leaderboard, see if you can beat 44.74.
+Also, experiment with prompting.
+It's a very powerful way to improve on this number.
+Enjoy the experience.
+See how good you can get and do.
+Share any screens that you reach.
+Any, any, any opportunity that you have to beat my numbers and I will I will see you for the wrap
+up.
+Okay.
+And for the wrap, let me just start by bringing back up the the latest, the leaderboard, the results
+so far.
+You'll remember we didn't even show the random guess on here.
+It was 300 and 300 something constant got us an ERA of 106.
+Linear regression brought it down to 102, but only slightly better than constant.
+But when we added in NLP with linear regression the bag of words, we came all the way down to 77.
+Random forest did a bit better even with a small data set.
+XGBoost did better again with the full data set.
+Super fast human level performance in the form of Ed, uh, did miserably.
+Uh, 8788 um, but, uh, the vanilla neural network came in and did great at 64.
+The really impressive GPT four one nano, though, without any training at all.
+This was trained on 800,000 examples.
+Uh, but the GPT four one nano out of the box, based on its general expertise from all of the training
+it's been through, it's able to to write poetry.
+It's able to write, write a marketing emails, it's able to translate languages.
+And guess what?
+It's also able to predict product prices to within $63 for one.
+Fast does a bit better.
+Gemini three Pro does better again at 50.54.
+And of course, there's fairly big error bars on this because we had a small 50 data points here.
+But I'm not showing the error bars which is which isn't very disciplined of me.
+But you can add that in if you wish.
+And Claude 45 sonnet blew me away with terrific results at $47, better than anything I did last year.
+But GPT five one stole the show.
+Best results of the lot 44.7.
+Actually, I did just rerun this now with reasoning at high, and I got basically the same number,
+so it didn't do worse, but it also didn't do better.
+So 44.7, uh, that is the leader on the leaderboard.
+That is GPT 51, without any training, without any fine tuning based only on its pre-training, it's
+already able to guess the price of a product to within $44.74.
+Very nice.
+Okay.
+And finally, finally, after all this talk, we're actually going to get to do some some fine tuning
+next time.
+And, uh, yeah, I've been giving you a couple of hints that, uh, all may not go according to plan.
+So as long as you're mentally prepared for that, then as a recap, you can already run open source
+closed source models.
+You can do prompt caching, you can do little alarm, uh, you can create advanced Rag solutions with
+lang chain, including evals and without lang chain.
+And you can follow a five step strategy.
+You can curate data, you can make a baseline model with traditional ML.
+And now you can throw deep learning in there, at least somewhat deep learning.
+You can you can work with deep neural networks with with eight layers.
+And you can just add in more layers if you wish.
+And you can make a frontier solution to a business problem, as we just have.
+Next time you're going to know how to fine tune a frontier model, create the fine tuning data set and
+then test a fine tuned model.
+Very exciting stuff.
+It's a real pro move and it's all happening tomorrow.
+I'll see you then.

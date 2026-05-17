@@ -1,0 +1,869 @@
+--- Lecture 1 ---
+Oh, I'm really looking forward to today.
+I'm going to be able to nerd out with you on building traditional ML models.
+It's going to set the stage for what's to come, and it's going to be a lot of fun at the same time.
+But first, a reminder what you can already do generating text and code with open source and closed
+source models.
+Creating Rag solutions with Lang chain 1.0 and Non-long chain two, and evaluating Rag, but then also
+a five step strategy to solving a business problem with AI curating data, batch mode, document rewriting,
+pre-processing so much that we've covered today, you'll be able to explain a traditional baseline model,
+how you build a baseline model, how you build a traditional ML solutions, and you'll be able to apply
+some natural language processing techniques.
+The countvectorizer bag of words you'll see, and then using advanced ML models as well, like random
+forest XGBoost.
+Lots to do.
+It's going to be great.
+But first, of course one more time to look at the Price is Right.
+Remind you what it is.
+Given a description of a product, how much does it cost?
+That's the problem we're trying to solve.
+We're using a curated data set that we crafted ourselves.
+We started with a hugging face data set that was in fact a scraped Amazon scraped from from from the
+last from a couple of years ago.
+Uh, we then we curated it and picked out, we sampled the distribution, which was did a nice job of
+representing different product prices and different categories.
+And we then pre-processed it using GPT OSS 20 B via grok, using grok in batch mode.
+So much.
+All right.
+And we know that this is eventually going to end up in an agentic solution hunting for bargains.
+That's why we're building this.
+And it's nice that there's this very simple evaluation using price differences that we're going to be
+looking more at.
+Okay.
+And the order of play again on week six.
+This current week.
+It's about curating data, evaluating frontier models, where you already curated the data in day one.
+We pre-processed it.
+It was great yesterday.
+Now baseline models and traditional ML, then neural networks and frontier llms and then fine tuning
+a frontier LLM which goes into the fine tuning open source LLM and into deploying Agentic AI.
+The works.
+Okay.
+Let's let's talk about baseline models okay.
+So building a baseline is something which is easily skipped.
+People often do say let's just pull out the LLM.
+And that that would be an error.
+It's a great discipline in any in any proper commercial project you would want to start start simple.
+The rule of start simple and build from there is so important.
+Uh, even even even if you absolutely know that this is going to be a great model for you, you still
+need to have something to compare it with, to be able to to judge how well you're performing and whether
+you are state of the art.
+So start simple.
+Start cheap.
+It's always a good strategy.
+It also, of course it gives you, as I say, like like a benchmark on which you can only do better,
+hopefully.
+And although I say that it's always possible that you'll decide that actually you don't need an LLM
+in this case.
+There are many types of business problem where traditional ML is great.
+Particularly, I mean, if you if you know how linear regression works, basically just taking like
+a weighted combination of your features.
+If the actual true, the truth does turn out to be a weighted combination of the features, then you're
+not going to do any better than linear regression.
+And you can put the fanciest LLM on the planet in as your model.
+It's not going to beat linear regression if the actual answer is just a weighted combination of the
+parts.
+Um, and so yeah, you might find when there's some problems, some business problems that lend themselves
+really well to a simple, uh, simple, traditional approach, perhaps something that judges the probability
+of whether a credit card transaction is credit card fraud.
+It might turn out that it very much.
+There are certain patterns which are just simple to detect, and the probability depends very accurately
+on them.
+Then potentially a simple baseline model, a traditional ML model might do better.
+Or maybe just Python code might do better.
+That's why start with a baseline model to find out before you get fancy.
+And now this is not a course on traditional ML.
+So I'm going to grant myself one slide on just the core things about traditional ML that you need to
+know.
+I was very tempted to do a whole sort of exercise, a lab full of interesting linear regression stuff,
+but I realized too much of a distraction.
+We should we should stick stick with it.
+But briefly for traditional ML so that the sort of textbook definition of machine learning is it is
+like a branch of AI where programs learn from data to make predictions without being explicitly programmed.
+But obviously that's a real umbrella definition.
+And you can apply that to to any area of machine learning, including like modern AI llms, which in
+theory also fall under the umbrella of machine learning.
+And that's why this sort of generic definition does does work for anything.
+But in practice, when people use the expression machine learning or ML these days, what they're referring
+to is traditional machine learning.
+And when people say ML, they're talking about models that pre-date, uh, deep learning of the last
+sort of five, five, ten years and certainly predates Llms.
+So while, strictly speaking, llms are a type of ML machine learning, it's not commonly how people
+use this expression.
+When people say machine learning, that's shorthand for traditional machine learning.
+Things like linear regression, random forests, XGBoost, uh, support vector machines, all that stuff.
+That is all what people mean by machine learning.
+And whilst some people might say that some of this is old hat, and we know we've now moved to the world
+of llms, I disagree.
+First of all, there are still very frequently business problems that are better solved by machine learning
+by traditional ML.
+As I just said, but also even the modern LLM world, it's all based on the same foundational principles,
+and it's not possible to understand how llms work if you don't know your foundational machine learning.
+You don't need to know it in a ton of depth.
+You don't need to know all of the maths behind it you and not for typical everyday work as an AI engineer,
+but you need to know some of the the terminology, some of the underlying principles, because they
+apply just as much to modern llms as they do in the traditional world.
+And much of this is stuff that I've already alluded to as we've gone.
+First of all, there's this idea of generalizing generalization, which is the ability of a model to
+do well on unseen data.
+You've trained something.
+Let's again go back to this idea of credit card transactions.
+Are they fraudulent, fraudulent or not?
+You've got maybe 10,000 credit card transactions, of which 5000 are fraudulent and 5000 are not.
+And you've got details like how much was the amount?
+Maybe there's suspicious amounts, which are amounts of credit card transactions just below some threshold,
+which normally triggers more review.
+There might be patterns that are particularly indicate a high probability of it being fraud.
+And so you take all of this data.
+You write some software that creates features from this data.
+And then you build models that take these features and use this to give like the probability that it's
+credit card fraud or something like that.
+Some output based on the inputs and generalizing is when after giving it lots of examples, it can then
+take a new credit card transaction, not one of the ones in the examples, but something different.
+And because it's learned from patterns in that input data, it's able to do a good job.
+It's able to perform well to be accurate on new data that it's not seen before.
+That is generalizing that.
+That is what it's all about.
+Overfitting is what you call it when you've given it lots of training data, and maybe the training
+data has some noise in it, or maybe it has some anomalies and your model has has tried to be so accurate
+in fitting to the training data that it's done kind of too well.
+It's learned things about the training data that aren't real patterns in the real world.
+And so that's known as overfitting when it does that and and the the it wouldn't matter if it only affected
+the training data.
+The problem is that typically if a model overfits, then when it's given new unseen data, it starts
+to perform badly because it's, it's it's tried to account for the noise in the data or something that
+isn't real signal.
+It's tried to explain that, and that means it's not going to perform well when it's given something
+new.
+And so this is known as overfitting.
+And it's the kind of like the thing that destroys generalization, one of one of many, but it's the
+one that people often see happening in practice.
+And it's also something that often happens if you train too much.
+If you train too much, well, say with the same data again and again.
+Then often you'll find that your model starts to overfit.
+So it's a very common expression to hear that.
+And so the goal of machine learning is to generalize.
+I said that before.
+It's about making accurate predictions not on the training data, but on new data based on patterns
+from the training data.
+That's what it's about.
+And again, of course, that completely extends to the new World Llms.
+These are particular types of machine learning model, which the inputs is a sequence of tokens.
+The output is the probability of the next token.
+And the ability to generalize is that when it's given a sequence that's different to any of the input
+sequences taken from the internet, or all of the other sources of data that's used for training llms
+when it's given something new, like a chat with you on ChatGPT, it's able to generalize and still
+respond in a way that seems consistent with all of its input data, even though it isn't actually captured
+anywhere in the input data.
+That's generalizing.
+It applies to traditional ML and it applies to LMS.
+And now we're going to go to cursor to the lab.
+We're going to go and build some traditional ML models.
+And we're going to evaluate them in a way that we will do for many other models.
+It's going to be so much fun.
+Reminder there's three different ways you can follow along.
+You can just just think about what I'm doing, get the gist of what's happening, use it to build intuition
+about how one goes about these kinds of things.
+Secondly, you can follow along.
+Use the light data set.
+Of course the 20,000.
+It will work great with all of these models and use use the data that I've already curated and I've
+already built.
+It's there for you.
+We will download it right now, and there's no cost at all for anything that we do today.
+Of course, it's all just just ML models.
+And then you can also decide you're going to roll up sleeves and do it with the full data set.
+Just copy what I do.
+Very satisfying.
+Particularly for traditional ML.
+It's easy and it's fun.
+And of course again, no cost for what we do today.
+All right.
+That's that's enough preamble.
+Let's go to cursor.
+Let's go to traditional ML.
+--- Lecture 2 ---
+Okay, so here we are in Casa opening up week six.
+Going to day three.
+Let's get going with traditional ML of play.
+We've already done curation.
+We've already done pre-processing.
+We're now doing evaluation baselines.
+Traditional ML.
+Now there's a bunch of imports here.
+These imports are going to bring in numpy say some ordinary libraries.
+And then a bunch of stuff from sklearn.
+Sklearn, which is the short for scikit learn, is the workhorse of traditional ML.
+So many algorithms in here, linear regression is one of the sort of go tos that we'll use.
+Of course, Countvectorizer is a basic NLP library, and then Randomforestregressor is where things
+get juicy.
+Okay.
+And I've got light mode set to false, which you can to for this one because this lab we're doing traditional
+ML, it should work fine.
+If any troubles just switch to true to the smaller data set.
+And this is how it loads in the data sets.
+It's very simple.
+Username.
+Keep it as my username unless you've created your own data set.
+And then it looks up either items light or items full depending on light mode and loads that in.
+From the hub you'll see that I've got items from hub for that data set.
+And then what comes out is the training data set, the validation data set, and the test data set.
+These are the three different pools of data.
+In this case we've got 800,000 training data items, 10,000 in the tests in Val and 10,000 in test.
+And I believe this takes about 27 seconds, which means that any second now we're going to have there
+we go, 25 seconds, 800,000 training items, 10,000 validation, 10,000 tests.
+Great.
+Okay.
+So the game of the next few weeks is to write functions which take an item and estimate the price of
+that item using a bunch of different techniques, using techniques from very simple techniques to very
+advanced Balanced techniques.
+And we are going to start as part of building the baseline with things that are as simple as we could
+possibly imagine.
+And the one that is really, really simple is say, okay, what about we write an algorithm which just
+makes a guess.
+It's given an item and it guesses a number from 1 to 1000 or 1 to 999.
+Just just at random like that.
+Surely that's the simplest.
+Let's start with that.
+That's it's a bit silly, but it gives us a starting point to look at it.
+And that's what this function is.
+Random process takes an item.
+It ignores that item.
+It doesn't even look at it, and it returns just a random number between 1 and 999.
+That is it.
+Let's let's dig in to what this could do.
+And before we dig into what this could do, I have I need I need to ask you to do something for me.
+I need you to get a prop.
+I want you to get a piece of paper and a pen, a piece of paper and a pen.
+I got I got myself a piece of paper here, and I get a pen and.
+Yeah, you'll, you'll, you'll need that and you're going to need that for the next couple of weeks.
+We're going to be writing some stuff down.
+So, uh, piece of paper and a pen.
+If you want to use your computer's notebook, you can.
+But it's more fun if you put it on a piece of paper and a pen.
+So get that.
+Put me on pause while you get it.
+And then we're going to start our first experiment a random price.
+So we'll see how it does okay.
+So hopefully you have your piece of paper and a pen.
+Uh, so uh, what I'm going to show you now is going to be quite fun.
+I have written a function called evaluate and evaluate is a function which itself takes a function.
+It takes a function which is able to to take an item and return a price.
+So if you're familiar, if you write a function like this in Python, it calls the function.
+If you do it like this, it doesn't call the function, it just passes that function in as a parameter.
+And my evaluate function is able to call this repeatedly.
+And I also pass in my test data set.
+And it's going to call it repeatedly for 200 the first 200 items in that test data set.
+Uh, so evaluate itself is, is if we go and have a look at it, it's in Pricer again as as is everything.
+Here it is evaluator.
+It's quite a long function here because it does a few plots.
+You'll see it does a few plots.
+It iterates through the first 200 items in tests.
+Um, and 200 is just the default size you'll see at the top here, the default size is 200.
+It iterates through those 200.
+And you can you can override that and pass in a different number if you want.
+Uh and here it is.
+Evaluate.
+It goes through them all.
+And each in turn it will calculate.
+It will it will look up the actual price.
+It will use the function to estimate the price.
+And it will figure out the difference between them and see how it does.
+And it will then visualize that that's what we're going to see.
+Uh, and um, one other thing to mention is that to make things fast, I've actually run this in parallel.
+I have workers.
+Workers is five means that it spawns like five threads that all run at the same time.
+And if that's something that hammers your system too much, you can change that just by passing in workers
+one or workers two.
+When, when when you call, evaluate.
+Or you can just hard code it in the evaluator function so whatever works best for you.
+So back here again if this is turns out to not work nicely, you can do like, um, uh, you can say
+size equals 100 if you want it to run faster.
+Um, and you can say workers equals one if you, if you don't want it to be so, so much parallelized.
+But we're going to do 200 and I'm going to run it right now.
+And we're going to see what the visualization looks like.
+And it's a visualization we're going to see a lot.
+So better get used to this.
+Here it goes.
+Bam.
+We've got ourselves a chart.
+Let's look at this chart.
+I'm going to have to zoom out a little bit on my screen.
+There we go.
+Um okay okay.
+What are you looking at.
+Here's the thing.
+This is quite, a quite a common kind of chart or charts like this in data science.
+And it's sometimes called like a y hat y.
+Chart.
+The y hat is what you call.
+That's that's the terminology for a model's prediction.
+In our case, it's what was what did our what did our function say the price should be.
+And y is the actual price the true price also known as the ground truth.
+So what are we looking at here?
+This this is a scatter plot.
+Each each of these dots on this picture represents one of our 200 test points.
+And so if I, if I hover over this scatter point this is apparently for a tidal front.
+Oh, this this is what I know what it is.
+It's an HP LaserJet laser printer.
+Okay.
+Something normal.
+So you see where this is?
+This is this is a 300 on the x axis, which means that this thing actually costs $300 according to our
+Amazon scrape on the y axis, the guess was $433.
+That's how much we the the function.
+This this random function.
+Basically that's what this returned.
+It returned the 300 number.
+Where are we?
+Here we are.
+It returned 300.
+Sorry 433.
+And this point you can see it's 300 across 433 up.
+And that's why it's there.
+So the closer the points are to this blue dashed line, which is the line of perfection this line represents
+when a guess was identical to the actual price.
+The closer it is, the better the model has done, and I've colored in the points as green when they're
+nice and close to the line, yellow if they're a bit far out, and red if they're way off.
+Okay, are you with me?
+This scatter plot will see it so many times.
+You're going to get so used to this.
+This is a way of visualizing our evaluation.
+And because our function here is a random function, these are randomly distributed in the y in the
+height.
+They're just all over the place.
+Uh, and you can see that in many cases that's a horrible answer and it's done a terrible job.
+And so that's why we're seeing the scatter as it is.
+And at the top here, this number at the top is telling us the overall error, the average error on
+average.
+This model was wrong by $382 382.
+That's how far off we were.
+And $0.08.
+We might as well get this right.
+And so the reason for the piece of paper and the pen is that I would like you to write down with me.
+Right now, I'm going to write down random pricer.
+The random results from this random pricer is 300 random 382.08.
+And a lot of what we're going to be doing is going to be using more and more sophisticated models to
+try and do better and better at that.
+Number.
+382.08.
+That's where we are.
+Now I've also got some other numbers here.
+MSE the mean squared error.
+That's that's a more sort of a bona fide kind of data science metric.
+And it is, of course, take the difference between this and this and square it.
+That is what you're seeing with the MSE.
+And R squared is another.
+It's common for this kind of problem when you're trying to to come up with numbers r squared measures.
+How well is your function able to reflect the pattern of the input data.
+The trends in the input data and r squared of 100% means that you are perfectly explaining the variation
+in your data.
+An r squared of zero means that the way that you're explaining data is no better than just guessing
+the average across the board.
+That would get you an R squared of zero, and a negative R squared means that you're actually doing
+worse than just guessing the average.
+You've got like something that's that's performing.
+You do better just to say just always guess the same number.
+And in this case, the random function had a terrible negative r squared, which is kind of funny.
+Uh, so so there you have it.
+That is what we've got a negative r squared, uh, and a horrible result and $382 off on average.
+Surely we can do better.
+One other thing to mention on this is that I've got a second visualization here, which I've added in.
+One of the things that's very important to keep a careful eye on is that if you're doing a test on something
+like 200 data points, the question you need to ask yourself is, okay, but maybe I just got lucky
+with those 200 data points.
+Maybe if I picked a different 200 data points, I'd have got a completely different answer.
+Or maybe if I if I took 201 data points instead of 200, I'd have got a different answer.
+And so this is just showing you as you increase the number of data points in the test, what was the
+average error turning out to be?
+And of course it was.
+It was super volatile to start with.
+And then you can see it sort of settles down.
+and that gray shading is showing you something that is known as the confidence interval, that maybe
+that that has some horrible reminder from, from like high school maths.
+It's like a statistics thing.
+The confidence interval is telling you that within like 95% confidence level, it should.
+We believe based on the numbers that we've got, that the true the random pricer result is off by $382
+plus or -$37 at the 95% confidence interval.
+And it's shown visually by that gray kind of border along there.
+So this is a good thing to reference.
+It's good to keep an eye on that to make sure we're being disciplined about.
+We're going to we're going to really focus in on this number here.
+But make sure we know our confidence interval as well.
+That's that's a good good practice okay.
+There we have it.
+This is a visualization that we're going to we're going to see a lot.
+And it's really cool.
+And the model is not so cool.
+The random price has done horribly.
+It's time for us to do a bit better.
+--- Lecture 3 ---
+Okay.
+What's next?
+Well, remember I told you I was mentioning R-squared is zero when you just guessed the average?
+But that might have given you a little idea.
+What would it be like if we made a model?
+Another sort of silly model that all it does is just guess the average.
+Uh, let's let's look at this.
+Uh, so, so let's look at our training data.
+Collect all the prices in our training data and figure out what is the average price across all of our
+training data.
+And actually let me print that I'm going to print the training average so we get to see it.
+And then we can have another function called constant pricer that takes an item.
+And again it ignores whatever item it's given.
+It just simply returns this average number.
+Let's see what this average number is.
+Apparently the average price is $140.56, which may that that vaguely rings a bell because I think we
+did print that ourselves.
+Uh, earlier in I think in day one.
+Uh.
+okay.
+So now we can just call this evaluate function again with the constant pricer and with our test data.
+Let's see what we get.
+Maybe picture.
+How are you expecting this might look.
+You've got any sense of how you think this might look.
+Let's see if you're right.
+Here it is okay.
+Takes a second to take this in.
+Right.
+What are we looking at here?
+Well look remember the x axis is the actual ground truth.
+The price of the product, the y axis is how much did our model predict it should cost.
+And so hopefully it's like a, like a eureka moment for you that you see.
+Of course every point is at the same y axis.
+It's all always guessing $140.57 the average price.
+And you can see that that that's why it's just a line of dots over here.
+And there's a bunch of them are red.
+And then there's some green where it so happens that the test data set items had a price that was close
+to the average price, and then that goes yellow and red again.
+And this is the result.
+This is what we see.
+Um, and, uh, somewhat remarkably, uh, our error has come slamming down.
+And that's because it's convenient that the average is a fairly low number.
+So it means that we did get a lot that are fairly close to the average, uh, and a lot that.
+Yeah, not not far and a lot of either green or yellow.
+Uh, and so we end up with 106.18.
+Write that down.
+Please write that next on your piece of paper on your prop constant.
+The constant number 106.18.
+Again this is a very silly superficial kind of model, but nonetheless it gives us a number.
+It's off by $100 if you simply guess the average.
+And you can see that r squared there is, uh, almost zero.
+You remember I mentioned that an r squared of zero is if you guess the average and you might say, well,
+why isn't it exactly zero?
+Well, there's a reason for that.
+If we look at this, you'll see that we're doing we're doing pretty well here.
+But there's still some error bars around around here.
+This might be one where we could we could easily we could bump up the number the size of this because
+it's obviously going to be very quick just guessing the average.
+So let's let's put in a thousand.
+Let's look at a thousand data points here.
+And now when we look at a thousand data points the r squared is now even smaller minus one.
+Let's make it like 2000 data points.
+Let's see how we do now.
+And now R-squared is exactly zero.
+So you know with enough points and presumably yeah look at look at how tiny the error bar is.
+Now the error is, is, is.
+Well I've already written down 106.18.
+So that's the official error.
+Uh, but this is the, uh, um, the one that we get if we, if we actually use, uh, 2000 data points
+in our test.
+But let's take that out.
+Let's just run it one more time like this.
+So we've got our official number 106.18.
+There we have it.
+That's the constant pricer.
+Very nice.
+It's finally time for a real machine learning model linear regression.
+So linear regression is perhaps the simplest of any ML model.
+It's just saying hey take take your data.
+Come up with some features.
+Something about the data that might be interesting.
+And I'm going to see whether some weighted combination of those features allows me to predict the price
+based on on your input data.
+So if you give me a few features of your of your products, like how heavy they are and how long the
+descriptions of them are, maybe I'll find that multiplying two by the weight and three times the length
+gives me some kind of an estimate on the price that tends to sort of tie out.
+And it uses like basic stats to do that, to figure out the right, the right kind of weights to use.
+And that's what's known as linear regression.
+Okay.
+so first up I've written this little function get features.
+Given an item.
+It returns a little dictionary of features of useful features.
+And we're just going to go with with those ones how heavy it is it confusingly it's the word weight.
+The weight sometimes like the weights of the parameters.
+So you know I mean heaviness here in pounds.
+Remember we calculated everything in terms of pounds.
+Item weight gives us that.
+And then this is this is often a common trick with linear regression.
+If you have a data field, if you have a feature like weight that might be zero and zero represents
+that we don't know the weight.
+Then give linear regression another feature, which is whether or not that weight is meaningful and
+it's known as a binary feature or weight unknown, which is either 1 or 0.
+And that way linear regression can account differently for those two different cases.
+And then the number of of letters in the summary is like a silly thing.
+But maybe longer summaries have a higher price or lower price.
+Okay.
+So those are the features.
+There's a little bit of code here to convert that dictionary into a special object called a pandas data
+frame.
+Pandas is a library that gives you sort of Microsoft Excel kind of functionality in Python.
+And this is like turning it into a little Excel grid, turning each of these dictionaries into a little
+bit of of of of a grid, a data frame.
+Um, and then we're going to do that for some training data and test data.
+And then we're running linear regression.
+This is just some very standard stuff.
+We're telling it the feature columns we're asking it to.
+We're giving it the training set and the test set.
+And then you just call this model is linear regression model fit all of the scikit learn models.
+You just create them and you do model.fit and you give it some input data and some output data.
+And it does its best to fit to that.
+Uh, obviously I'm not going through this in tons of detail because this isn't a course on traditional
+ML.
+You can just use this exactly as it is.
+And it's giving us here some facts about how important was the heaviness, the weight, how important
+was, whether the weight is known or unknown, how important was the text length and the intercept?
+Uh, and we can now turn that into one of our functions for prediction, linear regression.
+Pricer.
+It takes an item.
+And now we do look at the item.
+We're not going to ignore the item for once we get that we use our code to get the features.
+We then use this data frame thing to to turn that into a data frame.
+And then we call Model.predict.
+And that is how we say to our model, okay, given everything that you've learned, tell me what should
+be what is your prediction for the price?
+So the key things to know for traditional ML for using scikit learn, you create a type of model.
+You do model.fit given some some x and y, some some input and outputs, and it fits to those inputs
+and outputs.
+and then you do model.predict to then predict something new on some new unseen value.
+That's what we do.
+And we run it.
+And it's pretty terrible.
+It's, uh, I mean, you know, like what we were on 106 before.
+Linear regression has got us to 101.56.
+But I hear you, it's not linear regressions fault.
+We've got this this slight, like maybe it's done a little bit better than than guessing the average.
+Uh, but, uh, this is not because linear regression is bad.
+What is it because, well, why why is this so, so hopeless?
+It's because we've given it terrible features.
+We've given it the weight.
+The things depend on how heavy they are, the price of things.
+Not.
+Not really.
+And maybe sometimes, uh, and the length of text.
+Yeah.
+What?
+That doesn't reflect anything, really.
+We've given it nothing to work with.
+It's no surprise that it's not done well.
+And in fact, a huge part of traditional machine learning is about what's called feature engineering,
+which is about spending tons of time digging into what features could we possibly come up with that
+might help linear regression or might help some other model?
+And that used to be a huge part of the job for a data scientist doing feature engineering.
+In modern AI, you no longer have to do that.
+Models work out the features for themselves.
+That's the sort of aha with with using deep learning.
+But in traditional ML you had to get the features.
+And that's why data scientists in the traditional world needed to be real experts in the business domain.
+You needed to know about, like Amazon products in this case, and what kinds of features might we want
+to explore so that that whole sort of craft of feature engineering, it's no longer a thing unless you're
+still working with traditional models.
+But you can see if we wanted to do any, any good here, we'd have to come up with a lot more features.
+--- Lecture 4 ---
+But wait, maybe there are some easy features that we could use linear regression for that are that
+are within arm's reach.
+Supposing, for example, we thought we looked at the description, the text itself, and we said to
+ourselves, well, maybe if the word luxury is in that description, then it might be something that,
+that that is a little bit higher priced.
+So we should we could have a feature, which is how many times is the word luxury in this description.
+And maybe the word uh, maybe there could be uh, some something like guarantee that might mean that
+it's priced higher.
+There might be something that is like, like a smart as in a smart TV.
+If we've got TVs here, that might mean it's priced a bit more or less.
+And maybe there are some words that might mean that something is is not priced so well.
+Uh, budget might mean that it's like a cheap item or something like that, or maybe cheap.
+Uh, so there might be maybe we should build some features by counting up how many times different words
+are there, and then passing a feature that's like count of luxury, count of cheap, count of smart
+and pass that in.
+That might be an idea.
+It's a great idea.
+And in fact, you might might be thinking about this already or you might already know, but but, uh,
+you don't need to to to like, like come up with the words.
+What you could do is say, okay, let's take all the training data, let's find the 2000 most common
+words in there and then treat that as being our 2000 features, 2000 features which which are each one
+reflects one of the 2000 most common words.
+And for each feature, we then calculate it by counting the number of words in each of our data points.
+Um, so maybe one of them is luxury, one of them is smart.
+And then we form this list of features for each of our data points, counting up these common words.
+Okay.
+That's a thing.
+It's known as bag of words.
+Uh, and there's particularly there's there's a, um, a class in scikit learn called Vectorizer, which
+uses that idea the bag of words to to count up the number of common words.
+And it's called a countvectorizer, because what the result of doing this is that for each of our items,
+there will be 2000 counts, or however many the 2000.
+You can decide how many common words you want.
+We'll go with 2000, so there'll be 2000 numbers associated with each of our products.
+If it doesn't have any of the 2000 most popular words, then that's just going to be 2000 zeros.
+If it just has the word luxury once, then that'll be a lot of zeros, except for the one of these numbers
+that represents the word luxury, which will be a one.
+And then lots of zeros.
+Uh, and so you could think of this thing as like a vector to use the, like the vector.
+Obviously, it's very different to the vectors that we had in week five, but it is a bit like a vector.
+It's a very coarse kind of vector, coarse grained vector, just counting the number of popular words.
+It's nothing like the encoders that we've met before, but that is a very simple technique and we can
+do that and that is what we will do now.
+So we're first going to gather all of our prices in a numpy array.
+And all of our documents.
+Our documents will be the summary text of every item for all of our training data.
+And then we're going to set a random seed.
+And we're going to call this countvectorizer, which turns all counts up.
+The most popular 2000 words we say 2000 is the number of features.
+And then it counts them up for each of our documents.
+Uh, and this, this thing here, stopwords is how we tell it.
+Hey, please ignore words like and and if and and something that is just like a common English word
+that really doesn't matter.
+Don't include that in your counting.
+We don't care about those.
+We want 2000 interesting words.
+And then vectorizer dot fittransform documents is the thing that is going to go ahead and do all of
+this.
+I should kick this off because this will take a minute.
+Um, so again, this is this is, uh, nothing like the interesting the amazing stuff we did in week
+five.
+This is much more simplistic.
+This is traditional ML bag of words is the technical name for this.
+And it's a first example of natural language processing, NLP, this idea of just counting up these
+words.
+So it's happened.
+And now we can dig in and look at our 2000 words and at some of these vectors.
+Okay.
+So now we're going to to take our vectorizer and we're going to ask it, what are the most popular 2000
+words that you identified.
+And I'm going to print how many there are and just print like randomly.
+I'm going to go from number 1000 to 1020.
+Let's see what they look like.
+So there were indeed 2000 words found.
+And just here's just some of them.
+Jack jacket, Jeep jet, jigsaw joints, uh, kilohertz kickstand, kids and King.
+So, so uh, again, this this one here, Jack, is number 1000.
+So we're going to, we're going to have for each of our inputs, we're going to turn it into 2000 numbers.
+And if the word Jack appears twice in the in the product description, I guess it's like a car Jack.
+Then, uh, I don't know what it is, but whatever it is, the number two will appear at that point
+in the, uh, in the in the vector that represents that particular product.
+So we've turned we've, we've we've switched every product instead of just being a bunch of text.
+It's now this very simplistic vector of 2000 numbers, which counts up how many times the most popular
+word is there.
+And we can now run linear regression.
+So again we create linear regression.
+And we fit all of this data to the, the prices.
+Um, and uh, it ran it took a few more seconds.
+There's a bit more to it.
+And now we can simply run the same write a function.
+Natural language linear regression processor.
+And we can we can do the the turn item summary into a vector.
+And as before we call regressor dot predict.
+Remember with traditional with these scikit learn libraries you you create the model, you fit it given
+x and the and the ground truth the y.
+And then you then, uh, on the other side, when you're trying to predict, you call this model that's
+been trained dot predict.
+It's as simple as that.
+It's like two lines of code.
+And now we're going to call our evaluate function on this on natural language linear regression Pricer.
+Let's see how it does.
+This is traditional natural language processing NLP.
+It's linear regression based on the features 2000 features which are a bag of words count of the most
+popular words.
+Let's see what it looks visually better.
+And wow, look at that.
+We're down to $76.
+76.81.
+This is natural language for linear regression.
+And we are at 76.81.
+I hope you've written that down.
+That is where we are.
+76.81.
+Excellent.
+And look at r squared creeping up now at 41.8%.
+That's quite a difference from the random one.
+Uh, and it looks visually you can see it's starting to look like it's like shaping this much less red.
+It's looking a lot better.
+That's what you get with good linear regression when it's given some interesting features, counts of
+words.
+And this kind of traditional, uh, NLP is this is this was a, this was what people were doing maybe
+15, 20 years ago.
+Okay.
+It's time now for us to turn to a couple of pro ML models to, to look at what the sort of the frontier
+of traditional machine learning is able to achieve.
+--- Lecture 5 ---
+And first up on our voyage into the frontier of traditional machine learning is the one of the really
+cool ones, the random forest.
+Here people talk about random forests a lot.
+Here it is.
+And I'm going to just select a subset of the data because it's very slow.
+If you want to run this with a lot of data, you can bump this number up and leave it running overnight.
+It'll also hammer your computer because it really, really pounds it.
+Um, and again, the way you work with these scikit learn libraries is so simple.
+You just give the name of the model, you pass in the parameters it needs.
+It wants to know that these things let me set this running because it takes a minute.
+Uh, and then you call the model dot fit, which is where you run it.
+And you can see I'm plucking out the subset of X and prices.
+So what is random forest.
+So it's a type of model called an ensemble, which means it's a model which itself combines many smaller
+models, a super powerful technique in ML.
+And in particular, each of these smaller models is something quite simplistic, which people often
+say in a bit of a negative way.
+It's called a decision tree, which is a type of model which is basically a bunch of if statements.
+It tries to figure out, like, like I've got an example here, but like if it sees if the word TV appears
+more than a certain number of times and led and HD, then let's say the price is $500.
+That would be an example of like a decision tree model.
+And decision tree models are often seen as a bit of like people roll their eyes, they're seen as a
+sort of fake AI, not really AI, it's just a bunch of if statements.
+It's just a decision tree.
+Well, Random Forest isn't just one decision tree, it's tons of them.
+In fact, it's 100 of them in this case.
+And you can make it more, uh, and what it does is it just creates it takes a subset of your features
+and a subset of your data, and it builds a decision tree off that.
+And it does that 100 times and then lets them sort of be combined to come up with a best prediction
+as some sort of a combination of all of these little, little decision trees.
+And that produces something more powerful.
+And so now, of course, you remember we've created the model, we've done model.fit, and now it's
+simply model.predict to now get it to predict the, the what it should be based on a new unseen data
+input.
+So this is our new function, random forest.
+It takes an item.
+And now we can evaluate that function to see how the random forest does.
+Here we go off it runs and it's complete.
+And again visually it looks a bit better.
+It's actually.
+I glanced down at my piece of paper.
+It is only slightly better than than the already very good one that we just had.
+But it is better.
+Random forest and we're getting to 72.28.
+And that's that's getting a pretty, pretty good pretty respectable number here.
+And you can see that, uh, r squared actually looks like the r squared, uh, is, uh, I mean, there's
+obviously some, some noise in the r squared, but it's, it's the same, same territory, let's say
+uh, and uh, but $72 an excellent result.
+And obviously if you have time and you want to bump up that number 15,000, you can leave this running,
+you'll get an even better number that is random forest in action.
+And now we go on to the model that the cool kids use, at least the cool kids in traditional ML land
+XGBoost.
+It's similar to Random Forest.
+It's also an ensemble and it also uses decision trees.
+But.
+But unlike Random Forest, Random Forest creates each of these different decision trees based on a completely.
+They all run independently and it combines them in an ensemble.
+XGBoost builds one tree and then it builds a second tree which corrects for errors in the first tree,
+they sort of compound on top of each other using clever techniques.
+Uh, that I'm not going to get bogged down on.
+You can.
+I'm sure ChatGPT can do a much better job than me at talking you through why it is that XGBoost does
+so well, but the the real reason that it does well is that it's much, much faster.
+And because it's much faster, and it's also very good at generalizing at a very quick, quick pace.
+It means that that we can use the entire data set, uh, and it will run pretty quickly.
+Now, this this import is the thing that imports the library.
+And it might not work on all systems because it needs like a, a, um, a particular library installed
+on your computer if you want to run this, if you're on a mac, you might need to run this brew install
+command.
+If you're on a PC and it doesn't work.
+I think actually this does come with I think it's already installed on PC, so I think it will work.
+But if not, honestly, this is just one quick experiment.
+It's not such a big deal.
+You can see me doing it.
+I'm going to run the x g boost with lots of estimators, a thousand of them, and for the entire data
+set.
+So it's now running for everything.
+Uh, and uh, it's also it's running with with four different jobs, and we will see what kind of outcome
+we're able to get from the the power of XGBoost.
+It finished in 15 seconds.
+This again, you remember one more time the standard pattern.
+We create a model.
+We do the model.fit giving it x, the which is the input data and giving it y the prices.
+And then when we're at inference time, we simply do the model dot predict.
+And the model.predict is where we get our answer.
+So there we have it.
+It's time to run evaluate.
+Let's see how XGBoost does.
+Visually it looks even better.
+And yeah, we've ticked down again.
+The error is now on the piece of paper.
+The error is 68.23 68.23.
+There we have it.
+Yeah.
+Hopefully you've written more neatly than I have, but you've got yourself a nice little handwritten
+list of these models.
+But a picture tells a thousand words.
+Look at that.
+You can see visually how much better the model is doing.
+R squared is creeped up as well.
+It looks.
+It looks really good.
+It had some problems with the with the, uh, things that were actually more expensive.
+Uh, but it's done.
+It's done very well across the board.
+XGBoost for the win.
+The strongest model that we've looked at that is great.
+And that is the last of the models that we're going to be running today.
+Okay.
+And while our official, uh, prime record, our golden source of truth for, for these experiments
+is going to be that piece of paper that you've got your results scribbled on that, that, that right
+there, your piece of paper that's precious to us.
+Uh, I have also taken the liberty of typing this into this cell here so that we can also just visualize
+right here this prediction error from each model that we've experienced so far.
+I haven't included the random one because that's just too silly.
+Uh, just guessing.
+A constant number is 106.
+Linear regression comes down here, uh, using natural language processing.
+still linear regression, but passing in the 2000 vector and look, we slam down to 76.
+Then random forest comes down to 72 and XGBoost is at 68.
+You can see nice, uh, progress that we're making there.
+And of course you can do things like experiment now.
+Like, it was so much fun to experiment with linear regression.
+You could experiment with turning up that countvectorizer from 2000 to vectorizing more.
+Maybe.
+Maybe we'll get better and better results.
+You could do random forests for the whole data set and leave it overnight, and it will beat XGBoost
+handily.
+I'm very confident and combining all those things together, you can do pretty well with traditional
+ML.
+It turns out that given the words in a description and given these different models, uh, given given
+their ability to find patterns in data, you can do very well, but you should be expecting we should
+start to see diminishing returns because there is natural volatility in the prices of things.
+Even on Amazon they change day to day.
+So so it's not like you could ever know for sure what something's going to cost.
+So we are expecting there is true error in the numbers themselves.
+So there's only so far we can go.
+But still this is our results so far.
+And it looks fine.
+And uh we've obviously we've still got some some room there for some improvement.
+And tomorrow is when we see what it's like to start layering in, uh, neural networks and LMS into
+this picture.
+And, and I'm excited to show you that.
+But first, back to the slides for a wrap.
+Well, I had real fun with those traditional models.
+I hope you did too.
+I hope you're exploring some more.
+You know, there's lots of others in scikit learn.
+There's tons to choose from.
+Support vector machines I did in the previous version of the course, and they, uh, definitely random
+forest and and XGBoost do better, but but play around, see what you find.
+It's it's just there's so much juice in there.
+Um, obviously there's and the amazing thing is that the LMS have just been big for the last five years.
+There's like 50 years of, of, uh, of of ML tradition behind it, uh, that you could dig into tons
+to explore, and I, I do hope you enjoy it.
+It's just create the model model.fit and then model.predict to to predict on unseen data.
+Okay.
+But at this point, in addition again to generating text and code, uh, with frontier models, open
+source models, choosing the right LM for the task, creating Rag solutions with and without Lang chain
+and evaluating them, and following a five step strategy to solve commercial problems.
+Curating a data set.
+Pre-processing data with the batch API.
+So many things that you've picked up, you're honestly you're built all of this expertise.
+And now next time you'll be able to build a vanilla neural network.
+We're not going to get in tons of depth on that.
+I just want to give you a flavor for it.
+You'll be able to to run a business problem against a frontier model, and then compare leading models
+for how good they are at solving a business task.
+All of that tomorrow.
+See you then.

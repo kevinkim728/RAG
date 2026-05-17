@@ -1,0 +1,879 @@
+--- Lecture 1 ---
+I've been looking forward to today for some time.
+I have a total treat in store for you today.
+I, I feel jealous that you are where you are, having not experienced what I have in store for you
+today and it's all about to happen to you.
+You you probably think I'm being over the top, but wait and see.
+All right.
+What is it about today that I'm so excited about?
+Well, this is the day of vectors for Rag.
+I'm going to introduce Lang chain.
+Such a.
+I mean, we've been introduced to it before, but we're going to go deeper on Lang Chain.
+And I'm going to introduce you to, to looking actually at vectors, putting them in chroma and visualizing
+them in chroma.
+As a reminder of what you can already do, you can already generate text.
+You can generate code with frontier models, with assistance tools, with open source models, you can
+confidently choose the right model for your project.
+And at this point, you can explain the big idea behind Rag, the fact that you use vectors to do a
+sort of semantic search.
+A fuzzy search to find relevant content.
+That's the big idea.
+That's what we're going to use to go from that rather simplistic thing that we did yesterday.
+There's something rather more powerful.
+And by the end of today, you're going to be able to explain long chain, the good and the bad.
+You're going to be able to work with popular encoders, embedding models as they're also known.
+And you'll be able to divide documents into chunks, turn chunks into vectors, put vectors in a vector
+data, store all of that all in one day.
+And it's today.
+Okay, before we dig in, let's do a super quick recap of what we went through yesterday.
+I know you already get it, but it's important to reinforce.
+So the user asks a question.
+We did something pretty janky yesterday when we took that question.
+We just sort of broke it into words and we saw, do we have anything about these words?
+But that's not a great way of doing it because you may miss important information.
+You really want to do some kind of a fuzzy search on that text.
+Okay, here's a way to do that.
+Bring in an encoding LL.M.
+An and Lmw that creates a vector that represents the meaning of the question.
+Turn the question into a vector.
+Look that up in a vector data.
+Store a database which is quick at finding similar information to the vector that you just passed in,
+and then collect this information that we've got.
+Pass that in the prompt to the LM.
+And what we'll get back is something which is based on that context, that relevant context that we've
+passed in in the prompt.
+Okay.
+Let's now talk about lang chains.
+So you met Lang Chain briefly uh, earlier on.
+But now we're going to go deeper on lang chain.
+So Lang chains are an open source framework.
+It was launched October 2022 by someone called Harrison Chase who who started this and then later formed
+a company around it.
+It is a common framework.
+We sometimes call these abstraction layers that allows you to interface with many different models and
+also stitch them together, building things like rag pipelines that we'll be doing.
+And there was a new version of Lang Chain, released very recently, October 2025, which is quite significant
+overhaul including repackaging much of Lang chain.
+So there really is a kind of a pre 1.0 and a post 1.0, and we will work with 1.0 with the new version
+of Lang Chain today as we dig in to this, this, this framework, um, this abstraction layer that
+lets you glue together, chain together different llms to accomplish a business task and to introduce
+the like the pros and cons of Lang chain, the good and the bad.
+So a few a few pros.
+First of all, Lang chain is something that makes it much quicker to glue together llms to accomplish
+something.
+So for things like assistants or for rag that will do or for summarization tasks, it means you can
+get to market much quicker.
+Things like using tools.
+There's a there's a very robust set of tools that comes with it.
+This sort of stuff very quick to do out of the box.
+That's what Langshan gives you.
+There's also a lot of adoption in the enterprise.
+Langshan was extremely popular when it first came out, and during 2023, it really, really took off
+in a big way.
+So it's very common in enterprise.
+A lot of projects use Langshan, so it's often it's a good, good resume material.
+It's good to have it there.
+It's something that you know how to do.
+You will frequently come across it.
+So in terms of some of the downsides of Langshan, probably the first thing I'll mention is that when
+Langshan first came along in like 2223, it was quite different to make calls to to OpenAI and to anthropic
+and to Gemini if you did it yourself.
+And so there was a huge need for something like Langshan that unified and brought this together and
+made it so you could switch around different models.
+But since then, times have changed.
+And now, as you've experienced yourself, because all the providers have OpenAI compatible endpoints,
+it's incredibly simple to switch between different models just using the OpenAI Python client library,
+and you can just switch out the base URL, which can just be configuration and move between different
+providers.
+So there's less need for this kind of abstraction layer built on top.
+And also some of the other things that that this was, that was set out to, to simplify, like using
+tools and using prompt templates, they've all sort of converged over time.
+There are now very common patterns for doing all of these things.
+So there's there's less of a need for long chain at this point.
+So that's obviously a downside.
+And the other downside is perhaps more debatable and is perhaps a matter of personal taste.
+But Langston originally was considered to be a fairly lightweight abstraction layer.
+But over time it has grown and grown, and it's now reasonably heavyweight.
+It's pretty substantive in terms of everything it offers.
+It has.
+It has a lot of terminology, some concepts, some things to learn.
+It even has its own language, LCL, that hasn't really taken off, but that's also part of it too.
+And and some people do use that.
+And so it's actually become quite a heavyweight abstraction layer.
+There's a lot of learning.
+There's quite a learning curve to go into the Lang chain ecosystem.
+And nowadays there are other abstraction layers like light LM that we met that are really very lightweight
+indeed.
+And that can you can use things like light LM very easily with a tiny learning curve and switch between
+different models, where lang chain is a lot more to sign up for.
+And so as a result, lang chain has started to feel a bit more like it's like a legacy product with
+with a big learning curve and with stuff that's kind of hung over from, from a prior age, like the
+human message and AI message stuff.
+If you know that which has been replaced really in people's minds with a very simple list of dicts that
+we're so familiar with from OpenAI.
+So from that point of view, Lang Chain can feel a bit heavy, quite a big learning curve.
+There are lighter things available like light, little lamb and and some of it is perhaps less needed.
+So I wanted to give you that kind of candid pros and cons.
+You're going to get a personal first hand assessment of it yourself in the next few days.
+As we work with it, it's as I say, you're going to see the best of Long Chain, and maybe you're also
+going to see some some of the rough edges.
+It's going to be so easy to build a rag pipeline.
+We're going to have it all together, a couple of lines of code.
+We're going to have ourselves a rag pipeline.
+It's going to be fantastic.
+But you may also see some of the bit of the learning curve terminology, extra stuff that comes with
+the mix.
+And of course, Lang chain itself is now it's part of the Lang Chain Company.
+They have other offerings too.
+They have Lang graph, which is something very different.
+Uh, used to, to, to connect together agents in a dependency graph that we cover in my agent course,
+they have Lang Smith, which is an observability platform.
+Um, and they have some other things as well.
+So, so there's, there's a big ecosystem built around Lang chain, and there's a lot to like about
+it.
+And a couple of things to watch out for as we will see.
+--- Lecture 2 ---
+All right.
+Here we are in.
+So we're just going to have a quick look at Lang Chain before we continue.
+And actually for me this is my first time using cursor version two which just came out for me.
+But you've been using it all along I expect.
+And at the top here I see that we can now flip between the editor we're on here and agents where you
+you can have multiple agents running.
+That's the new functionality.
+Anyways, going into week five we're now on day two, it's vectors day.
+This is when we continue work with our expert knowledge worker for the insurance company, Insure Life
+Insurance.
+And we're going to be now working with taking the data in the knowledge base and vectorizing it and
+putting it in a vector store.
+So there's going to be three parts to today.
+We're going to first divide our documents into things called chunks, which are little little bits of
+the document that are useful ready to be put in our vector data store.
+And then we're going to turn those things into vectors.
+Or we're going to at least have vectors associated with each one, and then put it in and chroma and
+open source vector database that I'll talk about in a bit.
+And then we will visualize our vectors.
+But for now just part A let's divide our documents into chunks.
+And you might be thinking why do we need to divide documents into chunks and to break them up into pieces?
+And the reason is that imagine we've got these documents that they're going to have all sorts of different
+bits of information on them.
+We've already seen there's like employee HR records.
+There's stuff about products.
+When a user asks a question, it will probably pertain just to one part of one document.
+And if we just built one one vector associated with a whole document, then it's much less likely that
+a question is going to match directly with like an entire document like that.
+So it makes sense for us to try and think about how could we split up each document so that we've got
+the best chance that one particular fragment is something which can address a few different questions,
+and we've got just the right granularity for that to be true.
+And figuring out how to take documents and divide them into chunks is an example of of of one part of
+working with Rag that is super experimental, full of trial and error.
+There's no one rule to get chunking right, as we will see when we experiment with them.
+Anyway, that's the quick introduction.
+Here are some imports.
+There's a ton of imports we're doing here, and a lot of these are long chain related imports.
+Let's just take a quick look at them.
+Lang chain has a number of different packages and the different packages.
+You have to be pip installed or you've added separately.
+And they typically have different sets of dependencies.
+So there's one here for lang chain underscore OpenAI which is all of their classes related to OpenAI.
+There's one for for Chromo the database we're going to be using.
+There's one for hugging face classes.
+There's there's a set of document loaders, which are its tools for loading documents, which are in
+the Lang chain community, which is a bit like our community contributions.
+It's where people have added in open source contributions and then text splitters, which is a particular
+part of Lang Chain that's responsible for taking documents and turning them into chunks.
+So, as I say, it's an example of how Lang chain is quite heavyweight, that there are many different
+packages.
+If you remember with light LM there was there was only one package and it was it was just super simple.
+You import the one package, you can use any LM.
+So it just gives you a sense there's a lot going on, there's a lot of functionality.
+But it's it's there's also a lot to sort of learn about sign up for okay.
+So we do these imports.
+And interestingly it does take a fair bit of time to import all of this.
+There's such a lot going on.
+We're going to use GPT four one nano because we particularly want to do something which is going to
+be cheap and fast.
+And GPT four one nano is both of those things.
+We're going to be storing our documents in a vector database, which we'll come to later.
+It's going to be called vector DB.
+And let's also check that we've got an open AI key we have.
+All is good.
+All right.
+Next up we're going to load in our documents.
+So before we use any Lang chain code at all, I just want to examine these documents.
+First of all, I've got something here which is going to to use glob.
+Glob.
+If you remember that our way of a way of like walking through our directory structure for anything in
+the knowledge base directory that contains that is a markdown file.
+And we'll find out how many files we've got.
+I'm going to load all of them in to one variable called entire knowledge base.
+And I'm going to print how many characters do we have in the whole thing.
+So there's 76 different files in this knowledge base.
+And there's a total of 300,000 characters.
+And I'm going to use a library called Tick token.
+You might remember, I think we looked at that like we one uh, to, to look at how many tokens there
+are in this and count up the number of tokens.
+And there are apparently almost 64,000 tokens.
+If you take the entire knowledge base and you tokenize it.
+And for those that remember some of the leaderboards we looked at like, like Valium.
+You'll you'll realize that actually, that is something which we could squeeze into the context window
+for any of the major models.
+So you could, in fact, put the entire knowledge base I've got here.
+All of these directories, everything here could fit into a call to open AI.
+Now it would start to be a little bit more, more pricey every time you call it.
+With that entire context.
+It's a bit like putting all of hamlet in every single time, but it could be done.
+But the point here is that this data imagine that it was ten times bigger.
+Imagine that it was 100 times bigger.
+You would very quickly get to a point where you couldn't do it.
+And now I didn't want to do that because it would it would be unwieldy and it would start costing costing
+money.
+Uh, but but that's what you have to keep in mind.
+The idea of Rag is to be able to scale and support massive knowledge bases and still be able to get
+expertise, still be able to get high quality answers when we call the LLM.
+And indeed, in week eight, we're going to do a knowledge base with 400,000 documents.
+So we are going to scale.
+You will see that.
+And in my AI in production course we also use use much bigger scale.
+So so these this this example is like a medium scale just to give you a sense of it.
+But just picture going up by by two orders of magnitude.
+The same will apply.
+Okay.
+Finally time for some long chain code.
+We're going to load in these documents and turn them into a long chain object called a document, which
+represents each document.
+And this code is doing it's not very much.
+It's looks like there's a lot of code here.
+Uh, okay.
+But what we're doing is we've again, we've got we're using this glob glob to get a list of all of the
+folders.
+Each of these company contracts employees products into a variable called folders.
+And then we're going to say for oh, sorry, I just spelt that wrong.
+I somehow got that changed.
+There we go.
+Folders.
+Uh, so we're going to uh, we're going to, to take a documents list, an empty list.
+We're going to walk through each of these folders.
+For each one, we're going to say that the document type will just be the the name of that directory
+which whichever directory it is.
+And then we're going to use this lang chain community class called directory loader, which is something
+that can take a whole directory load in everything in there.
+And this here makes sure that it works on PCs as well as Macs.
+We will then bring that in.
+And for each document we will we will set something called doc type to be the type of document.
+And we will add that to to this list of documents.
+Okay.
+So if I'm then going to do print I'll do that cursor fill in for me.
+Print that we've loaded however many documents we've loaded.
+So this this is using the Lang chain loader classes to load in each of our documents.
+It's not that much more more sophisticated than what we did yesterday when we just loaded in documents
+as a string.
+But each of these things, if we just look at one of them, let's look at Documents Zero and look at
+it.
+It is a Lang chain object called a document, it has metadata.
+The source is where it came from.
+The doc type, the thing that we just put in there ourselves.
+This line right here, the doc type is the word products.
+Because this first thing is a product.
+And then page content is the complete contents of that page.
+So those are the fields in this object document.
+And you can check this out yourself and, and go through them and look at them and get a sense of what
+we have just loaded into the documents list.
+And now it's time to split each document into chunks.
+And splitting something into chunks is, uh, again, it's very experimental.
+It's very empirical.
+You try different things.
+There are a number of different things called text splitters, which are different classes in long chain
+that let you break down a document into smaller pieces.
+The very simplest one is just called the character text splitter.
+And it does basically what it says on the tin.
+It just chops it up by characters.
+There's a slightly more sophisticated version called the recursive character text splitter.
+Again, it sounds it sounds like it's something fancy, this one, but it's not.
+It's it's recursive and it just tries to.
+It first tries to split things by wherever there's a couple of empty lines between sections, and then
+it tries to do it by just one empty line and then just by end of sentences and things like that.
+So it has like a sort of hierarchy of how it tries to split up documents so that it's doing its best
+job at trying to break it where it thinks there's a natural break in the documents and you tell it.
+How many characters do you want roughly in each chunk, and how much overlap would you like there to
+be between different chunks?
+Because if you think about it, when you when we ask a question, there might be it's possible that
+a question will be answered by, by one paragraph.
+Uh, or it might be the answer, you know, if we if we just split the document, it's possible that
+the answer to our question would be somewhere in the middle, and that would be problematic.
+So by having an overlap with each of our chunks, we make it less likely that we would sort of chop
+an answer in half, but that it should often be the case that a particular question will map nicely
+to at least one chunk.
+So this is all some of the thought process that goes into chunking.
+But as you will, as you will discover, if you're wondering like what's the process for this?
+The answer is going to be trial and error.
+You experiment, you try different chunking strategies and see which one works best.
+And I know what you're thinking.
+You're thinking, okay, but what does it mean to work best?
+How do you know that a chunking strategy is working best?
+And that's an excellent thought for you to have.
+And fear not, we will cover that.
+That is one of the most essential aspects of of a Rag workflow that we'll be covering later in the week.
+But enough enough talk.
+Let me run this.
+We have just divided our documents, our 76 documents into 413 chunks.
+And here's the first one.
+It's just a chunk of the product summary.
+It's a chunk of this thing right here.
+Uh, so that's one of them.
+Let's, let's go through and just look at another one.
+Let's look at chunks.
+Uh, whatever.
+Number 100.
+Let's see what number 100 is.
+It's a chunk out of, um, the source, uh, thing and the source, the source document.
+And it begins with seven business continuity.
+So it's just a fragment of the document, 413 chunks.
+What happens if we change the chunk size down to 800?
+Then we end up with 532 chunks, more chunks, because they each have a smaller size.
+And we'll put it back to 1000.
+And you should try this out.
+Get a sense of it, get a sense of what this chunk overlap looks like.
+Convince yourself there's nothing very clever going on here.
+It is basically just dividing up the documents.
+You get different numbers of chunks if you have a different chunk size.
+Um, and, and uh, you can use you can, you can look up the different kinds of text splitter that
+you could try out here if you wanted to get deeper into this idea of turning documents into useful chunks.
+Okay.
+That is our first quick look at Lang Chain.
+We're going to go back and explore a little bit more about vector embeddings and vectors.
+And then we'll come right back here.
+--- Lecture 3 ---
+
+Okay.
+Well, that was your first look at Lang Chain and your first look at the document Splitters part of
+Lang Chain.
+We were able to load in a bunch of documents, split them into chunks, chunks that are like fragments
+of the document.
+And we use the recursive character text splitter that's able to to try first with, with double empty
+lines and then single empty lines and then spaces to try and divide things down into a certain number
+of characters with a bit of overlap between them.
+To try and sensibly divide up our documents into fragments, chunks of text that are likely to map to
+questions.
+Okay, put all of that to one side.
+We're changing topic.
+We'll come back.
+We're changing topic.
+We're going to talk about encoders or embedding models that I introduced yesterday, models which are
+good at taking text and turning them into a set of numbers that we can think of like it's a vector.
+It's a location in space sometimes known as a vector embedding.
+And this is something which which these models are very good at doing.
+And we, uh, we I do want to distinguish very carefully, and this is going to be a bit of a recurring
+theme today between these two different steps.
+Turning text into a vector that uses an encoder, and then storing that vector in a vector database
+such as chroma, which is one we'll be using.
+A vector database is a particular type of database that's very quick at doing queries, not SQL queries.
+In a way you may be familiar, but queries about which piece of data has a vector closest to this one,
+so they are quick at vector based retrieval.
+That's their point, but they don't themselves come up with the vectors.
+The vector isn't created by chroma.
+The vector is created by an encoder model, an LLM.
+That's what creates the vector.
+So there are these two different things to think about the encoder model and the vector database.
+And they are separate.
+When we look at the code it's somewhat conflates these two because you create them at the same time
+and associate them together.
+So it can get confusing to keep in mind that the vector database is where they get stored, but it's
+not where they're created.
+They're created by an encoder model.
+So just to rattle off a few encoder models, there's this word to vec, which is where it all began,
+a model which can take a word and turn it into a vector.
+It's not used for this purpose, but for historical reasons.
+This is the thing I mentioned with the king minus man plus woman is queen.
+Then Bert came out in 2018.
+This was Google's transformer model.
+That was an encoder that was so powerful and is still somewhat used today.
+But modern encoders, there are many of them.
+These are the ones you might come across most often.
+OpenAI has a bunch of encoders.
+They've got one called Text embedding, three small, uh, and they've got a companion called Text embedding
+three large.
+And we will use both of these at some point, I imagine.
+Uh, Google has one called Gemini Embedding 001, which is there.
+They're embedding model that's very popular.
+And then Hugging Face has a ton of open source encoders in a package called hugging Face sentence Transformers.
+And the one that is, I think, most popular, certainly the one that we all use and the one that I'm
+sure you'll come across many, many times is called the All mini lm, l6 v2.
+Very popular indeed.
+So these are some of the most common encoders you're likely to come across.
+Okay.
+We are now going to use long chain to take what we've just built and put it in a vector data store.
+So we already read in the documents across all of the folders.
+We already divided them into these chunks.
+We turned documents into little, little bits.
+From it broken down.
+We use the recursive character text splitter again uh, which which looks for double enters and then
+and then single character turns and then spaces.
+We've got these chunks that are all about 1000 characters long with 200 character overlaps.
+Hopefully you've gone in, you've dug in, you've looked at them, you've examined the chunks.
+You've satisfied yourself that they do make up these documents.
+Now the final step is to turn them into vectors and store them in a database.
+And again I say the final step, but you really do need to remember it's two different things.
+An encoder or an embedding model that's turning the text into a vector.
+And then a vector store the database where they are stored, which is able to quickly look up things
+that are close to each other in the vector data store.
+And so to to again recap the popular encoders I mentioned OpenAI's ones Gemini has one.
+The hugging face all.
+Many Ml6 v2 very popular.
+And then there are popular vector data stores or vector stores.
+So there's a lot of these.
+And I often get the question which vector data store should I use.
+Which one is best.
+And again it comes back.
+I think people often get confused between the encoder and the vector store.
+You really need to worry a lot about which encoder or which embedding model is best for your problem.
+Different embedding models will perform very differently in different use cases, and that needs a lot
+of experimenting and testing, as we'll be doing this week.
+The choice of vector store database.
+This is more like any other database choice.
+This is more an infrastructure choice about trading off cost and performance.
+There are open source entrants that chroma will use today.
+So easy to use and of course free open source.
+You just put it.
+There is another one that's pretty popular.
+Um, Fyss is very popular.
+It's Facebook's.
+It stands for Facebook AI similarity search from meta before the name change, I guess.
+And Fyss sounds better than mice.
+Uh uh, so uh, so Fyss is also it's very popular, but it is not really a database.
+It's just an in-memory, uh, version that is able to just take vectors and do in-memory vector search.
+So these are some of the most popular open source ones.
+There are paid offerings that are paid products like Pinecone and Alleviate, and there are a lot you
+can, you can, you can Google it or ask ChatGPT to to tell you some of the best.
+There are lots of them.
+Um, pinecone.
+They're both very, very popular.
+And these are paid offerings.
+And so you pay to be able to to scale to so they are managed database offerings.
+Um, and very, very much more powerful.
+So if you're looking for, for an enterprise vector data store, you might consider this.
+But I have to say it's less common in recent years.
+Uh, a recent year, I should say this is all very new, uh, because nowadays the mainstream database
+providers all support vectors natively, and so there's less of a need to sort of adopt a pure vector
+database like a pinecone, because the mainstream databases like Postgres, you can put vectors in Postgres
+as a relational database.
+Uh, Mongo a NoSQL database, you can a document based database.
+You can put vectors there to uh, at at Nebula.
+In my day job we use Elasticsearch, the high performance search platform.
+And that takes vectors natively.
+And so we have like 200 million vectors.
+And we're able to do a search that filters and finds similar vectors.
+And it does it just in a couple of seconds.
+It's blazingly fast.
+Um, and so it's just like like a native search engine which also natively supports vector similarity.
+And so the point I want to drive home here, a lot of people do ask me about vector data store choice.
+And I just want to say that that most of the time what matters is the encoder, the embedding model.
+That's what you really need to care about.
+That's what you need to test, as we will this week and really understand what are the which embedding
+model is going to work best for your business problem and surface the most relevant content, the data
+store it goes into.
+This is more of a concern of a typical Infrastructure data base decision.
+It's more about your cost, your performance, your ability to scale, your resiliency, the backups,
+the security, all those kinds of concerns as you would for any database.
+And so it's more of that kind of infrastructure choice that could work with whichever encoder you pick.
+Now there are some exceptions to that.
+The pros are probably waiting to jump in and, and correct me with some situations in which some of
+the high end, uh, platforms that can support different kinds of similarity search, uh, special performance
+optimized searches when they, when they only look in certain regions of space, that kind of thing.
+So it's certainly true.
+There is some overlap, but it's relatively light most of the time.
+What you should be spending your, your, your, um, energy focused on as a, as a, as an AI engineer
+is the embedding model.
+How are you creating vectors from text and the database decision?
+It's more of a kind of infrastructure call a trade off between cost and performance.
+--- Lecture 4 ---
+And welcome back to and welcome back to right where we left off before I did that little detour.
+Uh, so you remember, of course, that we just took our documents.
+We broke them into chunks.
+I think you got the idea of chunks now.
+413 of them.
+Uh, there they all are.
+We are now going to make vectors and store this in chroma.
+And we're going to use the open source embedding model or mini lm, l6 v2 from Huggingface.
+Now, look, I do believe that you do not need to be logged in to Huggingface to use this model.
+It's something that's just available publicly.
+Uh, but just in case, if you have if you do get any hugging face login, uh, error, then you remember
+that in week three we set up a hugging face token.
+HF token, please.
+If you get a problem with logging in, then add that token to your EMV file and be sure to rerun EMV.
+But I don't think it's needed.
+It shouldn't shouldn't happen to you.
+We'll need this for week eight anyway, so you might want to do it anyway.
+But but but regardless.
+Okay.
+So we're going to start by creating a new variable embeddings.
+And we're going to create an instance of this hugging face embeddings object.
+And this is part of Langerhans Code.
+And we tell it the model name.
+We want to use the all mini lm, l6, v2.
+There it is.
+And what we do here, this is saying uh, it's checking to see whether or not there is already uh,
+a thing called vector underscore db, which is what we called our database.
+And I do have that because I've run this before and it says if it exists then come in and make sure
+we wipe it so that we're starting fresh.
+So that allows you to run this many times again and again.
+And every time it will wipe it if it exists.
+And if not, it will create a new one.
+Okay.
+And now look at this line the vector store.
+We're creating a vector store.
+We use this this word chroma.
+This is another it's a long chain object that represents the chroma database a free open source database
+that actually has SQLite running behind it that will just get created just like that on your computer
+without you needing to do any more work.
+Chromium documents.
+And the thing we pass in as our documents that we want to create in our vector data store is the chunks
+that we just made are how many were there?
+400 and something chunks 413.
+Chunks 413 chunks.
+We passed them in and we also pass in the embedding model, the encoder, this thing here, the hugging
+face embeddings.
+And we tell it the name of the directory where it's stored.
+That is how we create our chroma database with the chunks, with the embeddings, with the directory
+name to create.
+That's what we do.
+And this is when I say that it's easy with with encode to sort of conflate the database with the embedding
+model.
+You can see you just sort of pass it all in together to create chroma.
+But this embedding model isn't isn't really associated with chroma.
+It's different.
+It just it could be any embedding model we could pass in there.
+Anyway, let's run this.
+It's now going.
+It's taking all of those documents, all 413 of them, turning them into vectors, putting them in the
+vector store.
+That's happened.
+It just all happened.
+And this directory vector db, if I open it up, it's full of SQL Lite sort of stuff, which is in fact
+a database with 413 chunks in it.
+How about that?
+If you just ran that, you just created your very first vector data store.
+Congrats.
+So next we're just going to dig into the vector data store to look at what we've got here.
+So a collection is the name of like.
+Like what in relational databases we would think of as like a table.
+So we've got we've only got one collection.
+So we bring it in as a, as a variable collection.
+And we asked for its count.
+How many things do we have.
+And we also just get one one of the of the objects in there.
+One of them we find out how many dimensions does it have.
+Let's have a look.
+So we've got 413 vectors in Cromer with 384 dimensions.
+Mentions.
+So that means there's like 384 numbers associated with each of those vectors.
+And if again, I know I think you know this, but those 384 dimensions, that's not a that's not a feature
+of Cromer.
+Cromer can take vectors of any size.
+It's a feature of the hugging face all mini lm, l6, v2 embedding model that turns text into this 384
+dimensional vector.
+That's where the vectors have come from.
+Okay, now for the best part.
+It's time for us to visualize.
+So I am a big believer in visualizing your data and seeing it and exploring it, something that we will
+be doing many times over the next few weeks.
+And this is no exception.
+And visualizing information represented in vectors can be particularly insightful and interesting.
+Gives you a way to spot outliers and interesting trends or problematic trends.
+It's just a great thing to do.
+And it's also from an education point of view, it's very, very helpful to give you like a real intuition
+for what does it mean to have our data represented by vectors?
+What does that actually mean?
+Well, you're going to see it and it's going to give you some clues.
+So first up I'm going to just just just pull out from our database a list of the vectors, a list of
+the documents which really the chunks, the metadata associated with each one.
+Um, the doc types.
+And then I'm also going to have a color, uh, that will pick based on whether it's a product, employee,
+contract or company.
+So that is what we will do.
+Um, and uh, what we're now going to do is, is bring this up just to see what it looks like visually.
+But there's a problem and, and, and the problem is with you and me, uh, the problem is that we humans,
+we humans have a limitation that we're not very good at seeing anything above three dimensions.
+We can't see things in 384 dimensions because we don't have any idea what that even means?
+Uh, so that is that is a problem.
+But luckily, mathematicians have come along to to put us out of our misery.
+There is a technique.
+There are a few techniques.
+There's one called PCA, there's one called t-SNE, which we're going to use.
+t-SNE stands for T-distributed.
+Stochastic neighbor embedding just rolls off the tongue.
+You don't need to know that you don't know what it stands for, but what you do need to know is that
+t-SNE is a very popular technique for taking higher dimensional data and projecting it down, say,
+to two dimensions, um, such that things that are close together in 2D are likely to be close together
+in multi-dimensional space, and things that are far apart in 2D are likely to be far apart.
+It's a statistical technique.
+You can you can Google it to read all about it.
+On Wikipedia.
+It's very common.
+Uh, so we are going to to run t-SNE and we're going to ask it to, to project down to two dimensions.
+It's going to use, uh, this random state means it should, should come up with the same answer each
+time.
+Uh, and we are then going to plot it so that we can see what this looks like when it's displayed in
+2D.
+Okay, here we go.
+We run it and bam!
+This appears.
+Now you may see some warnings.
+It may give you some hugging face related warning about something about threads.
+Ignore that.
+It's nothing you often get warnings with with sort of open source software.
+The frontier and warnings can can usually be just just noted down in case something goes wrong later
+to come back to.
+In this case, it's nothing.
+All right.
+Anyway, take a moment to absorb this.
+And it's like, wow, what are you looking at here?
+What is this?
+So this is like a, like a map of our data.
+And if you move your mouse over it, you will see that each one is showing you that the type at the
+top, this is an employee document and the text associated with this chunk.
+And you can see that all like 400 chunks are being displayed here.
+And if you if you some people say what is the meaning of the x axis and the y axis?
+There is no meaning of these axes.
+It's just the data as it's distributed there.
+What?
+What matters is what's close to each other, because that should be information that is similar in meaning.
+So that's the thing to to really get your head around and to, to, uh, browse around.
+Um, and here's the thing.
+The, the text that was sent to our encoder model, remember, it's the encoder that made the vector.
+It's been stored in chroma, but the encoder made the vector.
+That text was just the text of the chunk.
+It's based on the text of the chunk.
+It wasn't told that some of these are employees.
+Some of these are companies, some of these are contracts and some of these are products.
+So it's pretty interesting that some of the data has been separated out quite nicely.
+Like you'll see that generally the employees are all together here.
+Now there's some company related information no doubt.
+If you dig into it you'll see that it's quite employee related, but some of it has ended up around
+here.
+But most of it is clustered up here.
+And then you'll see some of the other stuff around here.
+So generally speaking it's separated things out.
+There is something which looks like a bit of a stripe of the product data that seems to come in between
+some of the different sections of contracts.
+So there's some separation by, by meaning based on the type of document.
+Uh, and you will hopefully get a good sense by looking around here are the different integration services,
+parts of different contracts.
+And you can see how they're close to each other in the vector space.
+So take a moment.
+Take some time to look through this.
+Examine the chunks.
+See that chunks with a similar meaning are close to each other, and get a sense for what does it mean
+to have this information, these vectors stored in chroma, keeping in mind that the vectors are stored
+in chroma, but the vectors were made by the hugging face or mini V2 model.
+That's what built these vectors that we're looking at right here.
+--- Lecture 5 ---
+Well, hopefully you are as happy with this as I am.
+I do find these these visualizations really cool.
+Make it a bit bigger.
+Why not?
+And close that that sidecar.
+There we go.
+Now we really get it in its full glory.
+All the different points there.
+I hope that you've you've taken a moment to to really dig in to this data visualization, but maybe
+there's something a little bit cooler we can do as well.
+It's probably not lost on you that we humans, as I mentioned before, are able to go one bit further
+than 2D.
+We can see things in 3D, and I wouldn't be doing my job if I didn't, uh, bring for you a 3D representation
+of this as well.
+And t-SNE is able to do that simply by passing in a number of components, three instead of two.
+Uh, and we can project our 384 dimensional space down to 3D and see how that would look.
+So let's take a look.
+Here it is coming right up.
+Bam!
+There I present to you, uh, our points are 400 chunks shown in 3D space.
+And I hear you.
+You may, may say, oh, at first blush, this looks a bit of a mess.
+Uh, I prefer the 2D version.
+Uh, but but wait, uh, you could, first of all, hover over these points to get their descriptions
+like this and see where they are in the space.
+But also, you can rotate the whole space around like that, check that out and get a real sense for
+you.
+Really get a better sense for how those blues, whilst they are a little bit in the middle of the red,
+they are somewhat in their own cluster.
+Um, and the yellows also have their own sort of distribution.
+Uh, and you can really hone in by, by zooming in like this.
+Check this out, come in and explore the different points.
+And so even though these yellows seem like they were a bit closer to the reds, they really don't look
+at it.
+Now you can see how they're distributed differently.
+So even though the 2D is a little bit easier to look at than the 3D, you can explore and And investigate
+so much more with the 3D, and I encourage you to have fun with this.
+Of course, the sort of the proper use of this is to spot anomalies.
+Spot how?
+Well, uh, different, different documents are being grouped by similarity.
+Dig in and try and find mistakes and gives you clues as to how you could potentially use different encoders.
+But it's also great fun, and it gives good intuition for what it means to have these vectors.
+And again, you can think of it like we're visualizing these vectors as they are in chroma.
+Just always keep in mind that we're visualizing indeed these vectors as they've been stored in chroma.
+But the vectors weren't created by chroma.
+The vectors were created by the hugging face sentence transformers model or mini lm, l6 v2.
+That's what turned our 400 or so chunks into these points in 304 dimensional space.
+And now for my next trick.
+Uh, I want to to drill down on this idea that it's the The encoder that decides where these points
+are in space.
+And what better way to illustrate that than to try a different encoder?
+So let's go back and let's try the different encoder back.
+Back we go here and I'm going to comment out where we set the embedding model.
+And here let's start by looking at the text embedding three small model from OpenAI.
+Let's check this out.
+Let's run this.
+And this code you remember is going to delete my database.
+Create a new database with 413 documents.
+Again the same chunks that are gone in.
+Let's run this again.
+Remember you can see here we had 384 dimensions before.
+From the hugging face model we now have 1536 dimensions.
+Because we're using a different embedding model.
+We're using a paid one.
+But it's very, very cheap from OpenAI.
+Text embedding three small.
+All.
+Okay, let's go back to visualize again.
+We'll do the pre-work to get our documents.
+And now here we are.
+So before I run this cell, let's take another look right here at how it looks before.
+This is how it looked before.
+We're now going to run this and generate a new visualization of the new vectors, as they are from the
+OpenAI small model instead.
+Okay.
+Are you ready for this?
+Keep this in your mind.
+Keep keep that picture.
+If you've got a photographic memory, hopefully it's there.
+Let's run this again and see what it looks like now.
+Okay.
+It's happened.
+There we have it.
+Okay.
+It looks completely different.
+So first off, the fact that it's all rotated around is doesn't mean anything.
+Remember the actual x and y coordinates don't have any meaning.
+What matters is the how separated the documents are.
+And look at how much better OpenAI's model has done.
+Look at how the employee documents are all the way over here.
+Look at how the, uh, the contracts are here.
+And you can see now that the products are in a quite a different place.
+Uh, except for some documents over here.
+And what you'll find if you look into this is that this specifically, these parts here are specifically
+around the features of the products.
+And that's going to be very similar to the text around here, which is the parts of the contract which
+relate to features.
+So you'll find that when you're using a model like like OpenAI, it's really very good.
+The OpenAI embeddings model and associating meaning.
+And over here you'll see that the company stuff is all here.
+In this one strip, you'll see that there's a couple of of employee records here.
+And these are going to be chunks of the employee record that seem to relate to information about the
+company.
+Uh, if you dig into it, I expect you'll find that.
+But let's go back up now and let's make one more change and change to the to to the large model and
+see how that looks.
+So here I am back in the embedding model section we'll go for text embedding three large.
+Let's run this.
+And we are now hopefully going to be converting our 413 documents into bigger vectors.
+Well how much bigger.
+Let's have a look.
+Before we had 1536 dimensions associated with with each vector, we now have 3072 dimensions, 3072
+dimensions in the vector store associated with each of our 413 chunks.
+Okay, it's time to visualize.
+Remember how it looks.
+This is how it looks with the small variants.
+Let's have a look with the large variant.
+Uh, and here it is.
+Okay.
+Uh, so again it's another step.
+Better see how again, first of all, as before, the employees are over on the left.
+Now it doesn't matter.
+They are clearly very separate except for these two pieces, which is the stuff that, um, you can
+see the word ensure is in both of these.
+So these are the the two fragments of an employee document that seem to be most about the company as
+a whole.
+You can see now that the separation between blue and red is even stronger.
+The smarter model has done an even better job of understanding the different semantic meaning between
+these chunks.
+Um, and over here you'll see that this this is indeed still parts of the product that is about the
+functionality which seems to belong most with the contracts.
+So you can see that that's why it's done that.
+Look here again, it's, it's part of the, of the product.
+And this is the parts of the contracts that are about the product, which is why they're all around
+the same territory.
+So absolutely fascinating.
+You can see what a better job the large model has done.
+And so we really see how we've, we've we've stepped up between the small hugging face model, then
+the small version of OpenAI, which is still pretty big, and then the large version with 3072 dimensions
+and and how that's allowed the data to be so separated.
+And it's worth pointing out, it can be tempting to think that the reason that the large model is better
+is because it has more dimensions.
+It is typically the case that like, like, like a larger model will produce vector embeddings with
+higher dimensionality that allows it to express things with, with, with more degrees of freedom.
+But that's not always the case.
+And it doesn't need to be the case.
+It matters that it is a more advanced transformer that is a better at capturing the meaning of the text,
+and being able to express that in more dimensions, I suppose, gives it more power to do it.
+So they are often somewhat related.
+But we did move between about 400 dimensions, originally 384 for the hugging face model to about 1000
+dimensions, 1005 to about 3000 dimensions.
+As we move through those three embedding models, I know, I know exactly what you're waiting for me
+to do.
+You're waiting for me to make the 3D plot.
+I'm thinking of it too.
+Let's do this and let's go in.
+Remember the old 3D plot?
+This is the old one with the hugging face model.
+A bit of a mess.
+Let's now create a new 3D plot.
+I know it's what you're waiting for.
+Here it is.
+Well, you know, it's still a little bit messy because these 3D plots can be.
+But check this out.
+Look at what happens if I maneuver us around.
+Look at how cleanly separated those four blobs are.
+Again, some overlap between contracts and the products.
+And that's because there is some overlap in those types of documents.
+Contracts contain some product related information in them, as you will see if you dig into these documents.
+But generally speaking, this is just amazing to see.
+It really gives you this, this, this good sense of what it means to take the meaning of a document,
+turn it into a vector in space.
+I hope you like it, and I do encourage you to explore this more.
+Now keep working through this.
+Look at different points where there are points close together.
+Satisfy yourself that the content of those chunks is similar, and get a good sense of what it's what
+it takes for a model to position some data somewhere in vector space.
+And that is a wrap on this great day.
+I hope you agree that that my intro was was was true.
+It was a lot of fun today.
+Those vector visualizations, that's what it's all about.
+Uh, I very much encourage you to experiment with different encoders now.
+Go, go and try some different embedding models.
+You can look them up, you can do different open source ones.
+Or you could try and do like the Gemini one if you've got a Gemini account.
+Experiment with them and then look at the visualizations.
+Playing with with encoder models is terrific fun and getting a good sense, a good intuition for for
+how they represent information differently.
+Anyways, to recap, at this point you can generate texts and code with frontier models, assistants
+and tools, open source models, hugging face transformers.
+You can choose the right model for your projects using benchmarks leaderboards.
+You can explain how Rag uses vector embeddings and vector data stores to turn text into documents,
+into chunks, to turn chunks, into vectors, to put vectors in a data store how vectors is like the
+index in to data.
+And we've used chroma, the open source database, perhaps your first vector database that you've now
+got running on your computer.
+Fantastic.
+Next time, next time we actually build a Rag pipeline, we use Lang Chain to build a Rag pipeline.
+Super easy.
+We deliver like a rag based expert question answerer and you'll be able to to and we'll create like
+a Gradio based chatbot app that will show not only the answers to questions, but also it'll be able
+to show the documents that it used.
+That's reference that helped it answer the question.
+The relevant context surfaced by our Rag pipeline.
+We're going to do all of that tomorrow.
+And at this point, you are 55% of your way through to being an LLM engineer.
+See you tomorrow.
+

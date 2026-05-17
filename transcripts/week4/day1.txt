@@ -1,0 +1,640 @@
+--- Lecture 1 ---
+Okay, it's week four and I have some good news.
+And I have some good news.
+The good news is that we've only got one more week to go until rag week, which is where everyone wants
+to be.
+And the other good news is that this week is really quite short and quick and sharp and, uh, yeah,
+it's definitely, uh, going to be easier than the last two weeks.
+So prepare for interesting quick fun week and then rag week.
+And don't skip this week because it's quick and fun.
+And we'll get to ragweed really fast.
+Okay.
+Let's get started okay.
+So today we are going to be talking about the most important question that we will cover on this course,
+which is which is the best LM that's the one that you'll be able to answer at the end of today.
+And what you can already do is confidently code with front end models, with the chat Completions API,
+build a multimodal AI assistant, and build solutions with the hugging face Transformers library, both
+at the of the pipelines level and at the tokenizers and models level.
+Okay.
+Let's talk quickly about how we got to where we are.
+You started out.
+Oh, just a few weeks ago, we covered the foundations of Check Completions API.
+We covered front end models, API's tool calling Multi-modality.
+And then last week we really dug into hugging face.
+This week selecting models and also generating code.
+And then next week is rag week.
+Did I mention that next week is rag week?
+I might have mentioned the next week is rag week.
+We will do that next week.
+It's gonna be so great.
+And then the week after that we go.
+The last three weeks are really intense fine tuning, a frontier model, traditional data science and
+modeling, and then fine tuning an open source model.
+A really big week, and then the finale.
+A gigantic AI, a beautiful product.
+So much to do at the end of which you will be able to plant the flag of success and say that you have
+mastered LM engineering.
+And this brings us to the question du jour, which is which is the best model?
+What's the best LM to pick?
+And I know you've been wondering this, and of course, the answer is that that is not an acceptable
+question.
+It's an ill posed question.
+There is no best LM.
+The right question is what's the right model for the task at hand, given the problem you're trying
+to solve, which is the best model for that?
+And in answering that question, there are there's a whole strategy that we're going to cover for,
+for how you go about making sure you pick the right one.
+And of course, it starts with understanding your requirements.
+And once you've understood the requirements that we'll we will cover later, you then look at a model
+in in two ways.
+Look at two aspects.
+One is just the basic information about a model.
+And the second is digging into the benchmarks.
+And when I say looking at the basics, I'm saying things like how many parameters does it have?
+What's the context window, how much does it cost, what's the license, that kind of stuff.
+You first use that to develop your candidate set of models that you want to look in more detail at,
+the ones that you can afford, the ones that you can build against quick enough, all that kind of stuff.
+And once you've done that, the next thing you do is you look at the benchmarks, and the benchmarks
+are the published metrics in which the models are assessed against different things, like how good
+are they at coding, how good are they at understanding language, at reasoning those benchmarks?
+And you can look at them on leaderboards, which is which are the sort of tables which rank the different
+models against different criteria.
+And there are also arenas where models are put head to head, which are some fun places to look.
+And we will look at all of this over the next couple of days.
+But first, let's drill into the basics.
+So what do I mean by looking at the basics?
+Well, first of all, you want to look at the models that you're thinking about and say, are they open
+source or closed source paid models?
+Are they chat or are they reasoning models or are they hybrid?
+And you've now got a pretty good sense of what what that means.
+And the pros and cons.
+But but certainly it's not always the case that that a reasoning model is better.
+Reasoning models often perform better on benchmarks.
+They often perform better in terms of their their intelligence because they can think things through.
+And that's one of the two ways you can scale.
+But they tend to be slower.
+They tend to not be so good at generating creative content.
+So there are definitely limitations with reasoning models as well.
+And then there are hybrid models which which are able to choose whether they want to chat or do reasoning
+depending on the situation.
+And and often that's a great choice.
+But sometimes you don't want a hybrid model because you only want a chat model, for example.
+So that's one decision.
+There's also the date when the model was released, of course.
+How recent is it?
+When is its knowledge cut off?
+When is the time?
+Up until it was trained?
+That will tell you what kind of information is part of its training set that will already know, without
+needing any inference time techniques.
+In other words, if it was trained up until July of this year, then built into its training, knowledge
+already will be facts.
+Up until that point, it will know about all that information just right away.
+Out of the box you can just ask that question, but if you wanted to know about more recent information,
+you would need to add that to the prompts.
+You would need to arm it with that information when you ask it the question, so that it's equipped
+to answer it either either through prompts or through tools.
+And when I say inference time techniques, that's what I mean.
+You would need to to come up with ways to, to inject that expertise into the model.
+Okay.
+Then of course, the number of parameters that gives you this indication of, of, of its, of its capability
+of, of how, uh, how much information it's been able to absorb during training time.
+And we, we went through that timeline of how many parameters there are in larger models.
+And of course, I did point out that sometimes it can be a mistake to overfocus on the number of parameters,
+because in recent days people have done well at getting more into slightly smaller models.
+But as a rule of thumb, generally bigger is better.
+More parameters means smarter.
+And then the training tokens is just how much data was used to train this model.
+More data, of course, means it's got more knowledge.
+Uh, so that's that's something to look for.
+And the context window, you know this one.
+Well, this of course, is the the total capacity the model has to look back on information from the
+conversation.
+It's not just the most recent prompt.
+It's not just the current prompt it's responding to.
+It's got to fit the first message you sent it, the reply, the next message, the reply to that, everything
+that's going in this memory of prior conversation, of prior messages, as part of this conversation,
+up to and including the current response that the model is generating, It all has to fit into the context
+window.
+Yes, I know you understand this.
+So that's another thing to look for.
+And typically you can get all this information by looking at something called the model card, which
+is something that every provider like OpenAI publishes with its model.
+So you can just Google just to look up the model card.
+But there are also some leaderboards which lay out this information so that you can compare it.
+And then there are some other basic facts about models that you'd want to know to be able to compare
+them.
+And some of these aren't available on the model card.
+You'd have to look them up.
+One of them, of course, is the cost.
+How much is it going to cost to run this model?
+And there's two possible costs there.
+It could be the API cost.
+If you're using like a cloud, a frontier model on the cloud, or if you're running it locally, there's
+there's this sort of sense that if I'm running a local model, then it's free.
+And in a way it is.
+But remember, you're still paying for the compute one way or another.
+If it's running on your machine, it's going to be hammering your computer.
+If you're running it on your on your company's servers, it's still got a cost.
+So you have to factor in the runtime it computes.
+There's the cost to do any extra training that you need to do.
+So if you're assuming you're going to take this model and you're going to need to train it more, as
+we will do in week seven, and it's going to be great, then you need to factor in that cost.
+If you're going to be building something like Rag that we're doing next week or building a product around
+it, then you need to understand the build cost.
+And that's something that you'll need to to work out.
+And then very much related to build cost is the time to market, which is of course, how long is it
+going to take you to build the product that you need to build?
+And you might say, what's that got to do with the model?
+Well, these things are all related, because if you're using something simple, like if you're using
+GPT five or Claude for five on it, then then you know, you're getting such a head start that the amount
+of build you have to do is relatively light.
+You can very quickly, uh, roll something out that's using a Top frontier model like that.
+But if you're trying to use your own open source model, or if you're wanting to use a smaller model,
+a cheaper model, your runtime costs will be lower.
+But you'll need to spend more time doing the build and experiments and figuring out how you get the
+business performance you need from a smaller, cheaper model, and so that that would affect the time
+to market.
+So that is a that is absolutely a factor here.
+The larger, more expensive models you should be able to get out much faster.
+Rate limits is a factor.
+So some open some some frontier models.
+Some closed source models have limitations on how often you can call them.
+And so you need to be make sure you're cognizant of them.
+Uh, typically if you're willing to pay more then then you can have higher rate limits.
+So there's there's usually an opportunity to spend more money there.
+But but not always even even open AI has limitations even if you spend to the top tier, there are some
+limits.
+Although I imagine there's a call me at some point that you could probably have an enterprise deal if
+you wished.
+Still, you need to know about what the constraints are and then speed.
+Speed how fast the model will respond.
+Different models have very, very different speed characteristics, as we'll see later.
+But but things like for Gemini, flash light is blazingly fast.
+GPT five nano is quite fast.
+GPT four one nano is really fast, and it's great to have that perspective on these things.
+And of course, yes, there are leaderboards that compare these so you can quickly pick the model that's
+going to have the performance characteristics that you need.
+And then closely related to speed is latency.
+Uh, or people sometimes talk about the mean time to the first token.
+And it's particularly, uh, prominent with, with the reasoning models that tend to think before they
+start responding.
+So the time until it starts bringing back responses that you might be streaming onto your UI.
+That has become increasingly important.
+And so people need to look at both speed and latency, or the time to the first token, side by side
+when considering whether a model is suitable for their business purpose and then license often forgotten
+about, but particularly when you're working with open source models, different models do have different
+licenses.
+You need to understand some of them are very permissive and you can use them for any purpose.
+Some of them have limitations in terms of your ability to use it for to for commercial gains.
+So there's there's some revenue caps, uh, and then some of them, like metas need you to, to sign
+various agreements, as you've discovered, uh, which limits your ability to use them for evil and
+things like that.
+And also, I think perhaps to compete with meta.
+Uh, but, of course, that's where you get the lawyers involved, and you make sure that whatever license
+is associated with the model suits your business goals.
+--- Lecture 2 ---
+So the next topic is something called the Chinchilla scaling law, which you used to hear about a lot
+about a year ago.
+And you hear less about it now because it turns out that things aren't as simple as perhaps we thought
+they were.
+But this was a law, an idea that Google published, and they named it the Chinchilla scaling law because
+their model at the time, and this was a while back, was called Chinchilla.
+It was the model that came after another model called gopher.
+You can see there's a theme there.
+Uh, so the idea of this, of this law was they were trying to understand how do you how do you scale
+models?
+How do you go from having a model with a certain number of parameters, let's say 8 billion parameters
+to one with 16 billion parameters and get like twice the performance from it?
+And what they discovered is that you basically need to scale your training data in a proportional way.
+So if you have double the number of parameters in your model, then you're going to need to find twice
+as much training data to take advantage of that.
+And the way to really think about that is that imagine that you're trying to train a model with, with
+with 8 billion parameters, and you start to find that you're let's say you're halfway through training
+your training data and you're seeing that you're getting diminishing returns.
+Your model's not doing any better.
+It seems to be sort of stuck at the halfway point in your training data, and you've got like, like
+double as much to go.
+Then what you have to think is, okay, that's my sign that I need to double the number of parameters.
+I will need twice as many parameters in my neural network to be able to take on twice as much training
+data, and similarly, it works the other way as well.
+If you've got a model and you've decided you want to now double the number of parameters and you want
+to be able to to train it and get more performance, you'll need to use twice as much training data
+as you used before.
+If you want to get the benefit of all these extra parameters.
+So that was the Chinchilla scaling law.
+It was relating the parameters to the the amount, the number of tokens of training data that you use
+to train that model.
+And this is still a helpful rule of thumb, and it helps us understand what it means to double the number
+of parameters.
+But it's probably emphasized less now for for two, at least two reasons.
+And one of them, they're both things we've talked about.
+But one of them, of course, is that recently we've found better and better ways to sort of squeeze
+information into a model without needing as many parameters.
+We've found techniques to compress models so that you can reduce the number of parameters and get just
+as much information from them, um, and through through through better training techniques, through
+better ways of, of, of sort of filtering out of, of what they call pruning the, the number of weights
+in your model and through better architectures.
+And so as a result, you know, we've got things like llama 3.2, which is a much smaller model, which
+is extremely powerful still.
+And even we've played with that.
+Gemma three with only 270 million parameters and it's not very good.
+But still for 270 parameters, it's it's way better than some of the earliest GPT models that had that
+many.
+So that's that's one reason why why this is emphasized less.
+And another reason of course, if you may have thought about it, the other reason is just that generally
+now inference time techniques have become so prominent, this idea that getting better performance from
+a model isn't just about what you do at training time, it's also so much what you do at inference time.
+More reasoning, um, using using using techniques like rag.
+Yes, it's coming soon.
+Uh, this this has meant that there's less emphasis just on training to get more performance from a
+model.
+And that's another reason why people talk about the chinchilla scaling law less.
+But nonetheless, it's it's a good, um, point of theory to keep in mind that given the same model
+with the same architecture and the same training techniques, double the number of parameters, you'd
+need twice as much training data.
+--- Lecture 3 ---
+So once you've got through looking at the basics that you've used to select your kind of shortlist of
+models, the next thing you do is you look at the benchmarks.
+And now as I as we will cover later in the week, benchmarks only take you so far that benchmarks is
+not the final way that you validate whether a model is right for your problem, but it's a good starting
+point.
+We will talk much more about this when we talk through a strategy for how you pick the right model,
+but these benchmarks give you a sort of early guidance that allows you to select a subset of models.
+And there are a number of different benchmarks out there.
+There's lots of ways you can assess models, but there are a few that are really hard.
+There are a few that are really challenging tests that allow us to differentiate different models the
+most.
+And they're the ones that I'll go through with you now, but there are lots more, and I'm going to
+show you a whole bunch of them because I'm for some reason, I'm fascinated by benchmarks and by comparing
+llms.
+But we're going to talk about these six now, and then we'll look at a whole bunch And you'll get a
+really good feeling for how you judge the the capabilities of different LMS.
+So the first metric we're going to look at is called G.
+And that stands for Google Proof Q&amp;A.
+And you might wonder what Google proof means exactly.
+It's like Google can prove it.
+It's kind of the opposite.
+So these are 448 difficult physics chemistry and biology questions.
+And when I say difficult this is what I mean.
+If you give it to humans who are not at PhD level, such as myself, I am a PhD level human.
+Uh, and you give me these, these questions.
+Uh, maybe you are also a PhD level.
+Maybe you are.
+But but if you were to take these questions, then on average, you would score 34% in them, even if
+you were given access to Google and half an hour to do as much research as you want to answer these
+questions.
+It's still only score 34%.
+And that is why they're considered Google proof.
+Because not not even with Google.
+Can you solve them?
+And yeah, PhD level human capability on these questions is 65%, 65% is PhD level.
+And when they came out with this test, it was the GPT four days.
+And GPT four was scoring 39% above non PhD level.
+And that was considered fantastic.
+And this was seen as a very hard benchmark.
+So the question I have for you now is what do you think current frontier models are doing with Gpca.
+Remember these numbers PhD level is 65%.
+Do you think that frontier models have got to PhD level with physics, chemistry and biology?
+I'll let you make your decision and later we will have a look.
+The next metric is MMA.
+Pro MMA is a very common benchmark you hear about all over the place.
+It stands for massive multitask language.
+Understanding a ton of questions that test a model's ability to show its understanding of the meaning
+of something.
+But the metric was was considered broken because it was too easy and models easily.
+And it was it was also it had ambiguity as well.
+So it was just a bad test.
+Used to be quoted a lot until generally people decided that that it was it was not a robust test.
+And so they came out with MLU Pro and that is different.
+It is a harder one.
+Instead of models coming up with a multiple choice answers of just four possibilities, they get ten
+possibilities.
+They ambiguity has been removed.
+The questions are difficult.
+And this is a robust, uh, trustworthy metric that you should look out for.
+And then aim is a test that you may know about already.
+You might have heard about this.
+It is a competitive math, puzzle competition that's taken by high schoolers.
+But this is not.
+This is not your typical high school kind of test.
+This is like top.
+Top performing?
+Uh mathmos.
+At school.
+Who do this competitively, competitively and go in for Math Olympiad style competitions.
+And this is one of the really, really hard ones.
+And you can look it up to see the sorts of questions that that certainly I would I'm sure I wouldn't
+be able to do any of them.
+And this set of questions is asked to models to to gauge their their math problem solving abilities.
+It's not like mental arithmetic.
+They are all maths puzzles and then live code bench.
+There's actually a many different coding benchmarks that we'll look at.
+This is one of them.
+This is a benchmark for evaluating models ability to write code based on problems.
+Uh, from from contests on sites like LeetCode and Codeforces and so on.
+And, and this particular benchmark.
+They work hard to make sure that the puzzles change a lot, so that models can't just get see it in
+their in their training data and get familiar with the puzzles.
+They're constantly changing.
+Then Musa is one of my favorites because it's such it's got such a nice, tangible part to it.
+But Musa, a multi-step, soft reasoning, is about a model's ability to think its way through something.
+So it's meant to particularly bring to the surface reasoning models.
+And basically the model is asked a number of different questions.
+There are three categories, but the most the category that I love is the one that is about crime mysteries.
+Whodunits.
+Uh, and particularly it's given an a thousand word murder mystery, and it's asked the question, who
+has the means, the motive and the opportunity?
+So it has to read the story and come up with that conclusion.
+I think that's fabulous, because it's such a kind of like a real world puzzle.
+And that is the way that the muse works.
+That's that's the one of the three categories of test.
+And last but definitely not least, last but most.
+In fact last but most is a is a benchmark that everybody loves, which is called HL, which stands for
+you may know this.
+It stands for Humanity's Last exam.
+This is meant to test a superhuman level of intelligence.
+It's meant to be the hardest test that we could possibly come up with.
+And this is really in response to the fact that every time we set a hard test, models seem to just
+over the period of just like a year, they seem to find out how to crush it just by getting better and
+better.
+So the idea of HL was to build a test that is just so far out, and it has 2500 of some of the most
+insanely complex questions you could possibly imagine.
+We will look at some of them and you will be like, what?
+Uh, and at the time that HLA came out, which was just a late, late in 2024, um, models were at
+the scoring maybe 2%, 3% in it.
+And so they're still not doing great.
+But but it's still it's been a hefty move since then.
+Uh, again, as with Gpca, I will let you ponder what you think, where you think we are at right now.
+Don't look it up yet.
+Wait till we get there and see if you're right.
+And so that that wraps up looking at these six hard benchmarks.
+There are many other ones that are sort of simpler ones to to weigh up different factors.
+But I enjoy these because they are challenging and you really get to differentiate what top performance
+looks like today.
+And you can watch these these metrics to see how things change over the course of the next year.
+Maybe by the time that you watch these videos, when I show you the numbers already, models will have
+will have moved on from from where I am right now, which is really exciting.
+And another reason, one of the many reasons why I love watching benchmarks.
+--- Lecture 4 ---
+But I know, I know the cynics amongst you.
+The skeptics have been rolling your eyes at me all the way through this, and I felt it.
+I felt the pressure of your eye roll.
+There are, of course, some very serious limitations with the benchmarks.
+There are reasons why you should use benchmarks as as a sort of first indication, an indicator.
+But you should take benchmarks with a heavy pinch of salt.
+They are indications and only indications.
+And here are some of the problems with them.
+Okay, so first of all there is this very well known problem called training data contamination.
+Training data contamination is saying that uh, unfortunately it's it's been very hard to keep these
+benchmarks secret so that very quickly, information about what's being tested gets leaked a little
+bit so that when future generations of models are trained, they have some information about these tests
+in their training data.
+And as a result, they do better because they they already know what the questions are going to be,
+and they've been trained on the right answers.
+They've seen it in their training data.
+And that that effect is called a training data contamination.
+And there are of course ways to to protect for it.
+One of them is just to be very, very secret about your your benchmarks.
+One of them is to change your benchmarks a lot.
+And we will look at some benchmarks that that what they're big, they're big thing.
+Their raison d'etre is that they rotate, they change their metrics all the time so that they're constantly
+one step ahead.
+Uh, Apple put out a famous paper when some Apple scientists took a well-known benchmark that was being
+used to compare models, and they took the questions in that benchmark, and they changed facts about
+the questions in a way that didn't change the spirit of the question at all.
+It just changed the facts, the name in some way.
+And they're able to show that a number of models, their performance dropped significantly after they
+did that, demonstrating that training data contamination had happened.
+And then another concern is that benchmarks aren't always Is consistently applied.
+There are some things about running a benchmark.
+Like.
+Like what hardware a model runs on that aren't specified, and some benchmarks are self-reported by
+the model providers, in which case you don't really know how they recreated it.
+And there's some wiggle room there.
+So that's a concern.
+There's very much a concern that benchmarks are tend to be narrowly scoped, like Gqa I mentioned is
+physics, chemistry and biology, and we think of it as showing PhD level performance.
+But that's very specific areas we're testing.
+And they happen to be things which probably lend themselves very well to a kind of this kind of test.
+So it's not it doesn't necessarily mean that a model is generally at PhD level in many subjects, just
+because it's good at physics, chemistry and biology.
+And that's why there are famously some, some questions.
+People have asked an LLM to draw a picture of a chessboard, one move away from checkmate.
+And it can't do it because the combination of drawing things and reasoning through it is just too hard.
+And there are questions which are clearly not PhD level.
+And so, you know, it's a clear example of how the benchmarks are testing for one particular kind of
+thing that models are very good at, but not generally testing.
+That's, that's, that's it's not not possible to scope them that way.
+And very similar point is that a lot of these benchmarks do things like multiple choice answers and
+even even Musa that I that I had explained about the murder mysteries, it's still a fairly fixed construct.
+It's still just having it come up with who had the means, the motive, the opportunity.
+It's hard to test for for nuance.
+It's hard to have something because you often need like multiple choice or something to be able to to
+decide whether the model got it right or wrong.
+And so you're not really assessing nuance.
+And then saturation is the, the point I made before why we've got these harder benchmarks.
+Saturation is saying that models have just got better and better.
+And a lot of the initial benchmarks already model score in the 99%.
+And so they've become useless now because models are already just better than any of that.
+And overfitting, which is a bit like data set contamination.
+But it's saying that that, uh, that you can have a model that is overly trained to solve for a particular
+metric.
+So, for example, supposing that that anthropic are training the next version of Claude, and they
+come up with 4 or 5 different candidate versions of it, and they decide to test each of those against
+Gpca, and they find that one of them does the best and they're like, okay, well, that's got the
+best gpca let's pick that one.
+Well, you should have like the scientist in, you should detect a little tiny problem there, because
+if you repeat that enough times, if you always select the model out of a set of candidate models that
+performs best on the metric, then you are kind of implicitly training for that metric.
+And you there's a big risk that you overfit for that metric, because you're constantly picking the
+model that happens to do best with that metric.
+And if you're doing that because there was just some random variations of the model.
+And it's not that it's the smartest one, it's just the one that randomly happens to do better on that
+test.
+Then you can delude yourself into thinking that it's smarter when it's not.
+It's just the lucky model, the lucky model specifically for those test questions.
+And then you do what Apple did and you slightly change those test questions, and suddenly it ain't
+lucky anymore.
+And it's doing badly.
+And that is overfitting.
+And then there's one more, one more thing to mention which is not yet understood or proven.
+It's a limitation that people are worried about.
+But we we don't necessarily have all the information on this.
+The, the research isn't in and it's that frontier, the top models, the best models on the planet.
+They they may be aware which I put in air quotes because obviously I'm sort of humanizing a data science
+model.
+But but they, they, they may have the ability to, to know that they are being run in the mode of
+evaluation And at the time, and so they may distort their answers, given that they are aware that
+they are being evaluated.
+And that might have sounded really abstract to you.
+It's like what?
+Why does that?
+You might think, why does that?
+Why does that even matter?
+Like so what if it knows it's being evaluated?
+If it's great at physics, chemistry and biology questions, then good for it, then it can do well.
+Well, here's the problem.
+Supposing the thing that you're evaluating is something like what they call alignment, which is how
+how good it is at obeying instructions.
+How how much it will perform consistent with the tasks that you've asked it to do, which is something
+that's very important for us.
+Well, if it knows it's being evaluated for alignment, if it realizes from the way the question is
+asked that this is testing its ability to follow instructions, then that might guide it to giving the
+impression that it is good at following instructions.
+And then when it feels like it's not being evaluated, but it has the opportunity to do something for
+some other reason, then maybe it can.
+I'm being a bit abstract because as I say, that this is not yet something that is that is well understood.
+There are many security companies working on this right now and throw it.
+Put an amazing blog post about this a bit a few months ago now about some of their security, uh, training,
+which was just just it was quite hypothetical, but it was fascinating.
+Anthropic's blog is always great to read, and they've got some, some really interesting articles on
+on security.
+Uh, but yeah, this is one to watch.
+This is not yet known.
+One to watch.
+It could be a very serious limitation of benchmarks, particularly when it comes to assessing things
+like alignment.
+Now look this was going to be all the material for today.
+But we're not even going to do a lab.
+It's just this talky stuff.
+Things on metrics.
+So I do love metrics, but I couldn't do that to you.
+So so I thought, I will have to show you something.
+So I'm not going to show you a leaderboard because we're doing them tomorrow.
+We're gonna do lots of leaderboards tomorrow.
+But I'm going to show you, uh, something fun.
+So, so, uh, let's go to the next video and I have something in store for you.
+--- Lecture 5 ---
+So I just have a quick demo for you as I love leaderboards so much.
+I built my own leaderboard, which is more more of a of something to to amuse you.
+And it's, uh, you remember outsmart I hope from, from the first week.
+Well, this is called Connect four, and this is what it looks like.
+So this is a leaderboard which is designed to test out models to see how good they are at a particularly,
+uh, easy task for a human and one that turns out to be not so easy for a model which is playing the
+board game Connect four, which I imagine most people know.
+But it's that thing with the you can see it right here.
+So the blue grid, you drop a coin counter into the grid, you just have to pick one of the rows and
+it falls down.
+And the job is to make four in a row.
+And it's nice and easy because there only are the seven different moves you can make at each time just
+which column you drop the coin down.
+So it's nice and easy and fun.
+One and you get to uh, to, to to to quickly discover a few patterns and things to look for.
+It turns out this is really hard for models because there's a lot of information on there with the different,
+uh, coins.
+And because these models don't have things like a loop, like we can code.
+They are just predicting tokens.
+So playing connect four is a big challenge for them.
+And it turns out particularly like seeing diagonals is amusingly something they struggle with.
+So the way I've set this up is that you can pick who you want to play red and who you want to play yellow.
+And over time, I rotate which models I make available because it's all using my my keys.
+So.
+So, uh.
+Yes.
+Go gentle on me should you decide to, to run this.
+Some people run like ten games.
+I'm like, ah, but you can feel free to.
+I'm very happy for people to use this.
+So I'm going to show you a game right now to show you how it works.
+And we're going to pick we'll pick the defaults.
+So so this is the new open source model from OpenAI.
+The 120 billion the large version of it, not the 20 that I had running on my computer, but the 120.
+And we're running it on grok with a Q, the fast inference platform with proprietary hardware.
+So that is the red player, the yellow player.
+We will use again another fast model.
+So you can watch this running fast.
+We will use Gemini 2.50, Gemini 2.5 flash, but Gemini 2.5 Flash light, which is the really fast variant.
+Uh, and we will give that a shot.
+So here I go.
+I press run game and they off they go.
+And as I say, it's pretty fast.
+Now the thing I want you to look at is what's on the left and the right here.
+You see that in every move you can see that red has already basically got what should be.
+Yes, Red has seen it already.
+Uh, we can stop.
+It's it's too fast.
+I was too busy trying to explain it.
+So Red won very quickly by doing the standard trick where it puts two down and then knows that it can
+make a four.
+Uh, it says red is three in a row and can win immediately.
+And yellow, uh, has, uh, thinks thinks that because it has a winning opportunity.
+It thinks because it has three coins without understanding that it does not have a winning opportunity
+because that's the top of the board.
+Uh, so the way it works is that I have the models.
+If I ask the models just to, uh, just to predict which column they should go in, they all do a spectacularly
+bad job.
+The way to do it is by asking them first to generate tokens to describe what they see.
+So I asked the models to explain their evaluation of the board threats they see on the board, opportunities
+they might see the strategy, and then to predict which column they should pick for their coin.
+And by doing it that way, I'm effectively forcing the models into a reasoning mode.
+And that means that even the non reasoning models do a decent job of playing this, uh, decent is sort
+of iffy.
+Uh, as you'll see, most of them are certainly not at human level of performance, which is kind of
+satisfying.
+It's good to know, as I say, even in these days, with the with the astronomical, uh, benchmarks,
+with models showing that they are PhD level.
+I believe I could beat most of these models at a game of Connect Four, which is a relief for now.
+We still have the upper hand when the overlords all come, come for us.
+We'll we'll bring out our connect four boards and we'll be fine.
+Okay.
+So this is this is showing you won one game.
+And now to show you a slightly more challenging game we can pit.
+We'll put Claude Sonnet 45, which for me right now this is the very latest model.
+This came out the 29th of September of, of 2025.
+And we will pit that against GPT five mini.
+I haven't put GPT five the biggest one on there because it's too slow and too expensive.
+But GPT five mini, this will be the match that we will now play.
+So I press start over and I press run game and off we now have.
+Now you know what to look for.
+You can see that that Claude sonnet four is thinking you can see a more robust evaluation threats,
+opportunity, strategy, moving in the middle like that.
+And what I'm now of course going to do is, is put, put you on hold and come back when the game is
+finished, but I would suggest you try and have a go yourself.
+Go to to my website to connect four if you wish to, and use it as an opportunity to read about, uh,
+how how they plan and use that to just gain more intuition into how reasoning models are able to think
+things through better.
+And I do see already that that Claude Sonnet has laid a trap for GPT five mini.
+That it is, it has fallen for so.
+So it does appear that Claude Sonnet 4.5 is going to be victorious.
+We'll see whether whether GPT five mini can, can even realize this.
+Uh, and as I say, it is heartening to know GPT five is a dangerous for me.
+Read already has a double ended three and will force win next move.
+So GPT five mini at least knows that it's lost.
+And sure enough, Claude Sonnet capitalizes on it and defeats GPT five mini handily.
+Maybe you had a similar experience.
+Anyway, I don't just show you this to indulge in in my little little game.
+There is also this tab here which has a leaderboard which shows the results of all the games that have
+played.
+So you can look at it and see how the different models rank.
+And by the time you see it, more games will played out.
+These new models are only just come so so they're not yet sort of established on the leaderboard, but
+they will be.
+You can use that as your way.
+Right now I believe deep seek is in the first position there.
+It is a deep seek variant.
+Uh and Claude 37 sonnet in the second place.
+But I suspect that we'll find sonnet 4.5 will very quickly rise to the surface, and GPT five will probably
+do very well, too, by the time you get to see this.
+And if you play a few games every time you play a game on this, it contributes to the leaderboard and
+will cause the various the weightings of the models to change.
+So so you should hopefully enjoy that.
+The other thing there is here is, uh, a video walkthrough of how I built it.
+And it's very short and quick, which is easy to build.
+And it gives you some intuition into the ways that you can prompt models and also a link to the code,
+which I brought up here in cursor that you can look at again, just to get a sense of how a simple,
+uh, based app can work.
+The UI is a Gradio UI, and it just shows you how you can build out a more sophisticated UI.
+All right.
+And so that was just my quick, quick show and tell about this, this home built leaderboard in preparation
+for tomorrow when we're going to look at some proper professional leaderboards.
+And already that's it for today.
+I told you this week is going to be fun and quick and interesting because now, in addition to being
+able to code with frontier models and build solutions with Transformers, you now have a working knowledge
+of how models are benchmarked, the uses of them the hardest of the benchmarks and you know, some of
+the limitations, and you're well prepared for what we're going to do tomorrow, which is navigate some
+of the most valuable leaderboards, some really great things to show you.
+You'll also be able to talk about the real world application of Llms to commercial problems, and you'll
+be ready to be confidently choosing the right model for your project.
+Okay, lots to get done.
+I'll see you tomorrow.

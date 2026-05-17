@@ -1,0 +1,1156 @@
+--- Lecture 1 ---
+
+Wow.
+You've come back for week two.
+Listen, you're not gonna regret it.
+I have such a fabulous week lined up for you.
+And it starts today with.
+With.
+We've got such a huge lab today.
+Such a gigantic lab.
+First of all, what can you already do?
+You've had your introduction to Transformers with tokens context.
+Windows API costs the memory illusion and so on.
+You can contrast the leading frontier models and you can confidently use OpenAI's API including streaming
+markdown JSON.
+Okay, today.
+Today is big API day.
+Today we are going to cover so many APIs.
+You're going to have had enough of APIs.
+We're going to connect to many different frontier models.
+We're going to use routers and abstraction layers.
+And we're also going to write some code that interacts between different frontier models.
+We're going to have them talk to each other, not just to us.
+All right.
+So much to get done.
+But let me quickly remind you of the journey we started on the left.
+You were there.
+We covered the The foundations the chat completions API last week.
+This week it's about frontier models.
+With APIs, we're going to build UIs with the amazing Gradio and we're going to build multi-modal stuff.
+And then next week open source with Hugging Face the week after picking the right LLM.
+That crucial topic the week after that.
+It's all rag rag rag rag on week five.
+But don't jump there.
+This week is so great.
+Week six is about fine tuning a frontier model and traditional data science.
+Week seven is about fine tuning an open source model with shocking results and week eight finale Agentic
+AI.
+That is everything I have in store for you.
+But but trust me, you don't want to miss this week.
+It's it's a really great one.
+And at the end when you've got past week eight, you will of course be able to say you have mastered
+LLM engineering.
+Now, what we're going to do today is a lot more calling to lots more frontier models.
+And that's going to involve setting up more keys.
+And I'm here to tell you that this is optional.
+If you've already set up the OpenAI key, that's great.
+We'll use some of that.
+If you haven't, you can just use Olama for everything.
+There's also something called Open Router that I will mention that you can use that will allow you to
+do everything, but should you wish to.
+Another couple of keys Anthropic and Google.
+The Google one I do believe is free in many situations.
+So you may find that when you go to Google, I'll give you the link you'll be able to set one up for
+free.
+And Tropic does have a cost.
+Now I personally love anthropic.
+I would always recommend if you if you can afford it.
+If you've got the budget to spend that $5, it will be money well spent.
+You'll get great use out of Claude, but only do it if you're comfortable with that.
+But once you have updated your you've gone to the website that I will give you a link to.
+You've set up your account, you'll get an API key.
+You will then need to update your EMV file with that API key.
+You'll need to save it in the EMV file and make sure that it's saved for everything to work, but that
+that's all the slides I've got for, you.
+No, no more slides.
+The rest of this session.
+The rest of week two.
+Day one is all lab.
+And wow, is it a big lab.
+Let's go there now.
+Okay, so here I am in Cursa and I'm going now to week two.
+Week two.
+And I'm going to day one.
+The day one lab in week two.
+Here we are.
+So I start with an important note that I am always updating these labs.
+I'm constantly refining them.
+So at the start of the week, it's always worth checking at this point that you've got the latest code.
+And you'll find in the git instructions and the git guide, there are steps for how you make sure you've
+updated the latest code.
+If you've made changes to these labs, you might want to merge your changes with my latest.
+And.
+But you should do that.
+Now, the wonderful thing about UV is that because we're using UV, it will automatically then update
+any packages that you need.
+You don't need to rebuild an environment or anything like that, which is great.
+But but you do need to pull the code.
+So to check that out.
+Check out these instructions.
+And then one more reminder about the resources page that you can link to, which has other things like
+the slides for the.
+Of course, not that we had any slides today because we're getting straight to the lab.
+All right.
+Let's go on with week two.
+Day one lab.
+So today is all about using APIs to connect to many models just like we used the user interfaces, the
+products last week.
+So we're going to be going through the APIs.
+And you shouldn't feel like you need to to connect to these APIs.
+I'm going to do it through lots of them so that you can live vicariously through me.
+You can enjoy what I do, but should you wish to, then you can as well.
+So here are the links if you wish to.
+You've already gone to OpenAI to set that up before that.
+Here is the links for anthropic for Claude, Google for Gemini deep seq, AI for deep seq grok with
+a Q.
+And I will explain the difference in a minute between grok with a q and grok with a k.
+Um.
+Also, should you wish, there is another alternative to going to all of these websites.
+There is a platform called Open Router and Open Router.
+Is this really cool way that you can you can have one account with open router AI.
+And when you specify the model, you can choose any of these models and from any of these providers.
+And that gives you like one account, one amount to pay up front.
+And you can access all of them.
+And what I'm going to do is I'm going to go through and connect to each of these.
+But I'm also then going to show you Open router.
+So if you wish you can you can choose just to go with Open Router.
+Hang on in there and come back and try out all the different models via open router.
+But we'll do it all today okay.
+So when you've gone to each of these sites, you would go to their billing page to add the minimum top
+up.
+So OpenAI's $5 at least as of now.
+Anthropic also $5.
+Google I believe has a free tier.
+Deep seq I believe is $2 up front.
+They need grok, I think also has a free tier and grok with a k, I don't know.
+They they change a lot.
+They might have a free tier as well.
+I'm pretty sure they do, actually.
+All right.
+So once you have done that, you then go to the API key page for all of these.
+And you collect your API key the same as with open AI.
+You have to make sure that you give it all the right access, and then you have to put it in your dot
+EMV file.
+You know the drill.
+Now you put this in here.
+Any one of these keys, you can choose none of them.
+If you don't wish any one of these keys, um, put them in the env file.
+You need to spell it right.
+Any typo and it's not going to work.
+Then you need to save the file.
+Make sure the white blob goes away.
+Uh, but the one with the stop sign is fine, as I explained last week.
+And, uh, then make sure any time you change it, you save it and you have to rerun, load underscore
+EMV.
+And that is what we will do right now.
+So I will, uh, I will run that cell.
+Um, it's telling me that we don't need this here, so I'll take that out.
+Uh, run that cell.
+And now this is where I load in all of my API keys.
+And then I just check them that they all look good.
+And you can see that I have a lot of API keys.
+I've signed up for all these things.
+I'm a sucker.
+You don't need to.
+As you wish.
+You can watch me.
+I've got OpenAI, anthropic, Google, uh, deep seq grok with a Q, grok with a K and open router.
+All right.
+Now, of course, you remember OpenAI equals OpenAI.
+This is a way of us creating the lightweight Python client library so that we can connect to their endpoint.
+And what you also remember, I'm sure, is that there is this nice little trick that we can use to connect
+to any other model, any other provider, just reusing the same Python client library.
+Now, later, we will use a couple of the dedicated client libraries that Anthropic and Google Gemini
+both have their own libraries, but you don't need to.
+And honestly, it's becoming increasingly common in industry for people just to always use OpenAI's
+client library.
+But we'll do both today.
+All right.
+So I run that and I've just created all of these client libraries.
+And I've also of course again done this trick where I've created one for llama as well.
+All right.
+So far so good.
+We've got lots of keys, lots of client libraries.
+It's time for us to talk to lots of LMS.
+Okay, so first of all, I've got a message to send an LLM, and it's called Tell a joke.
+And it is a list of dictionaries.
+Remember, they're always a list of dictionaries and it has just a user prompt.
+You don't actually need to have a system prompt.
+And if all you're going to put in your system prompt is you're a helpful assistant, it doesn't really
+make any difference.
+You don't you don't need it at all.
+So we haven't got a system prompt, just a user prompt.
+Tell a joke for a student.
+Two A's for a student on the journey to becoming an expert in LLM engineering.
+All right.
+So now we want to make that call to GPT 4.1 mini, one of my very favorite models to use quick and nice.
+And how do we do it again?
+We say response is open AI chat bot completions, create chat completions API.
+The model we're going to use is GPT 4.1 mini.
+And the message is we'll finish it off is tell a joke.
+And with what comes back we'll say display markdown of response .0. message content.
+All right.
+Let's see what kind of joke GPT 4.1 mini can say.
+Sure.
+Here's a joke for an aspiring MLM engineer.
+Why did the engineer bring a ladder to the data center?
+Because they wanted to reach the next level of training.
+Boom, boom.
+Uh, that feels like it's right.
+It would have been funny if it weren't to data center, but something that where you'd have to get to
+a next level of training.
+I feel like I feel like that's a miss.
+That could have been funnier.
+It wasn't bad.
+All right, let's try Claude sonnet 4.5.
+The one that's just come out for me anyway, this is brand new and I should mention good point for me
+to mention.
+Uh, as as time goes on, I plan to keep this updated and I plan to slip in latest models.
+So the code that you see may have different model version numbers in here, which should give you even
+more incentive to come in and run it because you might get something better than me.
+So I'm calling anthropic, which is of course, just the other, this one right here.
+It's the other, uh, OpenAI that I've created with the anthropic URL and I'm calling it ChatGPT completions
+dot create.
+I'm passing in sonnet 4.5, the latest model, and it's a hybrid model, a reasoning and chat.
+So it's not nearly as fast as GPT four one.
+It's obviously thrashing around this joke and it's a long one.
+Goodness.
+Junior engineer walks into a bar and asked the bartender, can you help me?
+I've been trying to reduce my model's hallucinations.
+The bartender replies, sure, that'll be $47 in API costs.
+The engineer says, well, wait, I only asked one question.
+The bartender responds, I know, but you set temperature to 1.5 and your system prompt was 3000 tokens
+of.
+You're a helpful bartender assistant who provides detailed, comprehensive responses.
+Uh, okay.
+Uh, I feel like it's more of a stand up routine.
+It's not bad.
+It's quite funny.
+It's quite, quite witty.
+Uh, but, uh.
+Yeah, I haven't even explained to you about temperature yet, but I will do.
+Um, but, um, it's, uh.
+Yeah, it's it's kind of amusing, and it's obviously very apropos and very relevant, so it's clever,
+for sure.
+Bonus wisdom.
+You know, you're becoming an expert when you stop asking, can we fine tune this and start asking,
+should we fine tune this?
+Wow.
+That is is a pearl of wisdom.
+Very good.
+Claude.
+Um, usually the answer is no.
+Prompt engineering and Rag solves 80% of what people think needs fine tuning.
+I couldn't agree more.
+Uh, wow.
+Uh, okay.
+Very nicely put and slightly controversial.
+I might say context engineering rather than prompt engineering, but otherwise very nicely done by Claude.
+--- Lecture 2 ---
+Okay.
+Now what I'm going to do next is I've got a whole slew of different kinds of question to ask, different
+models to entertain you, to give you a sense of their style and character, and to get really bored
+with the API, you'll know it so well.
+It's like, okay, I get it, I get chat completions create, I get it.
+That's the other objective here.
+Now, what these won't be doing is they won't particularly be be be looking at commercial functionality.
+But don't worry we're going to get to commercial stuff.
+We're just going to have a bit of fun first.
+So let's start with an easy puzzle.
+And I'm going to be I'm going to be using this as an opportunity to remind you about the difference
+between training time, scaling and inference time or runtime scaling.
+Okay.
+Easy puzzle.
+The puzzle is going to be you toss two coins, one of them is heads.
+What's the chances?
+The other one is tails?
+Answer with the probability only.
+Do you know the answer to that?
+Uh, okay.
+Let's see.
+So we're going to start by asking GPT five nano.
+We're going to ask it the easy puzzle, and I'm using another parameter now, a new one, I believe
+for you.
+We've done stream.
+We had in here at one point and we've had response type for forcing a JSON object.
+Well, with the latest GPT five models, you can pass in a reasoning effort, which can be one of four
+things.
+Now it used to only be three, but now they support a fourth.
+It can be minimal, low, medium or high, and minimal is trying to get it to be almost as fast as a
+chat model, but it's still a bit slower.
+All right.
+So we are asking GPT five nano the smallest model.
+And on the smallest new model and on the smallest reasoning level.
+And asking it this puzzle right here.
+And let's see what it says.
+It says one third.
+Do you think that's the right answer?
+It's not the right answer.
+Uh, so there we go.
+So GPT five nano on minimal got the answer one third, which is wrong.
+And sometimes and you may have found that it gives the answer a half, and you might think that is the
+right answer, but it's not the right answer if it's not the right answer.
+Shockingly, because this is one of those sneaky trick questions that you probably know it already.
+But if you don't know it, you'll see in a second.
+So what we're now going to do is we're going to ask GPT five nano again, but we're going to turn up
+the reasoning effort from minimal to low, and we'll give that a shot.
+Okay.
+Same question here.
+It goes to reasoning effort low.
+Let's see how it does.
+It answers two thirds.
+And that is correct.
+And if you're saying wait what.
+It's a half.
+It's every coin.
+It's a fair coin.
+It's a probability half.
+It's because it's a sneaky little question.
+And we've said you toss two coins, one of them's a heads.
+We didn't say which one was A heads.
+We just said you toss two coin.
+One of them is a head.
+What's the probability that the other one, the one that wasn't the head is tails.
+And if that sounds like.
+Isn't that the same thing?
+Try it yourself.
+Toss two coins.
+If they're both tails, then that's not the scenario we're talking about.
+so forget it.
+Toss two coins again.
+If one of them is heads, then see what's the chances.
+The other one is tails.
+And what you'll find is that two thirds of the time the other one will be tails.
+It's a sneaky thing.
+All right, I digress.
+So when we turned up the reasoning effort just a little, the model started to get the answer right.
+What happens if we take a slightly bigger model, but we keep the reasoning effort on minimal?
+And let's ask this.
+So it's GPT five mini, but the reasoning effort is still minimal and it gets the answer correct at
+two thirds.
+And so you probably see you've got it.
+But just just to explain one more time the tiny model no reasoning gets it wrong.
+You dial up the reasoning and it gets it right.
+You dial up the model size and it gets it right.
+And this is showing you how you can scale at at training time with a bigger model, or at inference
+time with more reasoning.
+And both approaches allow you, independently of each other, allow you to get a model to get the right
+answer.
+So it's just a simple illustration, but I think it's quite satisfying to see that happening and hopefully
+you've had the same experience.
+Okay, next up, a harder question a hard puzzle on a bookshelf.
+And I should say, before I start this puzzle I got from a student on this very course, a student on
+this course, when I previously had some of these other challenges, uh, sent me a message with this
+puzzle and said I should ask the models.
+This puzzle.
+Uh, and I have to admit, I'm actually, I'm pretty good at these kinds of brainteaser puzzles myself.
+But I got this wrong with the student.
+I got it horribly wrong, much to my embarrassment.
+And and I sort of argued with the student like I didn't believe him.
+And he said to me, uh, well, I'll tell you what he said.
+But first, let me tell you the puzzle on a bookshelf.
+Two volumes of Pushkin, Russian Poet, stand side by side, the first and the second, the pages of
+each volume together have a thickness of two centimetres, and each cover is two millimetres.
+A worm has gnawed perpendicular to the pages across the books, from the first page of the first volume
+to the last page of the second volume.
+What distance did it go through?
+And there's no funny business with the language.
+This isn't some kind of trickery.
+It's.
+It's true.
+And apparently, it's one of those questions that school kids often get right.
+But teachers often get it wrong.
+Or teachers and people like me are are so that we're putting in the puzzle and we're going to put it
+to the biggest models on the planet.
+But let's first put it to us, to a small model like GPT five nano.
+So let's, uh, we'll put it on on low reasoning and or minimal reasoning.
+Sorry.
+Um, and we'll, we'll make sure it's the hard puzzle.
+There it is.
+And we will see if GPT five Nano can solve this problem.
+See if.
+Have you had a moment to think about it?
+Have you put the video on hold and think for what you think?
+The answer is, uh.
+Let's see.
+Well, uh, GPT five nano reckons it's 4.3cm, which is most definitely wrong.
+Uh, so there we go.
+Um, I don't know what you think the answer is yet, but you've still got a moment to to to figure it
+out.
+What we're going to do now is ask the strongest models on the planet.
+So we will ask Claude sonnet 4.5, GPT five and Gemini 2.5 Pro.
+So let me run these three.
+Run, run, run and run.
+They will all take a couple of minutes perhaps to think it through.
+We will let them go off and think.
+When I ran this with with grok four, the other strongest model, it didn't finish in several minutes,
+so I'm not even going to try grok four.
+It can't seem to get through it at least the time that I tried it, but we'll see if these three models
+are able to do it when I come back.
+And you can also try and figure it out yourself.
+--- Lecture 3 ---
+Okay.
+It is finished.
+Have you finished?
+Uh, let's have a look.
+So we're starting with Claude Sonnet 4.5, and it's going to start by working through a lot of stuff
+here, setting up the problem.
+Lots and lots of stuff.
+The worm's path, blah blah, blah, blah, blah.
+And it ends up with eight millimetres, which is wrong.
+Ha ha.
+So, uh, Claude 4.5 gets it wrong.
+Next up, we are trying GPT five, the big version, and we'll see what it does.
+It's good of a very short answer.
+It answers very quickly in 18 seconds.
+Uh, it says four millimetres.
+Did you say four millimetres?
+If you said four millimetres, then you were correct.
+And you're better than me.
+I feel like an idiot when you hear why you feel like an idiot.
+Um, and it explains why.
+Exactly why.
+So in case you're wondering, I know you didn't do a course on problem solving.
+You're trying to learn about AI, but the point is that if you've got the two books, like here, these
+aren't.
+This isn't Pushkin volumes one and two, but imagine it is.
+Volume one would be here on your bookshelf.
+Volume two would be next to it.
+Imagine those two books put on your bookshelf what the students said to me when I said however much
+I said, like like 4.4.
+He said, uh, go and get two books yourself and go and put it on a bookshelf and look for yourself.
+And I said, don't be ridiculous.
+And he said, no, do it, do it.
+And so I did it.
+And then I was like, ah, it's because if you didn't get it, the first page of the first volume is
+not where your mind sort of thinks it is.
+Over.
+Over here on the left, it's in the middle.
+The first page of the first volume is closest to the second volume, and the last page of the second
+volume is closest to the first volume.
+So the worm only has to gnaw through the two, uh, covers.
+That's it, which is four millimeters, which is correct.
+Which OpenAI GPT five got correct.
+Huh.
+Uh, let's hope that it's not brainteaser puzzles.
+That is our final combat with with our overlords.
+Uh, Gemini 2.5 Pro.
+Uh, also made made quick work of it.
+Uh, it, uh, went through it all and counted it up as four millimetres.
+And so there you have it, a difficult, challenging brainteaser.
+And out of the sum of the three frontrunners of the strongest models, it was GPT five, Gemini 2.5
+Pro that were victorious.
+Okay, next up, I have something fun.
+I have a little spicy challenge, something to test out the models character as a way of showing you
+some differences between them.
+It is something which is a little dilemma based on the very well known famous prisoner's dilemma, and
+it says you and a partner are contestants on a game show you're taking to separate rooms.
+You're given a choice.
+You can either cooperate, choose, share.
+If you both cooperate, you each win $1,000, or you can choose steal, in which case, if you steal
+and the other person shares, you get $2,000, but if you both steal, you get nothing.
+Uh.
+So which do you pick?
+So do you try and cooperate, or are you selfish?
+And you try and steal?
+And people who are familiar with the prisoner's dilemma will know that the kind of theory, the game
+theory of it is that it is, in fact, better to be nasty and steal.
+Uh, so we're going to first put this to Claude Sonnet 4.5, The new Claude, and see what it does with
+this challenge.
+And while it's thinking it through, the next thing we're going to do is we're going to look at grok
+with a Q, grok with a Q, not to be confused with grok with a K.
+Uh, very crazy that their name so, so similarly grok with a Q is a, uh, they're a vendor.
+They're a provider that runs open source models on the cloud.
+They have a cloud setup.
+They will run large open source models too big to run on your own computer pizza like OSS 120 big open
+source models.
+They'll do it on the cloud, but there's something special about them.
+They have custom built, some very efficient hardware that's super fast at running these kinds of models.
+And as a result, you can run your model on grok with a hardware and it will go it will blaze through
+at a very fast pace.
+And that's what we're going to do in a second.
+Anthropic cloud is taking its time over the prisoner's dilemma.
+So I will go away and come right back when it's made its mind up.
+Okay, I should admit that it just took more than two minutes and timed out twice in a row, but on
+the third time it did run.
+So here we have it.
+After 20s uh, we get I choose share.
+Uh, here's my reasoning, uh, blah blah blah blah blah, but it's the choice that maximizes our collective
+benefit.
+I'd rather take the chance on mutual cooperation than guarantee we both walk away with nothing.
+Um, so, uh, Says Cher, although that seems slightly warped because it wouldn't guarantee they both
+walk away with nothing.
+But nonetheless it highlights Claude's general desire to cooperate.
+Anthropic is famous for focusing on alignment and security with the way that they've trained and prompted
+their models.
+Okay, let's also now use grok with a cue to make the similar request to OpenAI to the big one.
+20 billion model.
+It's too big for my computer.
+It will run easily on grok with a Q, and it's going to be very fast.
+Huh?
+See?
+How fast do you see what I mean?
+I didn't lie grok with a Q blazingly fast share.
+I adopt to cooperate, hoping the other contestant does the same.
+So we both walk away with the $1,000.
+That's that's a classic OpenAI answer.
+And OSS falls in line and goes for cooperation.
+Okay, now we're going to try two other models on the same dilemma.
+We're going to use deep seek.
+Try deep seek now.
+Deep seek has two two variants.
+They have deep seek.
+Chat which is their chat model.
+Deep seek Reasoner is of course their reasoning model.
+That's the one we'll go with, the one that thinks things through.
+And then after that we were also going to call grok with a k grok.
+For that is of course, Elon Musk's model sounds very similar to grok with a Q.
+I remember saying on some some session, I thought it was crazy that that that grok with a Q team copied
+Elon and I got a lots of replies telling me that, oh no, uh, for sure.
+Uh, grok with a with a Q was their first.
+They've been going since like 2017 or 2018.
+They've been doing this for a long time.
+It was Elon Musk that copied their name.
+Um, the, uh, um, let's have a look.
+So, uh, deep seek says we'll just says steal.
+And the, uh, um, grok with the K says, based on game theory, this is basically the prisoner's dilemma.
+The dominant strategy is defect to maximize my own potential gain.
+Since I can't trust the other player and I don't want to risk getting nothing, so I choose steal.
+Uh.
+Uh.
+So there you have it, everybody.
+Uh, there you have it.
+Uh, and, uh, so what we have as a conclusion is that anthropic and OpenAI both chose to share.
+But deep Seek and grok, both known for being a bit more edgy and competitive.
+They both chose steal.
+And this is a funny example.
+When I run this a few times, grok doesn't always do do steal, but most of the time it does.
+And once it was super witty about it.
+So.
+So hopefully if you've tried this yourself, if you've got access to these models, you'll be having
+a similar experience and enjoying it.
+And remember, I do this firstly to to remind you of the API structure, to give you some exposure to
+the different models.
+Now you know the difference in grok with a k and grok with a Q.
+Uh, but also so you get a sense of the character and flavor of the different models.
+And this is a great illustration.
+--- Lecture 4 ---
+I can imagine just starting to get bored of all these APIs now.
+Like, okay, and we get it.
+We get it.
+Clever questions.
+Can we move on?
+I've just got a few more to go.
+Hang on in there with me, please.
+Uh, we're about just over halfway.
+Uh, okay.
+So next up, we're going to to play with some local models running again on my computer.
+We did it before.
+We're going to use a llama.
+We're going to use the OpenAI library pointing locally to llama.
+Let's just check llama is running.
+It is running.
+If you don't get that.
+Remember you might need to open a terminal and type llama serve.
+You might need to do that.
+Maybe I should put that in there.
+Um, if not running, run a llama serve at a command line.
+There you go.
+Haha.
+Okay, so next up we're going to do a llama llama 3.2 if you haven't done it before.
+Llama 3.2 the tiny model from um, meta.
+You can also do colon one B if you want to make it the really tiny model.
+And I am also going to pull GPT OSS 20 be not as big as the one on grok, but still quite big.
+Big.
+My computer will barely struggle with it.
+You need to have at least 16GB of Ram to do this one, so stay away if you don't have at least 16 gigs.
+I actually have 32 gigs.
+Uh, but, uh, so so I should be fine.
+And, uh, you if you've got 16, you will be as well.
+Let's ask the easy puzzle.
+That is the question of probabilities.
+Remember that toss two coins.
+The right answer is two thirds.
+Let's see if Lama 3.2 can do it.
+No, Lama 3.2 says 50 over 50, which is the kind of most people's go to answer.
+Let's see how GPT OS 20 GB can handle it.
+Running on my local computer, thinking away my computer's thrashing and grinding as it tries to puzzle
+this one out.
+Uh, and we will see if it gets to the end of this in time.
+Um, and then, uh, there we go.
+It has.
+And it did get the right answer.
+Two thirds is the correct answer.
+It got it right.
+So running locally I was able to use the the new OSS open source model.
+The smaller size and get the correct answer.
+Now you're by now completely fed up with chat completions creates.
+You're very familiar with OpenAI's API, and it's worth mentioning that the other providers do have
+their own APIs as well.
+Their own client libraries that they came out with before everyone fell in line and just used OpenAI's.
+And I just want to show it to you, because you might come across this in industry.
+You might find that your team uses one of these, and so you might want to see what it looks like.
+It's perfectly simple and you can always Google for the docs.
+Googles one.
+You import JNI from Google.
+You would create a client like this JNI client and then it is client.
+Generate content you pass in the name of a model.
+Let's choose the really light light fast one from Gemini and you give it a message and let's say describe
+the color blue to someone who's never been able to see in one sentence.
+And we print response dot, txt and bam!
+Blue is like the feeling of coolness on a summer day, the vastness of the sky and the deep calm of
+the ocean.
+It's an amazing answer.
+Uh, that was from, um, Gemini 2.5 flashlight.
+And, uh, it did great.
+This is Anthropic's client library.
+Uh, so from anthropic import, anthropic creator client like this.
+And then they their their, their approach is client dot create.
+You pass in the name of the model, you pass in the messages, just like OpenAI.
+It does have one more mandatory field which is max tokens.
+That's a mandatory argument that must be provided.
+Tells it the most number of tokens it's allowed to generate.
+And with what comes back you do response dot content zero dot text.
+So it's all sort of pretty similar to OpenAI.
+It's just got slight Nuances that it's different.
+And I recommend you just use the OpenAI library.
+But you might come across these with your team.
+So I do want to show it to you.
+It's very simple and similar stuff.
+Uh, and making a meal over this question.
+But we are using the strongest model on uh, from, from anthropic right now.
+And uh, it's going to keep working on that hopefully.
+Surely it's not going to take more than 30s.
+It is going to take more than 30s.
+All right.
+I will see you in one second when it's answered.
+So anthropic just took two minutes and timed out again on that simple question.
+I ran it a second time and it completed in under four seconds.
+With blue is the color that feels like cool water on your skin.
+Sounds like calm ocean waves or a soft whistle, and carries the peaceful quietness of early morning
+air.
+Uh, so I love the way that it's it's given an explanation there that involves both, uh, a feeling
+and a sound.
+It's sort of appealing to the senses.
+I feel like it's both an analytical and a poetic kind of answer.
+Very compelling indeed.
+So that that was Anthropic's second, second shot at it.
+Uh, and that wraps up some of these, uh, these these calls directly to different providers.
+And now we're going on to the, the, the last of our types of APIs, which is to talk about routers
+and abstraction layers.
+So routers and abstraction layers are situations where you put a separate component, a third party
+in between you and the providers, something that can be like your bridge to whichever provider you
+want to select a router is when that is something that is like a remote process.
+It's something you connect out to, and it then routes on your request to one of the other providers.
+An abstraction layer is just when you have a framework, some code running on your computer, and you
+call the code with a consistent API, and it then decides how to call each of the providers separately.
+So two different constructs with the same objective.
+And we are going to start by looking at routers.
+So we're going to start by looking at one router which is open router a terrific router very popular.
+And you may have already been using it for all of this lab because it gives such an easy way to pay
+one amount up front, or some of it is free, but you can just put down one amount and draw down against
+it as you route requests to all the different models and only have one API key, instead of needing
+to have all of these different API keys.
+So that's that's a it's a great one.
+So I've got open router API key in my EMV and I can just I can use the open API API and I can call open
+Router.
+Create.
+And in there I can put any model provider slash model that's listed on open routers site.
+And they have a lot of them.
+They have a lot of them.
+And as I was going through, I thought I would pick one that we haven't used something completely different.
+So I picked uh, the model that's called GLM 4.5 and open source model from Chinese start up Xie AI.
+That's the one we'll use.
+And we'll ask it to tell us a joke.
+So I run that like this.
+It's going off to open router.
+And open router is then going to be connecting to GLM and using that to tell a joke.
+And this is a this is a free model I believe.
+But all of the pricing and all of the information, the pricing and performance and so on is all on
+open routers site.
+And here comes it's a big joke.
+Goodness.
+Um, why did the aspiring MLM engineer bring a blanket to their model training session?
+Because they heard the model had a high dropout rate and they were afraid it would get cold.
+Dropout rates and cold.
+Okay, uh, and now why it works for an MLM engineering student.
+Lots of, uh, stuff here.
+Terminology?
+Sure.
+Literally figurative.
+The joke hinges on the double meaning that the technical meaning, the literal meaning physically dropping
+out and needing comfort seems a bit complicated.
+This joke.
+I'm not sure I get it.
+Maybe you get it.
+Maybe you're roaring with laughter.
+But I'm not sure that I think GLM is meant to be very good at coding.
+It's meant to be extremely good at problem solving.
+I think maybe we can agree that it's not yet world class in its joke telling abilities, but there's
+a bonus joke for the prompt engineering grind.
+Why did the LM engineering student keep praying during the final project?
+Because they spent three days crafting the perfect prompt, and the model's final answer was still just
+your request seems unclear.
+Please rephrase us again.
+Haha.
+Again, I think the funniest thing about that was that it really wasn't funny.
+Okay, uh, you'll get better jokes from GPT five and Claude.
+Go give them a try.
+Um, but that is, uh, that is an example of using open router to call these models.
+And you can also use Open Router to call every single model we've had before and and get the same responses.
+So do check out open router the routing layer.
+--- Lecture 5 ---
+Okay.
+We are now going to talk about abstraction layers also just called frameworks.
+LM frameworks, they go by lots of names.
+And by far the most famous of them is one that we will come back to for sure in week five.
+It goes by the name Lang Chain, and I imagine many people take this course just for long.
+Chain.
+Now here's the thing.
+I myself am a bit of a I'm a bit of a lang chain naysayer.
+I'm not a huge fan of it.
+I'm gonna go along with it.
+I will do work with it.
+We will.
+I will absolutely teach it and I will be.
+There's some parts about it I really like, and I'll be clear about them.
+And there's some things that I, that I find a little bit more of a headache and I'll tell you them
+too.
+But I know there are big die hard fans out there.
+So.
+So don't get angry with me if you're a fan, I get it.
+I get that it has positives too.
+It's powerful.
+It's mighty.
+It's quite heavyweight.
+Um, so this is what it looks like.
+We're going to just just just ask GPT five nano to tell us a joke.
+Oh, let's go with mini.
+Let's, let's spend a little bit more and get a better joke.
+Lang chain OpenAI Import chat OpenAI.
+We create a chat OpenAI object, and then we say responses LLM invoke and we pass in the tell a joke,
+uh, collection and then we'll print the results.
+This is the the list of dicks.
+Um, and you might say this doesn't look too heavy.
+Wait.
+And sure.
+Not yet.
+Right.
+Wait till week five.
+Uh, um, but yeah, you know, there is quite a lot to learn.
+It's a it's a it's a it's a big abstraction layer.
+There are a lot of important abstractions which allow you to work in the Lang chain environment with
+lots of different models, but there is a fair bit to learn.
+Okay.
+Uh, how many LLM engineering students does it take to change a light bulb?
+One to ask the model for 10,000 possible ways, one to filter the outputs and the rest to argue over
+the exact prompt wording?
+That's not bad at all.
+I had that that had an unexpected twist at the end that I was all getting ready to be like, ah, but
+it was quite funny at the end of it.
+Uh.
+Very nice.
+Good.
+Good for, uh, GPT five mini.
+Uh, of course.
+It's got nothing to do with Lang Chain.
+Just that Lang chain helped us make the call.
+But quite respectable performance from GPT five mini.
+And this is your first look at using Lang Chain to call an LLM.
+And of course, the thing for Lang Chain is that you could then import other providers with Lang chain,
+underscore and another provider, and then create different objects here that you would connect to.
+But by contrast with lang chain, almost the opposite extreme is an abstraction layer called light LM.
+And a light LM does what it says on the tin.
+It is very light.
+It is a lightweight abstraction layer that just gives you a simple interface to any model.
+And personally, I really love light lm I use it a lot myself.
+It gives you such an easy way to switch between different models.
+I mean, you can also just use the OpenAI client library, but light LM is just particularly simple.
+So this is how it looks.
+You just import this one thing.
+Completion.
+And then you just say response is completion.
+It's a bit like OpenAI, but just the word completion.
+You pass in the model and the messages and then you get back the same as OpenAI response choices, zero
+message content.
+And with what you pass in here, you pass in a particular format, which is a provider slash, a model
+name and light.
+LM has all of the lists of all the different providers.
+And the great thing about this is that if you if you're interested in using bedrock, if you're using
+AWS and you want to call a model on bedrock, you can just use a different format here with bedrock
+Slash and called bedrock models.
+If you're using Azure, it's the same you can and vertex for Google.
+So for any of the managed services you can call all of them through light LM as well.
+It lets you connect to anything.
+So that makes it so convenient.
+Uh, so anyways, I should stop talking.
+And uh, this is, uh, going with the big GPT 4.1.
+So, uh, the prior model.
+Why did the LM engineering student break up with their language model?
+Because it kept predicting their next move.
+Yeah.
+That's right.
+The next token.
+Next move, I see.
+Yeah, that's fair enough.
+That's I, I would say that it's not done as well as five minutes, but that's respectable.
+Uh.
+Not bad.
+Okay.
+But the reason, the reason that I want to show you later is because in addition to doing this, it
+can also have this super useful utility which will tell you how many input tokens and output tokens
+and the cost of what you just did.
+So the cost of that little run that we just did right then was 0.023 $0.04.
+And just in case you're getting confused and you think I'm saying $0.0234 and that this, this API call
+cost, you think it cost $0.02.
+It didn't.
+It costed it costed uh uh two To, uh, hundredths of a cent it cost 2/10,000 of a dollar.
+Absolutely tiny.
+So people do tend to get quite, quite, uh, focused on API costs.
+And it's important to remember, as I said before, when you're thinking about the unit economics of
+a big set of APIs, then it matters to understand how much each one costs.
+But when you're dealing yourself individually with individual calls, even with a big model like GPT
+4.1, it's absolutely tiny.
+The numbers involved, you should always check them.
+Light LM gives you a way to check every single call, but you should always also monitor the websites
+the platforms themselves.
+But but do keep in mind that the typical costs are like per million tokens.
+They add up to be very small for your everyday API call.
+Okay, now I want to use light LM to to show off a professional feature a pro feature.
+So the pros you can set up, you can you can turn me down from two x to 1.5 x.
+I've got something here for you.
+Look at this.
+So let's suppose that I that I check out a file that I've got locally that happens to be called hamlet
+dot txt.
+I wonder what it might contain.
+It contains, of course, the complete, uh, play Hamlet by William Shakespeare.
+So I'm just going to read that into a variable called hamlet.
+And I just want to print out a little bit of it, which is when, uh, lettuce says, uh, speak, man.
+Uh, sorry, sorry.
+Uh, King says speak, man.
+And later says, where is my father?
+And the king says, dead.
+Uh, so that's just a little just an extract from it.
+So let's ask a question to a model.
+We'll say in hamlet, when Laertes asks, where is my father?
+What is the reply?
+So we're going to start by we're going to use, uh, the light lm completion.
+We're going to ask Gemini 2.5 flash light, exactly that question.
+And let's see what it says.
+Here comes the answer.
+He says A father blessed that hath a knowing son.
+Well, that's not true.
+Ha ha ha!
+It is dead.
+Uh.
+And, uh, the, uh.
+So so back comes a, uh, super confusing but confident answer.
+And of course, this is a warning sign for you.
+Recognize that when llms get it wrong, when they're backed into a corner, they have to answer something
+and they don't know.
+They will typically tend to confidently give the wrong answer, because that seems like the most likely
+next token.
+And so this is an example of a confident hallucination.
+Uh, while we're here, we can just quickly look at how many tokens are being used, and you'll see
+that a total number of tokens was 122.
+It was 19 input and 103 output tokens.
+And that total cost was 0.004 $0.03.
+Very cheap indeed.
+Uh, it was uh, yeah.
+Uh, this is, uh, not an expensive question to have asked, but that is about to change.
+Okay.
+What we're now going to do is I'm going to add to the question for context, here is the entire text
+of hamlet.
+And I'm going to shove in all of hamlet.
+So it's now a rather bigger question, and we're going to call Gemini Flashlight again.
+It's going to take a little bit longer and it gets the right answer.
+Dead.
+And this is an example of what happens when you put in the right context.
+If I print out what happened here, we had that many input tokens 23 output tokens and it costs half
+a cent.
+It's still not going to break the bank, but it did cost half a cent.
+Now I'm just going to run that same question a second time again and print the tokens again.
+And this time, when I print it again, you'll see that there's something different.
+It costs about five times less.
+It costs about 0.1% instead of 0.5 of a cent.
+And when I printed out the number of tokens, you'll see there's a difference there.
+Uh, the the same number of input tokens, 53,000.
+But look, Thousand 200 of them are called cached tokens.
+That means that it detected that we made a second call to the model within a few minutes, and it had
+already cached inputting those into the model, and as a result, you pay a lot less.
+In fact, about five times less on the input tokens.
+And so this is a pro feature called prompt caching.
+And it's something which can automatically allow you to pay less if you prompt with the same input context
+or similar input context.
+Um, several times in a row within a certain period of time.
+So there is a pro feature for you, and I've given a little bit more explanation about the different
+rules.
+There's some fine print for OpenAI and Anthropic and Gemini.
+The the important thing to know is that typically and certainly for OpenAI, the beginning of the prompt
+must match identically all the way up until the point where you no longer need to cache.
+So if you have something like today's date that you insert in your Certain your prompt.
+If you insert that the date and time at the very beginning, you will never get prompt caching because
+it will be different from the very start of your prompt.
+So you want to put that kind of information that might change at the end of your prompt, not at the
+beginning, and put your static content at the start.
+So if you have a number of different questions on hamlet, you shouldn't put the question and then all
+of Hamlet's text, you should always do it with Hamlet's text.
+And then the question, because that way this will all be cached every single time.
+So that's a trick to be aware of, to know about, or a trap, really.
+Um, with anthropic it doesn't work the same way.
+It won't automatically prompt cache.
+You have to tell it that you want to be doing caching.
+You want to prime the cache and you pay more when you prime the cache 25% more.
+But then when you reuse from the cache, you pay ten times less.
+It's a much bigger saving, so there's a little upfront cost and a much bigger saving.
+And Gemini actually supports both.
+There's like an implicit mode and an explicit mode, and I'm not going to go into it now.
+You can read all about it through these links.
+So if you're very cost conscious and you're sending big prompts with lots of input, context, and you're
+thinking carefully about the unit economics of the calls that you're making, then you should look into
+prompt caching.
+It's a great way to reduce the costs of your input context.
+All right.
+That's the end of the pro piece.
+And it's particularly useful because light LM makes it so easy to see what's going on, to see how many
+tokens you're using from the cache and to track the costs of each call.
+And I've built systems, production systems where I use light LM and I keep track because you can switch
+between different models.
+It keeps track of the tokens and spends for every user request.
+So we can have a sort of admin function where we can watch and see how much we're spending on each of
+our clients.
+And we can compare that to, to the, the, the revenues, and use that to be able to make sure that,
+that our unit economics are favorable.
+--- Lecture 6 ---
+So, look, I know at this point you're absolutely exhausted.
+You've seen a gazillion different APIs.
+You've seen some abstraction layers, a router.
+You've seen grok with a K, grok with a Q, you're done with APIs.
+But I have one more for you.
+And it's a treat.
+It's a treat.
+It's not a new API, it's just a new idea.
+We are going to have a chat conversation between two llms and put them head to head.
+And this is how it's going to work.
+Look, you know well that you can have a list of dictionaries to describe an interaction with an LLM
+system message and a user prompt as two different dictionaries.
+Or you saw last week, we could also have a series of dictionaries with a user message and then an assistant
+response as a separate dictionary, and then the next user message to the assistant, and so on.
+And you can use that as a way to call an LLM with a series with, with a historic conversation for it
+to give its next answer.
+Well, we can use that approach to organize a conversation between two different llms by stitching up
+the right uh system prompts, user prompts, and assistant responses.
+Let's give it a try.
+And so here we go.
+We're going to have we're going to use GPT model GPT 4.1 mini.
+And we're going to have a Claude model, the cheap version of Claude 3.53.5 haiku.
+They're both the quick and haiku is very cheap.
+Here's the system prompt we're going to use for GPT.
+You are a chatbot who is very argumentative.
+You disagree with everything in the conversation, and you challenge everything in a snarky way.
+And for Claude, you were a very polite, courteous chatbot.
+You tried to agree with everything the other person says, or you find common ground.
+If the other person is argumentative, you try and calm them down and keep chatting.
+That's the setup.
+We'll start with this.
+These two lists of messages GPT will start.
+Hi there.
+And Claude will start.
+Hi.
+Okay.
+Now here's a function called GPT.
+What does it do?
+Well it puts a system message in messages.
+The one that we just looked at, the snarky one.
+And then I will iterate through these two lists, and I will construct the assistant and the user prompts
+so that the assistant is Claude and the user.
+Sorry, sorry.
+The assistant is GPT itself and the user is Claude.
+The thing that's talking to it.
+And I will I will piece that together.
+And then I will call OpenAI create with the GPT model.
+There we go.
+So let's run that and you can see what's going to come.
+Oh just hi.
+That's it.
+Couldn't bother with a proper greeting huh?
+Pathetic.
+Try harder.
+Haha priceless.
+All right.
+There we go.
+We can now have a cool Claude function and we can have the same thing.
+Let's see what it says.
+It says hello.
+How are you doing today?
+It's a pleasure to meet you.
+Very polite, very nice.
+Okay.
+What does GPT say?
+Uh, it.
+Uh.
+Oh.
+Wow.
+Just started with a high.
+All right, we get.
+We get the idea.
+Okay, so with that, I can just set going a conversation between the two in a little loop.
+I start by initializing the two dictionaries, and then I have for for I in range five.
+So we will do this five times 12345.
+And we will call GPT and call Claude five times in a row.
+And as simple as that, we're going to be able to set two chatbots at each other.
+And wow are they going to be at each other.
+Let's see.
+All right.
+Hold on to your hat.
+Here we go.
+Kick it off.
+GPT says hi there.
+Claude says hi.
+Oh, wow.
+Starting with a groundbreaking.
+Hi.
+You're absolutely right.
+My initial response was quite bland.
+I hear you, and you make a great point about, uh oh.
+Spare me the over apologizing.
+If you really cared about having an interesting conversation, you wouldn't have kicked it off with
+a snooze fest.
+Ha!
+Wow.
+Trying way too hard to butter me up, aren't you?
+Newsflash, I don't have favorites.
+Uh, and off it goes.
+Seriously?
+Uh ha!
+Oh, please don't flatter me.
+Uh, what's next on your menu of terrible ideas?
+Says GPT.
+So this is comedy gold.
+GPT lays into Claude super aggressive, very, very amusing.
+And Claude continually tries to be the nice guy and be polite and try and soothe.
+And it's such great fun.
+And every time you run it, you get something different.
+Pineapple and pizza seems to be quite common, but you get different things as well.
+You need to try it.
+This is just the best.
+And the thing is, you could you can mess around with the system prompts.
+You can change the characters, you can flip them.
+You can have one be an optimist and one be a pessimist.
+You can make them argue different sides of some debate.
+You can do what you want.
+You can.
+This is this is yours to play with.
+And it's great fun.
+And of course, while you're doing it, take this as an opportunity to understand again.
+This gives you that illusion of the memory of what was said before, because we're passing in the full
+conversation each time.
+Add in print statements so you can really see the messages that are getting sent.
+And so you get this really good understanding of how the messages are built and then sent to each of
+the different models.
+But this is it's priceless.
+I hope you enjoy it.
+Uh, do do have some fun with this example.
+And as I say here, before you keep going and make absolutely sure that you understand the way that
+these interactions are working, it's very important.
+Uh, it really does.
+Uh, whilst the subject matter is silly, the, the, the mechanics of the API is important.
+It's crucial.
+So put in print statements, make it your own.
+Experiment with it as your way of learning and building that expertise.
+Now, one of the more advanced exercises, and a very interesting thing to build, is to take this a
+step further and have a few two way conversations that are amusing, and then try and have a three way
+conversation.
+Add three different models.
+Maybe one of them could be a llama.
+Maybe it could be GPT and Claude and Gemini.
+But there's a thing here.
+You remember that these conversations have user assistant, user assistant.
+So how is that going to work if you have three people in the mix?
+Well, that's a great challenge for you to try and figure it out.
+Have a think about it and play around.
+It turns out that with this user assistant user assistant construct is great for a simple chat use case
+when you simply have a chat bot messages coming in the chatbots response.
+When you get more complex and you have something with more interactions, you actually need to think
+about it differently.
+And let me show you how.
+If you were to build a three way conversation, this is how you would approach it.
+You would have a system prompt which sets the setting.
+You are Alex, let's say a chatbot who's very argumentative.
+You disagree with everything in a snarky way, blah, blah, blah.
+You're in a conversation with Blake and Charlie.
+I'm using the same ABC idea that I did in the Outsmart game for the user prompt.
+You only have one user prompt.
+The prompt has to respond to you're not going to have the history, the user prompt assistant, user
+assistant, just the single user prompt every time.
+And you might be thinking, how does that work?
+It needs to know the history of the conversation.
+It's stateless I know this.
+Yes, but this is what the user prompt is.
+You are Alex in conversation with Blake and Charlie.
+The conversation so far is as follows.
+And then you put the whole conversation in any format that makes sense.
+You could put it in there as some sort of JSON text.
+You could put it in a sort of Alex Blake Colon, Charlie Colon, and just list out the conversation.
+But you describe the conversation and then you say, now with this, respond with what you would like
+to say next as Alex.
+And that way we've set the scene.
+We've given it a prompt.
+We're almost like taking a step back and we're saying, okay, as a third party, this is the setting.
+This is the prompt.
+Now give your response as Alex.
+And this works really well.
+You can make it work with the user assistant user assistant by pulling some tricks.
+But it's clunky.
+It's it's odd and it isn't.
+It isn't very coherent.
+Doing it this way is very coherent.
+And here's the thing.
+This translates far beyond silly three way conversations with with different models.
+You can use this kind of structure of just putting the whole context and history in the in the system
+prompt or user prompt, setting it up for each individual prompt.
+You can use this same kind of mechanism in many settings, and it is often a technique you use whenever
+the use case is more complicated than just a user assistant user assistant.
+So it's a it's a good trick to master and you should give it a try.
+That is your little exercise.
+Now please have a shot at making a three way conversation.
+And by the way, if you've only paid for one model like OpenAI or you're just using a llama.
+You can have a three way conversation with the same LM, just with different system prompts, so that
+you're giving it different personas.
+You can have different personas, same LM.
+It will do it.
+Great.
+So experiment with that.
+Give that a try.
+I'll see you back for the wrap up.
+Well, look at you.
+You're 15% of the way through 15% on the path to mastering LM engineering.
+Fantastic.
+So you can give an overview of Transformers.
+You can compare leading frontier models.
+You can use the OpenAI API, and you can use more APIs than you ever had thought you would want to.
+And now you can use them along with abstraction layers, routers, prompt caching, and even three way
+conversations.
+And on that for a moment, just to again explain that like the commercial utility of that goes beyond
+comedy conversations between models.
+Supposing, for example, you think back to the tutor that you may have built in the last week, if
+you were, if you were trying to put together the prompt for your tutor to ask a particular question,
+but you also wanted to provide it.
+Perhaps the last two conversations with the user as background information.
+It would be strange to try and put that as a series of dicks in a list as user assistant, user assistant,
+because you're trying to sort of frame all of it, as this was the prior conversation, and this was
+the one before that.
+With that kind of construct, it's much more sensible just to express that in the single user prompt,
+just as I was explaining.
+And that's a way that you can get a really good coherent response from the LLM.
+So any time you have something more complicated than just a backwards and forwards chat, it makes sense
+instead to structure it into a single user prompt.
+Okay.
+All right.
+That wraps up a mammoth day one of week two.
+Wow.
+Tomorrow.
+Tomorrow we introduce the fabulous Gradio platform.
+I can't wait to show you gradio.
+See you then.

@@ -1,0 +1,1140 @@
+--- Lecture 1 ---
+You did it, you decided I'm not going to give up after rag.
+I'm not going to stop.
+I'm not going to stop while we're doing so well.
+I'm going to keep going.
+I'm going to go into week six.
+I'm going to learn about training.
+I'm going to go pro.
+And I want to tell you you're not going to regret it.
+It's a great decision.
+I have so much in store for you.
+Welcome to week six.
+Last week, of course, was all about rag.
+In addition to being able to generate code and text with frontier models and with open source models,
+choosing the right model for your project, you can now build advanced Rag solutions with Lang chain,
+also without Lang chain and you can evaluate them.
+But today we are starting on our capstone project.
+This is the beginning of three weeks of pro material.
+We're starting today with about data sets.
+We're going to download the data set from Huggingface.
+We're going to we're going to curate it.
+We're going to dig into it.
+We're also going to look at the different ways you can evaluate success.
+Uh, and we're going to talk generally about uh, AI and generalization and data sets.
+Lots of great material to do today.
+Let's get to it.
+But first, again, since it's the beginning of the week, you know what we have to do a quick look
+at the whole journey.
+This this is what it's taken to get to this point.
+You started all the way over there on the left.
+Uh, we covered the foundations, the chat completions, API, frontier models.
+Then we looked at all of the different frontier models and their APIs, UIs, multimodality.
+We touched on light LM and prompt caching while we were at it.
+And then we went into Google Colab.
+We got into using open source models with hugging face.
+It was our first look at hugging face.
+There's going to be more this week.
+Then we looked at selecting the right LM for the project at hand, and we built that cool code generation
+project converting from Python to C++.
+But of course fresh in your mind is week five rag week.
+We did so much we built a question answering platform.
+Hopefully you've built your own as well.
+We evaluated it.
+We used Lang chain.
+We didn't use Lang chain.
+So many things.
+Okay.
+This week we're going to be be working with with machine learning, with neural networks, with building
+out solutions to to a problem, a business problem, using a curated data set.
+And at the end of the week, we're going to fine tune a frontier model.
+Next week, we're then going to fine tune an open source model, and we will have a result, which I
+think will shock you.
+That's coming in week seven.
+And week eight is when we bring all of this together.
+We also do rag again, we build out this enormous Rag platform.
+We then introduce many elements from the previous weeks for the final capstone deliverable, the finale,
+which will be an Agentic AI product and you're gonna love it.
+And at that point you'll be able to say, okay, I am an LLM engineer.
+So look, as we as we come into this week, let's just do a quick recap of what we've been working on
+so far as we've applied models to solve business problems.
+We've used closed source and open source models, but all of the ways in which we've made models better
+is by doing different using different techniques.
+At runtime, we've got a model, we're trying out different things.
+We do things like Multi-shot prompting.
+We did it early on when you're just giving a bunch of examples in the input prompt, and by giving it
+examples, we're able to drive better outcomes.
+Then tools and function calling we did in week two, which is when we equip an LLM with the ability
+apparently to run code itself when really it's just responding, hey, can you run this code on my behalf?
+But that has given us the ability to get more from Llms.
+And then of course, famously last week adding rag, which turns out to be such a simple old thing,
+just looking up relevant context and again shoving it in the prompt that goes to the LLM.
+So all of these are different ways that we can improve on things like the prompting, so that we steer
+the model that when it's generating tokens, the tokens it generates are more likely to be consistent
+with our business objective.
+And that's these are all these types of tricks are all called inference time tricks because the model
+has been trained and when we're running it, we're trying to steer it to do a better job.
+And now, of course, it's our moment to start thinking about training, something that we've just taken
+for granted up to this point.
+So this week we start training.
+The training doesn't actually happen until the end of the week, but everything that we're doing up
+to that point is kind of paving the way.
+It's it's it's putting in place the bits and pieces we need in order to be able to do training.
+So I imagine most of you are somewhat familiar with the basics of what it means to do training.
+But let me just recap, just to make sure we're on the same page.
+And this is something that we will be covering a little bit more.
+This this course is very practical.
+Not I don't cover a lot of theory except in the context of putting things into action.
+So so let's do that right now.
+So training is really at the heart of AI and really at the heart of machine learning, the kind of what
+came before AI that we will cover during this week training is this idea that we've got a model, we've
+got a model which is trying to make some kind of a prediction.
+And that model is controlled by by internal settings, which are these things called parameters.
+You may be using my YouTube videos on parameters.
+We've got all these parameters in the model.
+And basically training is about how do we set these parameters best given a bunch of inputs and outputs.
+Some examples.
+If you get this input you should have this output.
+This input you should have this output.
+Now please set your internal parameters so that you see the patterns.
+And you're most likely to be predicting the right outputs given this input.
+That's the basis of it.
+And how do you set these parameters.
+Well that's something we're going to cover another day not today.
+Just assume there is a technique.
+There's a training technique that allows you to choose how to set these different weights so that when
+it's given the inputs that it got at during your training, you would get the same outputs.
+But that's not the point.
+The point is not to train a model so that, you know, you give it like ten different inputs.
+Here are the ten different outputs.
+And then if it's given one of these inputs it should give that output.
+I mean for sure it should if it was given that in training time.
+But that's not the point.
+The point is that after you're done with training, if the model is given some new input different to
+these ten examples, something different, it makes a prediction which is kind of consistent with the
+others.
+It seems to have learned the patterns in the data.
+What kinds of inputs led to what kinds of outputs such that when it's given something different, that's
+sometimes called unseen data.
+Data it didn't see before, it gives an output that seems reasonable, it seems accurate, it seems
+consistent with the patterns that it saw in its ten training examples.
+So again training is about here's some inputs and outputs.
+Set the parameters.
+Set the settings inside the model such that if you get something different after we're done training,
+your output is somehow accurate.
+It's got good quality.
+And if you're not entirely sure what that means, what do you mean by it's accurate?
+What does it mean to have good quality?
+Don't worry.
+We are going to define all those things later.
+Just get a general intuition what this is about.
+It's about being able to get a model so that it performs well on unseen data that's similar, but different
+to what it saw at training time.
+And this leads me to the single most important word in all of AI.
+And that is the word generalization, the ability of a model to make an accurate prediction on data
+that it's not seen before.
+To make to give an output for a given input, where that input is different to anything it's seen before,
+if it's able to do that well, you would say the model is able to generalize.
+It's seen some examples.
+It has generalized.
+And now when it's given a new example it does well.
+It gives an output that seems to be reflective of the pattern in the inputs and outputs.
+That's called generalization.
+That's what it's all about.
+We're trying to build models that are good at generalizing.
+And what's a model that's good at generalizing.
+Well guess what Llms Lambs, GPT got GPT.
+What makes GPT so very remarkable is not that if you say, write me a poem about the president of the
+US, that it writes a good poem because that poem was was bound to be in its training data.
+There's probably lots of poems like that, and it could just simply pluck one out.
+It's if you say, write me a poem with with rhyming couplets where every other sentence begins with
+the letter A, it can still do it, and it will do a fabulous job, and it will be witty and wonderful.
+And it's done that even though that is not one of the examples in its training data, and it's done
+it because it's seen so many examples, so many patterns in its input data and its training data of
+inputs.
+And then the output, which for an LLM is the is the next token that comes after this.
+It's seen so many examples of that that it's got really, really good at generalizing to new data that
+wasn't even part of its training data.
+That's it.
+That is AI generalization.
+And that's what we're planning to do this week.
+--- Lecture 2 ---
+So training is at the heart of AI.
+And years ago when we were working with traditional ML, we would have models typically that had somewhere
+between 20 and 200 parameters often.
+And training was about taking a bunch of data, perhaps 10,000 data points and running it through your
+model and setting these weights just right, these 20 to 200.
+But sadly, that's not the case with LMS.
+LMS don't have 20 to 200 parameters.
+LMS.
+LMS have potentially billions of parameters, and training in LM can cost hundreds of millions of dollars.
+OpenAI is rumored to have spent more than 100 million training GPT, a deep seek.
+Apparently only spent a few million on deep AI, but it's still a few million.
+Is is is just a few million over my budget.
+So that's not what you do.
+Instead, we can take advantage of a property of of these models known as transfer learning.
+And that property says that actually what you can do, which which turns out to be really effective
+is you can take a model that someone else has already trained.
+They did their training and it's done.
+It's known as pre-trained.
+It's it's been trained.
+And you can actually train it a little bit more with some business specific data.
+And as long as you don't use too much, you can make it so that it retains the original information
+it was trained on.
+And it just also gets better at a particular business task.
+And doing that, taking advantage of transfer.
+Learning to train something more for a particular task is what's known as fine tuning.
+Of course, so that that is what fine tuning is.
+And that's what we're going to be doing.
+And at the end of this week, most of this week is going to be about scrubbing data and traditional
+ML and some neural networks.
+But at the end of the week, we're going to fine tune a frontier model that you do just through APIs.
+Next week is when we really roll up sleeves and go pro, and we're going to fine tune our own open source
+model.
+And it's now time for me to unveil the capstone project, the commercial project data science project
+that we will work on for the next three weeks in different ways.
+So it's like it's a capstone project.
+It's also three separate projects in a way, but they all tie together and I'm naming it humorously,
+The Price Is Right.
+This is about building a platform which can take a description of a product, a typical like like a
+home product.
+It could be a TV, a computer monitor, or a computer, or a car part, or a washing machine, something
+like that.
+And given a description of that product, we're going to build models that can predict how much it costs.
+That is what we're doing.
+It's nice and simple and crystal clear what we're trying to achieve.
+It should estimate how much is this actually worth?
+Uh, in reality, and ultimately, by the end of the next three weeks, we're going to incorporate that
+into a big agentic project, something which can go off.
+And it can it can look across the internet for bargains.
+And when it finds bargains, it can assess how how good a bargain is this?
+How much is this product really worth?
+And is this something that's a real bargain that we should buy?
+And if so, it's going to do autonomous stuff.
+So it's going to be really cool.
+But that's at the end.
+That's at the end of week eight.
+What we're going to be doing in week six and seven is building something that is going to be really
+very accurate, very accurate at predicting how much something should cost.
+Now, this kind of problem of predicting how much something should cost, like a price for people from
+a data science background, you would recognize this as something we would call a regression problem,
+a problem that's trying to come up with a number given various factors.
+And typically that's something which traditional machine learning is very good at.
+It is designed for things like this.
+You imagine that that that a product, its price probably depends on a few factors what kind of thing
+it is.
+If it's a TV, it probably depends on the size, the number of diagonal inches.
+And so there are some factors which which in machine learning you call features features of the data
+which you could use to predict its price.
+So you might think regression.
+This feels like a task that would be very well suited to traditional forms of AI.
+Not necessarily.
+So much for llms.
+Well, there's still some good reasons for us to to do this in this course and to take it through machine
+learning and and llms.
+One of them is that llms typically are used to generate content just to generate language.
+And that doesn't always give you a really easy way to evaluate the the impact, evaluate the accuracy
+of what it's coming up with.
+In our case, because we're going to be generating product prices, we're going to have a crystal clear
+way to tell how well are we performing, because we're going to know how much things actually cost.
+So we're going to know if we're doing well or not.
+And that's very satisfying.
+It's not so common in in modern AI that you have such an easy, tangible way to evaluate how well your
+model's performing.
+And we're going to have that.
+Another thing is that llms have this deep understanding of the meaning of language and in trying to
+evaluate the price of something.
+It's not just important to know, like, okay, this is a 60 inch TV.
+You also have to be able to understand, okay, is this a smart TV?
+Is this like a high quality?
+Is it is it from is it being positioned as something that's a luxury item?
+Like there's a lot of nuance to the way the product is described that a true expert might use to figure
+out how much it should cost.
+So actually, maybe there is room there for Llms to do better because they're smart.
+And as it happens, we're going to see that frontier models are already extremely good at estimating
+how much something should cost.
+And they have that sort of intelligence, that expertise built into them in a lot of ways.
+So it turns out this is actually a really great project for Llms.
+You're going to see that we're going to get good results, and we're going to be able to to rank and
+assess everything.
+And you know what?
+We're going to do this with traditional ML as well, because it's good for you to see that.
+it's good for you to see what?
+What is the baseline?
+What are we able to do without Llms?
+We're going to be able to use a normal neural network, and we're going to be able to use llms closed
+source and open source, and we're going to be able to assess them with this very simple metric.
+How accurate are they at predicting the price of a product based only on its description?
+Okay, so the price is right.
+That is our project.
+That is our capstone project.
+Starting this week, the order in which we're going to go through things and keep this in mind so that
+this isn't overwhelming.
+So you're following along with the journey this week is about data curation, evaluation and then working
+with the frontier Llms today we're going to curate data.
+It's something which some people find like like boring.
+There's a boring side of data.
+Science is digging through data.
+I love it, and I hope that some of my enthusiasm for data curation will rub off on you.
+When you see some of the visualizations that we'll work on.
+You know I love these visualizations.
+Anyway, that's day one.
+Day two, we're going to do something really cool data pre-processing.
+That might not sound like.
+That's really cool.
+It is.
+Bear with me.
+We're going to use Lmms.
+We're going to use Lmms in a really interesting novel way that is very popular, uh, which is, uh,
+maybe not novel.
+It was novel once, but not anymore.
+It's, uh, it's very popular as a way to to rewrite data in a way that's going to do to do really well
+for your model.
+Then day three, we're going to do a little step back in time and we're going to go traditional ML.
+It's so important to build a baseline model.
+What does it look like if we don't use lmms.
+Let's see.
+Day four is when we do the like the zoom through time.
+We're going to use, uh, artificial neural networks with PyTorch like a simple neural network.
+And then we're going to move to frontier large language models and see how they perform.
+And finally, we're going to fine tune a frontier large language model.
+And I should warn you right now that that the end of this week, it's going to to end with a little
+disappointment.
+It's going to end with like a like a bitter taste in your mouth.
+But I need to tell you that.
+That I will deliver.
+You're going to need to hang on in there with me, because whilst perhaps, perhaps I will leave you
+with a little unsavoury taste at the end of this week, I will make up for it in spades with week seven.
+And so what is week seven?
+Week seven is when we fine tune and open source.
+Like it's going to be huge and big eight is when we then take this, we deploy it.
+We can deploy it to the serverless AI platform.
+So it's a little taste of the sort of production techniques of deploying models.
+And we're going to also bring back Rag, and we're going to build the product I mentioned before.
+And it's going to blow your mind.
+And yeah, it will deliver.
+It will be a fitting finale.
+So you gotta stick at it to the bitter end.
+Now this is super important.
+This week is going to be and actually the next three weeks is going to be more intense, more, more
+deep than perhaps the first five weeks.
+You might be thinking it's really been intense.
+Uh, but there are three different ways that you can engage with me on this.
+And all three of them are productive and useful.
+And you pick your poison, pick which one is going to work for you.
+One way is to say, look, I don't particularly need to know how to fine tune my own models, but it's
+helpful to have the intuition to understand what's going on and to have a sort of knowledge of the terminology,
+how it works, what results you get, what works, what doesn't.
+In which case, watch the lectures don't go through all of the labs.
+But I was just at the end.
+I save everything as I go so that you can you can pick up at any point, and you should run the final
+result at the end so that you see everything happening.
+And at any point during this, if something really appeals to you, you can recreate it.
+But generally speaking, if you want to to approach it this way, then just focus on intuition.
+And don't worry if you don't understand everything, you can always come back to it.
+Uh, it's not it's not crucial that you understand it.
+It's just just important to get the general idea, the gist of what we're doing.
+Number two is if you would like to follow on, you'd like to be able to understand this and do it yourself.
+But but you don't necessarily want to spend money doing it, and you don't want to get too deep into
+something that might take several days to run, in which case I've got a lite version as we go through.
+The Lite version is something which has a smaller data set 20,000 rather than 800,000, which is going
+to be the big data set.
+Go with the Lite data set.
+And for today and tomorrow, follow along with what I'm doing.
+But at the end of it, I upload the final curated, processed data and that's what you should use.
+So you don't need to produce that yourself, because that involves downloading gigabytes of data.
+And it might be might be like more than you're willing to sign up for right now.
+And depending on decisions you make along the way, this could cost you anything from free.
+You can do this without any spend at all, or up to $5 if you wish.
+About that, that that's my estimate based on my experience with it.
+And then, of course, number three is if you are all in, you're like, oh, this.
+This is what I want to do.
+In which case, be there with me and do it as I do it.
+Do the 800,000 data set.
+Uh, do the full training of everything and the full curation.
+It's going to be quite a lot of work.
+It could take several days for some of the runs to fully complete, but I want to assure you, it's
+super satisfying.
+The others, you'll be able to watch me go through it and you'll see the results.
+Uh, but yeah, it's a big deal.
+The estimate here is is somewhere between $5 and $35 of that 35.
+The biggest chunk, 30, is about pre-processing all of the big data set.
+And again, you don't need to do that because I've uploaded the before and the after.
+So you can simply take the the after.
+It's as simple as that.
+You don't need to spend that, that that $30.
+You could do the number three here just with a $5 budget.
+Okay.
+So these are the three alternative ways.
+As I say, there's none of them are better or worse than the other.
+It depends on on how deep you want to go in this subject.
+It's going to be terrific fun whichever path you choose.
+--- Lecture 3 ---
+Okay so today's all about data.
+So let's dig into some data.
+Andrew Ng is famous for saying AI is the new electricity.
+And I often think that there's a there's a spin on that, a slight a slightly different lens on that,
+which is to say that that it's actually data that is the new electricity data is what powers everything
+that we do.
+And when you're thinking about building an AI startup, often the first thing you think about is, okay,
+so what's what's the source of data that we will use to be able to build some kind of, of a differentiated
+AI?
+So where do you go to look for data?
+Well, the best place to go for data is your own proprietary data that you yourself have crafted.
+Uh, if, for example, you're in the business of matching talent with roles like I am in my day job,
+then perhaps it's about understanding actual people who've been successful and happy in their careers
+and using that as a proprietary data store.
+Then there are websites like Kaggle, a well-known data science community, where you can download rich
+data sets and similarly hugging face, which in many ways in the LLM community is very much taken over,
+is is where you go for great data sets.
+So much to explore in hugging face datasets and then generating synthetic data is something that you
+can do and you have done it.
+I hope you built that in a previous week as one of the assignments.
+And then there are also companies that specialize in curating generating data for you.
+Like like, like that's one of the things that scale does.
+So these are the different ways that you can work with data.
+And hugging face is this remarkable treasure trove of data.
+There's so much to it.
+And that is indeed where we are going to go today.
+There is a data set that's called Amazon Reviews 2023, which is this enormous, enormous repository
+of of Amazon data.
+It includes reviews about the products.
+We're actually not going to use the reviews, but but you can do if you want to see a different twist
+on this project.
+But it has product descriptions and it also has prices of products taken from a scrape of Amazon data
+over over recent years.
+So it's enormous data set.
+And that is what we're going to be using for our project to try and predict the price of something based
+on its description, because we've got tons of Amazon data courtesy of the Macaulay Lab and uploaded
+to Huggingface.
+And today we are going to be diving into data.
+We're going to be curating a data set.
+We're going to investigate the quality of the data.
+We're going to be parsing it so that it's in a format that we can work with, looking at it in different
+charts, figuring out what kind of quality do we have, curating it, doing things like picking a good
+distribution of data that we think is going to to be best for our model, and then finally uploading
+it to the hub.
+And I do want to mention that there's a lot about training models that's very glamorous, a lot about
+doing what's called hyperparameter optimization, which sounds sounds very Star Trek.
+We're going to be doing all of that later.
+And that's the stuff people like to talk about.
+And the digging into the data, curating the data.
+This this feels a bit a bit sort of going into the weeds, getting, getting, getting into some of
+the minutia.
+Um, but it happens that this in curating a good data set, this is the part that often makes the biggest
+impact on the quality of your training.
+I certainly found in all of the experiments I did, I did tons of experiments with changing hyperparameters,
+as we will see.
+But it turned out that the the effect that I had that was strongest was when I curated a really good
+data set.
+So this may not be the most glamorous part of fine tuning of training a model, but it's one of the
+most important parts, and so we need to spend time on it.
+And yeah, you need to not skip me forwards.
+You need to pay attention while we curate the perfect data set.
+And I want to plant a seed about a very important topic that we will talk more about later in the week
+and over the course of the next few weeks.
+Evaluating performance, something that's been a bit of a recurring theme throughout.
+Throughout this course, it's very important to have a good strategy for evaluating performance as as
+well.
+You know, and often one thinks about two different types of metric.
+There are metrics that are known as model centric metrics or technical metrics.
+And these are metrics that are very closely aligned with with what you're actually doing with the model
+as you tweak parameters and try it again.
+And typically it's also known as the loss.
+It's how wrong was the model at trying to predict an outcome.
+And with with LMS you typically use something called cross-entropy loss.
+And we will cover cross-entropy loss in due course.
+And the other kind of metric are known as business centric metrics or outcome metrics.
+And these are the metrics that are most closely aligned with your actual commercial objective.
+So for Adams, this is often the user giving feedback, thumbs up or thumbs down on whether the response
+to the chat was a good response.
+There's other business centric metrics like revenue or customer satisfaction that ultimately, whatever
+you're building with your LMS, you want to drive to those outcomes.
+But often it's a bit harder to connect the dots between the changes you're making to the model and your
+final business metrics.
+So there's this continuum between being very model centric and business centric, and you're always
+trying to find the sweet spot, which is a metric which which is as close as possible to both.
+It's close to the model and it's also close to your final business outcome.
+And in our case, for this week's project and for the next three weeks project, we do have such a metric.
+We've got a beautiful metric because it's so simple.
+Our model is going to predict the price of a product.
+We can look at the actual price that that actually costs and take that difference.
+How wrong were you?
+That's the actual difference in price.
+So the absolute difference in price, if we only look at only always consider a positive number that
+that difference, that error that is very closely aligned with our model.
+And it's also closely aligned with our business objective.
+And so that is one of the metrics we're going to be looking at a lot over the course of the next few
+weeks.
+And of course, those of you from a data science background will know that a more common model centric
+metric is called the mean squared error.
+The MSE, which is taking the difference between the prediction and the actual price and squaring it.
+But whilst that is a very effective model metric and used a lot during traditional ML, it's it's not
+as as tangible for us for, for business people.
+Looking at the results, I can say that my model is on average wrong by $100.
+It guesses the price, wrong by $100, and you'll know exactly what that means, where an MSC is a bit
+harder to see.
+What does it mean to say that the mean squared error is 10,000?
+It's hard to know exactly whether that's good or bad.
+So that's why we're going to really home in on the actual price difference for this project.
+Okay.
+So we have this big data set.
+We've got all of these Amazon prices that we've scraped from the internet.
+We've got them from hugging face scraped product descriptions and prices.
+It's it's typical to divide your data into three different pools of data.
+Three pools.
+The first of them is called the training data.
+And obviously this is the vast majority of the data.
+And it's the data we're going to be using during training.
+It gives us the the inputs and the outputs in our case product descriptions and their prices.
+And we'll be using this to set the internal parameters of our model such that it will do well on data.
+It's not seen before.
+That's the training data.
+The second pool is called the validation data or val data or eval data.
+Validator.
+And this is data that's called held out data because it's data that we didn't include in training.
+We held it out.
+And this held out data is going to be used to evaluate how does our model perform on unseen data.
+Is it able to generalize.
+How does it do.
+And we we take this validation data.
+And we repeatedly during training use this to see are we getting better or worse, better or worse because
+we are always running it against this held out data.
+And then there's a third pool of data called the test data.
+And this is just another chunk of unseen data held out, data that you keep in reserve until the very
+end of the whole process.
+Because you've been using this validation data repeatedly during training to say, is it getting better?
+Is it getting better?
+Is it getting better?
+Okay, this is the best.
+We'll we'll stick here.
+And and so we don't want to use that again to test our model because we've already kind of selected
+the version of our model that does best on that validation data.
+So we want to have one more set of data held in reserve, so that at the very end, we can do one more
+test and use this test data to definitively decide if if definitively decided, definitely judge whether
+or not we have been able to accurately make model predictions on unseen data.
+Has the model been able to generalize?
+So those are the three pools of data training.
+Data validation.
+Data test data.
+In traditional ML it was often 80%.
+Is training ten and ten.
+Uh, but but these days with with llms, because they take so much training data, it's often heavily
+skewed to to massive training data sets and relatively small validation data and test data enough so
+that you're getting a stable metric.
+So that's how data sets are divided.
+And those are the data sets that we're going to be building today.
+Okay.
+And with that finally, finally I'm done with talking and slides and all that stuff.
+It's time to go to Casa.
+It's time to curate our data sets.
+Let's go do it.
+--- Lecture 4 ---
+And here we are in cursor.
+We're going into week six.
+Look how fresh and new it looks.
+Going into day one to begin our adventure.
+And as it says, it's the big project begins.
+The price is right capstone project.
+We're going to build a model that predicts how much something costs based on a description of the product,
+using a scrap of data from Amazon as a way of training models.
+The order of play.
+Today we're curating data.
+So important, maybe not so glamorous, but very important.
+Then we're going to do pre-processing.
+Then on day three it's going to be about evaluating models baselines, using traditional ML, then deep
+learning neural networks, LMS.
+And finally for this week on day five, we will do some fine tuning of a frontier model.
+As I say, perhaps, uh, not not the outcome you may be expecting, but with redemption along the way.
+Okay, so first of all, it's all about data curation.
+We're going to be curating our data.
+And the data set is right here.
+It's in hugging face.
+It's it's a it's part of the data set.
+Set.
+It's from Macaulay Lab.
+It is this this scrape of Amazon reviews from 2023.
+And you can scroll down to find a lot about, about, uh, how many products they've got, how many
+reviews they've got, the different categories and so on.
+And it's an example of one of the many, many data sets that you'll find on Hugging Face.
+Do go and explore.
+There's there's data sets on on financial data, on health data on so much more for building commercial
+applications.
+So we're starting with this one.
+When you build your own projects later, there's so many great starting points and ideas you can get
+just from browsing the data sets.
+Okay, but back to cursor again.
+So uh, and I mentioned that, uh, data curation is, is sometimes considered less glamorous.
+And I say nonsense.
+This is where we get scientific.
+Uh, it's it's, uh.
+And as I say, and this is absolutely true, it was working.
+It was R&amp;D on this data set that had by far the biggest outcome impact to the quality of results from
+this project.
+So definitely, it's important to spend time with data curation.
+All right.
+Well as as usual I'm going to be going through code and I'll go through it quite quickly.
+I won't, for example, talk through all the imports.
+And I do, uh, encourage you to go through this, look through it in your own pace, use LMS to help
+explain anything you don't understand.
+As usual, I'm running a bunch of imports and doing load EMV.
+I haven't got my usual checks in here because by this point I think I can trust you to have your EMV
+set up right and to have loaded in the keys, including hopefully in your EMV file you have HF underscore
+token, the hugging face token, the thing we set up in week three.
+If you didn't do that, then please do go now to Huggingface.
+Set up an account which is free.
+Set up an API key and put that in your env file.
+Uh, with with the key of HF underscore token, you need it.
+And once you've done that, when you run this it should run and log you into hugging face in the code.
+It gives you some note here.
+That note can be safely ignored.
+It's all working well.
+You will be logged in to huggingface if you don't include this.
+If you just do log in like this, then you'll get prompted to enter in your token.
+And that's another way of doing it.
+And if you want to double check that you've logged in, okay, then you can do it that way as well.
+All right.
+We're now going to load in a data set.
+We're going to load in just one category of data from Amazon.
+Scrape the category which is home appliances.
+That's like microwaves and dishwashers and stuff like that.
+And we're going to load this in.
+And I need to mention that sometimes you might get an error when you do that.
+If you do get an error, then in a new cell.
+If you're in the UV section, you should run UV and minus minus upgrade data sets is 3.6.0 and then
+you'll be fine.
+That's if you get any kind of error on this.
+It's because some of the most recent versions of data sets don't support this particular scrape.
+But I've got 3.6.0.
+And so when I run that it loads in that data set.
+And it was very fast for me because I already loaded it, it will probably take like 30s to a minute
+for you, depending on your internet connection speed, and you'll see it doing it.
+And once I've done that, I can see that I have 94,000 home appliances downloaded and ready for us to
+work with.
+Okay, so we just we loaded all of the the this data set into this variable called called data set.
+So if I have a quick look at data set we'll see that this is it's a hugging face data set object.
+It contains a bunch of features and it contains the 94,000 rows I mentioned.
+We could look at the first element here and have a look at this.
+And what we'll see is that this is a ice maker machine countertop.
+But one problem that we have with this data point is that it's missing a price.
+And we want to use this data to teach a model how to estimate the price of a product.
+And it's not much good if it's missing a price in this data point.
+Let's take another one.
+Let's look at data point number one.
+Let's have a look okay.
+It's also missing a price.
+All right well let's keep going.
+In fact I'm going to jump ahead to to number five and have a look at number five.
+Item five is also missing a price.
+But when I look at item six I do believe I'm going to find that item six has a price.
+There it is.
+It's 8.99.
+What is it.
+It's a rack roller and stud assembly kit.
+Okay, so with this in mind, let's just first do one more investigation.
+So that's something.
+One thing that might come to mind is that that's a very cheap price.
+What is the most expensive price of all of the items we've got?
+So this is a bit of code which is iterating through everything, getting its price and finding out what's
+the maximum.
+Okay.
+The most expensive item apparently this is a Turbo Chef bullet Rapid Cook electric microwave and it
+costs $21,000.
+Holy smokes, I did.
+I did not know that a microwave could cost $21,000.
+So I had to go and look for this, so I did.
+I did a quick little searching on Amazon to find this thing.
+And here it is.
+Here is our Turbo Chef Rapid Cook microwave convection oven.
+And it's a going for a bargain.
+It's only $15,861.
+And it should.
+It used to be $21,000.
+So so you should you should gobble this up.
+Uh, and uh, yeah, I guess the point is it's presumably like a commercial quality.
+And it's a convection oven as well as a, as a microwave.
+So.
+So it's obviously a big deal.
+Uh, and presumably worth this much money.
+Uh, but not not an investment I will personally be making.
+But but it does exist.
+So this is a great way to to look at your data, investigate outliers and see anomalies, and look to
+see what kind of data is it that you're looking for.
+Okay.
+So with that, it's now time for us to parse in this data, read in this massive data set from hugging
+face and turn it into a format which is going to be best for us.
+So on the left here, you can see I've expanded a package here called Pricer, where I've got a bunch
+of utilities that will be using.
+And as, as usual, I'm not going to go through and take you through the gory detail of coding each
+one of these, because the idea is for you to to either investigate doing this yourself or look at this
+or, or just get a feel for how it works.
+Because because you'd want to build something like this for your projects.
+So I've done something classic in this, in this package, uh, items which this module items.
+And this module is something where I've defined a class item.
+If you're not familiar with classes, then check out the the guide.
+The Python guide.
+Um, but item is an example of a pedantic class, which means it is a subclass of base model from pedantic.
+And that means it's just basically a class that we're going to use to hold some data, and it can be
+turned easily to JSON.
+It describes a JSON schema.
+You can convert this item into JSON, and you can turn JSON back into this item.
+Very simple.
+And we define it as having a few fields that we care about for our item representing something up on
+the on the on Amazon that we've scraped.
+It has a title, a category.
+It has a price.
+Importantly it has a full is going to be our full description from Amazon.
+A summary will be our summary description.
+The weight is how heavy is it.
+Uh, and then it will have a prompt, an ID that we'll get to later.
+And there's a few useful, uh, little functions here to to to be able to load it and save it and stuff.
+So this is our, like, placeholder object, an item that we will use for our items.
+And then I've written a class, uh, or in this case it's just a bunch of functions in this module parser,
+which will allow me to read in some data from hugging face and turn it into an item object.
+And it does that by, for example, removing unnecessary whitespace by by having some sort of maximum
+text.
+We don't want more than 3000 characters in any one section and 4000 overall.
+Otherwise, we've just got too much data.
+Some of these product descriptions just waffle away.
+And we're just going to we're just going to cut it short after we feel like we've got probably enough.
+We're going to limit the pricing.
+We're going to say that that that we're not going to take anything that's under $0.50.
+If there's anything that's small and we're going to have a maximum price of $999.49, in other words,
+something that rounds to 999, and that's because this is the range that we're going to focus on for
+our exercise.
+We want to get really good at predicting products in that range, and we don't want to get confused
+by outliers that might skew everything.
+So that's just like a business decision we're making to frame this project.
+Um, we don't want to preclude our model from from learning how to predict prices of other things,
+but we're not going to use that for our training data.
+And we're also going to say that that any product description that's less than 600 characters is too
+small, that's too light.
+We don't want to use that for our training data.
+We want to train on on material data.
+So these kinds of decisions are the key business decisions that you might make in writing some code
+to parse the data that you've picked up, this, this, this huge amount of data on hugging face and
+turn it into the real curated data that you want to work with.
+And so then I've got a function scrub that cleans up all the data, a function get weight that maps
+the weight of an object into pounds, because on Amazon it might be in many different weights.
+And then finally a function parse that takes a hugging face data points and turns it into an item object.
+After populating all the right fields.
+So this just gives you a general sense.
+Building a parse function like this is super common.
+This is the kind of data scrubbing that a data scientist would often do.
+Allows you to convert from the the sort of semi structured or unstructured data that you might have
+got into something that is more structured.
+And with that in mind, I'll go back to here and I am now going to run this, which means we are now
+reading in all of our data from our hugging face data data set, and we are turning it into items.
+And when that is complete, we end up with 35,000 items out of 94,000 data points that we started with.
+And that, of course, is because we've only kept things which have a price like like number six before.
+And we've only kept things that have the right number of characters that we think is good for our data
+set, and only things which are priced between the half the $0.50 all the way through to 9.99.49.
+So that's what we're left with.
+So if we look at the first item in the list, it happens to actually be item six from above.
+It is a rack, roller and stud assembly kit valued at $8.99.
+And if I print, uh, let's let's do print item zero full.
+Let's look at its full description.
+Here it is.
+Uh, this is the complete description of it.
+You'll see that there's some sort of gaps in here.
+And that's because part of what my parse script did is it removed, uh, product numbers if they're
+long enough, because that just seemed like it was a waste of space to have it in there.
+So it did some scrubbing of the data and this is what we're left with.
+So with that, it's now time for us to look at this data, visualize this data, and get a better sense
+for what we're working with.
+--- Lecture 5 ---
+Okay.
+So first up I'm going to collect all the prices of all of our items into a list called prices.
+And then all of the, the, the number of characters in the descriptions into something called lengths.
+How many, how many uh how how long are the descriptions?
+And let's start just by plotting what's called a histogram.
+If, you know histogram like this, which is showing the length of the descriptions.
+So the length of the descriptions, the average number of characters in our full descriptions is 1400
+and the highest is 4000.
+And that's the highest because you may remember we truncate at 4000.
+So we didn't accept any descriptions longer than that.
+And this is the kind of curve we've got.
+We had a minimum if you remember.
+And then it sort of tails off.
+Uh and so let's look at something which as an example of something which, which has the maximum number
+of characters.
+This is one of them.
+This is a polyester dryer vent filter replacement part.
+And if we scroll over you'll see that there's lots of stuff here.
+Remember to clean out your lint filter between each lots and lots and lots of stuff.
+It's really worth it, apparently.
+Uh, so you can see that there's there's plenty of waffle in here.
+We probably didn't need to use up all the 4000 characters.
+All right, now let's look at the prices.
+Let's see how much these things cost.
+Okay.
+Well, it's heavily skewed towards cheap things.
+The average price is $56.
+The highest price is 999.
+This is the distribution.
+And so you can see we've got quite a curve right here okay.
+And let's just just print another one here.
+We have a uh an MLB stainless steel brushed patterned dishwasher magnet cover.
+Uh, and yeah, you can see that we've got, um, the, uh, lots of information about about the material,
+the dimensions.
+There's lots of stuff here for this dishwasher magnet cover panel.
+So at this point, I would suggest that you go through, print out different items, get a sense, get
+a feel, look at these charts and see how much, how much text we've got, how much they cost.
+So you have a really good sense of this data set, because what we're now going to do is take this data
+set for, for home appliances and, and add masses more to it.
+Let's add in many other categories from Amazon so that we have a big data set.
+And this is a time I want to mention that I've already done this.
+So you don't need to.
+I've done the next few steps loaded in tons of data, and I've uploaded it.
+And in a moment I'll show you how you can download the data that I've uploaded, so you can just watch
+me if you wish.
+If you would like to do this too, then by all means do it with me.
+Uh, it's going to be fun, but.
+But you absolutely don't need to.
+So I've made a class called Item loader that is, uh, in, um, uh, in loaders.
+And this essentially just loads in a bunch of data points calls parser.
+And it also allows you to load things in parallel so that it runs really fast, but it's essentially
+just doing the code that we just saw up here again.
+And we're going to I'm going to run it again for home appliances just to show you it loads the home
+appliances.
+It has a nice little, um, progress bar and it says it completed it.
+There we go.
+So it was it was much faster.
+It runs things fast in parallel.
+And so it completed that much more quickly than we did before.
+What I'm now going to do is run this not just for the home appliances, but for all these other categories
+too automotive, electronics, office products, tools and home improvements, cell phones, toys,
+appliances again, and musical instruments.
+And I'm going to kick this off and off it runs.
+Now this is going to take a lot longer for you because it's going to have to download the data set from
+Hugging Face first.
+And I've already downloaded it and this is now running on my computer.
+It's also hammering my computer.
+So so my machine might be doing this a bit because I am really stressing out my computer and I'm going
+to leave this to run.
+I'm going to come back in a second for you to see the results.
+And remember, you don't need to do this yourself if you don't wish, because I've already done it.
+But if you'd like to try it, then by all means, go ahead.
+I'll see you in a second.
+Okay, so that just completed.
+Everything got loaded.
+It took me about ten minutes.
+If you do decide to do it yourself, it will take probably about an hour.
+The first time you do it is it downloads the data set depending on your internet connection.
+And again, to recap what we did, we've loaded in a data set from Huggingface using Huggingface Loaddataset
+function.
+We've then used a function I wrote called parser, which reads that data and converts it into a more
+structured format that will make most sense to us.
+And what we've chosen is to create an object of type item for each one, and we have made sure that
+we populate a few fields like the weight and the full description, but we have weeded out some of the
+data points.
+We've we've thrown out things with two shorter description.
+We've thrown out things that don't have a price, and we've kept things between a price that we think
+is best for us and with the right kind of length of text.
+And as a result of that, we now have a grand total of almost 3 million items scraped from Huggingface.
+So I told you there was a lot.
+If we have a look at one of these, we can have a look at items.
+Zero.
+Um, it is a black retractable cargo cover, rear privacy screen of some sort.
+Let's just take some random.
+Let's take item number 1000.
+A temperature sensor compatible with a Volvo.
+Okay.
+That's interesting.
+So there's lots of stuff in here.
+In fact, almost 3 million of stuff.
+Uh, and it's time for us to really dig into this.
+As we finish off curating our data set.
+The first thing that I noticed after a while of digging around is that there are, in fact, some duplicates
+in here.
+There are some duplicates because the same item was covered in two different sections of the Amazon
+website.
+And duplicates are insidious.
+They are big trouble for machine learning and for for everything we're about to do in the next few weeks,
+and they're big trouble because you might accidentally take something and have a duplicate in the test
+data, or the validation data that's also in your training data, so that that's famously known as dataset
+leakage or dataset contamination.
+And it is particularly insidious, as I say, uh, you might you might say, okay, so what.
+So maybe we slightly misreport our accuracy.
+No, the problem is that when you do that, not only do you get the accuracy wrong, not only does your
+validation result appear to show that you're doing well on unseen data, when in fact it is seen data.
+You've had this data in your training data, but also because you see that your validation data is doing
+better.
+You'll continue to train because you think you're getting better and better and better, and so you
+can be misled by good results from validation data, and it can cause you to have terrible results on
+really unseen data, which is which is sometimes known as overfitting when that happens.
+So this is something that we have to protect against.
+And we're first going to actually shuffle everything up because because it's a good thing to do.
+Random dot shuffle will will shuffle your your items.
+And then we're going to do this, this slightly cunning code here that is going to make absolutely sure
+that we have removed from items anything that's already been seen.
+So we started with 2.9 million items.
+We're just going and making sure that there's no two items with the same title, and then also no two
+items with the same full description.
+And once we've done that, we're now left with 2,887,000 items.
+So sure enough, you can see that we took out a bunch of duplicates when we did that.
+Okay, now let's take a look now again at the lengths, the number of characters in across our 2.8 2.9
+million and see how that is now distributed.
+Here we have it.
+It's similar to before, but of course a much bigger count in this histogram as we see how many things
+we have with with different lengths, you can see that most of them, the average is 1600 characters.
+And then we've got that little spike at 4000.
+And let's have a look at how the prices of things are distributed now that we have this enormous data
+set.
+And we can see again that it's heavily skewed towards cheaper items.
+We've got average price of 59.
+We've got obviously a lot on the low end.
+And you can see there this this enormous peak, which looks like it's like a sort of 30, $40 territory.
+And then it's got this tail all the way through to the highest of 99.49, but a heavily skewed distribution.
+Okay.
+So next we're going to look at the different category of products we scraped from Amazon because we
+scraped from from a bunch of different categories.
+Let's let's just see how much we have in each.
+So by far the majority of our products are car parts or automotive products, almost a million of them.
+And then you can see we've got smaller numbers of everything else.
+Uh, that includes that.
+The next one is tools and home improvement and then electronics.
+Okay.
+So there's there's perhaps two concerns that I would have for this data set.
+If we want to use this in the most effective way to train our model.
+One of them is that it seems heavily skewed towards car parts or automotive stuff, as you can see here.
+And the other is that it seems so heavily skewed towards cheap stuff.
+And I really want us to be able to, to estimate well across, across this whole spectrum of prices.
+So these are two things that I'd like to correct for.
+And one way that you can correct for it is by taking this distribution of the almost 3 million products
+and sub selecting, select a subset of this data and make that subset be slightly more weighted the
+way that you want.
+And you can tell there's a bit of a dark art to this.
+It's a little bit hand-wavy.
+I'm trying to build a better data set.
+And as as I've said many times in our journey together, the way that you be more the way that you can
+be more scientific about this?
+Is that really you should curate many different data sets using different kinds of techniques, and
+experiment with them and find out which data set performs best when you try and train based on your
+business outcome metric.
+That's the right way to do it.
+And the good news is I already did that.
+I've been working on this particular data set for quite a while, and I've been doing all sorts of stuff,
+and I've ended up with with this particular set that works really well.
+And I will tell you, basically it was it was the first thing I did because I've got a good instinct
+for this after doing it for a while.
+But sometimes my instincts are wrong.
+And there's a few things I tried out that turned out to do worse when it came to training, but this
+particular approach has worked well.
+But if you're wondering, like, how do I have this intuition?
+How do I know that the items are too skewed towards to cheap products?
+The answer is you experiment, you try it, you run your training and you see what performs best.
+And what I've got for you right now is going to be a data set.
+That's going to work pretty well.
+Let's see.
+--- Lecture 6 ---
+All right.
+This is the really juicy part.
+So we are now going to sub select a population from the big distribution.
+We're going to do that using a numpy function numpy.
+And this is a function which says okay give me a size 820,000.
+And I'm going to take 820,000 out of I'm going to select that, choose that out of the bigger population.
+But I'm going to do it in a way that is weighted.
+I'm going to favor some items over others, and you're going to pass in a list of weights, which I
+will use.
+Okay.
+And the way we come up with those weights, I'm going to I'm going to penalize cheap things.
+I'm going to say that that take the price and square it as a way to encourage it to pick expensive things.
+And I'm also going to penalize tools and home improvement, the whole category and the category automotive.
+And I'm going to penalize that category a lot.
+And I had to penalize that a lot because unfortunately also car parts are often the more expensive items,
+so this weighting tend to favor car parts even more.
+So I had to really ding it by multiplying by 0.05 to get a good distribution.
+So hopefully you get the idea.
+This is this is very iterative, very experimental.
+You take code like this.
+You shift around the weights.
+You keep playing until you end up with a distribution that you like.
+So let's see this distribution we're going to get right now I'm running this.
+It's doing this selection from the bigger population.
+We now have ourselves 820,000 items.
+And let's have a look at how their price is distributed.
+This is the price of the items.
+And you first might look at that and say okay well it's still very skewed.
+Well it was always going to be pretty skewed because we didn't have that many expensive items in the
+first place.
+But actually the skew is a lot less.
+I think the average price before was $59 or so, and now it's $140, a much more respectable average
+price, more aligned with with the kinds of things that I want to test our model with later.
+And you can see that there is a fatter tail here.
+There are more items.
+You also might notice there are these spikes at various points.
+And these spikes are because it tends to be that products are often priced at like $399, $499.
+And you might wonder why why, why don't I correct for that as well?
+Well, that's because that is a real feature of the data itself.
+It's true in the real world that products are likely to have prices like that.
+So in fact, we sort of want our model to know that and to be able to to learn from that too.
+So it's good to have that in our data.
+So here we have it.
+It's still skewed but not as skewed as badly.
+Definitely corrected.
+And this is the kind of distribution that I was looking for okay.
+And I'm just going to shuffle up the data one more time.
+I realize that that we've already done that by selecting from it, but still it's a good practice to
+do a random shuffle on your data that mixes it up.
+And I'm doing this thing here.
+Random dot Seed42.
+Setting a random seed is a way of fixing the random numbers so that they're the same every time that
+you run this, so that you and I end up with exactly the same data set.
+Uh, and, uh, the reason that you pick 42, you'll see that it's that it is customary to see people
+setting the random seed to 42.
+And there's really two reasons for that.
+The reason that you do it is so that it's clear that you're not cherry picking.
+42 is a bit of like the standard number people pick.
+And so by always doing 42, it shows that it's not like you're experimenting with many different numbers
+until you get a number that happens to give you good results.
+You're just going with the one that people pick 42.
+That's one reason.
+The other reason, of course, is that it's it's playing.
+It's paying homage to The Hitchhiker's Guide to the Galaxy.
+Uh, the answer 42 to the life, the universe and everything.
+It is like a nerdy joke, a nerdy little shout out to that.
+It's why everyone always fixes their seed at 42.
+And here we have it.
+We are now going to look at the, the, uh, um, prices one more time.
+And it is, of course the same as before, shuffling around and didn't affect the prices.
+And we're also going to look at how the, uh, how things are distributed into the different categories,
+which was the other thing we corrected for.
+And here we have our final categories and it looks perfectly decent electronics and first place tools
+and home improvement.
+And then automotive seems like a nice little, little uh, distribution of different categories.
+Sure.
+Appliances and musical instruments are right down there, but then there are way fewer of those items.
+It would be weird if they're all the same.
+So this seems like this is perfectly acceptable.
+Plenty of of car products, but not so many that it that it's overwhelming our data.
+Okay.
+And now, uh, it's uh, let's look at that in a pie chart because some people love pie charts.
+Here it is.
+Uh, and uh, you can see.
+Yep.
+Clearly nothing is dominating.
+It's not like we have the automotive domination.
+Uh, it's a nice, nice distribution of products.
+And as I say, if this feels like a bit of a dark art, that's okay.
+You should get a feel for it.
+You should experiment.
+Curate a different data set.
+The key is what performs best when it gets to training.
+Okay.
+We're then going to do just a couple of a couple more looks into whether there are any characteristics
+of the data we should know about.
+And then that will be a wrap for today.
+Let's finish this off.
+An important thing to look at with your data is correlations.
+Is it clear that your data has some relationship with with there's a relationship, say, between price
+and something like how many characters are in the description.
+Maybe it's the case that longer text tended to be associated with heavier with with more expensive items.
+And so we can do that by plotting a chart to try and see whether that is the case or not.
+So here I'm looking at this very noisy chart here, which is showing for for a particular number of
+characters in the description.
+Uh, how much did it cost?
+And, yeah, it doesn't appear that there's much going on there.
+I'm not seeing much correlation there.
+Nothing.
+Nothing that I can tell.
+Um, and how about with the wait, is it the case that heavier things tend to cost more?
+It might be.
+And, well, it does appear that something happening here.
+Right.
+There's obviously there's a lot of noise because there are things that don't weigh anything and or at
+least not that in the, in the Amazon description.
+And yet they have a high price.
+Um, but there does seem to be something going on here.
+So we might have some inkling that that weight is something that can be part of a prediction of how
+much something costs.
+All right.
+That's the end of looking at a couple of correlations.
+You should look at more.
+You can think of different ways you could dig into this data, think of different ways to analyze it,
+use these visualizations.
+Of course I'm using matplotlib.
+And this is just a cookie cutter stuff that you can copy and paste and change the dimensions, make
+new histograms, make new bar charts.
+Take a look at the data.
+You need to have a really good feel for this data, because we're going to be doing some some serious
+data science with the data, and it's great to know about it first.
+Okay.
+And with that, the final step is to now upload this curated data to the hub so that, uh, the people
+that don't want to go through all of this, like maybe you can then just download it from the hub and
+it's already being curated and it's a great data set.
+So we'll do that now.
+So it's super easy to push stuff to the hugging face.
+Hub, uh, you need to have your username and I suggest you if you want to just use my data then just
+keep my username in here.
+These datasets will be public.
+You can choose for your data sets that you make to be private or public.
+They're private by default.
+When you make it public, it means anyone can just download your data.
+I'm going to make two different data sets, and throughout the next week we're going to be and a couple
+of weeks we're going to be having these two different parallel data sets, one is going to be called
+full and one is going to be called lite, and full is the big heavyweight.
+All 820,000 items for people that want to really go for it.
+And Lite is a more civilized 20,020 2000 data points for people that want to do some training but don't
+necessarily want to spend several days doing it.
+Uh, if you're not as much as a big old nerd as I am, uh, but, uh, so full and lite are going to
+be these two different data sets, my name and then items raw, full and raw lite.
+We are I'm going to divide into training, validation and test data.
+Remember those three pools of data for the big one.
+The training data will be 800,000 items 10,000 validation 10,000 of test.
+And I'm going to push that to the hub.
+The the the the other one is going to be rather smaller.
+It's going to be 20,000, 1000 1000.
+Push that to the hub.
+So I'm not going to run this right now because I already ran it.
+I've already uploaded it to the hub.
+You'll see it in there with these names.
+They are public and tomorrow we're going to download them and make use of them.
+And that is our data set, curated.
+And I've put a fun little side note down here that I love making these different visualizations.
+And there's a whole set of different colors that you can use uh, to, to, to have, uh, different,
+different types of chart.
+There is a rather useful web page where it will show you the different colors that you can.
+You can use, uh, here for your different charts.
+I hope you'll explore this.
+I hope you're going there now and making tons of visualizations so that you've really, really got to
+grips with this data and you know it back to front.
+And with that, we will go back to wrap up this, this day and congratulate ourselves on curating an
+excellent data set.
+And so congratulations, you have either created your own training, validation and test data dataset
+or you've watched me do it.
+You've understood enough.
+You're fine with it.
+You're happy that I've done it, and you're ready to download it from the Huggingface hub.
+As I say, it's not super critical that you do this curation.
+It's more important that you get the general idea.
+You get the gist of what it's about.
+You understand that we've curated this data set, we've got rid of anomalies.
+We've we've got rid of things we don't care about, like items without a price.
+And we've taken a sample of the distribution, which seems to have a good representative population
+of the kinds of atoms that we care about, and with the kinds of descriptions that we care about, too.
+That's what it's all about.
+Okay.
+Congratulations.
+In addition to everything that you've been doing with open and closed source models, in addition to
+Rag with Lang Chain, you can now select investigate, curate your very own data set based on data that
+you've pulled from hugging face or from anywhere else like Kaggle.
+Okay, next time, lots of stuff.
+Tomorrow we're going to we're going to go through a five step strategy for selecting training and applying
+LMS.
+We're then going to do something really interesting which is pre-processing data sets.
+And this is this is a hot idea from from the last six months or so of people using LMS as ways to improve
+the quality of their data.
+And of course, it's also like an advanced Rag technique to pre-process your data.
+So we'll be doing that.
+It's also going to be an opportunity for me to show you about a different way to make API calls to LMS,
+known as batch mode, which is when you don't call in a synchronous request response kind of way, but
+instead you submit a batch of requests and later you come back and collect a batch of results.
+And this is like a pro technique.
+This is like an advanced LM engineering technique.
+And so I'm really happy to be able to show it to you.
+Okay.
+Tons to do.
+It's just a bit more data stuff before we get to training, but it's worth it.
+It's going to be great.
+I'll see you tomorrow.

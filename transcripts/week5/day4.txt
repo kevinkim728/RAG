@@ -1,0 +1,1287 @@
+--- Lecture 1 ---
+Are you enjoying Rag Week?
+I should hope so.
+Welcome to week five, day four as we continue our adventures in Rag.
+And today I gotta tell you, it's a bit of a hardcore day.
+We are gonna cover.
+We're gonna cover perhaps the single most important topic of the entire course.
+We're going to cover it today.
+It's about evaluations, about evals.
+It's about what it takes to put scientific rigor around a practice which is really more of an art form.
+And, as usual, to reinforce what you've already learned, you can already generate code.
+You can generate text using a bunch of closed and open source models.
+You can choose the right model for your project.
+And now, as of yesterday, you can implement your own Rag pipeline, an expert question answering system
+using Rag.
+We built it.
+It worked.
+Congrats!
+Now we turn to this crucial topic of okay, you've built it.
+How do you tell if it's actually working?
+Well, like how do you gauge the performance?
+And we can we can do this in a couple of ways.
+We can we can judge the performance of our retrieval process.
+How good are we at retrieving relevant context?
+And we can also judge the performance of the of the question answering itself.
+Does it give good answers to the questions as a result?
+And that, of course is most aligned with with our with our business objective.
+And today we're going to do all of that.
+And then we're also, as a result of that, going to experiment with things like the chunking strategy
+and the encoder and see how it affects our evals.
+So I'd like to motivate evals by explaining what their is that what's great about rag.
+And then perhaps what's not so great about rag starting with what's great.
+Well of course first of all, it's so quick to get something out there.
+Last time it took us a matter of minutes to have a question answering system that knew all about Ensure
+Elm.
+It's really very quick to build these things.
+And a similar point is that it's quite a scalable approach.
+We could easily have had 100 times as much data ingest.
+We've taken a bit longer.
+But but that's not that could be left to run overnight.
+We'd have had a populated vector data store and then doing the query would be really fast, so we could
+have tapped into a massive expertise.
+The contrast to these first two points is doing something like fine tuning, which we'll do later in
+the course, which is which is hard work, takes time and is expensive.
+This this is really quick.
+And then of course rag saves on context length.
+We don't need to to fill up the contents with lots of context, lots of information.
+We just select the part that matters.
+And then a very similar point is that it avoids us polluting the context with lots of information that's
+irrelevant, not needed.
+To answer this question, we can focus the context window on the most relevant information for the LLM
+to answer this exact question.
+Now I know what you're thinking.
+You're thinking, this all sounds great.
+What's there not to love about rag?
+It's amazing.
+And everyone people love rag.
+People talk about it all the time is how is it going to be a naysayer now and come up with bad things?
+Well, here they are.
+The first thing is that rag is basically a big old hack Transformers we built, transformers.
+They have they have layers of the neural network which which are responsible for figuring out how to
+pay attention to what matters in the input.
+Uh, and that's what they're good at.
+And they've been trained.
+They've been they've been really good at doing that.
+Our problem is that we've got too much information, and we don't want to waste our powerful transformer
+spinning his wheels, trying to figure out that only this little tiny bit is important.
+So we're using Rag.
+We're using this encoder and vector similarity as a kind of hack, just to say, ah, we can probably
+zoom in on this piece and that's probably all that matters.
+And probably since the vectors associated with these chunks put them in different places, they're probably
+irrelevant.
+But there's a lot of probablys in there if you didn't notice.
+And that's that's all part of the sort of hand-wavy hack that is rag.
+It's a performance trick.
+It's a way of just throwing out stuff that's probably not important.
+Focusing in on what is.
+But as a result, you have to you have to call it what it is.
+It's basically a hack.
+Okay.
+And you're probably thinking, well, so what if it's a hack?
+If it works well, that's the thing.
+It doesn't always work.
+It's very.
+People like to say it's empirical, uh, which is the sort of fancy way of saying it's it's trial and
+error.
+It's very experimental.
+You just have to try different approaches, try different rag techniques and see what works best.
+Uh, it's not like this is always the right way.
+I do quite often get questions from students that are like, I've got this setup and I've got this kind
+of input, and now I need to know what should I what kind of encoder should I use?
+What chunking should I use, what what should I use this kind of rag or this kind of rag and and it's
+like I can have an instinct.
+I can guess and I often do, and I'm always one with, with opinions.
+But you don't know until you try it out.
+It's very much about experiment.
+Experiment, see what works best.
+Uh, because it is, at the end of the day, just a sort of performance optimization to try and get
+better results.
+And as a result of all of this, I guess it's pretty much the same point.
+But you can sometimes hit this unexpected situation when you think you're doing everything right, but
+you ask a question like who won the prestigious award?
+And you just get the answer, I don't know.
+And you go, oh no, what's going on?
+Now?
+You roll up your sleeves, you dig in, you find out that it's surfacing at some context, but because
+of your chunking strategy, because of something, the wrong bits of information are getting in there,
+and you have to think about it slightly differently or add in a different flavor, or change a parameter.
+Do something differently so that that question starts getting answered.
+And sometimes it can be a bit of a of a whack a mole that you fix one problem and just another one pops
+up somewhere else, and you fix that and another one pops up and you're constantly getting after these
+little weird rag problems.
+And this is, this is all because it's basically a hack.
+And so these are the side effects of the fact that it's not a particularly scientific approach.
+It's not like we're training the the attention heads of a transformer which, which, which would be
+more rigorous, but rather it's a kind of shortcut to try and get the relevant context.
+And my last point is, is really the same again.
+But but just to say that the tyranny of rag is that ultimately what matters is what are the answers
+to your questions, and it doesn't always end up the way you think.
+Often with Rag, I've had this idea about a way to do something, and I've been like, that is a fantastic
+idea, and I've built the idea and I've put lots of work into it, and I've made it all, put it all
+together.
+And then when I asked the question, I get the wrong answer or I get, I don't know.
+And so sometimes the best ideas are things that you think that it's just gotta work just ends up not
+working because because it's a bit of a hack.
+Because you never quite know whether the right chunks will be surfaced.
+So, so there's there's definitely again, it's really it's really back to the whack a mole.
+It's something where there's different problems popping up.
+You're trying to solve them.
+But other problems are popping up and it's about trial and error experimenting until you get the outcomes
+you need.
+It's not always intuitive.
+Sometimes things you think are going to work really well don't actually help.
+And things that you think, oh, I'll just try this just in case.
+And suddenly things are really great.
+So so there is this very empirical, very experimental side to rag.
+And so to give you a real sort of tangible sense of this, think about something like chunking.
+It's something that you've only learned about in the last couple of days.
+And unless you already knew about it, this idea that you take a document and rather than trying to
+put that whole document in your vector store, you break it up into pieces and you take each of those
+and you make a vector for that.
+The thinking being that a question is probably going to apply to a chunk of your document rather than
+the whole document.
+Well, that sort of depends on the question.
+And it depends on on whether it's on on how big your chunks are in a very in a strange way, if you
+make your chunks too, too big, then there's too many questions being asked in here.
+And it's unlikely that a particular question is going to be a close match to the entire document.
+If we're asking about the I o t award for Maxine, and we have all of Maxine's HR document with lots
+of information, then the question who won the I o t award is less likely to be close to her entire
+history.
+And so that that lends itself towards saying we should we should make small chunks so that Maxine's
+II o t award is probably in a chunk.
+Okay.
+But if we do that, there's a risk that we get so small that we don't even have Maxine's name.
+We only have her first name, say, which is a very problem that we have.
+Uh, and we don't we don't have the part like the heading of the document which has her name on it.
+And as a result, the chunk is too small.
+And even though it gets selected, having that chunk in the context isn't enough to answer the question.
+And so that's another kind of problem.
+And so sometimes chunks need to be bigger.
+Sometimes they need to be smaller.
+Sometimes you need more overlap between them.
+Any one of these things could make your rag performance better.
+And so maybe you're thinking this sounds nuts.
+Uh, you know, it sounds like it's some sort of alchemy that you that you use to figure out how to
+make this thing work, that I'm only going to get through tons and tons of experience of doing this
+myself.
+Well, well, luckily, no, that that there is, there is like a, like a like a shortcut.
+There's like a process.
+There's a way that you can take this art form, this this alchemy that is rag and, and put science
+around it.
+And that comes down, as, you know, to evaluations that that's what evals are about.
+And, and this is actually a bit of a recurring theme with LMS, which is why I mentioned this is perhaps
+the most important topic that a lot about working with LMS is very experimental, very iterative, very
+much try the prompt, try this.
+And and that can feel sometimes very unsatisfying.
+And the way to make it satisfying is to build evals, find a way to measure in a quantitative way the
+performance of your setup.
+Then you can experiment, you can iterate, and you have a way to gauge whether you're getting better
+or worse in a way that you've decided you've signed up for.
+This is going to be my North Star.
+This is my metric.
+I'm going to keep iterating until this metric is higher, and that that gives you a technique.
+It gives you a procedure around the alchemy.
+--- Lecture 2 ---
+Okay.
+Now let's talk evaluations.
+So as I say here they are.
+Everything that's so important.
+This is a this is a big slide.
+So three steps.
+Step one is to build your golden data set collate curate a set of questions and answers that are going
+to be your your reference answers against which you will measure your performance.
+So if it's in Shoreham, then you build this set of questions about the company that are great prototypical
+questions.
+And and with them you basically there are many different ways to do it.
+It's not there's one way but the way that I'm going to use for this week, and it's a common kind of
+way, is you come up with a set of questions, and then for each one, you can identify a few keywords
+that should be in the relevant context.
+That'll allow us to test that the chunks that we surface have these keywords in it.
+So of course, if the question is, uh, who won the prestigious IIO o t award, then we would want
+Maxine and Thompson her first name and last name to be two keywords that ideally are going to be in
+the chunks.
+And we already know that Maxine makes it in there, but the last name does not.
+So so that's the kind of thing.
+And then we'd also want a reference answer, a perfect answer which which is something like Maxine Thompson
+one or Thomas won the prestigious Jyoti Award.
+So so we would want we would want that as well.
+Now where do you get these from?
+Well, you can of course, just come up with them yourself by looking through your data and coming up
+with questions, telling yourself, look, these are the questions that if my system can answer these
+questions, then I am satisfied.
+Then I'm then I'm good.
+This is this is where I set the bar.
+But there's a better place you can get the questions from.
+And where is that?
+Well, that is from your users.
+This if this is a system that's actually out there in production, maybe, maybe this is something that
+you're trying to improve an existing system.
+Maybe this is something where you're trying to be able to automate existing questions that people have
+that come in as emails today and take 24 hours for someone to turn around.
+That means that you have real end user questions and you've got real expert answers.
+And that is always your best, best source of golden data.
+And you might have lots of it.
+Uh, so so that is that is a brilliant place to go.
+And it's worth pointing out as well, that this test set can be a living, breathing thing.
+You can add to it over time as you build up more examples.
+Because of course, one of the one of the disadvantages of this approach is that because you're going
+to be optimizing for this test set, your system is going to be highly dependent on these tests.
+And it might turn out that you do a good job of of solving all of these tests.
+But but it doesn't generalize.
+Well given a new kind of question, it suddenly fails.
+So so it's it's very important with evals that you spend time trying to build the best possible test
+data set and that you are constantly adding to it, particularly if you find problems.
+And then typically there are two types of tests that you would do using your test data.
+First of all, you would measure how effective is your retrieval.
+How good are you at retrieving relevant content?
+And there's a bunch of metrics you can measure.
+There's actually lots and lots and lots of metrics, and people have their favorite ones.
+And I'm going to I'm going to mention probably the ones that I think are most popular.
+I'm not going to I'm not going into too much detail.
+I'll just tell you the ones you should know about.
+But but it's not like it's super critical.
+Uh, and I'll go through the formula in just a second.
+But MRI mean reciprocal rank, which basically it's, it's one if which is the best number if your very
+first chunk, uh, always has the, the information that you want the relevant content, then you'd
+have an MRI of one and that would be great.
+Ndcg normalized discounted cumulative gain.
+Which kind of measures how good are you at surfacing?
+Uh, the most important context to to the very top.
+And then recall and precision I'll go through in a minute.
+But these are all ways that you measure specifically that you're surfacing the right context.
+And this is good because it's very closely measuring what you're doing with rag.
+So it's very similar to to to a model metric.
+It's something which is closely tied to the performance of your model.
+And so making a small change to Rag will will make a change to this metric instantly.
+And you can rapidly iterate.
+You can quickly iterate on things, change the chunk size, see what happens.
+And that's what we're going to do in a minute.
+Okay.
+And then the other kind of thing to test is the actual answers themselves.
+So you've got the answer that you've got the reference answer that you've already recorded.
+And now you've got an answer that your rag system makes based off the context.
+Uh, and you can compare the two.
+And of course, there are various ways of doing it.
+You can you can sort of do things like a word comparison, looking for how many, how the frequency
+of overlapping words.
+But that's kind of janky.
+It would be nicer to, to somehow use Llms in some way.
+Like maybe you could vectorize them and see how similar they are.
+But it turns out the way that's used a lot, which is really easy, is called LLM as a judge, which
+is when you ask an LLM to to to think about this and to say whether or not this is a good answer in
+the context of the reference answer.
+So you're basically saying to another LLM, hey, here's an answer.
+Here's a reference answer.
+Please score this answer compared to the reference answer.
+And Llms are very good at that.
+And it's a relatively easy task for an LLM.
+And it's always good.
+It's recommended to use a stronger LLM as your judge.
+You should because it's going to be evaluating.
+We're going to use a pretty lightweight one for us today because it's a simple task just comparing these
+two.
+And you can either just get it to to give it a score from 1 to 5, or you can you can dimension it.
+You can ask for a score in a few ways.
+How accurate is the answer?
+How complete is the answer.
+So Maxine on its own wouldn't be good enough.
+We'd want to see Maxine Thompson wants to see both names together, to be to be confident that it's
+complete.
+And then how relevant is it?
+Which is kind of the flip side of complete.
+It might say Maxine Thompson, but then give lots of other stuff about Maxine that's not actually answering
+the question.
+Too much extra stuff.
+That would be a relevance.
+Ding.
+So, so to score well on all three, it would have to be an answer that is, that is accurate.
+That's right.
+That has all the information.
+It's complete and it doesn't have any irrelevant information.
+So it's all relevant.
+That would be accuracy completeness and relevance.
+But these are all ways that you measure the quality of your answer.
+So you could probably see like a familiar trade off happening here.
+Measuring retrieval is something that is that is very much in our control.
+It's if retrieval goes down we know exactly what to do.
+Like it's so easy to see what's happening, what's the context that's being surfaced, how can we control
+it.
+So it's very much it's like a very close to the model, the retrieval measure.
+but it's not the ultimate business problem we're trying to solve.
+The ultimate business problem we're trying to solve is good answers.
+So measuring answers whilst it's slightly less in our control, it's more aligned with the kind of end
+user objective that we have.
+And of course, there's more metrics even further downstream.
+We can we can actually gather end user feedback on the answer.
+And you know, if you if you use ChatGPT occasionally, you get prompted, uh, how is it doing?
+Which of these two answers do you prefer?
+And that's what's going on.
+You know, we're collecting it's collecting training data so that it can, it can, uh, address it
+can it can correct itself in the future.
+So, so doing that measuring, getting end user feedback is always going to be the best.
+But that is the furthest down downstream.
+It's it's then the hardest to tie all the way back to the accuracy of your model.
+So generally we we typically would measure retrieval and then the accuracy of the answers.
+The retrieval is the one that's that's fastest to iterate over and to see the instant impact.
+The answers are a bit harder.
+You need to connect more dots to figure out why the answers aren't scoring well, but it is more aligned
+with the end goal.
+Okay, we're about to go and do stuff.
+I can I can sense your antsy and I'm gonna do a little bit more talking and then we go do stuff.
+I just want to tell you about these metrics okay.
+So MRI.
+MRI stands for mean reciprocal rank.
+Sounds kind of technical but it's not particularly.
+It's just saying okay.
+So take take how far up in the chunks that were surfaced.
+How far up was the first hit?
+The first time that we got relevant content.
+And and if it's if it's in the first location, call that a one.
+If it's in the second location, call that one over, call that one over two the reciprocal of two a
+half and then one over three, a third, a quarter, and so on.
+So top, top one would be one a half, a third, a quarter, a fifth.
+And just take the average of that.
+That is the mean reciprocal rank.
+So an MRR of one would mean that you always surface the hit in the first chunk that gets that gets retrieved.
+So that would be really great.
+That's MRI.
+And then Ndcg.
+It's not as common.
+So I'm not gonna I'm not going to get stuck on this one.
+I'm going to show you the formula.
+The formula has logs in it.
+So it's like not not so easy.
+But but the idea is that it's it's not just looking at the first hit.
+It looks at all of the hits and it asks the question how how well distributed are your the hits in these
+chunks?
+Does it tend to be that the chunks that are relevant are the first few chunks, or do they come lower
+down?
+So it's more about the distribution of the chunks in your results.
+But if all of the if the chunks that had relevant content are all your top few ones, then you would
+score a perfect one with your ndcg.
+Okay.
+And precision and recall are very common terms from from machine learning from statistics.
+You may have heard of them before.
+They're often they're often said that way around precision and recall.
+But when it comes to rag, recall is the more important one of the two.
+So let's start with that.
+So so I put it here as recall at k where k is a number like recall at three or recall at five.
+And it means recall at three would be to say what percentage of your tests if you took the top three
+chunks, was it a hit?
+There was relevant context in the top three chunks that that is called recall at three.
+And so if you scored 50%, it would mean like in half of the cases, half of your test cases, the top
+three chunks had relevant context somewhere in them.
+That's that's what what recall at three would mean.
+Recall at k would mean in the top k chunks in whatever percentage of your tests you had a hit.
+And there's a sort of similar.
+In our case, we're going to be dealing with lots of keywords.
+Um, and so it's a little bit more complicated because, because you could have a case where all the
+keywords is in one chunk, or some of the keywords are in different chunks.
+So, so typically with this case you'd use something like keyword coverage percentage.
+Um, what what percentage of your keywords are covered across the the test set.
+But it's a similar it's a slight variation on recall.
+It's a sort of recall style metric.
+Okay.
+And then precision is what proportion of the chunks that got surfaced had relevant content in them.
+So if K is is is is five let's say.
+So if you're always surfacing five chunks then on average how many of those five have relevant content.
+You see how that's like the other way round of thinking about it.
+So there a score of 50% would mean okay, in about half the chunks that get surfaced in each one of
+our of our rags, we're surfacing relevant content, relevant context, even if that's that's true for
+all of the test cases, 100% of the test cases, but your precision is 50%.
+If in each case, it's only half of the top five.
+Uh, that, uh, on average, I guess maybe if it were six, it would be three out of the six, uh,
+that are getting this, uh, hit in that chunk.
+So that one is a bit of a head scratcher because you might think, okay, so what?
+Why do I care if what surely recall is much more important?
+I care about knowing what percentage of my tests have a hit.
+Well, the answer is if what you're really concerned about is making sure that you're not wasting your
+models time with irrelevant content with distraction.
+If it's a problem for you, if bad chunks are being surfaced, then precision would be a problem because
+you'd want to really scrutinize precision, because that's what precision is capturing.
+How much what percentage of your chunks are hits?
+Uh, that's what that's about.
+But it's not so common.
+You can imagine in in rag, we don't care too much if we've got some irrelevant content in there.
+What we really care about is recall or keyword coverage.
+We really want to make sure that we're doing a good job of of surfacing what matters somewhere in the
+chunks.
+Ideally high up in the chunks that get surfaced when the user asks a question.
+Okay.
+And I realize I hit you with lots of stuff.
+Lots of like, uh, expressions and maths and stuff, and it's not that important.
+It's useful that you've that you've seen it and heard these definitions.
+We're going to look at them.
+We're going to look at the code.
+We're going to we're going to play with it.
+I think knowing MRI is a good thing.
+So we'll cover that more.
+Knowing what keyword coverage means, it's kind of obvious and understanding that it's a recall style
+metric.
+That's all good.
+And the rest of it it's it's it's not super important.
+But of course, understanding the three things curator test set, measure the effectiveness of your
+retrieval and measure how the quality of your answers put in place a scientific way of doing it, and
+use that as your basis for experimentation.
+That is the key.
+That's what it's about.
+And that's what we're going to go and do right now.
+--- Lecture 3 ---
+Okay, we're in Corsa.
+We're going to week five.
+We're going to day four.
+Welcome to evaluation.
+So such an important topic this is this is so crucial I do want to ask you to keep in mind how will
+you apply this to your business.
+Remember that that rag week this week is it's useful for any business.
+It's one it's one of the most immediately applicable LM solutions.
+And so so really be thinking about how can you apply this to business problems that you face.
+I, I often find that people are so focused on architecture and things like which Rag framework should
+I use?
+Should I use long chain or should I not use long chain?
+Should I use any one of these other ones?
+And I often feel like it's because it's engineers falling into their comfort zone of asking questions
+about architecture.
+It honestly doesn't matter if you use long chain or not, it doesn't make any difference.
+It's just about whether you use their glue code.
+What does make a difference?
+How are you evaluating success?
+Have you really thought that through?
+Have you thought about how to align the performance of your Rag system with end business goals.
+That's the hard stuff.
+And and you may say that sounds like it's more business than technical, but the people that can really
+understand it are the technical people.
+It's you with your knowledge of the problem you're trying to solve that can connect those dots.
+And so that's why it's a superpower to be able to do just that.
+Connect the dots between what you're working on here and end business outcomes.
+Okay.
+Rant over.
+Let's get started.
+So we are going to do some evaluations in a notebook.
+And then we're going to move to modules.
+And I've got a few things to point out to you.
+I have a whole, uh, Python package here called evaluation a directory inside week five.
+Uh, and if we come into this, there's a few things that I might want to show you.
+One of them is this.
+This file tests.
+You know what jsonl is jsonl you you do know.
+Okay, well, then just don't listen to this part.
+L is a type of JSON file where each line is a well-formed JSON document, but the whole file is not.
+And you might be like what?
+In other words, it's like a JSON list, but without the square brackets on either side and without
+the commas at the end of each line.
+Just each line is a dictionary, a JSON object on in its own right.
+And so you might say, okay, why not just put it in a collection and put commas?
+Because this sort of file format is much more convenient for being able to quickly append to.
+You can put extra lines in it, and it's much more convenient for this kind of thing, for it's like
+the JSON version of a CSV file where each line represents a row, and these files are very common for
+things like test data.
+And they're going to be very common for batch data that we will get to at some point when we make batch
+API calls.
+So good that you know about Jsonl if you did it already.
+So in each row here I have a question.
+And the question on row one might be familiar to you, a question like who won the prestigious award
+in 2023.
+Some key words.
+These are words that should be surfaced in the context, and then a reference answer will come after
+that.
+And I do believe I also put each one with a category.
+You'll see at the end there is indeed a category direct fact.
+So each one is categorized as well because that's going to be convenient for us.
+Now you might you might say, is this like the standard format for tests?
+No, there's not a particular standard format.
+Although when we look at data in Huggingface, you'll see that there is like a huggingface format,
+but this is just JSON file, a bit like having a CSV file full of stuff that we will be using for our
+testing.
+You can use whatever format you want because we're going to load it in using Python right now.
+So I've got I've got this Python module Test.py.
+It's a very complicated Python module.
+It's a, it uses pedantic, uh, and I imagine most of you have probably experienced pedantic in some
+way.
+I'm not I'm not going to cover it in detail now, but it's the kind of thing we'll probably touch on
+quite a few times along the way.
+Uh, but this is something where pedantic is a way that you can describe JSON schema with a Python object
+by having a Python object be a subclass of base model.
+And on my agenda course we use a lot of Pydantic because it comes up a lot with gigantic framework programming,
+but so you import base model and then you can you see here that I make something called test question
+has questions keywords, the reference answer and the category.
+And I have one single function load tests which loads them all in very simple stuff.
+This is all just just very much boilerplate Python.
+And what that means is I come back here to this, this notebook run a second ago.
+I can import that that very module we were just looking at test.
+I can call load tests and that has just loaded them all in.
+Let me tell you how many of them there are.
+There are 150 of these tests.
+Okay.
+Let's take the first one test in location zero.
+And then if we just loaded it in JSON, we'd have to treat it like a dictionary and select each thing
+in square brackets.
+But because we're using Pydantic, we can call Python variable names question, category, reference
+answer and keywords.
+Let's see it.
+So the question who won the prestigious Jyoti Award in 2023.
+The type?
+The category.
+It's a direct fact.
+The answer Maxine Thompson, uh, won the prestigious inaugural innovator of the year award in 2023.
+And the keywords Maxine Thompson I o t y not very shocking.
+You can see it's loaded it in from the jsonl.
+We've got it in a set of tests.
+You can do the same for your business.
+This is all very standard stuff.
+And yeah, hopefully thinking wow, gosh, editor is a hard worker writing those 150 questions.
+But hopefully you're not thinking that because you know perfectly well I wrote the first one and then
+I said, okay, Claude.
+Ha.
+Uh, and of course, not only not only do you know that llms are great at generating synthetic data,
+but you might even have built a synthetic data generator yourself in week three as part of that exercise,
+in which case you could see you've already actually experimented with building JSON data sets, and
+maybe you already made a JSON data set, but if not, you can come back and use that to make one for
+your business that you can use for testing your own rag.
+Okay.
+All right.
+The next thing we're gonna do is we're just going to see how many do we have in each category.
+And this is a little bit of fancy Python.
+If you're not familiar, there's a there's a class called Counter and Collections which allows you to
+count things up like the number of categories.
+We can do that.
+And we can see we've got 70 questions that are about direct facts, 20 that are that are temporal,
+a quarter like like, uh, the timing.
+How long was someone somewhere that kind of question, 20 questions are in a category called spanning,
+which are questions that rag has a really hard time with, which are questions that need you to look
+across multiple documents to be able to answer them, like how many employees have a salary more than
+$60,000?
+And that is something which is like the Achilles heel of rag, because it won't be in any one chunk.
+It'll be across many, uh, comparative uh, who's been around for longer.
+Two employees numerical and anything to do with with like who's who's salary is above this much or something
+like that uh, relationship who reports to who, that kind of thing.
+And holistic.
+Another Achilles heel of rag a question which which is something that pertains to to to everything as
+a whole that you might only know if you'd read a lot of the documents.
+So that's that's really hard for rag because it only selects a few chunks at a time.
+So both the spanning and the holistic category, I've only got a small number of questions in them,
+but they are two of the areas which rag struggles with the most.
+Okay, and if this is all a bit too numbers for you and you want more action, we're gonna get to action.
+But this is good stuff.
+This is the kind of data science this is.
+This is a bit of data science, and it's the stuff that really makes the difference with your project.
+So I have in this evaluation package a module called eval.
+And this is a bit longer.
+And I'm not planning to take you through this in and tons of detail.
+I just want to show you that there's there's two there's basically two things going on here.
+There's evaluate retrieval that is given one test and it figures out how good is the retrieval.
+And there's another one called evaluate answer and evaluate.
+Retrieval is something which is just going to calculate the MRR the mean reciprocal rank.
+And it's going to do it you you can see it's going to be very very simple.
+We're going to go and have a look.
+It's going to just take the average across all of the keywords.
+It's going to also work out the keyword coverage which is the keywords found over the total keywords.
+Uh, so that is how well covered were the keywords for this test.
+And then, uh, yeah, that's, that's uh, it's also going to calculate the ndcg, which it does right
+here.
+Uh, so let's just go up and have a look at these calculations very quickly.
+The MRR, that's the one I really want to focus most on the mean reciprocal rank.
+Look how easy it is.
+It just says if if it finds one, it returns one divided by the rank, so if it's in position one,
+it will do one divided by one is one.
+If it's in position two, it'll be one half, position three it'll be a third.
+Super easy.
+That's that.
+You can you can have a look at how, uh, the, the ndcg is calculated.
+It calculates this thing.
+It is you can see it's got the, uh, log of I plus two underneath it.
+If you're familiar with this stuff, you'll know exactly what's going on with this.
+Otherwise, it's not super important.
+I don't want to get bogged down in maths.
+You'll you'll see pretty clearly how it's reflected in the numbers.
+Um, but it's what's called normalised, which means that it's trying to make sure that if the best
+it could possibly do, given the context is have two, two things to its surface, two good chunks,
+then it just wants to make sure that those two chunks and the first two positions, and it won't be
+penalized for for other chunks, not having content.
+So that's that's what normalizing is about.
+And that's, that's you'll see that it does that right here.
+Okay.
+So that that is how the retrieval is calculated.
+That's how we're calculating all of those metrics.
+--- Lecture 4 ---
+And now now I want to show you evaluate answer.
+That is the other thing.
+Remember we've evaluated the retrieval by calculating those stats.
+Evaluate answer is where we decide we use an LLM as a judge.
+We're going to reach out to an LLM and say hey how is this answer compared with the reference answer?
+Now I'm going to use a particular technique here known as structured outputs, which is a really powerful
+technique, really, really handy.
+But I'm not going to explain it to you because we're going to come back to it later.
+So you're going to have to take a leap of faith that I'm doing something clever and it works, and it's
+super useful, and you'll use it all the time.
+If you've been on my course again, you've used structured outputs so much, so we'll use it again.
+But I'm not going to go through.
+I'm going to give you a little intuition to it.
+I'm going to I'm going to plant the seed because we will come back to it.
+But evaluate answer is going to very simply make a call to an LLM.
+It's going to say to to the LLM, we're first going to do this right here.
+We're going to call answer question for the question.
+Now answer the question.
+Does that sound familiar?
+Does that ring a bell?
+I hope it does, because answer question is the very thing that we wrote yesterday.
+It's in implementation answer.
+It's this thing right here.
+It's the thing that was began as five lines of code and is now sort of grown a little bit.
+It's it's more like 7 or 8, uh, more like ten.
+Uh, but there it is.
+This is answer question.
+This is the key method that actually decides the function that decides how to answer a particular question
+after looking up context.
+So that's what we've done.
+Uh, so so um, back to eval.
+So we, we collect that answer.
+We actually call this to get the answer.
+And then there is a prompt here when I'm prompting an LM, you are an expert evaluator assessing the
+quality of answers.
+Evaluate the generated answer by comparing it to the reference answer.
+Only give five out of five scores for perfect answers.
+And then I say the question.
+This is the question.
+The generated answer.
+This is the generated answer.
+The reference answer.
+And here is the reference answer.
+And then it says please evaluate the generated answer on these dimensions.
+Okay.
+That is the call we're making to an LLM in order to judge our performance.
+And we're using we're using light LM here I've imported light LM.
+This is the completion function I hope you remember it.
+It's beautiful.
+It's so easy.
+Now before I show you structured outputs, I feel like you need to see something working.
+It's been too much talk.
+Let's just go back quickly to to day four and let's just see this.
+So from eval we're going to import the evaluate retrieval.
+This is the thing that calculates the stats and evaluate answer.
+That's the thing that does the LLM as a judge.
+So we'll make those imports.
+And now when it's imported it's going to take its time.
+Uh we're now going to call evaluate retrieval.
+So this is for this this this question.
+Who won the prestigious IIoT award which you'll remember.
+It's very fast.
+You remember that the um the the uh, and that's not actually all that was doing is retrieving the relevant
+context and then judging that context.
+It's judging the retrieval.
+And you remember that we surfaced the chunk with the Maxine, but not it didn't have a last name and
+it wasn't.
+I don't think it was particularly high up.
+And sure enough, you see here the MRR is indicating that the chunk that that surfaced the the important
+information was a bit further down.
+And this, this, uh, DCG is a fairly low number.
+Two keywords were found, but they were found lower down.
+This is out of a total possible keywords of three.
+And so the keyword coverage is two thirds, because we were able to find two thirds of the keywords
+in this particular lookup.
+That's that's the keyword coverage a similar to a recall style metric.
+Okay.
+That was our retrieval stats.
+You can see it worked perfectly.
+You could go back and look through the code.
+If you do want to know that this formula with the log of two plus n in the denominator, go back and
+look at it.
+And you can you can always also Google it to see the the proper formula and the rationale and how it
+works and why.
+But it's not as nearly as common as MRI and keyword coverage.
+Those are the really common ones.
+These are go to stats for testing the effectiveness of your Rag retrieval.
+All right.
+Now it's the big guy we're going to call evaluate.
+Answer.
+This is this is the one that really does the LM as a judge.
+So I run this and it's basically doing the rag retrieval.
+Then it's calling an LM to answer the question using that answer function that we that we saw in implementation.
+And then it's then calling LM as a judge to judge it.
+And we got back in evaluation.
+And here it here it says the answer correctly identifies Maxine as the winner mentions the IoT award,
+but it omits Thompson's full name, which is present in the reference.
+And I can actually print out that the four fields feedback, accuracy, completeness, and relevance.
+These are the four fields, um, and uh, it, uh, it gives it some.
+I see, I see, so it gives it five for the accuracy for, for completeness because it didn't say Thompson
+to get five out of five, we'd have needed to have her last name but five for relevance because it only
+contained relevant information.
+So it does give it a good score, even though it even though the answer missed out the word Thompson
+to get five, five, five, it would needed to have got that too.
+And that makes total sense.
+So that is showing you LMS as a judge in action evaluating this question.
+And it worked really nicely.
+I told you I wanted to come back and have a quick look at the code after we saw it running, if we come
+back just to look at it again.
+So I mentioned we're using I'm using light LMS.
+So instead of OpenAI create it's just completions I pass in the model, I pass in the, the the messages
+that we just created.
+And then there is also this thing here I'm passing in another thing called response format.
+And then I'm passing in this thing answer eval.
+What's that about.
+Well this is this thing called structured outputs, which is when you call an LM and you say, hey,
+I don't want you to respond with just, just any old language.
+I want you to respond in JSON and I want it to, to, to, to be follow this schema that I'm going to
+tell you, I need the JSON to be formatted a particular way.
+And with light LM you can do that by passing in a pedantic object.
+So what I mean by that is if we come up here, you'll see one right here.
+This here is a pedantic object.
+It is a class which is a subclass of base model.
+And I define fields here feedback, accuracy, completeness and relevance.
+That sound familiar.
+So we just saw a second ago.
+Right.
+Uh, and for each one I give it a little description.
+And because I'm passing this class in, when I make this call to to light LM, it means scroll back
+down.
+Sorry.
+Find that again.
+It means because I passed that in that whatever response open AI generates, it will conform to that
+spec.
+And it will.
+It will create something which which will be Jason, to reflect that object.
+And that means that we can then take whatever comes back and turn it into an answer eval object.
+So if I lost you there.
+Don't worry about it.
+We're gonna we're going to cover structured outputs in week eight.
+It's it's such a crucial.
+It's it's it's so helpful honestly.
+It's such a go to thing for, for for getting your llms to generate, uh, consistent and high quality
+outputs.
+Uh, in the course.
+We use it all the time.
+So if you're coming here from my course, then, you know, structured outputs back to front, you're
+like, okay, stop.
+But but if you're new to it, uh, get get an intuition for it.
+Let me have planted a seed.
+Uh, we will talk more about structured outputs in the future.
+But you can see that we forced the LLM to come back with this answer.
+And now I'm using GPT four one nano right here and this this running this in a second.
+Of course, we're about to run this for our entire result set.
+And it's going to cost about $0.02.
+2 to $0.03 maximum is how much it costs.
+It's nice and cheap.
+It's not super cheap, but if you if you rather it be free, you can just simply change this to be an
+Obama model.
+You can have it go locally.
+You can choose any model you want, either doing it through light LM, or you can simply replace that
+call to light LM with a with a call of your choice, of course.
+Um, but but let's say Lemkin can talk to Obama.
+It can talk to to anything else.
+Um, so, uh, but I would recommend sticking on on for one nano if you don't mind spending, uh, about
+10 or $0.15, then you could go up to opt for one mini and you might get more accurate results.
+You'd certainly probably get slightly more critical results because, uh, mini will be able to to be
+able to think it through and perhaps be a bit more critical.
+Um, but but nonetheless, Nano is going to do a fine job.
+It's good for us right now.
+This shows us how we're using GPT for one nano as LM as a judge, and we're using structured outputs
+to make it respond in this way with its feedback and with its scores.
+--- Lecture 5 ---
+Okay, it's time for action.
+You've been waiting for the action.
+Wait!
+No longer.
+The time has arrived.
+There is this class here.
+Evaluator.
+And that is the.
+That's the business.
+That's where the stuff happens.
+And it's like a fancy.
+It's like a Gradio app.
+You look through it, you'll see that it's a whole lot of gradio.
+And I'm not going to walk you through this Gradio app.
+And you're wondering why not?
+Because I didn't write it.
+I got Claude to write it because llms are good at some things.
+They're problematic.
+They're painful with, with with some things particularly like data science, it can be hard.
+But when it comes to something like building a user interface, if you've got the business logic already
+written in something like eval, and you want a UI and you can describe it, they are amazing at just
+just churning out a Gradio app.
+And as long as you can then look through it and proofread it and tweak it, then you're in great shape.
+And that's what I did here.
+So I'm certainly not going to walk you through it.
+We don't need to be walked through it.
+All we need to do is run it and see what our user interface looks like for running an evaluation.
+Okay, here we go.
+You've Run.
+Oh, sorry.
+First I had to go into week five.
+Go into week five, as should you.
+And then you've run evaluate.
+Uh, evaluator dot pi.
+And then let's see what happens.
+So this is a user interface, which with any luck, if, if, uh, Claude has done its job, is going
+to.
+There we go.
+Very nice.
+It's zoomed in.
+Let me zoom out a bit so we get to see everything.
+Here it is.
+There we go.
+Now you see everything on one screen.
+So there is two two panes to it.
+There is run evaluation uh for retrieval evaluation and run evaluation for answer evaluation.
+So let's see what happens when I press this button right here.
+So off it goes.
+It's evaluating.
+It's pretty quick.
+And bam here are our results I can zoom in on this because we only look at the top half.
+Here we go.
+So we see our stats the MRI the mean reciprocal rank.
+We get 0.7298 the ndcg which is you remember like how well distributed are the all of the rank results.
+All of the all of the hits, are they all at the top of the chunks or are they sort of spread through
+it?
+And that is 0.7387.
+The keyword coverage is just above 80%, and it ran 150 tests because there are 150 rows in that JSON
+file.
+And it's also given us a nice bar chart.
+Isn't that beautiful?
+A bar chart that shows us for each of the categories, the the seven categories that we've got, how
+did it perform in each category?
+And you can see it did pretty poorly.
+It did worst in spanning.
+I'm actually surprised it didn't do too terribly and holistic because that's very difficult.
+But relationship spanning and holistic all did kind of badly.
+They are all the difficult ones.
+Relationship is hard as well because it's between two different chunks.
+And then these ones, it did relatively well on um, best of all, numerical because that's just a just
+a straight look and direct fact.
+Pretty good as well.
+Okay.
+That is evaluating our retrieval.
+That's cool.
+Uh, next and by the way, you'll see I've colored it, I arbitrarily I decided that 70% would be would
+be read.
+And I've made some some thresholds.
+I think it goes yellow from 80 and green from 90, just as something for us to shoot towards.
+Um, but, uh, yeah, there's uh, it really the right number is something that would depend on your
+business problem and what would be acceptable for you.
+So it's not like there is one absolute number.
+You know, MRI should be 0.9.
+You just have to to do some experiments to understand what it would look like to be good for your problem
+and make sure that it achieves the the bar that you have set, uh, that is, that is acceptable to
+your business.
+Okay.
+But the trouble with setting bars for this stuff is that it's a bit abstract.
+And and what isn't abstract is evaluating the actual answers.
+So let's kick that off.
+And now I have bad news, which is that this isn't super fast.
+This this takes a bit of time.
+I, I actually I made a version of this that was, that was multithreaded and it ran it all in parallel.
+That was really cool.
+But I realized that it's quite a lot.
+It's not that much.
+It's just a bit more code.
+And I figured, uh, that, that it's better to keep it simple.
+You know, it's like, I'm not I'm not trying to teach you to do fancy multi-threaded stuff or async
+stuff or anything like that.
+So if you want to do this, you can you can either make it async if you know about that, or you can
+use something like multiprocessing, the pool, uh, to to make it be be run in parallel.
+But it's not necessary.
+If you don't do that.
+You just have to wait a minute for this to run.
+So I'm gonna gonna gonna go offline for a second.
+And when I'm back, it will have completed and we'll look at the results.
+Okay.
+It just finished and there you see the results.
+And you may have got something similar.
+We did fine on relevance.
+The model didn't give irrelevant information, which is kind of what you'd expect.
+But we didn't do great on the others.
+Accuracy just fell into the red territory with 3.99.
+Completeness is at 3.85, and there's a slightly woeful tale on the right.
+Here.
+You'll see that definitely holistic was where it really struggled.
+Spanning didn't do too great either.
+And then you'll see that again.
+Numerical was was was one of the best.
+So these are the results of our current state.
+And the good news is that there's plenty of room for growth.
+We've got opportunity to do better.
+But you can see, I hope.
+I hope this gives you that real, tangible sense that having these numbers, it gives us something to
+shoot for.
+If I now change a strategy like the chunking strategy, we're going to see these numbers change.
+And it's going to give us like like a, some sort of quantitative way of knowing that we've done better,
+not just a kind of qualitative feel, or even if you remember when we looked at the vector spaces,
+we got a sense, okay, this encoder, it looks it looks prettier.
+It looks like things are clustered out more and it looks nicer and more organized.
+But that doesn't you know, that doesn't necessarily tell us something meaningful.
+This is giving us a number.
+It gives us a number.
+And it's giving us like red trouble.
+So this is something we can get after.
+And what I want you to do now is to write down these numbers.
+And we're not going to focus on everything because it's a bit too much to, to, to worry about here.
+We're going to focus on MRI, which is 0.7298 and on accuracy, which is 3.99.
+And now that we've got this great tool, this really nice, simple tool to be able to to measure how
+we're doing this is going to give us the framework we need to experiment and improve, which is what
+we're going to do for the rest of today.
+And then in an even bigger way tomorrow.
+And we're going to get deep into rack.
+Uh, so, so, um, yeah, take take notes, take a screenshot.
+Uh, come in and run this yourself.
+You might get slightly different results each time.
+Uh, this certainly this this is always a little bit different, but but see what you get and then let's
+get ready to drive some improvements.
+And actually, just before we run some experiments, I do want to point out you're looking at this.
+I hope you've got an I hope you think wow, this is cool.
+The the charts and the numbers look really great.
+And you might be thinking, uh, but this is like a UI that we just just knocked up.
+I definitely wanted to focus on the right thing.
+The thing that's cool about this is perhaps the least glamorous part of it.
+The thing that's cool is that we built that test set.
+That's what we're really measuring everything against.
+So just just to stay focused on on what it is, it's allowed us to see our results this way.
+It's because we did the homework of building a golden test set and checking it, making sure that it
+was good and representative align with our business expectations.
+The questions and answers were things that perhaps we'd actually collected them from business users.
+We spent our time curating that test set.
+That's where the value is.
+The fact that that then of course, the value is knowing that MRR is an important thing to know.
+So it's so understanding how to calculate it and what it is is important, but then actually calculating
+it and drawing it in a fancy UI like that, that's just like half an hour with with Claude code.
+Or you could there are different, different observability tools that can do this kind of thing as well.
+And it's a fairly, fairly easy calculation.
+So I just want to make sure that you're excited by the right thing.
+Uh, fancy though the screen looks.
+What's exciting, uh, believe it or not, is is the less glamorous part of having dug into the data,
+built a golden test set that can be our North Star for improvement.
+Okay, now let's go run some, uh, some experiments.
+--- Lecture 6 ---
+Okay, let's run an experiment.
+So we come in now to the implementation folder.
+This is where we're going to live now because all we need to change is either the ingest approach or
+the answer approach.
+We don't need to change anything else and then rerun evaluation.
+So let's go into ingest.
+So first thing you often go to is chunking.
+Good old chunking that that big old hack.
+So we're currently chunking into chunk size of 1000 characters give or take.
+Let's let's just try changing that to 500.
+Let's have smaller chunks.
+Uh, now that means we'll have like twice as many chunks.
+Now, when we do this, uh, it's worth remembering that we're surfacing five chunks each time.
+And it seems to me that if we're going to have smaller chunks, it's only fair if we surface more chunks.
+Uh, otherwise there's less context overall.
+So.
+So if we go to answer pie at the top here, retrieval k is five.
+That's saying that we always try and and collect five relevant documents you see right here.
+K is five when we call retriever dot invoke.
+So let's make that ten.
+So instead of five documents of 1000 characters we're now going to surface ten documents of 500 characters.
+That seems fair.
+Uh, so now same amount of context will use up in both cases.
+All right.
+That's good.
+Let's let's go and test this out.
+Okay.
+So I'm going to bring up a new terminal.
+I'm going to go into week five.
+I'm going to go into implementation.
+And then I'm going to do.
+You've run ingest dot pi.
+Remember this rebuilds the the vectors.
+Uh re-ingest.
+So before we had 400 and something.
+So now we're expecting 8 or 900 or so vectors to be created and put in our data store.
+And there we go.
+970 vectors.
+Because there's overlap that you would expect there to be more than double.
+Uh, so so there we have it.
+Um, lots of vectors, 970 of them.
+Now let's go and rerun the evaluation now.
+Actually, if you've got your screen still running from before, you have to to quit that and create
+a new one because we've regenerated the database.
+So you will need to to launch a new Gradio app.
+So let's go and do that right now.
+And then let's, let's run an eval okay.
+So I do CD up up I go up to week five and now I do you've run evaluator.py.
+It's going to bring up our evaluator.
+The MRI that we're comparing with is 0.7298.
+That's what we have to beat.
+Let's press run evaluation.
+Let's see what we get.
+Drumroll please.
+And we do do better.
+Smaller chunks mean that we do better.
+Uh interesting.
+Okay.
+Let's let's take a note of that.
+It's all all gone, gone yellow.
+Uh, I'm just just for to keep us focused on one thing.
+Both.
+Both MRI and all three metrics have improved.
+We've gone right into the green with keyword coverage with more smaller chunks.
+Let's we're going to try bigger chunks.
+But let me take a note of this.
+So this is with 500 I'm keeping a little note tab.
+And so should you try and try and write this down so we don't lose track.
+Because if we're going to be scientific we might as well be scientific.
+Okay.
+Now let's go and make bigger chunks and try again okay.
+So I'm going to I'm going to close that.
+I'm now going to go back to ingest I am going to uh change the chunk size.
+We're going to go up and I'm not going to double its 2000, I'm going to go to like one, six, six,
+seven.
+And you're like, why?
+Why are you doing that?
+Uh, why such a weird number?
+Because I want to stay true to filling up the same amount of context space I'm going to go to to answer
+dot pi and say, let's go down to three, K is three, because three of one, six, six, seven will
+come to the same number to, to uh, to 10,000, which means sorry to 5000.
+Uh, is that right?
+Yes.
+Three times one six, six, six seven 6667 would be 5000.
+So we are now filling up the same amount of context.
+So basically it's three bigger chunks versus the five chunks that we had to start with versus the ten
+chunks of much smaller.
+So we've got consistency there.
+Okay.
+So we're comparing apples and apples.
+All right.
+We need to rerun ingest CBD implementation run ingest dot pi.
+Off it goes.
+Let it do its thing.
+We're expecting fewer much fewer now uh 235 vectors okay.
+And now we're going to go to uh upper directory to the parent directory.
+And we're going to do you've run evaluator dot pi.
+And it will bring up a fresh interface for us to to run with.
+And we'll see what you have to make a bet.
+What do you think.
+Better or worse, better or worse.
+We'll soon find out.
+Running evaluation.
+And we find it is interesting.
+How about that?
+Were you expecting that?
+Because I wasn't.
+It's.
+I was thinking it was going to be worse, but it's not.
+It's slightly better.
+So let's review.
+So having a chunk size of, um, uh, of one six, six seven, um, is, is uh, .7475.
+That is the MRI, which is better.
+So having a chunk size of 1667, a bigger chunk size is better than a chunk size of 1000, and having
+a chunk size of 500 is better than either of them.
+That's best of all.
+So there's clearly more experiments to be had here.
+You can get better numbers by continuing to experiment with it, and it's important to try and keep
+keep all things being equal.
+Assume that you want to try and keep roughly the same amount of information in the context window,
+so that you're only varying one parameter.
+If you're willing to have more in the context window, that that would change the picture a bit.
+All right.
+Well, that was interesting.
+You should do many more experiments.
+This stuff is fascinating.
+But now we're going to try different kinds of of chunking strategy.
+Now one of the reasons people love Lang chain, and I totally see it is that it comes with so much stuff.
+It's a real, what they call a batteries included kind of framework that has lots of things that come
+along with the mix, and one of them is a ton of different types of splitter things that can divide
+up your chunks in different ways.
+And in our case, our knowledge base is actually made up of markdown documents.
+And it turns out, would you believe it, that there is a markdown text splitter that is designed for
+splitting markdown documents?
+There's actually two of them.
+There's a markdown text splitter that just figures it out, and there's one called markdown header text
+splitter when you specify how you want it to do it.
+But we're going to go with a simple one.
+So basically we find our recursive character text splitter.
+And we will comment this line out.
+And instead of that we will say text splitter is look at that.
+It's filled it in for us.
+But I don't think you even need to specify this.
+I think we can just do it like that and it will just figure it out itself.
+That's that's how good it is.
+So let's see if I'm right.
+Let's do UV run ingest.py, uh, and we'll see if that just runs and just does some, some documents
+splitting.
+It's done it 109 vectors.
+Let's go test them.
+And I should say that I'm going to leave this uh answered py with k is three because these are clearly
+bigger chunks with fewer vectors.
+So just to roughly try and have apples and apples will keep retrieval k at three.
+And we will now go into the parent directory and do uv run evaluator.py evaluator.py.
+Up comes our evaluation framework.
+And we'll see whether this markdown splitter does a better job or not.
+Here it is.
+Run a valuation.
+Off it goes.
+And we get 0.738 is aha.
+So it does better than our original MRR when we had simple character splitting at the 1000 chunks.
+But it's worse than either of our of our subsequent ones.
+So for whatever reason going with the the markdown splitter has not worked out well.
+And it's not for whatever reason we can tell exactly what's going on.
+What's happening is that when we just focus on the headings now, our chunks are way too big.
+Uh, and so that's, that's, uh, that's why we're seeing, uh, performance suffering there.
+But it's nice to know that we've got this fancy markdown splitter, should we wish it.
+Okay.
+Are you getting bored of experiments now?
+Have you had enough?
+Well, I haven't.
+I'm only just getting started.
+I.
+One more, one more set of experiments to do.
+This is fun.
+This is what.
+This is what engineering is all about.
+It's about the experiments.
+So, uh, I have reset everything back to the chunk size of 500.
+The recursive character text splitter.
+That's our best result so far.
+We're now going to change the embedding model, the encoder.
+So we've been using the all mini Ml6 v2.
+So instead of that let's import OpenAI embeddings.
+And let's do embeddings.
+Is OpenAI embeddings.
+We'll use as the model the small the text embedding three small.
+And I will comment that out.
+And notice one little tiny thing here.
+If you do this, be sure that you do this after you've loaded your dot EMV so that your OpenAI key is
+set up.
+Okay.
+Copy that.
+Let's go over to answer dot pi.
+We also have to change the embeddings here as well.
+There we go.
+I've done that.
+We might as well comment out the line above it and make sure that we are importing.
+Yes we are importing it right up here.
+Excellent.
+We're in good shape.
+That's all it should take.
+We should now be able to try using OpenAI's embeddings model.
+--- Lecture 7 ---
+Okay, so we bring up a new terminal window.
+I go into week five.
+I go into the, um, implementation folder and I do.
+You've run ingest.py.
+This is now reloading our data again rerunning our data pipes.
+This time instead of using the hugging face embedding model we are using OpenAI embeddings.
+It's done 1500 dimensions are in there.
+This is exciting.
+Let's go back up and it's time to run our evaluator.
+Okay, here we go.
+I go to I just do UV run value.
+Value eight two.
+And up comes our Gradio app in just a second and we will see how this does.
+Here we have it.
+Let's run evaluation.
+Drumroll please.
+Off it goes.
+Takes a little bit longer now because we're going off and running these, uh, vectors with OpenAI.
+It's exciting.
+Still pretty fast.
+What are you?
+What are you thinking?
+Do you think it's going to do?
+Is it going to be similar?
+I tell you, it's often the case, like I told you, that the things you think are going to make the
+most difference end up not making much difference.
+So who's to say?
+But it's certainly running its way through.
+All right.
+Results are about to appear.
+You can you can decide.
+Remember originally our best so far is 0.7604.
+That's our best so far.
+Here we go.
+0.78490 .7849.
+Our best.
+So this is with OpenAI embeddings.
+We're getting 0.7849 for our MRR.
+Uh, that is great.
+Isn't it satisfying?
+We've changed something so abstract.
+The embedding model behind the scenes.
+We know it makes for a better diagram, but we can now in a quantitative way, we can see that we've
+got a better outcome.
+That's what I like to see okay let's try the large model.
+And so it's as simple as we turn this word here small into large.
+And we come here and we turn this into large.
+And we've just changed it in those two places.
+Or ctrl c out of this, we go into the implementation folder.
+We do UV run ingest.py.
+And we are now again running with the larger encoder model.
+Same thing, bigger encoder 3000 dimensions.
+Let's see what happens.
+There we go 970 vectors with 3000 dimensions in the vector store.
+Great.
+Back we go now UV run evaluator.py.
+We now have this methodical way of telling.
+Does it help us or hinder us to add in extra dimensions?
+We run this off.
+It goes, uh, again, not not as fast as when we're using the hugging face uh, model.
+This is a bit slower, but it's still running the number to beat the number that we got with the OpenAI,
+uh, A small three model was 0.7849, so 0.7849 is the number to beat.
+And now we're going to see what do we get with OpenAI large model.
+And I hope you're also keeping notes.
+Do you remember where we began with this was we started with 0.7298.
+So we've come quite a long way with our MRI.
+Here it is.
+Drumroll 0.7903.
+Excellent 0.7903.
+That is very most definitely a lot better.
+We are coming far.
+Excellent.
+Okay.
+Final thing for me to do then is now to run this evaluation down here.
+Let's do the full evaluation to see whether all of these changes in MRI has actually helped with our
+answers.
+Let's kick it off and I'll come right back in just a second.
+And come on, tell me that this isn't super satisfying.
+Here we have it better results across the board.
+And again it's nice because it's quantitative.
+we can see clearly and precisely that we've moved the needle.
+In fact, we've moved the needle in every single dimension than when we started when we began MRI.
+I have it down as 0.7298 the NdYAG.
+I have that down that we started out at 0.7387.
+And the key word coverage we had at 83.8% when we started out.
+Now we're at 92.5% in the green.
+Moving on to to the big new news.
+The answer evaluation.
+Look at how we've moved the needle.
+It was 3.99 slightly in the Reds.
+We're now at 4.21 a much more respectable accuracy.
+Completeness that was at 3.85 is at 4.05.
+And relevance that was at 4.57 is now at 4.71.
+Probably the least important of them.
+But but still that's that's a nice uptick.
+We've improved across the board and it felt kind of abstract.
+What we did, we experimented with different chunk sizes of how we break up the documents.
+And I picked the best, best one that we did.
+And we also played with three different encoder models, and it turned out, shockingly, that the the
+most expensive and the juiciest one.
+It's still very cheap, but it's for such a small number of documents.
+But still, the one that costs the most has the most dimensions, for what it's worth, but is clearly
+the Heftiest encoder model was the one that is able to get the most accurate retrieved context and gets
+us the most accurate results in our tests.
+So there you have it.
+The results of our tests and our successful experiments that have improved our Rag pipeline.
+Wow, I told you today was going to be hardcore and I hope I hope you agree I delivered today.
+Today was was a substantive day and as a result of that you have leveled up.
+Congratulations.
+There's no doubt that in addition to as as I keep saying, you can generate text to code with a bunch
+of closed and open source models.
+You can use tools.
+You can also choose the right LLM for for your your project backed by benchmarks.
+But now you really know how to build a rag knowledge worker a pipeline with expertise, you can use
+Lang chain and chroma, and now you can evaluate its effectiveness in two ways at retrieval and at answering
+questions.
+And you can do things like experiment with chunkers and encoders, but you can do so in a quantitative
+way where you have confidence that you're moving the needle.
+And it's so satisfying.
+Okay, so next time, next time I'm going to unveil a ton of pro stuff.
+It turns out that there's a whole zoo of techniques.
+There's practically like a cottage industry of different ways that you can take rag further that have
+sprung up lots of different techniques, and we'll explore a ton of them.
+We'll actually try many of them out.
+You're going to get hands on experience in doing this, kind of these, these sorts of techniques,
+things like reranking, query pre-processing, things like that.
+As we dig in to how you can drive better Rag performance and by the end of it, by the end of tomorrow,
+which will, of course, complete week five, you're going to be a rag pro.
+See you then.

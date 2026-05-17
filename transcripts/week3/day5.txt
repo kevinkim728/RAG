@@ -1,0 +1,589 @@
+--- Lecture 1 ---
+Well.
+Hello.
+You're back.
+It's time for day five of week three.
+As we as we bring week three to a close, we're going to be practicing and building confidence.
+You're already confident with frontier models and assistants.
+And you're just getting there with the pipelines, tokenizers and models.
+We're now just going to keep going, doing some work with Tokenizers and models to build a nice little
+commercial project and be able to run inference and open source models and implement an LLM solution
+that's going to use both frontier and open source models, and should be nice and satisfying.
+Another fairly technical one, but way to to really look at in in the weeds a bit.
+Um, so, so let me tell you what I have in store.
+So we're going to create an application that's able to make meeting minutes.
+It's able to take an audio recording of a meeting and turn it into a summary and actions.
+And that's the kind of commercial tool that you actually get built into popular products.
+So people are building this and making money from it.
+It's a real thing that we're going to do.
+And sure, we're going to do a more of an experimental version of it.
+It's not like it's ready for you to make your fortune off it just yet, but it's certainly a step in
+that direction.
+You'll certainly see how you could extend it.
+It's going to use a front end model to turn meeting audio into text.
+Previously we've done text to speech and this is now speech to text.
+Uh, we're then going to use an open source model to generate the meeting minutes.
+And then since we can, we're going to stream them back and show them and mark down.
+We're going to do all of that.
+That's going to be our commercial project and a way to build up our expertise.
+But first, I have something fun to show you.
+Let me let me take you back.
+Would you believe back to cursor.
+Let's go to cursor for a second.
+So I'm back in cursor.
+I'm going to week three.
+I'm going to day five.
+And of course day five begins with a link to Google Colab.
+But I'm not going to go there.
+I want to show you something first.
+Something I think that you'll like.
+So I slightly glossed over this yesterday, but I did refer to it in prior weeks the way that models
+actually do inference, the way they generate output is really a multi-step process.
+What you discovered yesterday is that the way that these transformers work is that the input is a sequence
+of tokens, and they only have one output, and that output is a set of probabilities, a probability
+for each of the possible next tokens.
+So maybe it's not one output.
+It's a lot of outputs.
+It's a 128,000 outputs its outputs.
+That is a probability for every single one of the possible next tokens, just the very next token to
+follow this input sequence.
+And you may remember when I explained this in week one, I think maybe it's week two, that the way
+that it works is that you put in your input sequence, you do this process and what comes out of these
+probabilities, and then you pick which one of these you say is going to be the next token.
+And it's common just to pick the one that it gave the highest probability to the most likely next token.
+Now there are other ways of doing it as well.
+But you take that.
+Let's say you take the most likely and then you say, okay, now let's take that input sequence and
+put that likely token at the end of the input sequence and pass that all in again as a new input to
+the same transformer.
+And it's going to produce a distribution of the probabilities of the second token.
+And you take that, you pick the most likely, you shove it on the end, you pass it in again and you
+repeat.
+And that way this transformer ends up sort of spitting out token after token.
+And that's why we have it streaming back results and why you see the typewriter animation.
+Because it's really generating these predictions a token at a time.
+And somehow it's this process of doing things a token at a time that allows it to come up with this
+very meaningful kind of, of response, and that allows reasoning models to sort of think through token
+at a time what they're going to do.
+And then later tokens are more likely to be accurate because they want to be consistent with the prior
+tokens.
+It's a strange effect, and when I try and explain it to people, I say people sometimes just sort of
+don't believe me.
+And and so I wrote this to to to help, help convince people that that's really what's going on.
+And in particular, someone said one of the questions I often ask models is this 1 in 1 sentence, describe
+the color blue to someone who's never been able to see.
+It's the kind of thing that these models give such great answers to.
+Let's put it to GPT for one minute.
+I think I think we did this in the past.
+So what I'm going to do now is I'm going to put it to GPT four on mini, but in a rather interesting
+way.
+There is a way that you can call GPT through the API, and it won't just give you the most likely next
+token, it will actually give you the most likely few tokens, and it will give you the probabilities
+of each.
+And you can call it in a loop and collect each one.
+You can also do this with hugging face code as well, quite easily.
+Uh, but I've done it with, with with OpenAI here because it's nice to see such a powerful answer.
+And I've written some code in visualizer, which you can look through.
+Uh, if you wish.
+It doesn't matter how I've implemented it.
+That's not the point here, but it draws it into like a graph in a way that I want to show you.
+I'm going to run it right now.
+I'm going to ask GPT four or mini this question, and I'm going to visualize the results.
+Let me show it to you.
+So that's running right now.
+And here are the results.
+And let me walk you through this.
+And I think this might be a like another aha moment for you.
+So for the first token, the first token that should come after the sentence, describe the color blue
+to someone who has not seen before in one sentence.
+The first token it thinks is most likely to be the word blue, with up to 3 to 1 decimal place 100.0%.
+But if you were to keep going, it would be like 99.9999.
+So it's almost 100% perfectly going to be blue.
+The second most likely also appears to be blue.
+But that's because there's, there's like, uh, it's blue without a word ending or something.
+So that it's a different, different form of that token.
+And then the other possibility is that it was thinking that it could start with the word imagine, but
+very unlikely.
+So it could think to a question like describe the color blue.
+The first most likely word by token, by a long way is the word blue.
+So blue gets selected and blue gets shoved on the end of that sequence.
+And now it's saying describe the color blue to someone who's never been able to see before blue.
+And now the model is going to generate the next token.
+And for that it comes up with these.
+These are the top three possibilities.
+Blue is 62% possible, blue feels gets 38%, and blue can is much smaller.
+And this all feels very believable.
+You know, like I it doesn't surprise me that you could write a statistical model based on all the data
+in the internet that would know that blue is is the most likely first word, and that is blue is.
+And blue feels would be very plausible.
+Second words.
+The second word to come after the word blue and we select is.
+So now we've got blue is and that's what we pass in again to GPT.
+And the next thing it could it could come up with blue is the or blue is a or blue is like.
+And again, that doesn't seem so far fetched that a statistical pattern matching program could see that
+that is a very plausible next word.
+So it selects blue is the, which is the most likely first three words to come after the sequence we've
+had.
+Sure, I buy that.
+That doesn't seem so far fetched.
+Blue is the cool or blue is the feeling, or blue is the calm and cool gets 87% feeling and calm.
+They all do feel like very realistic sorts of words.
+Blue is the cool and comma calming feeling of a gentle breeze on your skin or the And I encourage you
+to look through this.
+Look at the probabilities at each point and see you're getting to see like like to the Wizard of Oz
+analogy, the the man behind the curtain.
+You're getting to see some of the machinery of what's going on, how it is selecting probabilities of
+tokens, and how by virtue of selecting the most likely next token, it's yielding this very expressive,
+very poetic response to a very difficult question.
+And I'm hoping that by stepping you through this, a little bit of the magic of what next token prediction
+is about is kind of, uh, fading and you're thinking, oh, okay, so that's how it works.
+Uh, so that's that's what I wanted to show you.
+Uh, and you may have already seen it on my YouTube videos, in which case this is like, okay, I've
+already seen this, but I love this.
+For me, this was such a moment, even for me personally, because.
+Because I knew this, of course.
+But it's not until you you really see it, and you really agonize over it, that you get to feel this
+for real and and you get that sort of sense of these are the ingredients, like, like I think I saw
+in one of my videos when you know, the recipe behind some, some, some treat, it sort of loses its
+sparkle a bit.
+You're like, is that all?
+And and it feels a bit like that here.
+And what I do encourage you to do is just try changing this around like experiment with something else.
+Describe the color orange to someone who's never been able to see.
+And obviously you'll get some different response.
+And then, uh, yeah, more about warmth and vibrancy.
+And as you do this and you experiment with this, you just get that, that more and more tangible,
+concrete understanding of what's happening and that these, uh, awesome LMS, these astonishing LMS
+are really just statistical prediction machines.
+So even if you'd seen this on my YouTube videos before, you've now got the code.
+You should experiment with it.
+Get that hands on.
+Feel yourself.
+You can also reimplement this for hugging face models now.
+And that's actually very easy to do, and I'm sure GPT or Claude could do it for you as well.
+Just just update my visualizer code to use the models classes instead and play with those models.
+Get that hands on experience.
+One final point to make is to to describe something called temperature.
+You may already know that when you're calling OpenAI, you can pass in temperature as a field.
+When you're doing the OpenAI create, you can say model equals messages and temperature equals.
+And you may know that temperature equals zero means that you want it to, to be, uh, always, always
+produce the same output like be very consistent in what it produces.
+And a higher temperature gives you more variety in terms of its answers.
+Some people describe it as being more imaginative, but I think that's not quite right.
+It's more about the variation that you get.
+The way that actually works in practice is is really just that when it's doing the inference, the code
+that does this inference, this loop that picks the next token.
+It's all about how it gets to choose that next token.
+If you've put in a temperature of zero, then it's simply always picks the token that got the highest
+probability.
+That's the one that gets selected.
+It always picks that one.
+And that's why it's always going to be like the same with some randomness to it.
+But basically when you have a higher temperature, rather than just always picking the token with the
+highest probability, it samples from the tokens where ones with higher probabilities are more likely
+to get selected, and the higher the temperature, the more willing it is to look beyond the token that
+got the highest probability.
+And so that's all that temperature is.
+And so if you've used it before and you're wondering quite what that means and how that's incorporated
+in the transformer, it's all about this this inference technique and how it selects the next token.
+Okay.
+Well I hope you enjoyed this.
+This little look under the hood.
+Now it's time for us to go back to actually go to Colab as it is here and get on with our week three
+day five project.
+--- Lecture 2 ---
+And welcome everybody to the project to conclude week three on day five, creating minutes from an audio
+file.
+And in case you're not feeling like this is interesting enough to you, remember this is multi-modal.
+We're going to be using open source and closed source models.
+We're going to use pipelines and the models tokenizers.
+We're going to do a little bit of everything.
+It's great practice.
+You should definitely do this.
+And it's just in Colab for you to try it all out and a little bit of extra.
+I want to give you another piece of useful functionality, which is about connecting your colab to Google
+Drive.
+If you use that, and that's optional, you don't need to do that.
+But but I find it very helpful, very handy indeed for keeping files and being able to easily use them
+in Colab.
+So we're going to write this program to be able to to collect minutes, take minutes, and to do's and
+actions from a recording of a meeting and I found and in a data set, the minutes of the Denver City
+Council are.
+Seems like there's some riveting meeting minutes, should you wish to listen to them.
+But it wasn't useful for me to take them to transcribe.
+And I, uh, have uploaded them onto Google Drive, and I've got it so that you can download it.
+And I've taken a snapshot of it, a small chunk, so that we're not spending money on APIs doing the
+transcriptions.
+Um, although there will be a completely open source version of this if you wish.
+Um, so this is this is where you can download the file from my, where I have shared it.
+So you can go here to, to download this file where it is available for you.
+Uh, and also I've got the original data that I've linked to the hugging face data set where you can
+go to see this is the bank of all the Denver City Council data.
+And you can download the specific audio by going to that second link right there that will take you
+there should you wish to get the audio yourself, and then sort of take a snippet that you want to analyze.
+But I've already done that for you if you wish.
+This is what we will use for our project.
+Okay.
+So you've downloaded this file to your local disk, and we will soon figure out how to upload it to
+this Google Colab, because obviously it's not much good on your local disk.
+We need it on Colab box.
+So again remember if things go wrong with a Cuda error, you know what to do here.
+The first step is to do some Pip installs just the same as yesterday.
+Bits and bytes and accelerates.
+That will be a common thing for us.
+Then we've got a bunch of imports to run.
+And of course you need to first make sure that you are connected to a T4.
+Let me view my resources.
+I have already run this so you can see I've been I've been hammering my memory.
+We'll see if I survive without having to restart.
+Uh, so done some installs and imports.
+Uh, we're going to use this llama 3.2, so you need to have that permission as we got it yesterday.
+If you don't feel free to use llama 3.1 or use Gwen or Jama or whatever you want to use.
+Okay, so I want to give you this new capability to attach Colab to your Google Drive.
+And this is optional.
+When you run this, it's going to prompt you if I do this.
+Uh oh.
+So I've already mounted my Google Drive.
+When you do this, when you run this, it's going to bring up a pop up, which is going to ask you if
+you're okay to give permissions to Colab to access your Google Drive.
+And you'll have to go through and say yes to everything.
+You have to click yes twice.
+And on one of the screens that comes up, you have to scroll down a bit to say yes, to authorize Colab
+to access your Google Drive and give it the ability to see it.
+Now I had one.
+There was one student that was very concerned about the implications of doing that, and he said to
+me he was concerned about giving Google the ability, the Google, uh, the ability to to read his Google
+Drive.
+Uh, and I pointed out to him the slight logical flaw in that, that Google very much already does have
+an ability to read his Google Drive, given that it is Google's drive in the first place.
+The thing you're giving permissions is for this notebook, this colab here to have access to your Google
+Drive.
+So the thing that you're confirming is that you trust that there's no evil code in here.
+Malicious code that's going to dig into your Google Drive and do something nasty.
+Which, in other words, you need to know that you trust me and that you can read this code and there's
+nothing in here that's suspicious.
+And as you'll see, it's very vanilla code.
+So you should have some confidence in that.
+Despite the fact that I'm clearly a super devious person, uh, you could probably spot that this code
+has no opportunity to do anything nasty.
+So.
+So it's not.
+I think that's probably a manageable risk.
+Nonetheless, if you have any concerns whatsoever mapping a Google Drive, you certainly don't need
+to do it.
+I do it because I do find it really handy once you've run this and done said okay and given it permissions,
+you'll find that your Google Drive will be mapped.
+And so to show you what I mean by this, I'm going to press this, this button just here.
+Take a look.
+It's in the sidebar.
+It's underneath that passwords.
+The keys button is this files button.
+You do that and it opens up this files browser.
+And this is showing you the file system on this Colab box in the cloud.
+It has its own directory structure.
+And every time you create a new instance, every time you have a new runtime, you connect to a T4.
+It has this this sample data folder that's like a data that comes comes with it.
+And you can put more files in here.
+And whenever you disconnect and delete the runtime or it gets closed, everything is wiped and it's
+put back just the simple sample data.
+And you'll notice here this drive, that's because I mounted my drive.
+And so my Google drive is right there in in here.
+And yours will be too if you've run this.
+But if you don't want to, that's no problem at all.
+You can also just simply press this upload button.
+You press that button and you can upload find a file on your local drive like the one that you may have
+just downloaded from.
+From me.
+This file here you downloaded, you can then simply upload it and put it right there, or put it in
+a folder or something.
+It's as simple as that.
+And then this is accessible from this machine.
+So this is the local file system that this machine is running on.
+That's all there is to it.
+Using this code here allows you to have your Google Drive mapped.
+Uh, making life pretty easy.
+Okay, with that, I close this.
+Let's have a look.
+So you can you can use exactly the same file as me, or you can use your own, but, uh, but when you've
+done that, then this is another link to the same thing.
+Download it, put it on your Google Drive, and I put it in a folder called LMS in my drive LMS.
+And then Denver underscore extract, which is the name of the file.
+So if you put it there then this file name will be the right file name for it on the local box.
+If you put it somewhere else, then just name it, name it wherever it is right here.
+If you if you manually upload it, just just put my just put slash content slash Denver extract.
+Simple as that.
+Okay.
+Did I run this cell I don't think I did.
+There we go.
+Uh, okay.
+So next up, we're just going to sign in to Hugging Face.
+And we're going to open that audio file.
+And if that gives you any problems, it means that you didn't, uh, have the right file name or you
+haven't uploaded the right place.
+I'm sure that's that's, uh, you'll be able to to to figure that one out.
+Okay.
+So we've got two steps to this project.
+The first step is turning the audio into text.
+And the second step is to analyze that text and do meeting minutes.
+And for the first step I'm going to give you an open source and a closed source alternative.
+And I'll show you both and you can pick from them.
+Let's start with the open source one.
+The open source one is going to use hugging face pipelines.
+So we're going to use this nice pipeline I don't think I need that import.
+This is it.
+We're just going to import pipeline.
+Remember the great thing about pipeline is that you can just simply say the task give a model.
+We're going to give a model called whisper a simple model that OpenAI has the English variant of it.
+You can take that out if you want it to be multi-language.
+Uh, and we're going to I think that's, uh, I think.
+That's better.
+Uh, and uh, we are then going to, uh, just simply run this and print the transcription.
+Let's kick that off.
+Let's see if this works.
+The torch detect works as well, by the way, but I think that's the one we saw earlier.
+I think when it says it's deprecated.
+Now you're meant to say dtype.
+Uh, so we're letting this run.
+It's going to now uh, going to it's, it's using Cuda.
+So it's going to be on my GPU, it's going to be running that extract of a Denver City Council meeting
+through this model.
+And it's going to be turning it from audio into text.
+Now when you run this it will actually download the models.
+It might take a bit longer, but I already ran this uh, look, my system Ram is really very full.
+Uh, but, uh, it's now going to be going through and changing that audio into text, and I'll see
+you in a second when it's done.
+--- Lecture 3 ---
+Okay, the transcription just finished.
+It took all of two minutes and here it is.
+Um, merging of two rivers, the kind we've seen recently and politics in the world.
+There's a very big issue.
+Lots of stuff that came from transcribing this Denver City Council meeting.
+And I'm just going to store that in a variable open source transcription, because now we're going to
+use the other way of doing it.
+We're going to use open AI.
+It has a GPT four mini transcribe.
+Now I just ran this and it cost me $0.03, but I'm not sure whether that was doing it once or whether
+that's because I ran it twice.
+So it's either cost one and a half cents or $0.03 if you do it.
+So you would have to be comfortable with that, with that spend.
+Or you could always check whatever the latest pricing is of this, but it's certainly not more.
+It shouldn't be more of that order.
+But as always, don't always have a minimum spend on your key if you're ever concerned about this stuff.
+Um, okay.
+Now, the first thing you need to do, though, is if you want to do the closed source and this is optional,
+you can just stick with the open source one if you want to use the frontier model, then you need to
+go to the keys over here and make sure that your OpenAI API key is here.
+So it's got to look exactly like that.
+Not open API key, but OpenAI API key.
+You remember that it's got to be exactly right.
+You've got to have your key in the value, you've got to have it turned on, and then you'll be able
+to have access to that.
+And so here we do it.
+We get uh, the uh audio model is GPT four Mini Transcribe.
+This is where I collect that key that we just put over there.
+This is where I create a new OpenAI passing in that API key.
+And then I call transcription is OpenAI transcriptions create, I pass in the audio model, name the
+file and the response format, and then we will also print it.
+Let's see what it comes up with.
+Leave it running and I'll be right back with you.
+And OpenAI finished.
+And it took all of 27 seconds.
+It was faster than the two minutes, and you can see just visually looking at the print there, that
+it appears to be pretty similar.
+But look where one of them where the open source one put a comma.
+This put a full stop just showing different interpretations really, but otherwise it looks pretty similar.
+We can print them both one after another.
+I noticed that one of them is slightly longer, so maybe there's a max tokens I want to set somewhere
+if I wanted to get the full thing, but otherwise they look pretty similar and you can just choose to
+run one of those two.
+But I wanted to show you the use of pipelines.
+Some good practice there.
+And back to using the OpenAI API as well.
+So we've got some some frontier model in this too.
+Okay.
+That is step one.
+We've taken some audio and we've turned that into text speech to text.
+So now we've done text to speech in the past, speech to text today.
+And we've also of course done done image generation two.
+So we're covering lots of modalities.
+Anyways next step is going to be to analyze this transcription and produce a report, a report of the
+summary of the minutes and the actions.
+Let's get to it.
+And so as usual, we focus on our prompts.
+I have a system message.
+You produce minutes of meetings from transcripts with summary discussion points, takeaways and action
+items in markdown format without code blocks, and the user prompt is.
+Below is a transcript of a Denver Council meeting.
+Please write minutes in markdown without code blocks, including these these things summary discussion
+points, takeaways, action items with owners.
+And then there is the transcription.
+Maybe we should put in this.
+This might make it clearer transcription like that.
+Um, extra space.
+Uh, so that's a nicely laid out, you might say.
+There's a bit of repetition between these two, but repetition is never a problem.
+In fact, it's always a decent idea to try and say things a couple of times because you're biasing the
+model to be that much more likely to adhere to your task, to be aligned with what you want it to do.
+So let's run that.
+And now we're going to use bits and bytes to quantize to four bits.
+You remember this?
+This is the Nf4 data type that you can look up to.
+Find out more about the normal distribution so that, uh, the four bit number with 16 possible values
+can be mapped to a floating point space.
+And now here of course, is the simple open source steps.
+We get Lamaze tokenizer.
+We we set the pad token to be the EOS token.
+How could you forget this?
+Haha.
+Doesn't everybody set the Pad token to be token?
+Uh.
+All right.
+And then we take the tokenizer.
+We use the apply chat template utility so that we can pass in these messages and turn it into a sequence
+of tokens with a special tokens slotted in there.
+And then we get the return tensors in PyTorch style that's needed so that we can put it on the GPU.
+And if this seems, you know, that practice is how you will, you will get familiar with this.
+You should do this yourself and run this and look at it.
+But basically it's something you just do by rote.
+This is how you do it.
+You apply a chat template to turn messages into a sequence.
+You turn it into PyTorch, you put it on Cuda.
+This is the streamer thing that I introduced yesterday that we're going to create a text streamer telling
+it what tokenizer we're using.
+And then finally the big guy we take our model.
+It is the auto model for causal LLM causal LLM language modeling from pre-trained.
+We give it our Lama model name.
+We say we want it on the GPU.
+We're going to quantize.
+And then we simply say generate the output and use this streamer so that you can stream the results.
+And we run this and it's now going to it's going to load in.
+First of all Lama now here I'm suggesting you use the different models yesterday the 3 billion parameter
+version of Lama.
+So it's the you know a bit a bit chunkier than the one we did yesterday.
+And my GPUs are very, very tight.
+I'm not sure if this is gonna gonna run because it's the second time I'm running it.
+Hopefully it will, uh, keep an eye on that.
+It's always worth looking at it on your computer to make sure that your GPU memory is good.
+Loading this in.
+So far we're doing fine.
+And of course, if you've if you've, uh, already run it, then then it should be faster the second
+time.
+Here we go.
+It's running.
+And this was the the input going in right here.
+And here we see it streaming back.
+Results are, are LM call is coming back with a transcription with a heading.
+The summary 11 members, the location, the discussion points.
+Councilman Lopez presented proclamation 1127.
+In observance of the second annual Indigenous Peoples Day.
+Councilman Lowman takeaways, action items, additional notice.
+A lot about Councilman Lowman.
+Lopez obviously had a lot to say in this meeting.
+There we have it.
+This this has been the results of our LM reporting, summarizing and giving the action points and takeaways
+as a result of the Denver City Council meeting.
+It has been successful, but obviously we don't know for sure it's been successful until we've seen
+that marked down, printed out nicely.
+So here it is.
+Uh, this this is the summary formatted nicely.
+The Denver City Council minutes summary.
+There are the attendees, the discussion points, the takeaways, the action items and the additional
+notes.
+So there you have it generated by llama 3.2.
+If you use a bigger model, you can get of course different kinds of results.
+But this all ran for free except that we one of the alternatives was all completely for free.
+There was also the alternative to have spent $0.03 doing the transcribing, but other than that, this
+was an example of using free open source models in order to build some commercial functionality.
+This is actually a capability that is built into different commercial products, uh, like, like zoom
+and others and many others.
+And so this is something that you know how to build yourself now with open source, and you can do it
+and you should do it.
+And I've got I've put in here a student contribution that builds stuff.
+Put it uh, put this into Gradio, which is really cool.
+And you can do that too.
+There's so much you can do with this to turn it into a fully baked tool.
+And you absolutely should.
+This has given you some building blocks to experiment with, and the best way to build the expertise
+you need is through practice and building.
+Use open source models, experiment with them and build stuff.
+If you can think of parallel ideas of how you could apply this directly to your business, then you
+should do so and take take a look through this.
+Make sure you run this yourself.
+And if you come up with something interesting, that is a different twist on it that you'd like me to
+to add in here, please do send it to me and I will add in links to your projects to uh, since since
+it's not so easy to do a, do a PR for, for, uh, colabs.
+That's the way I'll do it.
+I'll include your examples in here so that other students can get to see your work.
+Anyway, I hope you enjoyed that and I will see you back for the slides to give you your assignment
+and for a wrap up.
+--- Lecture 4 ---
+Okay.
+And this brings us to the conclusion of week three, where at the end of week three, day five.
+And that can only mean one thing.
+It means it is assignment time.
+It is time for an exercise to wrap up the week, and one that can get you to put open source models
+to the test.
+And here it is one of the the the core use cases of LMS of JNI that can be applied to almost any business
+area is generating synthetic data using an LLM to create data sets that you can use in any project,
+and building yourself a synthetic data generator, something which you can you can put in something
+like, like, um, I want to have example, um, employee records.
+I want to have example product definition guides, whatever it might be, be able to describe the kind
+of data you need, how you want it structured its purpose, and build something that can generate lots
+of these documents.
+Uh, that that is something which will be incredibly useful to you, I guarantee it.
+So that's the project that I'm going to suggest.
+Write some models that can generate data sets, use a variety of different models, use that as your
+way of exploring the capabilities of models, and it also will give you nice and varied data set as
+well.
+So it gives you diverse outputs and diverse experience too, which is what this is all about.
+Uh, try quantizing, try not quantizing, try different different shapes and sizes.
+And of course, why not make a gradio UI for your product as well so that you can you can look at it
+and generate it and maybe even share it with other people at your company, and maybe, maybe post about
+it on LinkedIn so I can jump in there and see it myself and try generating synthetic data.
+Several students have done and it's great.
+It's very impressive.
+I used one of those to generate some data, and I've got of course, I've built my own, uh, synthetic
+data set generators many times.
+So it's a great exercise more than anything else.
+Now it's about practice.
+The best way to solidify this in your mind is to do it several times.
+Then you'll never think twice about the Pad token equals iOS token because you just typed it out or
+whatever, and they apply chat templates and all that other stuff, it becomes second nature once you've
+done it like 30 times.
+So, uh, build your synthetic data set generator and share it and, uh, and and enjoy the process.
+And as I say, that's something that is particularly useful because you can use it in your day job.
+You can use it with any sort of home projects that you're building.
+Models.
+It's the utility is so broad.
+So a great project to make.
+And with that, with that week three is complete and this week was it was definitely getting advanced.
+You can now code with frontier models.
+You can build an AI assistant, but also you can now build an LLM solution combining frontier and open
+source models.
+You can use the pipelines but also the model API in hugging face Transformers library.
+And you're starting to get some intuition and feel for how neural networks work under the hood for for
+the layers of a neural network, for the dimensionality embeddings and the self-attention layer.
+Again, you don't need to know this stuff in too much detail, but you need to have good intuition for
+it and the basis of an understanding.
+And I do hope that you like that inference, that visualization, and that you've played with that a
+bit yourself and got that perspective, that very rich understanding of what inference actually entails.
+Okay.
+Okay.
+So that concludes week three.
+Next week.
+Next week it's going to be all about what is perhaps the single most important question that gets asked
+with Llms, which is which one is the right one?
+There's so many of them.
+What's the best one?
+People say to me, what's the best LLM?
+Well, we're going to try and answer that very question next week.
+We're going to be comparing Llms.
+We're also going to be using a particular task.
+We're going to be doing code generation as well with a bunch of different models.
+And I know as well I realize that next week is the week before Rag week.
+I know people very much like Rag Week, so.
+But but next week is going to be great too.
+I want to make sure that you're not going to want to skip it, because we're going to do so much great
+stuff.
+And so get to have a great break and refresh and then come in ready to go for week four.
+Coming right up.

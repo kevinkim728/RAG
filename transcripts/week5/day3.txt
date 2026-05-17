@@ -1,0 +1,966 @@
+--- Lecture 1 ---
+And welcome to week five, day three.
+Yesterday we did the first kind of half of Rag by taking documents, putting them into vectors, into
+chroma.
+Today we're finishing it off.
+We're completing a Rag pipeline.
+It's all going to happen today.
+And I tell you, it's going to be remarkably simple.
+I think you're going to be pleasantly surprised by how easy it is to build a Rag pipeline.
+And as a quick reminder of what you've already done, you can already generate text, generate code
+frontier models with open source models.
+Using the Huggingface Transformers library, you can choose the right model for your project, backed
+by metrics from leaderboards and benchmarks and so on.
+And now.
+And now you can explain how Rag uses vector embeddings.
+It takes documents.
+It turns documents into chunks.
+It turns chunks into vectors.
+It stores vectors in chroma.
+Okay, today we're completing the picture.
+By the end of today, you're going to be able to use Lang long chain to build a Rag pipeline, you're
+going to be able to deliver a question answerer expert using Rag.
+And best of all, you're going to be able to have a nice little gradio user interface, which is going
+to be like a Rag application that not only will be able to answer questions with expertise, but it
+will be able to show you the documents that it's sourced that expertise from.
+Isn't that great?
+We're going to do all that today.
+Let's get started.
+And don't kill me.
+But we're going to start by one more time doing our recap of the big idea behind rag.
+I know you say you get it.
+Do we have to reuse redo the same slides again?
+But yes, because sometimes repetition helps.
+And just in case, because because some people still have some misconceptions about Rag.
+And it's so important to have the foundations understood, the user asks a question.
+It comes to our code.
+We could take that question and just try and see if we can do a SQL query, if we can just do a text
+search.
+But that would miss important stuff.
+There's a better way to do it.
+There's a trick that involves using LMS, a different kind of LM, not the one we're used to the autoregressive,
+but AR one that's sometimes called an encoder, sometimes called an embedding model.
+There it is.
+And we call it to turn the question into a vector.
+And we can then say all right let's look in a database.
+We've got of lots of other documents where we have indexed those documents by creating vectors of each
+of them.
+And we put them in a database that is particularly quick at finding documents with vectors, with indexes
+that are close to the vector we pass in.
+And we can use that to retrieve relevant contexts.
+Put that in the prompt to the LM.
+Get back the results that that's the big idea behind Rag.
+And that's what we're going to implement today.
+And then one more time to to remind you what we did yesterday, we read in all the documents in a bunch
+of folders in four different folders.
+We broke them up into chunks.
+This very hacky process of just saying, all right, let's take the text and just sort of slice it up.
+We use that recursive character text splitter that just looks for two empty lines, and then one empty
+line and then spaces breaks it all up.
+We do that.
+We have some overlap between the chunks.
+Do you remember that 1000 characters, 200 characters of overlap.
+And then we use that to turn them into vectors.
+And then we stored them in chroma.
+And I banged on about the fact that there's a difference between the encoder.
+The embedding model that makes the vectors and chroma the data store.
+It could be it could be a bunch of other data stores.
+That's where they get stored.
+That's good at quick retrieval.
+I said, you know, popular encoders.
+We've got the OpenAI text embedding.
+We looked at small and large, small three and large three.
+We looked at we didn't look at Gemini embeddings, but they are great.
+Uh, and then there's also hugging face all mini Ml6 V2, which we looked at first.
+And I said separate to the encoders is the the vector stores the place where you put them and retrieve
+them.
+And we use chroma, the open source data store.
+There's also Kudrin, there's vice, there's many others.
+There's paid ones which are much more scalable and resilient.
+But you have to pay for them.
+You get what you pay for.
+And there's pinecone.
+We've yet many, many more.
+And then I also mentioned that the mainstream databases themselves all support vectors to what you what
+you sign up for here is more of an infrastructure decision, more of something which which relates to
+things like the the costs involved, the support structure, the the performance.
+And then some of them, I think I mentioned have more advanced features like elastic lets you filter
+very quickly at the same time concurrently with looking for the nearest nearest vectors.
+So these are the kinds of trade offs you take into account as you pick your vector store.
+But separately to that, you pick your encoder, your embedding model, so that it gets the right kind
+of vectors for the problem that you're working on.
+And we'll talk more about that tomorrow.
+Okay.
+So we are now going to talk about Lang Chain.
+We're going to use Lang Chain to implement our Rag pipeline, and I do want to make the point that it's
+good to use long chain.
+This was one of the first places where long chain really shined, because it was so easy to to use long
+chain to build a rag pipeline.
+And so it became very, very popular.
+So it makes sense that I'm introducing it for this use case.
+But I will make the point that it is actually also very easy to build a Rag pipeline without using long
+chain.
+It's not like long chain is an essential part of building Rag.
+It does make things a bit quicker for us.
+You'll see it's going to be just a couple of lines of code that's going to be it, but it would only
+be a few more lines of code if we did it, like the manual brute force way, which is what we do in
+in week eight.
+And I say brute force, but it's honestly it's just a couple more lines of code.
+It's not much more at all.
+But anyways, for now we're going to focus on long chain and you'll see why people love Long chain.
+We're going to take two of the key abstractions.
+One of them is is an LM, uh, and that is like an object.
+And in fact, we already met this.
+We already used this abstraction in Lang Chain a couple of weeks ago when when I compared it with light
+LM and we saw how you can you can use Lang chain just to sort of wrap an LM so you can swap in open
+AI or anthropic or Lama or whatever in place.
+And it will, it will respond in the same way.
+And then another, another abstraction we're going to work with is something called a retriever.
+And a retriever is an abstraction around chroma, the data store and also the embedding model.
+That's all sort of wrapped up into this thing called the retriever.
+So you can just ask the retriever to retrieve documents close to similar to another document retrieval.
+So these are the two key abstractions.
+And as with many of lang chains abstractions, it responds to a method invoke.
+If you have an LLM, you can say my LLM dot invoke.
+If you have a retriever, you can say my retriever dot invoke.
+And there are many other objects in Lang chain that have this same behavior, uh, tools.
+Uh, and many more.
+That's it's a very common part of the framework.
+It's actually so it's called a runnable in Lang chain if you can call invoke.
+And in the prior version runnable was something that was very much surfaced.
+So so you saw runnable in the in the code a lot and people talked about it.
+But that appears they appear to have taken that out as a sort of main as an, as an interface, as something
+that you, that you particularly refer to in the code in lang chain one zero.
+Uh, so, so whilst we know that all of these things are runnable, that's, that's not a term that's
+as commonly used in Lang chain 1.0.
+And for sure we are going to be using Lang Chain 1.0, the new version of Lang chain.
+So we'll have an we'll have a retriever.
+It will take the method invoke.
+There are other methods you can call as well like Stream and Invoke for async invoke.
+We won't be doing those.
+But but you can bear in mind that there are these common things that any of the major abstractions in
+Lang Chain will respond to.
+Okay.
+But we'll be doing with we'll be dealing with LM and retriever.
+We'll be invoking them.
+Let's go and do that in cursor right now.
+--- Lecture 2 ---
+And here we are back in cursor.
+We're going to week five.
+We're going to day three.
+Welcome to day three.
+We're building our expert question answerer for ensure Elm.
+It's going to be a long chain one zero implementation of a Rag pipeline using the vector store we created
+last time.
+Now, you may remember last time when we made our vector store, we first used a encoder from Huggingface,
+the all mini Ml6 v2.
+Then we went back and did it again with a couple of OpenAI models that were a lot better.
+Well, I've actually just gone back and rerun it with the original model because I don't know which
+one you will have ended up using.
+And just in case you stuck with the original, the weaker one, that's what.
+That's what I've run it with right now.
+You can choose.
+You can go back and do that if you wish, or stick with what you've got up to you.
+All right.
+Let's start with some imports.
+So there's a bunch of of long chain imports here.
+And these are interesting ones.
+So this first one from Lang chain OpenAI import chat OpenAI.
+Now that that is the the LM abstraction I mentioned.
+Chat.
+OpenAI is one of the llms that you can create.
+It will respond to invoke from Cromer import Cromer.
+We had that abstraction last time.
+Uh, this is something to do with some, some, some messages that we're going to play with.
+And these are the embeddings models that we already looked at.
+I'll just mention that.
+So I'll run these imports.
+There they go.
+Um, so, uh, it takes a few seconds.
+There's a lot to import.
+Uh, so, so to show you here, we've got OpenAI import chat.
+OpenAI.
+You could also have here from Lang Chain.
+Uh, llama imports llama I spelt Lang chain wrong, but it is still filled it in.
+Uh, and I could say from lang chain underscore anthropic import chat anthropic.
+Uh, if you do this you could simply replace chat OpenAI with Chat llama or Chat Anthropic and it will
+just work that that is really the promise of long chain that these abstractions are very swappable.
+They all respond to invoke, and that allows you to to manipulate things quite easily, similar to the
+way abstractions like light LM do it, but with with long chain it is a bit more heavyweight.
+It's a completely different package that you have to to install and import.
+Okay.
+So I'll take that out.
+Uh, hopefully you get that.
+And now we're going to set some constants and then we're going to get going with our rag okay.
+Now first up we are going to create the embeddings object, the all mini lm l6 v2 object.
+And we're also going to connect to Cromer with embeddings object.
+You can see as I say I'm using this hugging face open source one.
+So if you're still using the OpenAI embeddings you need to make sure to use the OpenAI embeddings object
+here, import it and then use it here.
+Uh, or else if you want to use this one, you do.
+You may have to go back and recreate your database.
+It's just important that you use the same consistent one, because if you've got vectors in your database
+that are the OpenAI 3000 dimension vectors, and now we use this one here, this will be used when we
+come up with a query.
+We take our question.
+We turn it into a vector.
+Well if they're different models then trouble will ensue.
+You're going to create like this 300 dimensional vector from hugging face.
+And you're going to be trying to compare it to 3000 dimension vectors, completely different vectors.
+You remember how different they looked in the image as well.
+Completely different in your in your vector data store.
+And there's going to be an error.
+There's going to be a nasty ugly stack trace about mismatch in dimensions.
+And you're going to come back to me and say, Ed, what's going on?
+And I'm going to say you've got different vector models, so don't do that.
+Uh, make sure that they're consistent.
+So let's run this.
+And now we are going to have created our embeddings.
+And we have loaded our data store in the same directory.
+This directory is vector db.
+You can see it right there.
+We've loaded that in.
+And we've also told it about the embeddings model that we are using.
+Okay.
+It's time now for us to create the two big long chain objects the LM and the retriever.
+There they both are.
+Let's create them.
+So you can see that I create the retriever object by doing vector store, the chroma vector store dot
+as retriever.
+And that just packages it up into a retriever object, an object that we can just call dot invoke on.
+And it will do a rag lookup.
+So easy and with with chat with with with chat open AI.
+All we have to do is just create it like this.
+We pass in the model name and I'm also passing in something called temperature and that is making the
+LM.
+So what is this temperature?
+I think it's come up from time to time and I'm not sure I've ever properly explained it.
+So so let me just take one minute on temperature right now.
+So temperature is it's probably something you've heard about a fair bit, because all of the LMS take
+temperature as an input, and it's something that controls how how much variety there is in the output
+that comes from the model.
+It's a parameter that controls how different it will be each time you call it.
+A temperature of zero means that it should be predictable, deterministic, and a higher temperature
+means there should be more variety, more more flavor, more differences in the answers.
+Each time you call it.
+Now some people describe this as as creativity, a higher temperature for more creative output.
+I don't think that's quite right.
+It's not wrong, but I think it's a bit misleading.
+So I'd rather clarify just just so that it's clear for you.
+So what's it actually doing?
+Well, it's actually controlling at inference time when you're generating each token by token, it's
+to do with how you pick which token comes next.
+A model, an LM doesn't actually spit out the next token as I think you know, what it actually spits
+out is the probability of all the possible next tokens.
+Every possible next word gets some probability, even if it's a very small probability.
+But everything gets something.
+Uh, and typically when I've loosely said, we pick the next token when I'm what I'm sort of referring
+to is you could just always just pick the token that got the highest probability, the one that the
+model said is the most likely next token.
+And with a temperature of zero, all you ever do is pick whichever token got the highest probability,
+and you pick that one and that one every single time.
+And that is called a temperature of zero.
+The most predictable and sort of reliable and deterministic output.
+And a higher temperature means that you occasionally pick tokens which, which didn't get the top probability,
+but maybe got the second top or something like that.
+And in fact, in the case of OpenAI, the temperature varies from 0 to 2, and a temperature of one
+means that if a token were given a 10% probability, then you would pick that 110% of the time you actually
+sample what token comes next based on the probabilities that they got.
+So if a token got 1% probability, it was really unlikely.
+Still 1 in 100 times.
+You might pick that one if temperature is one.
+So there's more more variety in what comes out.
+And and indeed that that might mean that it's more creative, but not necessarily.
+It really just means that the word choices will be different, and sometimes perhaps a bit odd if the
+temperature is high enough.
+In fact, with the temperature coming up to two, you can get quite strange answers.
+So that's that's what temperature means and what it controls.
+And to add two notes to this.
+One of them is that, uh, I've used words like deterministic and reproducible.
+That's also not quite right, because even with a temperature of zero, the output won't necessarily
+be reproducible.
+Because there is there is, there is random.
+There are random numbers involved in running llms.
+You can do something called setting a random seed, which means that the random numbers will be the
+same each time.
+And indeed we will do that in weeks 6 to 8.
+And that can be particularly important when you're testing and trying to make sure that you really do
+get the same answer each time.
+So so we will be setting random seeds later and you will see that.
+And even when you set a random seed, it's still not guaranteed to be the same every time.
+Because there are changes at the frontier model in the labs, they change their models.
+And also because there are performance optimizations that mean that lots of calculations happen in parallel
+in a way that can't always be guaranteed, that the same things will come out exactly the same way.
+And so as a result, nothing is ever fully guaranteed to be reproducible.
+But if you have a temperature of zero and you do this thing called setting a random seed, then you're
+pretty likely to get the same answer every time.
+And we will be doing that later in the course.
+But for now, we're setting temperature of zero, which is quite common with Rag systems, because you
+do want to have a sort of stronger guarantee around reliability, but it's also typical to see temperatures
+around 0.5 0.7 as well.
+And I mentioned that that temperature isn't really the same as creativity.
+If you're looking for your model to be more creative and have higher creativity, the right way to do
+that is through the system prompt.
+The right way to do that is to instruct the model to be creative.
+Give it examples of what it means to you to be creative.
+That's what creativity should be all about.
+And if you want it to give different answers, the best way to do that is to tell it the prior answers
+it gave and say, I now want something different.
+That's the most reliable way to do it.
+You can use temperature for that kind of thing, but it's just not as reliable in my experience.
+Better to focus on prompting if you want to have a particular behavior from your model.
+Okay, this was a sidebar, but I think it was a very important sidebar, so I'm pleased we did it.
+Let's press on.
+Now with the big step of creating our two abstractions, the retriever and the LM, I ran it, it's
+done.
+--- Lecture 3 ---
+Okay.
+So we created our retriever object and our LLM object.
+And I promised you that you could just call invoke on either of these objects.
+And you may think, well, let me see that.
+I'm not sure I believe you.
+Well then we'll go and do it.
+So here we go.
+Retriever Dot invoke.
+Who is aviary.
+So what will a retriever do if we say to it who is aviary?
+What do you think?
+What?
+What?
+What should it do?
+That's right.
+Exactly.
+It should retrieve relevant context.
+Something relevant to who is aviary.
+So let's run it and bam!
+What comes back is for document objects.
+They each have an ID, they have metadata, and they have a source.
+And you can see that the first one has been pulled from the the document and they have page content.
+These are in fact long document objects that we met yesterday.
+And they are the chunks that represents the four different chunks that have been found closest to that
+question.
+Who is Avery?
+So what actually happened when we called in Vogue?
+It took that fragment.
+Who is Avery?
+It then used the the retrievers encoder that we had set up here.
+So the embedding function, which is Omni v2 to turn it into a vector, it then called chroma to find
+the closest vectors.
+And that is what it is now.
+Then located those documents and it's printing them there.
+Very cool, very easy.
+All right.
+And now we're going to call.
+Who is Avery.
+So what's that going to do then.
+Have a think about that.
+What do you think it's going to print.
+All right.
+You've had your thought and maybe it's not what you expected.
+It depends, uh, how much you've been, uh, seeing everything that's going on here.
+So it doesn't tell us about Avery Lancaster.
+Have you thought that was going to be the moment?
+Uh, but no, because, look, we this is this LM is just chat OpenAI based on a model.
+We haven't told anything about our retriever.
+The al-alam abstraction is just an abstraction around OpenAI, or around a llama, or around an anthropic
+or any one of many, many, many different models that you could you could use with long chain Gemini,
+whatever.
+Um, and so what we have got back is just a generic answer to calling like OpenAI create with who is
+aviary?
+We get back.
+Aviary is a given name that can be used for both males and females.
+It may also refer to blah blah blah blah blah blah.
+So in other words, that was, uh, definitely no rag happening there.
+So we've got our two objects, two long chain objects, either of which can be invoked.
+So what's left to be done?
+Well, basically we have to put them together.
+We need to use both of these in something which is known as rag.
+Let's do this okay.
+You ready.
+We're going to start with just a constant variable called system prompt template.
+It's going to describe our system prompt.
+Some of this used to be packaged for you in the previous version of chain.
+And now I think the idiomatic way to do it lang chain one is to write it yourself, which I much prefer.
+I much prefer it when these things aren't hidden from us, so I'm quite happy with the fact that we
+get to write our own prompt here.
+So the system prompt template is you are a knowledgeable, friendly assistant representing the company
+in your realm.
+You're chatting with the user about ensure realm.
+If relevant, use the given context to answer any question.
+If you don't know the answer, say so and context.
+And then there is a little, little placeholder that we'll replace with the word con with with with
+the context that we find from our retriever.
+Okay.
+That's it.
+That's a constant.
+And this, this function here, this I present to you rag.
+Rag in what is that that five lines of code.
+That's all there is.
+Okay.
+So I'm saying this this is a function called answer question.
+It's given a question.
+It's also given this variable called history that we're going to ignore.
+You may think why is that?
+But you probably have guessed why already.
+But anyway, so we are going to first take our retriever object.
+This is one of the two big long chain abstractions we're working with and we call invoke on that question.
+And we already know what we get back.
+We get back some documents that are that are relevant, okay.
+And we will just smash them together, taking the page content and, and wallop them together with empty
+lines between them.
+So it's just the chunks laid out there in this variable context.
+Okay.
+So far so good.
+Very easy.
+Next up look we'll take this system prompt template that I've got just up here.
+And we will we will just change that.
+We will substitute in the context as the context that we've just created right here.
+It's just basically taking the result of this and squashing it in here in sort of fancy Python.
+That's what this line here does.
+We've now got a system prompt that is going to be all of this with the retrieved documents in there.
+And now we do LM invoke and we pass this in as the system message.
+And we pass in this question as what Lang chain calls the human message, which we just known as, as,
+as user.
+We're used to it being being user.
+But Lang Chain has this idea of a system message and a human message.
+Uh, instead of a list of Dix, it's a list of these objects, these Lang chain objects, and we return
+response content.
+That is the result, uh, that is lang chains idiomatic, uh, way of plucking out the result from this
+response.
+And that is all there is to it.
+We're basically calling invoke on the retriever and invoke on the LM.
+And we're kind of stitching them together.
+And I'm running that now.
+Okay.
+Are you ready to try this out?
+I was born ready.
+You're thinking.
+Yes.
+Okay, so we're going to call it answer question with who is Avery?
+And we're hoping for a slightly better response than this, uh, this given name thing up here.
+Let's have a look at what we get.
+Who is Avery?
+Avery Lancaster is the co-founder and chief executive officer of insurer Elm.
+She's been with the company since its founding and has played a key role.
+Blah blah blah, blah, blah.
+Yes it works.
+We have just done Rag.
+We've just done retrieval, augmented generation, five lines of code.
+That is the magic of of long chains, abstractions making it so easy for us.
+Uh, and, uh, yeah, I hope that you're thinking, wait, what is is it that easy?
+It really is that easy.
+The long chain parts of this is the nice little packaging around doing an invoke and an invoke this
+system message, human message is is very much lancioni kind of stuff, but you can probably appreciate
+that it wouldn't have been much more just to do this yourself.
+Just to build the system prompt template, do the query in chroma and then do a.
+Create pass in the system prompt and the user message.
+We could have done that too.
+It would have been maybe ten lines of code instead of five.
+Lang made it even more elegant and simple and quick.
+But rag is just not that difficult, and I'm sure it's no surprise to you.
+But I can also change this to who is Lancaster, and presumably it will be able to to handle.
+Lancaster refers to Avery Lancaster quite easily.
+So unlike the nasty hack we did two days ago just searching for the word Lancaster, it can handle the
+first name, it can handle the last name.
+And I imagine if we do, who is Avery Lancaster?
+But we now spell her name wrong like this.
+I imagine it's going to be able to handle that.
+It seems there might be a typo in the name based on the information I have.
+You might be referring to Avery Lancaster.
+Isn't that amazing?
+Isn't that incredible?
+That is fuzzy matching at work.
+That is because it found the vector for Avery.
+Lancaster was close to the vector for Avery, spelt wrong Lancaster.
+Even though the words were different.
+And you can you can go to town experimenting with this and get a sense of what works and what doesn't,
+how far you can take it with.
+Of course, we're relying on the fact that the all mini LM, L6, v2 is pretty good at this kind of
+thing, but if you're using the OpenAI embeddings model, it'll be even better.
+And I know what you're waiting for.
+You, you you knew why I put that history in there, at least.
+Maybe you did.
+Uh, it's because, of course, what?
+We can come next.
+Is that anything you're familiar with?
+The fact that, uh, that that with with Gradio, we have a chat function that takes the message and
+the history.
+Well, there's nothing magic about the word chat.
+It doesn't need it to be called chat.
+It can be called anything as long as it takes a question and the history.
+So we can just simply create a chat interface and pass in answer question as the callback function,
+it should call with the question and the history.
+Uh, and uh, yeah, just, just, um, I know you get this, but look, let me just do this.
+Let me do return bananas in here.
+If I if this has returned bananas, then if I launch a user interface here and I say hi there, it will
+say bananas.
+Who are who is Avery bananas?
+Uh, I'm sure you get this, but some of you might have skipped week two, and so you might not be not,
+not be used to.
+Uh gradio.
+So just in case that's just a show.
+That's all that's going on here.
+I take that out.
+Now, this is the function that Gradio will call run that instead bring up a fresh interface.
+We are now going to say who is Avery?
+And if it says bananas, I'll be very surprised.
+Uh, and, uh, we'll see what happens.
+Avery Lancaster is the co-founder chief executive officer of ensure.
+L'm there.
+You have it.
+What is market?
+L'm.
+Uh, that's one of the products, I believe.
+Oh, did I spell it wrong?
+Uh, there we go.
+I spelt it wrong.
+Market l'm ensures innovative insurance marketplace.
+So?
+So it's a great example.
+Uh, which, of course, was intentional, uh, of how the vector data store is able to handle typos
+and look up the proper product name, even if I get the product name wrong.
+Uh, beautiful.
+We've seen rag at work through a graphical user interface.
+We've seen it being able to take a question, turn it into a vector, look it up in chroma, find associated
+relevant context, put that in the system prompt, send that off to an LLM and get back an answer which
+shows expertise in the area.
+That is Rag in a nutshell, and not only in a nutshell, but also rag in five lines of code.
+Courtesy of Long-chain.
+--- Lecture 4 ---
+Well, I imagine you are pleasantly surprised by how easy it's been to build a rag pipeline, and you
+may be thinking to yourself, I wonder that's that's all well and good, but we've been doing it very
+much in a notebook and in experimental way, and hopefully you're comfortable doing that.
+It's important to be able to have an experimenter's hat on, but there comes a point when you want to
+take the hat off and put on like, like something that's ready to to engineer this and to be ready to
+implement it in production.
+And to do so, we would want to do that in Python modules.
+And so that is what I've done.
+I've taken the code we put in the notebook, and I've turned them into modules for us to look at.
+And that is the way that you would do it yourself as well.
+If you're building proper ingest pipes.
+And the the way I've done it is I've made two different Python modules and I've put them in a single
+directory called implementation, a package, a Python package implementation.
+And the reason I've done that is because later this week we are going to improve on this rag and we're
+going to want to have a different implementation.
+And I want to be able to swap it.
+And I want you to make an implementation as well and make it even better.
+And so this allows us to be able to have like swappable implementations in one directory.
+There are two modules that we will have in this directory.
+Okay.
+What are these two modules.
+So the first of them is called ingest.py.
+And that's basically like the lab that we did not today but yesterday.
+The one that is going to read in a knowledge base, turn documents into chunks, turn chunks into vectors,
+store them in chroma that will all be in ingest.
+Py you can do.
+You've run, ingest py and it's going to do all that.
+And it could be part of your, your your Rag pipeline, your data ingest pipeline that has new files
+arrive.
+This automatically gets called and it runs.
+The other module is called answer.py.
+And it's a very simple module.
+It has two key functions that could be called by the outside world.
+One of them is called fetch context.
+Given a question we'll get relevant context and the other is called answer question.
+Given a question and some history, it will fetch relevant context and answer the question that is in
+answer.
+And the idea is that you could change this.
+You could write your own ingestor to ingest the data and your own answer to accompany it, using consistent
+encoder and so on.
+You just have to implement fetch context and answer question and everything else will work.
+So that's that's the scaffolding that I put in place.
+And those are the two modules that I have written.
+So how will we actually use these modules.
+Well I've got a few ways that we'll be able to to put these into practice.
+And the one we'll do today is that I've made a gradio application called App.py, which is in in the
+week five, and the parent directory to implementation and App.py will bring up a nice Gradio user interface.
+And we'll call answer.py to get answers to questions.
+And we can always swap out with a different implementation and still keep that same UI.
+And it's.
+So that means that that ultimately we're going to be able to do two different, uh, UV runs.
+We'll be able to say UV run ingests Py will actually do that from within the implementation directory.
+So we'll do CD implementation.
+And then you've run ingest.py and it will run the whole ingest.
+And you could imagine this could be something if you had data pipes.
+This could be something that is automatically triggered whenever a file changes in that directory.
+Or a cron job runs this every hour or something like that.
+So.
+So this will automatically populate our Chrome data store.
+And then from the week five directory, the parent directory we can do you've run App.py.
+And that of course will launch our UI.
+Okay.
+Let's go and have a look at this.
+So in week five there is this folder implementation.
+And sure enough it just has these two classes two class two modules.
+Ingest and answer.
+Let's start by looking at ingest.
+And this really is just the stuff from lab to lab.
+One was when we did the fake version.
+Lab two was the proper version.
+You can look at lab two and compare it.
+You'll see that it's basically the same stuff.
+I've tidied it up a little bit to put it in ingest pie.
+Um, this is this is a way to make sure we've got the right path to our database and our knowledge base.
+This is where we are creating the embeddings, the hugging face embeddings.
+And then you can see I've got fetch documents, fetches the documents using lang chains code create
+chunks using the recursive character text splitter.
+The chunk size is 1000, an overlap of 200 characters per chunk, and we split up the documents that
+gives us the chunks, create the embeddings, deletes chroma if it's already there, and then creates
+chroma passing in the chunks, passing in the embeddings, passing in the directory name.
+And then it prints that we've created the vectors with the dimensions.
+And then if this is you've run, what should it do.
+Well it should fetch the documents, create the chunks from those documents, create the embeddings
+from those chunks.
+And then we're done.
+That's that's what ingest Pie does.
+Should we see it working.
+Let's have a shot.
+Okay, so first of all, we bring up a new terminal window and cursor that is control shift and backtick
+to have a new terminal.
+Uh, or you can also go to the view menu and select terminal to open a terminal.
+And we start in the LM engineering directory.
+So we do CD week five to go into week five.
+And then we're going to go into the implementation directory CD implementation.
+If I do an LZ you'll see we have ingest Pi and Pi are right there.
+We do.
+You've run ingest dot pi and take a drum roll and off it goes.
+So it's doing a fetch documents.
+Then it's going to do create chunks of those documents then create embeddings.
+And then it will print ingestion complete as it prints faster than I can say.
+All of that.
+And it says there are 413 vectors with 384 dimensions in the vector store.
+That is a successful ingest run.
+Okay, time to look at answer dot pi.
+So control and backtick again takes out that terminal.
+Or you can just press the bin or the X button over there.
+Go to answer.py.
+Let's have a look at this.
+As I say, it is just the same code from lab three here.
+Same same set of imports.
+Slightly fancier way of making sure we're looking at the right place for the vector database in a platform
+independent way.
+Uh, same same model right here.
+All mini LM L62.
+Note that there are those two different places.
+If we change this model two two places to change it.
+Retrieval.
+Okay I have separated this.
+This is how many chunks get included.
+Get retrieved and included in the prompt.
+I think we saw that it was it was doing for before.
+You can actually specify how many chunks you want.
+And here we're specifying five same system prompt as before.
+As before we create the vector store the retriever and the LM.
+These are the two key objects that that we needed to build that we can call invoke on and fetch.
+Context is one of those functions I told you about the big, big, big functions.
+We're implementing.
+It takes a question and it just calls retriever dot invoke for that question.
+And this is where we pass in k.
+K is five so that five chunks are retrieved.
+And then this is the other big thing.
+Answer question.
+It takes a question and it takes some history.
+So I've got something here.
+It's a little bit more than the five lines.
+You might say.
+There's more than five lines.
+There are a few more lines now because there's a couple of things that I'm doing differently here,
+which relates to slight problems with that naive Gradio app from last time.
+I wonder if you found them.
+If you were playing with it, you might have very quickly discovered that there were a couple of hitches
+with it.
+So the first hitch, of course, is that we were completely ignoring history.
+So if the user said, if you said like, like, um, who is who is Avery?
+And then you said, and what did she do before?
+It wouldn't be able to answer that because it wouldn't know who.
+Every time.
+It was like a completely fresh message.
+We weren't passing in the conversation history every quarter.
+An LLM is stateless.
+It would have been just like when I said my name is Ed.
+Who am I?
+A couple of weeks ago, you saw that it just doesn't work at all.
+So this time I have I have done this properly.
+We take in the history and we do actually make use of it.
+Um, so lang chain, this is passed in as the normal list of dicts from the open AI format.
+Lang chain doesn't like that Lang chain likes its fancy type of messages with with that human message
+object and an AI message object.
+And there's actually a convenient way of saying, um, the convert to messages.
+So lang chain object that I that I lang chain function that I imported here convert to messages.
+And if you do that then it converts open AI style messages into lang chain style messages.
+So we do that.
+And then when I call invoke LM invoke I'm calling that with the proper formatted messages, with the
+original, with the system message, and then with all of the history converted into Lang chain format.
+That's not clear to you.
+Put in a few print statements.
+When you run it a few times, you'll see exactly what I mean.
+Changing it from being the OpenAI format that Gradio passes in into being the Lang chain format of these
+system message and human messages and AI messages in a list.
+So that's what this does, and it packages it up nicely so we can call invoke.
+There's one other thing I'm doing which you may have spotted.
+This extra function I put in called Combined question.
+And this one is kind of subtle.
+And you might want to implement this differently.
+This kind of depends on how you want to do things.
+See if you can figure out what's going on there.
+So the answer is this is this is a subtle thing which Lang used to to do behind the scenes in a way
+that that meant that you didn't have as much control over it.
+So I like the fact that it's very much in our hands with this implementation.
+So the question is, when you're looking up the relevant context, should you only do that based on
+the most recent question from the user, or do you need to look at all of the conversations so far and
+look up the context based on that?
+Or perhaps you should do it individually for each of those questions and gather all of that context.
+There's different ways to do it, and it really depends on the use case.
+It depends on what you're trying to do.
+It depends on the scenario.
+So there's no right answer.
+So I used to have this that it only looked at the context based on the most recent message you gave.
+But that wasn't great because you could say something like, uh, who is Avery?
+And it would it would answer, of course.
+And then you could say, and what did she do before?
+And even though it's getting the full history so it knows we're talking about Avery, when it looks
+up the context, it's looking it up on the on the statement, what did she do before.
+And there's no relevant context for that.
+It doesn't know that that's Avery.
+So perhaps a better way to do it is when fetching the context, don't just fetch context based on the
+most recent message, fetch context based on all the things the user has said so far, package that
+up.
+put it into a combined question, and fetch the context on that combined question.
+So again, if that's not super clear to you, put in some print statements.
+You'll see exactly what I mean.
+When I'm looking up in Chrome.
+I don't just look up based on the most recent question from the user, I do it based on everything the
+user has said.
+And maybe if you're one step ahead of me, you can think there's a better way of doing that and there
+is a better way of doing it.
+And we may we may mention that later in the week, perhaps when we think of more advanced implementations.
+But you can puzzle right now and see if you can figure out what would be a nicer way of doing it, to
+make sure that we do query well on something really good that's based perhaps on the most recent thing,
+perhaps on some of the the history as well.
+Have a think about that.
+We will revisit for now.
+Uh, let's press on.
+We've got our answer question function.
+I think what's what's what's left surely is for us to try this out.
+And what better way to try it out than in a nice Gradio UI?
+--- Lecture 5 ---
+Well, just before we bring up our Whizzy interface, let me just show you a less whizzy one.
+Uh, what's broken with day three's notebook that we looked at before?
+You remember that we had our very nice, elegant, simple five line question answering that did just
+fine, and we brought up a nice UI on it.
+And here it is.
+And we could say, who is Avery?
+And it's gonna do just fine.
+It's gonna, of course, do a rag lookup.
+It's going to give us a great answer.
+Well, check this out.
+If I say how much is her salary?
+Uh, we are going to get something, uh, odd back.
+Samantha Green's current salary is 70,000.
+What is that about?
+Two things have gone on that are a problem here.
+The two things that I showed you, we fixed, uh, in the in the proper module implementation, the
+two problems with this, uh, with this simplistic version.
+First of all, it wasn't even looking at the history that didn't get passed to the LM.
+So when I say her there, it has no idea that I'm still referring to Avery, but even if it had known,
+it would still have had a problem, because that this is the text that's being used for the Rag lookup.
+And because of that, it's just picking some random document with salary in it.
+The first one that happens to be Samantha Green.
+And that's why we're getting a, uh, like a, like a red herring of an answer, something that seems
+to be a completely different topic.
+So those are the two problems.
+We're not maintaining conversation history when we call the LM, but also we're looking up context based
+off this.
+So the two fixes that I just showed you in that longer version, first of them is to build up the proper
+history and pass that into lang chain using that Lang chain conversion function.
+And secondly, I'm not just looking up the context on this.
+I'm looking at the context on the combination of all of this text so that it would in fact include Avery
+in there.
+That's why I did it.
+Now you see it broken.
+Let's see how it looks in the new Gradio UI.
+And so I bring up a new terminal with shift control Backtick.
+Where is it?
+There it is.
+Okay.
+And now I go into week five and now I do UV run app Dot Pi, and it's going to spring up a new window,
+I hope.
+After a small pause while Gradio chugs into gear and there it is.
+Bam!
+Here we go!
+The ensure expert assistant.
+A nice little UI, and we've got a conversation on the left and we've got retrieved.
+Context will appear here on the right.
+Isn't that cool?
+All right, so obviously I could say who is aviary and we'll see how it does okay.
+What have we got.
+So we get a good answer.
+Of course we know this answer.
+And on the right here relevant context, we have the information coming back here along with its source,
+the place that it came from.
+And this white text is what was actually provided in the context to the LM.
+The orange is is just a note of the metadata showing us the source of where it came from.
+But this was not provided to to the LM, just these white blobs.
+Here it all is.
+This is all the information that was passed about Avery.
+How many chunks do we have?
+We have one, two.
+Three.
+Four.
+Five.
+Five.
+Five chunks were retrieved because we set K to five.
+Beautiful.
+And now I can come back here and I can say.
+And what is her salary?
+And we hope that we will see a combination of things.
+Avery Lancaster's current salary is 2.25.
+We see that the relevant context it's retrieved is related to this text and this text.
+So it's still all about Avery.
+The current salary is right up there in the second chunk.
+And so it also the the chat was sent with history to uh for one nano.
+And it was able to say we're talking about Avery for sure.
+And I've got the context.
+I know her salary.
+That's how it responds.
+This is rag with history with lookup.
+Fantastic.
+It's working.
+Now let me go back into cursor.
+I just want to go into the knowledge base, into the employees, and I want to find one employee document
+in particular.
+I want to find Maxine Thompson.
+Here she is.
+Here is Maxine Thompson.
+Let's bring that up in a nice markdown style.
+Let's have a look.
+This is her HR record.
+We'll get the terminal out of the way there.
+Uh, if we look around here, you'll see that she was recognized as the inaugural innovator of the year
+in 2023, receiving a prestigious IIoT award, the inaugural innovator of the year award in 2023.
+Good for Maxine.
+Now, I wonder whether or not the the R rag pipeline is going to be able to retrieve that.
+That is a challenging one.
+Let's find out.
+Let's go back to the terminal.
+Let's start our Gradio app up.
+Here we go.
+And then we're going to ask the question.
+We are going to say okay then tell us who won the prestigious I o t y award.
+Give it that.
+Let's see what it can do.
+It says Maxine was recognized.
+It gets that right.
+And you can see over on the right what's going on that it's coming up and we'll see right there that,
+uh, it found the details in here somewhere.
+Uh, there we go.
+It's because she received the prestigious award.
+Was also mentioned in her promotion, and it's got it right there with her name.
+But you may notice something that's not perfect about this.
+You may notice that it says Maxine, but it doesn't say Maxine Thompson.
+It doesn't realize her full name.
+And that's that's this slightly tiresome thing that this chunk that it that it found here mentions that
+she received that award in this rather nice small chunk, but it doesn't have her full name in that
+chunk, because her full name was at the top of the HR document and not in the middle.
+And this is an example of a nasty little problem with Rag with chunking that the chunk might answer
+the question, but it might not contain some crucial context from elsewhere in the document, meaning
+that you get back an okay but not perfect answer.
+So that's an interesting one for us to observe.
+It's okay, but it's not as complete as it could be.
+And there are other problems too.
+There are some problems with the way that I did that history lookup, and that's slightly hacky way.
+Suppose I start a new conversation and I say, uh, who is Avery?
+Uh, like like this.
+Uh, who is Avery?
+And we get back on the right and answer and then say, uh, and what did Avery do before?
+We'll get back some more conversation about Avery before founding Ensure Elm, she worked as a senior
+product manager or coming from similar chunks, working well.
+And now we'll say who won the prestigious.
+Award and see how it does.
+And strangely, it hasn't got the answer.
+It doesn't know.
+Why has that happened?
+Well, that's because I made that change.
+So that when I'm retrieving context, I combine this and this and this.
+And now the thing that I'm looking up in my data store, it's got too much other stuff other than I.o.t.
+It's got too much about aviary.
+And so if we look over on the right, it's still finding chunks about aviary.
+That's not very satisfactory.
+So we have a problem.
+The the change that I made has made it better at looking up context that relates to the whole conversation,
+but in doing so it's made it poorer.
+If you then change the topic and want to talk about something completely different, it's still dredging
+up context from earlier in the conversation and that's no good.
+So how would you fix that?
+There are many ways to fix it, but there are some ways are better than others, and we will work on
+problems like this over the course of the next couple of days.
+But the real takeaway I have for you is that rag is something that can be quite hit and miss.
+And we're going to really double down on this tomorrow.
+But but it's it's important to recognize that Rag is this very experimental, really quite hacky approach
+of trying to look up relevant context.
+And it can frequently go wrong.
+You can get good examples of rag working really, really well.
+Like it's surfacing that Maxine won the award.
+But you can also see that it didn't quite get her full name.
+It wasn't complete.
+And then after we've talked about Avery for a bit, it's not able to find out who won the Coty Award.
+So so it's quite easy to get it off track.
+So the, the, the right way to approach Rag is to come up with each problem like this as a new problem
+to be solved.
+And it's a bit like whack a mole, you find something and then you fix it, and then you find another
+problem and you fix that.
+And sometimes in fixing one problem, you cause another problem, as we just have as I, as I fix that
+that history, I then I then created this new problem.
+So a lot about Rag is getting after these kinds of puzzles and making your rag system better and better
+through a series of different techniques.
+That's what Rag is all about.
+And there's a technique to allow us to do that in a more scientific way.
+And that's what we'll be covering tomorrow.
+And in the meantime, before I leave the screen, the mission for you before we go to tomorrow is to
+bring up this user interface.
+You've run App.py.
+After doing a CD implementation, you've run, ingest py to populate your data store.
+Then do a you've run app.py and experiment and find the rough edges.
+Find what it's good at, find what it's bad at.
+Look at the chunks on the right.
+Understand why are chunks getting surfaced?
+Try and get really great examples of rag doing an amazing job at showing deep expertise about information
+buried in the documents, but then also find cases where it foolishly is unable to answer something
+that's clearly there in the documents, and get a really good sense for what's working well.
+And what are the blind spots?
+What are the rough edges and have that on our list because we're going to get after them, fix them
+as we make our rag better and better, starting tomorrow and before tomorrow.
+I do hope that you're going to take a moment, uh, to, you know, if you're a wine drinker, then
+I'd say it deserves a nice glass of wine.
+Uh, maybe even a glass of champagne.
+You have built a rag product.
+You can do this.
+You can now write your own ingest dot pi.
+You can write your own app.py and your dot pi and have something which is able to vectorize, chunk,
+vectorize, store a bunch of documents, and then you can ask questions on them.
+And it apparently has expertise across your entire knowledge base and only you.
+You secretly know that it doesn't at any one time have knowledge of the whole knowledge base.
+It's doing this trick of using vector similarity to do a semantic search over your data, pluck out
+a few chunks of relevant context, shove them in the prompt, getting back an answer based on that knowledge
+each time.
+It's it's a trick.
+It's a conjuring trick.
+It works really well, and it gives the impression that you've got something that's an expert on your
+entire knowledge base, but it has some rough edges.
+So as a recap, you can now generate code, generate text with front end models.
+With open source models, you can use tools.
+You can confidently choose the right model for your projects and and add it to the list.
+You can implement a Rag expert question answering system and the secret, the dark secret.
+Just.
+Just between you and me is that it's actually quite easy from next time.
+Next time though, we're going to get more disciplined.
+You can explain the importance of evaluations evals.
+So critical going to be able to measure the effectiveness of your Rag system.
+And we'll be able to experiment with things like encoders and chunking strategies and use our metrics
+use our evaluations to to be able to to to gauge how much difference we're making and to be able to
+make decisions about different solutions we want to build.
+All right.
+Lots of stuff.
+Tomorrow it's going to be really, really great.
+Um, very much looking forward to it.
+I hope you are too.

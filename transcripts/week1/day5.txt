@@ -1,0 +1,902 @@
+--- Lecture 1 ---
+Well, it seems like we only just started on our journey together and already we're in day five of week
+one.
+Welcome, welcome.
+Today is showtime.
+Today is roll up your sleeves and get coding reminder of what you can already do.
+You can already call OpenAI's API.
+You can use it to summarize things.
+You can contrast the different llms at the frontier.
+And we've done an introduction to Transformers, tokens, context, windows APIs, the the idea of the
+illusion of memory, and so much more.
+But by the end of today, you'll be able to confidently write code with OpenAI API.
+Or to be specific, the Chat Completions API.
+You'll use something called one shot prompting, which is just a fancy name for saying giving an example.
+We'll be able to stream back results.
+We'll be able to show it in markdown, which we basically already done, and also use JSON results.
+But also we'll be able to put this together into a proper commercial solution that you'll be able to
+do in a matter of minutes, and then you'll be able to apply this to your own commercial problems as
+well.
+All right, that sounds exciting.
+Let's introduce the commercial problem.
+Okay, so what we're going to do is build something which is able to generate a sales brochure for a
+company.
+You'd be able to give it a web address, and it will generate a sales brochure for possible future clients
+or investors or for your recruiting for your team.
+And the way we're going to do it, it might say that sounds a bit similar to summarizing a web page,
+but it's going to be a little bit more than that.
+It's going to be able to go and pull multiple web pages.
+It's going to take a web page.
+It's going to find links on that web page that are relevant to the company, and then it's going to
+follow those links as well, and then use all of that information together to build a sales brochure.
+And this is going to be the commercial product.
+And you could imagine you could package this up and have it as your sales brochure generator.
+So we'll be using the OpenAI API, of course, that we've already been introduced to.
+We'll be using this thing called one shot prompting, which as I say is a fancy name for saying, hey,
+imagine that input sequence we could put in that input sequence, an example of what a good outcome
+looks like, and use that as our way to to generate, to increase the likelihood that our outputs are
+what we want them to be.
+And we're also going to use a technique called streaming, which gives you that very familiar typewriter
+animation of the results coming back on your screen.
+So that's the idea.
+That's the sales brochure.
+It's going to be a lot of coding and it's going to be multiple.
+It will involve two LM calls.
+And so it's one LM call getting back the results and then using that to make another LM call.
+And so that's a sort of interesting idea of compounding these LM calls to get more commercial value.
+All right let's go to Casa.
+Let's go do this.
+Okay.
+Here we are back in Casa.
+I go into week one, I go to day five, and here comes our day five lab.
+Remember to click on the top right and select that kernel, which should be the one that is your VM.
+Okay.
+So the challenge we're starting, it's very similar to what we did in day one when we summarized the
+website.
+But we're taking it to the next level.
+We're going to build a company marketing or sales brochure by by looking at a web page, finding its
+links and looking at more web pages.
+And at the end we'll talk about business applications of this.
+And now, look, some people have said to me, okay, but can't we just ask ChatGPT to do something
+like this and give it some instructions and give it a URL?
+The poor rain on my parade and it's true, you can and it will probably do very well.
+But here's the thing.
+First of all, remember ChatGPT is a product built on top of GPT, and there are a lot of AI engineers
+that work at OpenAI building into this product.
+And that's basically a lot of what we're going to be doing now.
+We're going to be acting like an AI engineer working on our product, and it's going to be focused on
+the sales brochure rather than being able to do anything.
+It's got that that functionality.
+And besides, look, there are a lot of Verticalized AI products out there on my phone.
+I use Duolingo to to do my Spanish lessons, perhaps on going very well.
+But, but but I use Duolingo.
+And of course it has within it an AI feature as well that you can use that to chat with an AI.
+And the dark secret is behind the scenes that AI is just calling GPT.
+And guess what?
+We discovered ourselves.
+You can just bring up a llama and do it yourself.
+But that doesn't matter.
+It doesn't stop me from using Duolingo because it's convenient to have it being carefully crafted.
+The prompts have been worked on, the information has been put there, and so I use Duolingo, and I
+pay that premium amount to be able to use their chat AI, and they've made a lot of revenue from it.
+And so I want to make the point that just because it's possible to recreate functionality in ChatGPT
+with various prompts, that doesn't diminish at all the commercial value of building something with
+business logic that makes a call to ChatGPT.
+People sometimes use the expression a GPT wrapper to refer to functionality built around ChatGPT, and
+I understand that.
+And over the course of the next eight weeks, we're going to be building more and more functionality
+that takes us away from that GPT, GPT wrapper kind of term to something that's really very bespoke.
+Today, perhaps you could argue this is a GPT wrapper, but it's a starting point and it's a great starting
+point.
+And let's get into it.
+Okay.
+So we start with some imports as usual.
+Hold down shift and press enter to run it.
+If any of these imports fail, it usually means you don't have the right kernel selected.
+All right.
+And then as before we're going to initialize our API key.
+Let's use GPT five nano.
+Today the cheap variant of GPT five and the API key looks good so far.
+If yours doesn't, head to the troubleshooting lab.
+Okay, then you remember this scraper, this little utilities I've put.
+I've actually, uh, there's this this function fetch website contents we saw before.
+I've given another function fetch website links, which just grabs a web page, finds any any link on
+that web page and returns it.
+Just vanilla parsing code using this library.
+Beautifulsoup.
+That's very popular.
+If this I this is not obviously this is not a course about scraping.
+So you don't need to understand how this works, just that we're using this function.
+But if you're interested here it is.
+And for those who want to point out, I'm very aware of the fact that it's inefficient that in both
+of these two functions, I, I retrieve the web page.
+But that's because I'm not trying to teach about the scraping.
+I'm trying to teach about AI, and I want to keep these functions nice and simple so that it doesn't
+distract you.
+Okay.
+So with that we have this function fetch website links that I've just written.
+Nothing to do with AI.
+I can pass in a URL like Edward, and if I run this then Bam!
+I get just a list of all of the links that are on that web page.
+But there are two problems with this.
+The first problem is that many of these links are not going to be relevant to my page.
+There's links out to Y Combinator to Hacker News.
+There's links to other things that maybe aren't aren't relevant.
+This is something to do with probably the type of site that I'm running on.
+So there's stuff that's not relevant to my website.
+And the second thing is that it's possible for some of these to be relative links rather than full absolute
+links.
+Looking at this now, they do all appear to be absolute links, but on other web pages there will certainly
+be relative links to.
+And so typically what if we wanted to find what are all of the relevant links?
+We'd have to write some code to do that.
+And mapping relative URLs to absolute URLs is quite doable, but it's harder than you might imagine.
+There's some clunkiness to do with with understanding what that what that URL represents, but it can
+be done figuring out whether a link is relevant to me or not.
+Now that is very, very hard.
+In fact, you know, it requires an understanding of what the link represents because some things might
+be links off my my platform, like my LinkedIn page, which is still relevant, whereas something to
+Hacker News is not relevant.
+So trying to figure out that logic would be really hard and nuanced and require an understanding and
+that kind of thing.
+As of about four years ago was simply not possible.
+Like we didn't possess the technology to do it.
+And now it's just a tiny call to go away.
+It's just easy to do that kind of nuanced understanding.
+So this ability to parse information and then in a almost human like way, interpret it and reconstruct
+it.
+That is something which is which is amazing and new.
+And you can use this same kind of technique to parse people's resumes to, to, to parse restaurant
+reviews, whatever you might want, and have a sort of nuanced understanding and categorization of it.
+But we're going to do that now.
+We're going to use GPT five nano to figure out which of these are relevant, and make sure we've got
+the right kind of URL.
+--- Lecture 2 ---
+So how do we go about doing this?
+How do we start?
+Well, the place to start always with these calls is start by thinking about the prompts.
+What input sequence do we want to send to the LM to allow it to generate tokens, which are most likely
+to achieve our task?
+Okay, so we start by thinking of a system prompt and a user prompt.
+So here I've already written a system prompt.
+I'm not going to type it out because it'll be a lot to type.
+I'm going to show it to you here and talk it through the system prompt.
+You are provided with a list of links found on a web page.
+You are able to decide which of the links would be most relevant to include in a brochure about the
+company, such as links to an about page or a company page, or a careers jobs page.
+You should respond in JSON as in this example, and there is some JSON.
+If you're not familiar with JSON, Google it.
+I'm sure you are.
+So there is some JSON Jason, and it's got this sort of structure which I've just invented.
+I just invented this structure with a key of links.
+And then within that is a list, and each link has a type like about page and a URL.
+And there's a URL.
+So why did I invent some Jason.
+Well here's the thing.
+These language models have been trained with lots and lots of data, and most of that data fits into
+three categories.
+It's either just straight up English language.
+They're trained with a lot of English language or foreign language.
+They trained a lot of language.
+I mean a lot of natural language.
+That's the word a lot of natural language.
+Masses of it.
+Secondly, they're trained with lots of markdown.
+Websites get turned into markdown.
+Markdown is like a like basically shorthand for HTML.
+They're trained with lots of markdown.
+So they love markdown and they love generating markdown.
+They know markdown really, really well.
+That's a structure they're very familiar with.
+So markdown is something they know.
+And thirdly they're trained with a lot of JSON.
+They see JSON a lot.
+And so JSON is something that naturally when if you're sending structured information to an LLM, if
+you use JSON, it's going to just be coherent, it's going to recognize it and it's going to figure
+out what you're doing.
+And that's why giving it a nice, pleasing JSON structure that feels organized and that represents the
+information the way we want it.
+I want a type for each of my links.
+That's another another difficult thing to imagine ever coding that.
+How would you ever code a way to have a heading for each kind of link, and then at the URL for that
+link.
+So that's a great way to express the information you want back is by giving it a JSON structure.
+And in the old days, people used to try and say, you know, reply with this and the first bullet with
+some information, second bullet with some information.
+It's really hokey trying to sort of describe some some way of laying out data.
+Much better to use JSON.
+And in week eight we're going to to use something called structured outputs, which gives us a way to
+force that JSON to, to be focused on a particular spec on, on meeting a schema.
+We won't cover that here.
+We're just going to cover for now.
+Just giving an example and giving examples of possible answers is sometimes known as a one shot prompting.
+If you give one example, that's one shot.
+If you give multiple examples, that's Multi-shot prompting in theory, to get this strictly right,
+Multi-shot prompting is when you give an example question and then the answer that would be good.
+And then another question, and then an answer that would be good.
+Just giving multiple answers is also basically like multi-shot prompting.
+So in this case we're doing single shot prompting.
+We're giving it one example.
+And we're saying given this example, learn from it, replicate it, and it's just going to be fine
+at it.
+Remember, all it's doing is it's going to take this as the input and it's generating the most likely
+tokens to come next.
+And it just happens that the most likely tokens to come next are basically are actually the actual things
+we do want it to come next.
+It's going to be parsing our input and coming up with this information as the output.
+Okay.
+So that's our system prompt link system prompt.
+It's called all right.
+Now don't worry I'm going to do some typing in just a second.
+If you're like why doesn't he have a type I will I will.
+So next is the user prompt.
+So this time well this one I just have it as a variable because it's just always going to be exactly
+the same thing.
+Link system prompt.
+This one I have as a function, because we're going to generate a user prompt each time with a URL passed
+in.
+So a URL will come in and we're going to make a user prompt.
+And this is what it will say.
+Here is a list of links on the website URL.
+Please decide which of these are relevant web links for a brochure about the company.
+Respond with a full https url in JSON format.
+Do not include terms of service, privacy and email links.
+This is an example of what not to do.
+Is almost the opposite of one shot prompting its kind of these are these would be bad answers.
+And you can imagine I put that in there because it was including them.
+It's very common.
+I mean, and perhaps the most important thing you'll ever learn on this entire course is that key to
+getting good results from Llms is experimenting and iterating.
+It's all about the experimentation.
+That's what it takes to be a good LLM engineer.
+It's about being a good data scientist as well as being a good engineer.
+And data science is about experimentation, and there's no better way to get good outcomes than to keep
+refining your prompts.
+So if you do this and it starts generating privacy policies as what it thinks is a relevant link, you
+come back and you say do not include privacy policies.
+You iterate, you improve, you add examples.
+That's the way to get great results.
+So I then of course I call fetch website links.
+Which is that that function I just showed you that gets all the links for this URL.
+And then into this user prompt I add each of those links and that is what I return.
+Okay let's run this.
+Let's run get links user prompt.
+Let's do it for Edward Comm.
+Let's see what user prompt.
+Again we're not calling an LLM yet.
+There's no AI involved here.
+We're just baking a user prompt that we will then call with an LLM.
+Let's see what it says.
+It says here's the list of links on the website.
+Please decide which of these are relevant for a brochure about the company.
+Respond with a full Https.
+Do not.
+It's exactly what we just looked at.
+And here are the links listed out there.
+That's all I've done.
+I've built this string, and the code to build that string is in this function get links user prompt.
+So we now have links system prompt and get links user prompt.
+So we are finally getting ready to make our first AI call.
+And it's going to be this function.
+Select relevant links.
+Okay let's do this.
+So it's the chat completions API.
+So remember the way you do that is you start with we need to make sure that we've actually created an
+instance of OpenAI.
+Did we do that back up here.
+Let's check the Python client library.
+Go all the way back up all the way back up.
+Yes we did.
+There it is OpenAI.
+And we've got this variable model.
+So we have an instance of the Python client library back we come okay.
+So we can say response equals OpenAI the Python client library dot chat dot completions.
+And then we're calling the create.
+We're making a post to that that endpoint.
+All right.
+Now do you remember what what we have to pass in.
+We have to pass in two things.
+We have to pass in the model, which can just be model like a cursor filling it in.
+And messages.
+Now messages of course is the list of dictionaries.
+So it's a list of two dictionaries, in our case the first dictionary.
+Here we go.
+The role is going to be system and the content.
+Oh see there we go.
+Content is going to be thank you.
+Cursor.
+The link system prompt.
+Quickly press escape before cursor gives the game away.
+It's no fun.
+Alright, so that's our link system prompt.
+Now the next item the role is user and the content is okay.
+Okay.
+What is the user prompt?
+We don't have a constant.
+Now we need to call the function that I just wrote a second ago which is get links user prompt.
+Excellent.
+So that's that.
+Uh, get rid of you cursor.
+Stop with your with your cleverness.
+Okay.
+That is messages.
+Now, I told you before that we just got the two things to pass in model and messages.
+But but I lied.
+There is one more thing we're going to pass in.
+There is an extra parameter we're going to use which, uh, cursor is has already filled in, which
+is a response underscore format, response underscore format, which is how we can tell the API that
+we want the response to be in a particular format type JSON object.
+There we go.
+Uh, now a quick mention, a moment for the for the for the people that are like, I know all of this,
+let me just mention something that you may also know, but you might not, which is that one of the
+things that this does that's really quite sneaky and people that aren't familiar with this put your
+hands over your ears for a second.
+One of the things this does is it constrains GPT the model during inference time.
+When when GPT is is, uh, predicting the most likely next tokens, the way it does it is it doesn't
+just predict this is the next token.
+It predicts a probability distribution, the probable next token.
+It gives a probability for every possible next token.
+And often when we loosely say pick the next token, what we mean is pick the highest probability next
+token or sample based on the probability or something like that.
+Well, because that's how inference works because it does it token by token.
+You could also use that to make sure that we never pick a token that would result in invalid JSON.
+We can basically constrain it so that it's forced to generate JSON at inference time.
+The LLM can predict whatever probabilities it wants, but the ones that we actually select are going
+to be the ones that would make well-formed JSON.
+And that's super interesting.
+And that's how even though an LLM doesn't know what you mean, if you say you must respond in JSON and
+it knows if you say it in English, but it doesn't know that technically, but at inference time we
+can enforce technical constraints like that.
+All right.
+Now everyone can take your hands off yours.
+Uh, okay.
+So that is, uh, that that's that's the, uh, the the API call.
+It's now time for us to take back the response and do something with it.
+--- Lecture 3 ---
+Okay, let's keep going.
+So we now say something like result is response C response dot choices zero dot message dot content.
+Remember when we were just digging through the JSON.
+That's all it was.
+And then that result that's going to come back, that's going to be a raw text.
+But it's format.
+It's going to be like JSON text.
+And people that are familiar with with messing around with JSON knows that you can you can convert like
+text, a string that contains those squigglies and the quotes and stuff into Python dictionaries using
+the built in library JSON.
+And you do that by something like links equals length equals JSON dot load string result.
+So that's turning from a string results with with curlies in it and stuff into actual Python dictionaries.
+And that's what links will then be.
+And so now let's just return links and there we go.
+That is our select relevant links.
+Let's hope I haven't made any mistakes.
+Let's run that.
+Let's call select relevant links for my website.
+So this is now taking that.
+It's doing that quick web scrape taking that data.
+And it's packaging it off and sending it to GPT five nano with the system prompt and user prompt that
+we just described and asking for GPT five nano to analyze it and return relevant links in that JSON
+format, and that JSON format will come back as a string.
+We'll turn that into a Python dictionary, and we'll print that Python dictionary.
+And I hope that that yeah, it did happen just as I finished.
+There it is.
+There is the dictionary.
+If we just compare it with with up here was where we gave the style that we want the system prompts.
+Remember this is the style we wanted links for a list of links.
+And if we come here check this out.
+We have links.
+We have a list and each one has a type and a URL type.
+Home page.
+Type about page.
+Type blog post.
+How about that?
+We just got GPT five nano to do sort of intelligent parsing with a nuanced way sub selecting just the
+relevant pages.
+And yes, it reckons that LinkedIn is a relevant link for a marketing brochure about me.
+And but it thinks that that, uh, I guess, uh, my, um, and it put my Facebook and my Nebula, uh,
+in there, but it did not put, for example, my, my link to Hacker News because that's not actually
+relevant to me.
+So it, it's successfully thought its way through that, the nuance of understanding what makes a link
+relevant.
+And that is not easy stuff.
+Okay.
+And here I've got the same one again.
+But this time I've just put a print statement at the top and the bottom so that it's just a little bit,
+uh, more organized.
+And it will this time, like print what it's doing while it does it so, so that we can watch later.
+Um, so let me show that by we'll do the same thing for hugging face Co, the website for the open source
+hub and library that we'll be using a lot in week three and in others.
+So when I run this, it's first going to print selecting relevant links for Huggingface Co by calling
+GPT five nano.
+That's this print statement here.
+It's now this is the same code as you watch me painfully typing and it gets back the results.
+It loads it.
+And then at the end of it all it's going to print the, uh.
+Um, yeah, there we go.
+There we have it.
+This is the result, uh, and it says found three relevant links.
+And there they are, a brand page, a careers page, and a company page.
+Those were all retrieved from the Hugging Face website.
+And of course, there are many, many more links than that on the Huggingface website.
+It sub selected down to those three.
+Okay, now now it's time for us to get a much take a much bigger step and use this information to make
+a company brochure.
+So I'm now going to write a function which is going to take advantage of everything that we've built
+so far.
+It's going to be called Fetch Page and all relevant links.
+Okay.
+And this this this function is going to wrap the call to GPT that we just wrote.
+So this is what it does.
+It starts by doing fetch website contents.
+So given the URL that's passed in it just calls that the same scrape function that I wrote here, this
+fetch website contents.
+It's calling that just to get the information on that web page.
+Then it calls the other thing I wrote the the that we just did together a minute ago.
+Select relevant links.
+That's the thing that goes out, gets the links, calls GPT sub, selects the relevant ones and turns
+it into JSON.
+That's all in this one call here.
+We're packaging it up as if it's just calling Python code, or in fact it's going out to an AI.
+And this is like a hint of when people talk about agentic workflows, about stitching together calls
+to llms with Python code.
+That's what we're doing here.
+Basically, we're calling NLM and just wrapping it in a function.
+Okay.
+And then we're going to put all of this into a nice a nice bit of text.
+It's going to say at the top of it landing page.
+And then it's going to have the contents of the landing page and then the heading relevant links.
+And then it's going to iterate through each of the relevant links that we just got back.
+And for each one it's going to put the heading with link and then the contents.
+If you're not familiar like with markdown, putting two hashes like that means like a, like a level
+two heading.
+Okay.
+So this is just stitching together a big block of text.
+Uh, let's, let's see this in action.
+Let's, let's call it for for hugging face.
+So first of all when I call that because the first thing it does is it gets relevant links, you can
+see that it's selecting relevant links for hugging face by calling GPT five nano.
+So that's running.
+Remember it takes about 30s.
+I have to talk all my way through it.
+It's found 11 relevant links, so it's found a lot more this time than it did last time we ran it.
+And here then, is the full text.
+It says landing page.
+And this is the contents of of, uh, Huggingface landing page.
+And then link discord community and something about the discord community and so on.
+So if we if we show this a scrollable element, you can scroll through this and see each of the different
+links that's in here with the different bits of information.
+Okay.
+So so far all we've done is wrapped an existing call to GPT that we already made.
+What we're going to do now is turn this into our second call to GPT.
+All right.
+So last time we had a link system prompt and a link a get link user prompt.
+Same again.
+Now we're going to have a system prompt and a user prompt for creating our brochure.
+Let's start with the system prompt.
+You are an assistant that analyzes the contents of several relevant pages from a company website, creates
+a short brochure about the company for prospective customers.
+Investors and recruits respond in markdown without code blocks.
+That's just that extra way to make sure it doesn't put ticks around it all.
+Include details of company culture, customers and careers jobs if you have the information.
+So there is my system prompt, and I have an alternative system prompt below it, which would give you
+a humorous version of that.
+Maybe we'll come back to you later.
+So there is our system prompt.
+And now I've got another one.
+Get brochure user prompt.
+Just like before.
+Just like when we had the Get Links user prompt.
+This is the user prompt for building a brochure.
+You're looking at a company called Company Name.
+It takes company name and a URL.
+Looking at a company called Company Name.
+Here are the contents of its landing page and other relevant pages.
+Use this information to build a short brochure, and then we will plonk in everything that we that we
+built in that that function we wrote together a minute ago.
+I've just got this little thing here to truncate it to 5000 characters so that I don't use up all of
+your API costs.
+If we, uh, if we hit some big websites.
+You may notice I've also got little truncate that I put on the, uh, the web request as well.
+Just just to keep it sensible.
+Um, and we'll return that user prompt.
+Okay.
+So let's see what happens.
+Now.
+Let's give this a whirl.
+Let's try get the brochure user prompt for hugging face.
+Let's run this.
+So when we run this it calls this function right here.
+And that begins by calling fetch page and all relevant links.
+And that begins by getting the relevant links.
+So right now while I speak it's going out to GPT five nano.
+And it's making this request.
+And it found seven links.
+This time it's a bit different each time.
+And here is the user prompt.
+And you can see it's your A company.
+You're looking at the company website, blah blah blah blah blah.
+And you can look through it and it's basically going to be exactly what we see right here.
+It's working okay.
+It's time for us to make the final the piece de resistance, the time when we actually make a brochure.
+The second call to an LLM based on the first call.
+--- Lecture 4 ---
+Okay, let's do this together.
+I'm going to type this one create brochure.
+So as always it begins with response equals OpenAI chat completions dot create.
+All right.
+So remember we want to give it a model and messages.
+And uh this time we uh we don't want JSON back.
+We want text back.
+So it is just going to be model and messages.
+So for the model we actually I'm going to suggest we don't use GPT five.
+Let's use GPT 4.1 um mini.
+It's a nice model and it's nice and quick.
+It's just going to be faster than uh than GPT five nano.
+So for the messages, we are going to want to have a system prompt and a user message.
+And the system prompt is cursor is showing.
+I'm just going to press tab.
+So sue me.
+Uh, the system prompt is going to be uh, the, the brochure system prompt that we just wrote.
+And the user prompt is going to be get brochure user prompt passing in the company name and URL that
+we got.
+There.
+Thank you.
+Cursor up.
+You make it all very easy.
+And I didn't even mean it to.
+But just because I accepted that it filled in the rest of this for me.
+Uh, so we will then take I'm going to I'm gonna I'm gonna defy cursor and I'm going to type it.
+We get whatever comes back in response and we'll say result is response dot, dot, dot content.
+And by the way, if you're wondering if you're if cursor isn't prompting you for the same thing and
+you're thinking, well, why doesn't cursor prompt me the way it prompts?
+Ed the reason is because obviously I already practiced this recording.
+It's not my first rodeo.
+I'm not.
+I was a bit more clumsy the first time I did it, and cursor knows that I've done it's seen it already.
+So?
+So that's why it's so good.
+Uh, it's not, it's not really that it knows even the very names that I give variables.
+It's just because it's seen it before.
+Uh.
+All right.
+And so then I guess we'll do We will do the display markdown result.
+There we go.
+That seems great to me.
+Uh, all right, let's run that.
+So now with this, we should be able to say create brochure hugging face.
+Hugging face.
+Uh, so the idea is, if I run this, I kick it off, it's going to first call because it's collecting
+the user prompt.
+And as part of doing that, it's going to get the relevant links.
+So it's calling GPT five nano.
+Now remember from from that other function calling out collecting the relevant links.
+It's doing the intelligent parsing where it thinks what's relevant, what's not relevant.
+How do I get rid of relative URLs.
+Make them absolute.
+It's doing all of that.
+It takes about 30s.
+It's found 13 relevant links.
+That's going into a new user prompt.
+That's going off now to GPT 4.1 mini.
+And that's going to be coming back with a marketing brochure that it's hopefully about to display for
+us in markdown in this screen.
+By the time I finish this sentence.
+If I could drag it on.
+There we go.
+Here it is.
+Here.
+Here is a marketing brochure.
+And come on, it's cool.
+It's hugging face.
+Brochure about hugging face.
+What we offer the hub, the data set spaces, our community.
+It's much more than a platform.
+It's a thriving, fast growing community.
+Company culture, careers at hugging face visit is even put in like a link in there.
+That's cool.
+Why choose hugging face?
+Get started today.
+Uh, and hugging face the AI community building the future your home for collaboration, innovation
+and advancing machine learning together.
+Come on, this is impressive.
+A nice well crafted brochure.
+And because we got to choose the system prompt the user prompt the links, we were able to craft this
+the way we wanted and have it be something that is particularly specialized on building a commercial
+brochures for the audience that we specified for potential customers, investors, potential recruits.
+I give you a brochure generator and using it to make a brochure for hugging face.
+But wait.
+There's more.
+One more thing to show you.
+I want to show you.
+Streaming back results.
+So the streaming, of course, is when you see that very familiar typewriter animation.
+You see stuff that sort of flows back from the LM, and it's remarkably easy to do it.
+And that's what we'll do right now.
+LMS generate content token by token anyway, so why not print it token by token as well?
+You remember that when we call chat completions dot create, we pass in two things.
+We pass in the model and the messages.
+And we learned you could pass in a third thing the response format where there is another, there's
+a fourth thing and it is stream.
+You can say stream equals true by default.
+It's false.
+If you pass in stream equals true, then what you get back is not the response object, but rather you
+get back an object called stream.
+And it's something which you can iterate over, like I do right here for chunk in stream.
+And as you iterate over it, you get back each chunk as it's formed, as it feeds back, as it flows
+back from the LM.
+So this gives you an easy mechanism to be able to stream back results onto your user interface.
+Now also because we're bringing back markdown, I can't just print it.
+I have to do something clever to make sure that I update the markdown I've already got.
+So this is a little bit more fiddly than it needs to be, perhaps than sometimes you see it, but I
+have to first display some empty markdown and get like something called the display handle, so I can
+then update that markdown each time with the response.
+That's why it's a little bit more wordy here than than you often see it.
+It could just be a print statement if we weren't using markdown.
+But then this is the meat right here.
+What we do is that as we iterate through each chunk, we look at the chunk, we do chunk choices, zero
+content.
+And that should sound quite familiar to you because it's very much like response choices, zero content,
+but it's chunk zero Content instead of message.
+And that's because the delta represents just the little extra bit we're getting flowing back to us for
+this particular chunk.
+So we aggregate all these chunks to response and we update the markdown.
+And that means that this is going to show it to us in a nice format.
+And we're using GPT four mini right there.
+Okay.
+Let's give this thing a whirl.
+So we're going to say uh, stream brochure.
+Let's try and stream a hugging face and the Hugging Face website.
+Let's kick this off.
+So remember the first thing that happens is it calls the same select relevant links calling GPT five
+nano.
+And this is the thing that's going off GPT five nano and collecting and it's parsing making JSON, looking
+for relevant links.
+And as I say this, this takes like 20 30s.
+Sometimes it takes longer because, uh, this is a reasoning model.
+And so it's welcome to think through as much as it wants.
+But it's happened.
+It's come back and already the results are streaming back.
+You see, the way it's streaming like this, we get to see all the information coming back and isn't
+that gorgeous?
+That's a much nicer user experience with the typewriter animation and what you what you now really understand
+is that this isn't just about user experience.
+This is actually showing you what's happening to the model.
+The model is generating the output a token at a time and responding with that token that got generated,
+and then feeding that token back in and generating the next token.
+And we're getting that steady flow of tokens back streaming using a technology called ZK.
+If you're familiar with this stuff, that's the protocol.
+That's how how the data comes back to us.
+Um, and so there we have it, a streamed company brochure.
+And, uh, it looks terrific.
+And, uh, it's got got again, company culture, customers, community.
+And I really love it.
+Empowering the next generation of machine learning for a better open future.
+Uh, so our second company brochure is a success.
+And of course, I wouldn't be doing my job if I didn't go back and change the system prompt and show
+you how we can have ourselves a rather different style of brochure.
+Let's have a look.
+Back we go.
+Uncomment the lines below to give a more.
+Oh, keep that one commented up to give a more humorous brochure.
+Uh, so, uh, let's run that.
+We now have a different system prompt.
+Um, and now, uh, yeah, we'll just scroll down.
+You might be confused.
+Some people get confused that I don't need to reevaluate this, but but it's because we're using when
+you're when you're working with these notebooks, you often take advantage of the fact that these variables
+are all basically global variables.
+It's obviously not good practice.
+If you're building a production engineering software and you're building things, uh, in a way that
+you want to deploy them finally, which which, you know, obviously I cover in my production course,
+but when you're in this mode of being a scientist and you're exploring and investigating different prompts,
+it's it's absolutely acceptable to be working in this notebook style.
+In fact, it's encouraged because it allows for quick experimentation.
+So we're using globals.
+That's why it just works.
+If we just change it in that one place.
+And it's not something to be particularly concerned about.
+But let's come back down here and let's run this one here.
+And at this point, it should now be going off again to select relevant links.
+This takes about 20 30s or so.
+And at the end of that we should get it streaming back a brochure.
+And it should be a bit of a different brochure than the one we did before.
+And of course it's found 14 relevant links.
+It's now going off.
+And let's see what it comes back with.
+Uh, our motto, keep it open, keep it ethical, keep it hugging.
+What's cooking in the AI kitchen?
+Customers and culture and career.
+Geek out with us.
+Open source at heart.
+And then a heart emoji.
+Ethical AI advocates casual tea drinkers, and serious problem solvers.
+Always learning, always sharing.
+Always growing.
+Uh, and so, you know, you could you could say there's obviously a lot of hallucination going on here.
+It's making this stuff up.
+This isn't particularly hugging faces motto, but that's what we asked it to do.
+We asked it to, to create, to imagine, to to give this a humorous take that is consistent with hugging
+faces vibe.
+Uh, and, you know, I'll leave it to your judgment whether you think from looking at hugging face
+site, whether it's done a good job of this.
+Ready to join the AI Hug circle, this stuff is all.
+It's all made up.
+But I would argue that it's very much consistent with our objective.
+And if we wanted, if our style was was we want to make brochures which bring out the the most humorous
+and the most joyful side of your company, then this might be a really good outcome.
+And if it's not, that's the time to go back to the prompts.
+It's a time to iterate, experiment, explore, and improve the output until it's consistent with your
+objective.
+--- Lecture 5 ---
+Well, I hope that you found that interesting and fulfilling and that you're not thinking, oh, I could
+just do that with ChatGPT.
+But you realize how easy it was to apply GPT calls at multiple GPT calls, something of an agentic workflow,
+arguably to achieve a commercial purpose.
+And with that background, it's time to talk about business applications of what we just did.
+We we basically we took what we'd already done in day one.
+We extended it to make a couple of LLM calls and generate a document consistent with an objective.
+And it's something that that obviously it's a springboard.
+It's something that we can use to do bigger, better things.
+It's simplistic.
+I do I do say I do understand.
+Um, but generating content like this based on synthesizing, collecting some data, understanding it,
+synthesizing it, and generating an output that that kind of of use case is so common and can be applied
+to any kind of business, whether it's writing a blog post, whether it's generating a product tutorial
+based on a spec, whether it's creating email content.
+There are so many things that you can do with this to take it further.
+And so that that is the challenge for you.
+Think about how could you apply synthesizing information and generating content to your business, or
+perhaps a personal life problem that something that pain point that you'd like to fix?
+Rather like the student I mentioned before, and try making a proof of concept prototype using the notebook
+using this way.
+I know some people are very keen to move straight to Python modules, but I would.
+I would ask you to embrace being in the notebook, embrace being a scientist, experiment, explore,
+tweak.
+It's a different mindset and it doesn't come naturally sometimes to people who are more familiar with
+working in the more of the IDE environment with with Python modules.
+Um, but it's an important mindset and whilst it can feel hacky to start with this willingness to experiment,
+to tweak, to change, to shape.
+It's a different mindset that is super important for getting the best out of AI.
+So take take that mission.
+Apply it to something that matters to you.
+Look in the community contributions folders for other things that people have done.
+There's so many.
+It's amazing.
+And check out some of their implementations.
+Add in your own.
+Do something interesting.
+And uh, and then when you've done it, share it.
+Uh, you can you can see in the guides how to make a PR, a pull request, and then I can merge it into
+the repo so it goes into community contributions.
+Please do keep your change within community contributions.
+Otherwise everything gets out of control for me.
+So so keep it there.
+Make sure you clear notebook outputs so it's nice and tight and and give some good explanation of what
+you've done for other students benefits.
+And I would love that.
+And of course again if you then post about it on LinkedIn I will weigh in.
+I will, of course.
+Thank you.
+And it's a great way to amplify your expertise.
+Show other people all of the stuff that you're becoming an expert in.
+And then there's another exercise for you, too.
+I like giving some exercises.
+Uh, this one is to see the week one exercise notebook that I've got just there, which will give you
+some practice.
+So let's look at what this week one exercise is.
+I want to see your familiarity with OpenAI and Olama to build a tool that takes a technical question,
+which you can just type right here and responds with an explanation of that question.
+So I've got a little couple of hints down below, but use this as a way to call a model so that you
+could retype a question in here, and the model will explain it.
+It will give you an explanation of what that means.
+And that's a tool that you'll be able to use yourself during this course as a way of being like having
+your own AI tutor.
+And you can then experiment with the prompts again, all about the experimentation and you can make
+them better and better.
+And when it answers something, well, you can put that in there as an example of a good answer.
+And if it gives you a bad answer, that's just a poorly explained.
+You could put that in there as a counter example and say, don't do it like this, and this is what's
+wrong with that.
+And the more examples you give, it's multi-shot prompting.
+You'll see that the outputs will get better and better as a direct result.
+So have a stab at the week one exercise.
+You'll also see that there's a solution there should you need it, but you don't need it.
+You've got this.
+Uh, so make that use both, uh, OpenAI and llama.
+Or if you're not using OpenAI, then just llama.
+And with llama, you could try some different models.
+See whether five four gives you better answers than than llama 3.2 or than Quen uh, or even Deepsea.
+So have a have fun with that.
+Use that as a way to build your own tutor, and over time you can make that prompt better and better
+so that it's personal to you and explains things the way that you like to have things explained.
+Uh, and that will be a lot of fun.
+And one more time I wanted to mention the useful resources.
+There's links to the course resources, which includes videos of me yammering away about parameters.
+Uh, that's there.
+My LinkedIn.
+Did I mention I have a LinkedIn account and you can connect with me if you haven't connected with me.
+How have you held out this long?
+How how have you resisted?
+Don't resist.
+Uh uh, connect with me.
+Uh, and then.
+And then, uh, x uh, I'm I'm a little bit of a rookie with X.
+I'm not completely keeping up with it, but but do do do whatever.
+Uh, on on X, follow me, link with me, whatever it is, do that and teach me.
+Tell me what I'm meant to do so that I can, uh, get to use X a little bit more.
+That's probably good.
+Good, good for me to do.
+Um, and oh, and yes.
+And then finally, my editor would kill me if I didn't mention that, uh, the, the way that Udemy,
+one of the key ways that it decides whether to show this course to other people is if the course gets
+rated.
+So if you have time to rate the course, you might of course, you might want to leave it to see maybe.
+Maybe week two will be completely deaf.
+It's not.
+Um, but, uh, whenever you wish, uh, if you are able to rate the course, it makes an enormous difference.
+An enormous difference.
+And I'll be super grateful.
+So that would be a request and appeal that I would make.
+And I will see you back in the slides for the wrap.
+And again, just to summarize the challenge that I have for you or multiple challenges.
+First of all, of course tweak the brochure generator where that data scientist hat.
+Experiment.
+Try different prompts, add more examples multi-shot prompting, try different styles, and then add
+another LM call.
+I didn't mention that a second ago, but.
+But try adding a third LM call that does something different to the brochure, like perhaps translates
+it to Spanish or language of your choice, uh, translated to a different language.
+So you end up with two brochures, the original and a translation of it.
+So add a third LM call to the mix, more of an agentic workflow of a call, followed by call followed
+by call.
+And then the other one I mentioned is find a way to apply this to your business.
+Come up with some analogous kind of challenge that involves distilling some information, synthesizing
+it, producing some output.
+There's so many ways to apply this.
+And then the exercise, the exercise that I can't wait to see you do is to build your own technical
+tutor using GPT five, nano or Llama, or both to answer your questions.
+Work with the prompts, make it be fit for you.
+Make it be something which is personalized so it's something which knows how to answer questions.
+Given your background, knowing what you know and what you don't know, and it's able to really be a
+personalized tutor.
+And the more time you spend on those prompts for you, the better it's going to be.
+The more crafted, honed it's going to be for your situation.
+And and you're building something which has real value for yourself in a way that no other tool will
+be able to because you have complete control over those prompts.
+Those would be.
+That's a challenge in your exercise.
+And then remember put it in a PR, submit it.
+I can't wait to merge it, post it on LinkedIn and I can't wait to amplify it.
+This.
+The best way to learn is by building.
+And with that, you've completed the first week.
+One week done.
+Wow wow!
+I hope that you enjoyed the week.
+I hope that that whether you're a beginner or a pro, there was something in this for you.
+There's there's hopefully lots of interesting stuff at this point.
+You've got the basics.
+The fundamentals of Transformers, tokens, API costs, the, the uh, now also put into that like like
+Multi-shot prompting but but also the, the illusion of memory.
+Uh, you can contrast the leading frontier LMS.
+You can even play a pretty fun game with them, and you can confidently now use the chat completions
+API.
+You can stream back, you can use markdown, you can generate JSON with response formats, and you can
+use the llama.
+You can use OpenAI API to call a llama as well.
+And after next week, it's going to be we're going to be raising it.
+You're going to be able to be more proficient across the different frontier model APIs.
+We will use APIs for OpenAI and Anthropic and Gemini.
+Well, in fact, we can just use the OpenAI API, that client library.
+We'll use that library to access the different APIs you'll work for in a small way towards working with
+agents.
+It's the beginning of it by calling tools, and you're going to implement a customer support agent with
+a chat UI, and it's going to be multimodal and it's going to blow your mind.
+Week two is such a great week.
+I have to say.
+It might be it might be tied for first place with with another week.
+Uh, but it's right up there in terms of how much fun I have with it.
+And, and the thing that we'll really work on this thing called gradio is something that's a huge joy
+for me.
+So I can't wait for week two.
+And I hope you can't wait as well.
+I will see you then.

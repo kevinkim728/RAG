@@ -1,0 +1,1761 @@
+--- Lecture 1 ---
+So look, I've had a haircut.
+I've got myself ready.
+I'm here for business, and so are you.
+Today is week five.
+Day five.
+It's pro day.
+Today is the day it really gets real.
+Not only can you already generate tax code, frontier models, open source models, tools, you can
+choose the right model for the project.
+But you can also already create a rag knowledge worker using Lang chain.
+Using chroma, you can evaluate its effectiveness using a bunch of metrics, retrieval based, and those
+that are based on the actual answers to your questions judged by another LLM.
+And you can experiment with different chunking strategies and different encoders and do it in a quantitative
+way, where you are assessing the results based on how they impact real metrics.
+Okay.
+And now now we kick it up a notch.
+Today is expert day.
+Today we get into Advanced Rag.
+You're going to develop many techniques for how you get more juice out of Rag how you get better outcomes.
+You're going to do hands on experimenting with pre-processing, with reranking, with a bunch of other
+things.
+And at the end of it, you're going to deliver an advanced Rag pipeline with provably strong results.
+Sound exciting?
+It is exciting.
+Let's do it.
+Now, you must permit me to make something of a public service announcement.
+At this point, you you have reached perhaps the the pinnacle of this course today, week five, day
+five is when we're going to get more pro than any other.
+We're going to roll up our sleeves.
+We're going to really get into the thick of it.
+And by the end of it, you're going to know rag back to front.
+And you you might be tempted.
+You might be tempted at that point to to declare victory, to say, okay, I got what I came here for.
+I'm a pro at this point.
+I'm gonna I'm gonna exit stage left.
+And I'm here to tell you, no, no, the next few weeks after today are even better.
+It's not rag.
+It's something different.
+It's a capstone project.
+It's fine tuning, it's a bit of data science, some neural networks.
+It's really great stuff.
+So I just want to say I'm aware of the fact that a few people get through Rag and then they're like,
+okay, adios.
+Don't.
+It's not adios.
+Nope.
+We have to keep going.
+So I've said it.
+And now with that, if you agree, yes.
+Good.
+You agree.
+Then we will move on with the the absolute best.
+Week five day five okay.
+So I this this will be very very quick.
+I you know they say what they say about repetition.
+It's important and all that.
+You get it now you get this.
+But just to really embellish the way rag works is something that's actually really quite simple.
+The user asks a question instead of just forwarding the question to the LM as well.
+You know, we want to look it up in our knowledge base, and we've got this clever little technique
+where the way that we do, like a fuzzy lookup, is by turning the question into a vector using an embedding
+model or an encoder, call it what you will.
+One of those.
+We turn it into a vector, and then the way we find useful content is by looking for similar vectors.
+We look for documents which have an index, a vector index which is close to the vector of the question.
+And you remember, of course, that we we take all of our documents and we break them up into chunks
+where each chunk is likely to be something that will match a question.
+And it's it's retrieving the most relevant chunks that we do with this lookup.
+And then we take those chunks, we shove them in the prompt that goes to the LLM.
+Back comes the answer.
+You know it so well.
+That is all there is to rag.
+And I wouldn't be doing my job if I didn't do one more recap on the thing that matters the most evals
+I geeked out on them yesterday, but but I don't.
+I don't take it back.
+I'm I'm happy that I did.
+I think it's so important.
+There's a lot about working with with, with llms that can feel like voodoo.
+It's just a lot of guesswork and and it can feel very hand-wavy, very rough.
+And the way to to make it scientific, the way to make it bulletproof, is to come up with robust metrics,
+ways to evaluate the performance of your model and then to run experiments.
+And we discovered that the first step is curating that perfect test set with with golden questions and
+reference answers.
+And then to calculate metrics related to how well are you retrieving documents.
+We talked about MRI ndg precision and recall.
+And then we also had like the amount of the number of times that the keywords match as a similar concept
+to recall and then measure the answers themselves, the quality of your answers.
+There's lots of ways of doing it.
+LM as a judge is a really good one, and that's what we did yesterday.
+And just to remind you for a second about these different metrics, MRI, that's the go to one that
+is saying, okay, so supposing that in all of our cases, the top the top chunk that got surfaced was
+a hit, then that would be an MRI of one.
+It's all about what is the location of the first chunk that was a hit.
+If the if the first one, if it was always the first one, then it's one.
+If it was the second one, on average, that would be a half one over two.
+If it's the third one, it would be a third, the fourth one it will be a quarter.
+It's the inverse rank on average of the very first successful chunk, which which is a match for a keyword.
+So that's MRI.
+Super common, really tangible, easy to explain, easy to understand.
+And HCG is a bit more perplexing.
+But essentially you're just trying to to recognize how well distributed were good chunks was was good
+contact in all of the chunks that you surfaced.
+So supposing that you surfaced ten chunks and there were only three good, good hits in there, and
+those three are in locations one, two and three, then that's great.
+That's perfect.
+That would be an ndcg of one.
+If they were further down, it would be a lower ndcg.
+And the way it works.
+It's a formula.
+It looks at the sort of distribution and it penalizes you a bit if you have a hit that's further down,
+but it penalizes you in a way that has a log in the in the denominator.
+So it's not too much, it's just a bit.
+And you can look through the formula to get a bit of a better sense for it and, and get a sense for
+what does it look like as, as things get distributed further down and it's called normalized, it's
+ndcg because once you've calculated this, you divide it by what's the best score this could have been
+if supposing there were three good hits, if they were in locations one, two and three, divide by
+that such that a perfect answer would always be one.
+And that's why it's called normalized.
+And then you add that up across all of your data.
+So that is MRI and DCG very common stats.
+But MRI is the most common one.
+And now precision and recall.
+Do you remember them.
+Very commonly they science precision and recall.
+And in rag recall is more important where normalized data science precision is the first thing you look
+at.
+So can you remember the difference between recall and precision.
+What?
+What is it?
+It's kind of subtle.
+It's a bit confusing the first time you hear it.
+I'll give you a second.
+You can put me on pause.
+You can say it out loud because I can hear you wherever you are.
+Okay, okay.
+I'll put you out of your misery.
+Or maybe you know it well.
+So recall is when you're thinking about the the proportion of the tests themselves, the proportion
+of the times you tried to do a rag retrieval, how frequently in in the top k in the top three, let's
+say how often in the top three.
+Did you, did you get a hit.
+So if you if you ran 100 tests, how many of them are say, say in 50 cases?
+Something in the top three was a hit.
+That would be 50% recall.
+So recall is the proportion of the retrievals.
+Precision is about saying what proportion of the k of the chunks focus on the chunks themselves, what
+proportion of them are good, and how often are you surfacing stuff?
+That's that's not good.
+That's irrelevant content.
+That is precision.
+How precise is your ability to retrieve context?
+So that's the difference between recall and precision recall against the proportion of tests where relevant
+context within the top k.
+And we actually looked at a similar kind of metric about keyword coverage.
+But it's the same kind of thing.
+It's about how often in your tests you're able to surface important stuff.
+Precision is more focused on what proportion of what you surface is useful, and precision is more trying
+to penalize you.
+If you're surfacing a lot of irrelevant content, which is not going to be useful for your for your
+rag case, it's less important because typically Llms don't don't care too much if you're giving it
+lots of irrelevant stuff as long as the relevant stuff is there.
+So.
+So, uh, that's why, I mean, it's better not to waste context window with lots of irrelevant stuff,
+but it's not as important as recall in this case.
+And keyword coverage that we looked at is really great for the kind of testing we were doing.
+Okay.
+That's a that's a good recap.
+I know you've got this.
+You understand it.
+Let's go pro.
+--- Lecture 2 ---
+So as a rag really took off, like I guess a year ago now, a year and a half ago, there became this
+cottage industry of rag techniques, of things you can do, involving rag to make it better.
+And a lot of terminology developed around these techniques.
+There's so many different terms and words and they all sound very scientific.
+And in my mind it's it's all a bit of a pseudoscience.
+And I do want to I do want to make that clear to you.
+These terms in my I see them as trying to formalize something which is extremely hacky, really very
+experimental.
+It's kind of try this and try redoing this and and try organizing this all to work around the whack
+a mole that I mentioned, where you do something and it's not quite working.
+And you're like, all right, let's, let's try this, let's, let's chunk differently.
+Let's do this differently.
+Let's try this differently.
+Each of them are different experiments.
+And I very frequently get questions from students saying, which one of these different Rag techniques
+applies to me?
+Which one should I try?
+And you know that people like to say in, in the business that there's no such thing as a bad question,
+that all questions are good questions.
+But I'm here to tell you that, no, I'm not one of those people.
+I think that is a bad question.
+And I will say it because, as you know, I'm going to say it's a bad question because there are no
+magic answers.
+I can't tell you that reranking is what you need or that you need this encoder or something like that.
+The answer is set a metrics, set your evals, run experiments, and find out there is no shortcut for
+experiments.
+These.
+This is a pseudoscience.
+These are not like real uh, architectures or something like that.
+These are just different experimental things to try and different types of business use case and different
+data sets will tend to do better with different techniques.
+And, and the only thing you can do is try it and see and test it with evals.
+So I'm going to rattle off ten techniques.
+And no doubt I won't mention some of your favorite techniques.
+Don't hate me for that.
+You can Google any of them or look them up.
+They're all sort of cut from the same cloth.
+Many of them.
+But the first one is one that you already know about.
+We already did it, which is R&amp;D on chunking, experimenting with different chunking strategies.
+If you look, for example, in Lange, in that package we were playing with, there's tons of different
+types of text splitters and sometimes called splitters, sometimes called chunkers.
+You can you can play around with them all.
+They have different parameters changing, changing which one you use and changing the parameters and
+experimenting is a terrific thing to do now.
+It's always good when you're doing this if you're not just guessing, even though I described it as
+like trial and error, but you're doing so in an informed way.
+Like typically you find something that's not working with your rag process, something that is that
+is causing bad answers.
+And then you try something like changing your chunking strategy in order to fix that problem.
+There's a certain amount you can also do just sort of exploration of R&amp;D, just trying different things
+and see what happens.
+But it's usually good to have a particular problem or a hypothesis that you're trying to solve or improve
+by changing chunking, and then you can measure it and see what happens.
+So that's chunking R&amp;D and very similar.
+You probably knew I was going to say it is encoder selecting the best encoder model based on your test
+set and based on your business objective.
+People often ask me about about images.
+There's there's quite often you want to ask questions with a knowledge base that's not just got text,
+it's also got images.
+And there are different strategies.
+There are indeed encoders that are good at both taking images and text and mapping them into a consistent
+vector space, and you'll find them in sentence transformers.
+If you look on their documentation and hugging face, you'll see that they have models designed specifically
+for that.
+But I have to say that I, I do tend to find them, uh, hit and miss.
+And there's a different, more boring strategy where instead you first use a model to, to to write
+something, to write a caption for the image in a way that's most likely to be something that a question
+would match.
+And then you vectorize that text because it's more likely that you're going to be able to map an image
+to the right query and then query on it, in my opinion.
+But it really depends on the use case.
+And of course, the you shouldn't trust my opinion.
+You should try it and see if that's what you're working on.
+So using encoders to to try different types of document uh, that that is a big part of your advanced
+Rag toolkit.
+So I'll say one more thing here as well.
+People often ask me about things like PDFs and and word documents and things like that about, okay,
+so how do we vectorize that?
+Uh, and again, I would probably say the same thing.
+Uh, I would say, first of all, that there are some models that are that are meant to be, for example,
+good at, uh, at trying to encode a PDF, but I wouldn't recommend it that it's a binary object and
+it's not designed for that.
+I would say instead use something which converts the PDF into markdown and then vectorize the markdown,
+which is something that models are trained with lots of.
+And you know what?
+I would not use an LLM to turn a PDF into markdown.
+That that is a horrible abuse of using Llms.
+It's not what they're good for.
+You know what is good for that Python code?
+Remember, we were software developers once.
+There's plenty of libraries that you can pip install or you've add in our case that are fantastic at
+parsing PDFs, and you can convert them to, to markdown or to just to text or whatever makes sense
+for your business case.
+Converting between different file formats is a solved problem.
+You don't need an artificial intelligence to do it for you.
+You can do it with Python.
+So and you should.
+So that's that's what I would recommend.
+In that case if you've got different file formats, I would recommend use software to convert it to
+something that's going to work well for an LLM, potentially run it through an LLM to turn it into something
+that's really good for querying and then turn that into a vector.
+Okay.
+And enough on encoders.
+Let's move on.
+Next up is an obvious one really, in working on your prompts, it sounds.
+Sounds too obvious to even be mentioned here as an advanced technique, but it makes such a difference.
+And people often ignore the obvious as they as they drill into lots of complicated sounding rag approaches.
+But just remember that that rag is about providing relevant context, and there's often static, relevant
+context that you can put in every prompt that gives basic information.
+And it doesn't matter to waste a few few hundred tokens or whatever every time.
+It's not material amount of money, especially if it's getting you really good contacts.
+So develop good prompts that you can think of as like a fixed context, and do the standard tricks like
+being sure to put the current date in there.
+Why not?
+If that's going to help it in some way to to understand what you're talking about, any relevant context
+and conversation history and working on that properly, just working on the prompts can make such a
+difference.
+It's hardly an advanced technique, but it's one people often forget.
+Okay, this one is an advanced technique.
+So document pre-processing this.
+This is about saying, okay, when we're when we're taking our documents and we're about to put them
+into our, into our vector data store, maybe first we could rewrite our documents in a way that is
+going to make them more suitable for the data store.
+For example, if we had like a table of ticket prices that for traveling from one location to another,
+it's just like a table of numbers.
+When you turn that into a vector, it's not going to be very good because it's just going to be like,
+this is a table of numbers.
+But if you first put it through an LLM and said, hey, here's a section of my knowledge base, can
+you rewrite this in a format that's going to be most suitable for querying?
+Then it can do a fantastic job of turning that into text, which is going to match a vector lookup.
+Uh, so so this is a really great trick.
+A very similar is something I didn't actually mention with number one, which is when you're chunking,
+there's a type of chunking called semantic chunking, which is when you chunk not just based on like
+randomly breaking things up into different sections, but based on the meaning of each each block of
+text.
+Trying to divide up your your page in a sort of meaningful way, such that your document is broken up
+into different chunks that reflect maybe the different stages of someone's career or the different facets
+of a product or something like that.
+And so semantic chunking is a very powerful chunking strategy.
+And there is in fact a semantic chunker that I think comes out of the box with with lang chain in the
+experimental package.
+Uh, but but even easier is to do that as part of number four, do that as part of document pre-processing,
+pass it through an LLM and say, hey, here's a document.
+Can you please break this into meaningful chunks that make sense from a from a meaning point of view,
+so that questions will will relate to 1 or 2 chunks, and then rewrite them and carve them up in a way
+that's going to be best for a knowledge base.
+So that's really sort of one and four put together.
+That is a pro technique.
+So that's document pre-processing sometimes called documentary writing, it's a real go to one.
+There's a flip side that's called query rewriting, which is much the same thing.
+When the user asks a question, the user asks a question.
+Maybe that question isn't exactly right for doing a rag based lookup, or maybe to a point to a problem
+that we face before a couple of days ago.
+The question might be a follow on question from something earlier, and to do exactly the right lookup,
+you might want to kind of combine that with what we've said before in some clever way.
+And that can be really hard to do with code.
+But guess what?
+Llms have an easy time with it.
+So use an LLM, call an LLM and say the user has asked this question.
+Please rewrite this in a way that's going to be most suitable for querying a knowledge base, and it
+can make a fine job of it.
+And you can pass in the history and have it do something that reflects the context of the question as
+well.
+So that is called query rewriting.
+It's also sometimes called query pre-processing.
+And that along with document pre-processing those two are a powerful pair.
+--- Lecture 3 ---
+I know it feels like we've been on this slide forever, but it's such an important slide.
+Ten Juicy techniques.
+Number six.
+Query expansion.
+This is this is one that a lot of people use.
+This is just saying.
+Oh, okay.
+Look, um, um, we could we could, uh, add to step five.
+Don't just ask the model to write one query.
+Ask it to write a bunch of them, a bunch of things that we could call our database lookup for.
+Let's have three different Rag queries and collect similar documents for each.
+That's called query expansion.
+Super common.
+And then Reranking Reranking is saying we might have ended up with lots of different chunks from our
+data store, particularly if we've done number six query expansion, we might have a lot.
+We will have people like to say we have k times n, you have k the, the, the, the amount that you
+retrieve every time times n the number of queries you've got a potentially a bunch of chunks.
+Well, we could then take all of these chunks and try and reorder them in terms of the ones that's most
+relevant for the question at the top and all the way down to the least relevant for the question.
+And how are we going to do that?
+Well, we could have an LLM do that.
+We could call an LLM and say, you're not responsible for answering the question.
+Someone else is going to do that.
+You're responsible simply for ordering these chunks in order of most important to least important.
+Do that step.
+And then potentially we might chop off some of the unimportant ones when we finally send it to an LLM
+to actually craft the answer.
+So that is reranking.
+Again, super popular.
+And you can imagine, particularly if you've done some of the previous steps, Reranking can be really
+important to avoid polluting the context with tons and tons of chunks.
+Okay.
+Number eight, we're on the home stretch hierarchical rag.
+This is trying to fix a particular Achilles heel with rag that I mentioned before, which is that rag
+is really bad at answering questions which span lots of documents.
+It has a really hard time with that.
+And so there are some, pretty simple, uh, hacks that try and get around this.
+And one of them is to summarize your knowledge base at various levels of roll up, like a hierarchy,
+have a kind of a summary of all products, a summary of all employees.
+And then when you do your Rag lookup, do a Rag lookup across the summaries first to get the kind of
+coarse grained information and then drill down to to chunks that come from the fine grained information.
+And that means that if, for example, you could have an employee summary document that lists all employees
+and their salaries in one condensed document.
+And that way, if someone asks a question like how many employees have a salary of under X, then hopefully
+that chunk with this compressed data, this summarized data about salaries would be surfaced.
+And so the the the Rag, the LLM would have a hope of answering it otherwise.
+Without that, it's impossible to answer.
+Uh, how many of kind of question because it would require chunks from so much of the knowledge base.
+So that's a pro move hierarchical rag.
+And you can probably tell like it is very hand-wavy, very hacky because you could roll up in one way,
+but that might not be aligned with the question that someone asked.
+They might ask a question that's like how many documents starting with a letter A do you have?
+And obviously you haven't you haven't figured that one out.
+You haven't put that in in some hierarchy, uh, by by alphabet.
+So, so, you know, it's it's always a whack a mole.
+It's always someone asks a question that spans your documents.
+You don't have a good answer to it.
+So you think about a new hierarchical summary document that you could slip in.
+And that's that's the point of hierarchical rag okay.
+And we end with two fancy ones that people love to talk about.
+One of them is Graph Rag.
+Graph rag.
+It's actually it's it sounds really, really fancy, but it's a fairly simple idea, which is that often
+the documents in your knowledge base aren't isolated.
+They have some relationship with each other.
+So like an employee might might have a boss, a manager, which is another employee.
+So you could really think that that your documents frequently or even your, your chunks are related
+to other chunks.
+And when you're doing your your rag query, if, for example, you remember there's a metadata associated
+with each chunk, if we'd been careful in that metadata to specify other chunks that are related could
+be as simple as other chunks in the same document, or it could be something like the chunk associated
+with a boss or something like that.
+Then.
+Then when you look up that chunk, you could also then shove in the context the related chunks that
+are kind of one hop or two hops away in the in terms of these relationships that you've recorded in
+the metadata.
+And of course, taking it a step further, as you probably guessed, I was going to say there are special
+databases called graph databases like Neo4j's and many of them that are specially designed to store
+Information as as nodes with edges.
+A way to think about things in terms of relationships between entities.
+And if you store it in a graph database like that, then it's even easier for you to find a chunk that's
+close to a vector, and then include that and include all the chunks that are the sort of 1 or 2 neighbors
+away in the graph database.
+So it's a trendy thing to do.
+It tends to work only in reasonably.
+It tends to work well only in quite specific situations where your data does have a lot of relationships
+between it.
+And I would argue that most of the time you can handle this just by using the metadata.
+The need for a graph database, trendy though they are, are not as huge unless you very specifically
+got a problem that lends itself well to that kind of relationship based database.
+So definitely one to watch and potentially experiment with.
+Uh, but but uh, yeah, it's it's quite a fancy one.
+And then last but not least is a gentic rag.
+You may have heard of it.
+What is this?
+Well, it's it's a different way of thinking about it.
+It's much the same stuff.
+But what it's saying is, look, we've designed this, this very linear idea that the user asks a question.
+Then we go and do a vector based lookup.
+And we always shove that in the context.
+And then we call the LLM.
+Well that's a bit you know 2024 whatever.
+It's you know, things in ancient history is 2024 these days.
+Uh, it's a bit 2024, uh, that nowadays the way that we like to, to think about things is, is let
+the LLM make the decisions.
+So instead of just doing a vector lookup and putting all that in the context, call an LLM and give
+it some tools, give it a tool that could do a vector lookup based on a query, maybe give it some more
+tools, like a SQL tool that can run SQL on a database, or if it's the files that we've got in our
+knowledge base, just do a string lookup in the files if it wants to give it access to a bunch of tools
+and then call this like your retrieval agent or something, and then say, here's a user question.
+Go to town, go and figure this out.
+You can come up with your queries, you can make your vector lookups.
+And you can also do a SQL query.
+You can also look for ticket prices by by calling this API.
+You can do all these different things and use this as your way of retrieving context.
+Now in large part it is it is equivalent to some of the steps before, uh, if you just give it a vector
+database then it's going to call back.
+It's very similar you can imagine to doing query expansion, query rewriting and then query expansion,
+and then it's running the queries and then it's basically reranking because it's going to figure out
+which ones matter.
+And that's what will eventually be used to answer the question.
+So it's doing the ones before number ten.
+Number ten is about doing the ones before it, but letting the LM decide which to do and in which order.
+And potentially it can be in a loop so that if it does a few of them and it's not getting results,
+it can keep going.
+So a genetic rack has all of the great things and some of the caveats about working with this kind of
+more, more flexible approach.
+It can be very powerful and get answers where you've not been able to get them before, because it can
+keep working at it.
+Keep experimenting until the model decides to stop making tool calls and then it satisfies.
+But also it's of course, less predictable.
+It's harder.
+You can put metrics around it and measure it and get good results, but then you could run the same
+thing tomorrow and get bad results and that would be horrible.
+So, you know, it has the downsides in terms of repeatability, robustness and so on that you often
+find with these more what we call autonomous kind of kind of approaches.
+And if you're interested in more about this then of course my agenda course covers some of this.
+In the last week we have a graph based uh, memory, along with uh, also a vector based memory as well.
+We cover that a few times that that is the sort of that the new agentic approach to doing the same thing.
+But but very much keep in mind that it is still in large part carrying out many of the previous steps
+on this list, just doing it through tool calling rather than through R code orchestrating step by step.
+Finally, I will end this slide.
+I know I've been on this slide for 20 minutes.
+I'm going to end this by saying a lot of people are saying that rag is dead.
+You hear that a lot.
+You see lots of memes on this.
+And there's typically two different reasons for this.
+People come at it from two directions.
+One of them is that rag is dead because context windows are so big.
+Now that you can put all your knowledge base in a context window and let the transformer use attention
+to figure out what's what's relevant, that's surely the best.
+That's one reason people say that rag is dead.
+And I think that's that's, uh, that's nonsense.
+Because, uh, sure, you could say that, but but clearly there are going to be cases when your knowledge
+base is much, much, much bigger, like in week eight of this course, when we're going to have a monstrously
+large knowledge base.
+And okay, maybe you could put all that into an LLM call, or maybe you could carve it up and make many
+LLM calls, one after another and then another one to judge it.
+But wow, that's not going to be an efficient use of time.
+At the very least you could get down to you could throw out 90% very easily with some kind of a vector
+based search or any other, uh, on this list.
+So it just seems to me that however big the context window gets, this, this kind of approach to try
+and remove irrelevant context is always going to be important.
+But the other reason people say that rag is dead is because of number ten, because of a genetic rag.
+Now that we have agents, this kind of of pipeline where you do a vector based lookup and then you surface
+relevant content, that approach is kind of old school.
+The new approach is to equip an agent with the ability to, uh, to itself decide how to dig into the
+data to do the research itself using any of these techniques and figure out how best to retrieve relevant
+context and then answer the question.
+That's a super interesting point.
+But my answer to that would be, uh, predictably enough, you knew I was going to say long live, right?
+It's such a familiar trope.
+Uh, but the reason I say long live is that come on, that's just rag by a different name.
+Sure, you could call it a rag and sound like you're so modern, so fashionable.
+But but okay, it's still vector based or encoder based retrieval of relevant context.
+Or maybe you're using a graph database.
+Whatever you're doing, you're using techniques to retrieval techniques to augment your generation from
+an LLM.
+And so it's still retrieval augmented generation.
+It's still rag even if it's rag, whatever it is, by whatever name you choose to call it, as far as
+I'm concerned, that's still rag.
+Long live rag.
+--- Lecture 4 ---
+Okay, so there is the zoo of different rag techniques.
+There are many more that you can look up, but these are some of the most common ones that you'll come
+across.
+And of course we don't we don't have have time to build these.
+So I'm not planning to actually code these.
+Don't be ridiculous.
+Of course I'm lying.
+Of course we have time to code these.
+Not all of them, but we're going to code many of them.
+Uh, and let's go and do that right now.
+But the one little extra surprise I have for you, we're going to code a bunch of these now, uh, the
+probably the most popular ones, but of course, we're going to do so without Lang Chain.
+I wanted to show you that building rag without Lang Chain is pretty much.
+It's also very easy.
+A little bit more code, but not much.
+It's good for you to know so that you know how to build Rag natively if you wish.
+You're not tied to Lang chain, but if you want to use Lang chain, of course you can.
+And it comes with lots of stuff.
+So that's what we're going to do.
+Now let's go to cursor, let's do some building.
+Let's build some advanced features and see what we can do with some rag.
+Here we go.
+Okay.
+Well I'm excited to show you what I've got in store for you today.
+We're in week five.
+We're in the juicy day five.
+This is when we go pro advanced drag techniques.
+No long chain.
+We're going native.
+So you have the most flexibility.
+And so I show you there's nothing much to it.
+We're going to use an LM to divide up chunks in a sensible way.
+We're going to to also have it rewrite chunks.
+And it's going to be semantic chunking.
+That's going to figure out how best to organize the chunks.
+That's that's what we're going to start by as we look at the ingest part of the story.
+Remember there's the ingest and then answering because basically what we're going to do in this lab
+lab day five is we're going to we're going to make some changes.
+And then you remember there's that one directory implementation.
+Implementation is just here.
+It has like answer dot pie and ingest dot pie.
+We're going to copy this.
+We're going to duplicate it and make another version which is going to be our pro version.
+And that's how we're going to do this.
+But first, first we'll do we'll work in the lab.
+Okay.
+So this is this is the kind of setup when I get get myself organized here.
+And I want to point out a few things.
+There's no long chain imports at all.
+First thing to notice.
+No lang chain.
+Nothing.
+Uh, what do we have then.
+So this is directly using chroma chromas open source packages, not lang chain underscore chroma, but
+just chroma.
+The one class persistent client.
+That is what we've got.
+Like a saved database for chroma light.
+LM I'll be using for my, my LM calls, and, uh, that's really about it.
+Okay.
+I've got some constants.
+We're going to be using GPT 4.1 nano for for most of this.
+Uh, and I should point out so, so in total I do a bunch of runs using, uh, LMS and the numbers do
+add up a bit this time.
+My, my, I think I've probably run this once or twice all the way through, and I've spent $0.50.
+Uh, so half a dollar, uh, which, you know, it's it's it's not expensive, but also it's something
+that is meaningful.
+And so I want to tell you about it.
+And if you were to run this several times, it could add up to a dollar.
+Now it's totally optional.
+You can use open source the way you're used to throughout.
+So so hopefully you've got guide nine to help you.
+You know exactly how to use open source all the way through.
+You'll get good results too.
+But I'm using GPT four one nano nice and fast and still good.
+So let's run that.
+Um, you can see I've got a few.
+I'm going to set the average chunk size to be 500.
+Uh, we're going to use the large embedding model that worked well before.
+Again, you can swap this out for the open source model if you'd rather.
+Okay.
+So you remember we used Lang Chain.
+It had a document class A document is something that had metadata and page content.
+I don't know if you remember that when we printed it out, it always had that.
+Well, in order to sort of stay consistent and to take take a leaf out of their book, we'll, we'll
+have, we'll have a class called result.
+I'm not going to call it document, because I don't want to get confused between which one is chain
+and what's me.
+I call it result, but it's going to have the same two fields, and I partly do that so that everything
+else in our other classes can stay exactly the same.
+We don't need to change our eval code.
+We need to change anything.
+But we'll be returning one of these objects instead of a long chain object.
+So there we go.
+I've created that.
+And now we're going to go and define a few more classes as we get into chunking.
+So this here it's another it's another class I'm defining.
+It's a subclass of base model the pedantic base model.
+That means it's just a class that allows us to, to represent some, some object, uh, with, with,
+with in a way that is, has some meaning to it.
+A chunk is something that I'm giving a headline, a summary and the original text, and I'm describing
+what those three fields means.
+The headline is a brief heading for this chunk, typically a few words.
+The summary is a few sentences summarizing the content, and the original text is the original, the
+original source text of the document as it was in the document.
+So a chunk has those three components to it.
+And I've also got a little, little function here called as result that will convert one of these chunks
+into one of these little objects here like a long chain object.
+Okay.
+And I've also got this thing called chunks which is just a list of chunk.
+So this thing here is just a list of these objects.
+And each of these objects can be converted into one of these objects you following.
+Just look it through.
+Look through it.
+If you're if you're not okay.
+Now it's actually time for us to do our loading and chunking.
+Let's try this.
+We're going to do it in three steps.
+Three steps of doing our advanced semantic chunking with LM rewriting without lang chain.
+First we're going to fetch documents from the knowledge base using something just like Lang Chain did.
+Then we're going to call an LM to turn it into chunks by creating these objects.
+And then we're going to store the chunks in crowbar Steps one two, three.
+Let's start with step one.
+Step one is called fetch documents, and this should look familiar to you because this is super similar
+to the fetch documents from the Lang Chain version.
+If you don't believe me, just go and have a look at it.
+Bring them up side by side.
+You can you can right click.
+And I think it's a day two and do a view side by side and have a look.
+Uh, so um, I just iterate through the knowledge base path.
+I look for anything that is a.md file, and if it's there, then I read it in with a file.read and then
+we've loaded those documents.
+Uh, that's the fetch documents function.
+And in fact, I think it's slightly shorter than the version that used lang chains, document loaders.
+So, you know, there we go.
+We've loaded 76 documents.
+We did it.
+Look, Ma.
+No, no lang chain.
+Uh, but you know, I don't mean to diss lang chain.
+I know that lang chains power is not in loading documents.
+It's all the splitters, everything that comes with it.
+We're going to make our own right.
+Now, on to step two making the chunks.
+And at this point, we're going to make another call to an LM to divide up into chunks.
+And I'm hoping at this stage of the course, you're getting a bit more comfortable with calling an LM,
+making an API call as a function like this.
+It's something that should should be kind of becoming second nature to you.
+You have to to build a nice prompt.
+It's all about the prompting.
+So I've got a make prompt for a document function, which is where I would generate a nice prompt to
+use for a particular document.
+So I'm going to say you take a document and you split it into overlapping chunks for a knowledge base
+that I explained, it's from ensure I give the type of the document, I say where it's come from, and
+I tell it to divide it into, and I give it a clue about how many chunks to use.
+And you can imagine some of this has come from me experimenting.
+If I don't say that, it quite often only splits things into two chunks or three chunks.
+If I want more, I have to give it a hint to try and get it to do more.
+Um, here is the document.
+Respond with the chunks.
+So that's that's an example.
+Let's just have a quick look.
+So we have um if I look at documents zero this is an example document.
+Here it is.
+It's products.
+It's all of that.
+So now what happens if I, if I call uh make prompt like this with documents zero.
+What we should see is here we go.
+Let's let's print that so we see it a little bit nicer print.
+Uh, there we go.
+And here you see it.
+You see, you take a document, you split the document in overlapping chunks for a knowledge base,
+blah, blah, blah, blah, blah.
+And here's the document, okay?
+Just what you expect.
+We can we can have another function make messages that will call that and put it into one of these lists
+of dicts.
+Uh, again, uh, I hardly need to do this.
+I'm sure you're comfortable with this.
+I can do make messages, document zero.
+And look, we get user content.
+There is the user message.
+This stuff is old hat for you.
+You're like, yeah, yeah, yeah, I get it.
+Okay.
+And now process document is the thing that's actually going to do the work.
+So first of all, I call make messages.
+The thing that I just did.
+What I'm now going to do is call light LMS beautiful completion function, which is just the really
+very similar to OpenAI completion create.
+It's just it's a shorthand and it means you can pass in any model you want.
+But I'm also using this thing called structured outputs that I planted a seed with you before.
+And I told you that we're going to come back to this in week eight.
+And I realized probably also in week six.
+So so you're going to see this a few times, but this is just one more chance to see a little bit more
+with this.
+When you're doing structured outputs you give it a response format.
+You pass in this thing here.
+Response format is chunks.
+And what is chunks?
+Well look chunks is the class that we just defined up here.
+Remember.
+Where is it now.
+Here it is.
+Here it is chunks is this thing.
+Chunks is a list of chunks.
+And a chunk is a headline, a summary, an original text.
+So when we do it this way, We are forcing the model to respond with a particular type of JSON that
+is going to fit this schema, and it's going to allow light LM to return a bunch of these chunks.
+And we will then finally going to call that.
+As result, we're going to convert each of these chunks into a result object, which is the object that
+looks very much like a Lang chain document.
+It looks just like it.
+You're like, are you are you getting this?
+Well, hopefully you will.
+What I'm going to do now instead of make messages, document zero I'm going to call this process document
+function.
+And let's see what comes back.
+It's calling an LM right now.
+It's using structured outputs to require it to meet this spec.
+And look at what comes back.
+We get back four chunks there in the form of result objects.
+The result objects has two things a page content and a metadata.
+The page content looks to me like it's a bunch of page content, and the metadata at the end has a source
+and a type.
+So it's working really nicely.
+Process document is able to convert a document into chunks.
+Beautiful.
+Okay, well then surely the next step is to have create chunks.
+Uh, create chunks is going to take a set of documents and it will just loop through the documents and
+it will, uh, add them up.
+It will accumulate them in a list called chunks and it will return that chunks.
+Now, you see this thing.
+Are you wondering what that is?
+I could just say for doc in documents that would be more expected.
+Right?
+That's what you're used to.
+Uh.
+Is this little important, super important, uh, data science utility that you see an awful lot?
+And tiki tqdm is just something which puts a little status bar on whatever list you're iterating over,
+whatever list you're iterating over, it will automatically put a little progress bar as it iterates.
+Uh, which is so convenient.
+So you see tqdm all over the place.
+And if you're wondering what that is, it's making a little progress bar.
+And when you see those progress bars, you see them whenever you're doing hugging face things.
+We've probably come across them a bunch before.
+Uh, that is what you're doing.
+So what I can now do is I can say chunks.
+You probably saw I just it was there, I deleted it, and cursor puts it back.
+Chunks is create chunks of all of our documents.
+Let's run this and look at that.
+Low and behold, we get a nice little status bar showing.
+It's now going to go through.
+It's going to be calling, uh, GPT four one nano again and again, each time for each of our 76.
+Is it 76 documents, I believe?
+Uh, and each of our 76 documents is going to be turned into chunks, scrolling all the way up to remind
+myself how many documents we have.
+But I'm sure you.
+There it is.
+It is 76 documents.
+Uh, they are all loading.
+They're all getting chunked.
+And when I see you for the next video, we will be the proud owners of a bunch of chunks associated
+with our documents.
+See you then.
+--- Lecture 5 ---
+Okay.
+Success!
+It's finished 100%.
+It took almost ten minutes, so it wasn't.
+It wasn't exactly zippy, but it was very easy to do.
+Let's have a look.
+We have precisely 400 chunks.
+Uh, I've run this a few times.
+I don't always get precisely 400 chunks.
+I think it's a coincidence, but there we go.
+That's nice.
+Uh, and, uh, although it was slow, it was very easy.
+And that was step two.
+Step three, you remember, is just to save these embeddings.
+So we're no longer using lang chains.
+So we're now just calling chroma direct.
+And it turns out that's pretty easy.
+We we just call the database like this.
+Chroma is persistent client.
+This is the same as before.
+If the collection exists delete it.
+And then uh, we're going to get all of the texts chunked up page content for chunking chunks that collects
+all the texts.
+We will create embeddings by calling OpenAI embeddings create.
+It's nice.
+Now we're doing the code ourselves rather than just going through like the retriever, we we we very
+clearly separate the database from the encoding.
+So this is where we are clearly calling OpenAI.
+To turn this into vectors.
+And we collect those vectors.
+And then in chroma we've got our collection.
+We now simply add to the collection the the vectors, the texts and the metadata.
+And it's done.
+That would be the create embeddings function.
+Calling the encoder and calling chroma direct no longer lang chain gluing them together.
+And now we run that off it goes.
+It's now going to chroma.
+It's putting 400 vectors in there.
+And it's been done.
+The vectors have been created.
+We've got 400 vectors in chroma.
+And well I guess that's, that's that's it.
+Then we can go home or or can we go home.
+Have we, have we forgotten?
+Have I forgotten something?
+I'm not talking about actually doing the question answering.
+Of course, we also have to do that.
+But before any of this, we don't know that these 400 vectors are in chroma.
+We don't know they're there unless we can visualize them.
+So it turns out it's basically exactly the same code as we had before.
+We do the same thing to gather the vectors, the documents, the metadatas, and make colors.
+And then we used t-SNE, just as we did before t-SNE.
+Do you remember it stands for T-distributed Stochastic Neighbor embedding.
+Uh, and we use t-SNE to, uh, reduce it down to two dimensions and plot it in a picture.
+Here it is.
+I love these pictures.
+And that's pretty nice.
+We've got a nice cluster of greens, a nice cluster of yellows.
+We've got the blues.
+They do seem around here to get sort of stuck into the the contracts, but it does appear to be the,
+uh, the features.
+Look at that.
+Features and capabilities.
+It's the features part of the contracts that are more over here with the, the products.
+But it is interesting that products and contracts do do seem to be like on each other like that.
+Uh, but it's still very cleanly separated.
+I'd say that visually looks like a good improvement over even what we had before.
+And now?
+Now we will bring it up in 3D because, you know, that's just the kind of person I am.
+Uh, up we come.
+We can swivel around and.
+Oh, it's just so great.
+What could be better than this?
+You could just leave me now.
+You could.
+You could fast forward the video, like an hour and see me still going.
+Ah ha ha ha.
+Um.
+So spend the time, you know, enjoy browsing around this vector space.
+But this is the difference, of course.
+Keep in mind is that now each dot, the 400 dots don't just represent taking a document and like, striking
+them in various places.
+But we have we've used an LLM to decide how to divide them into chunks.
+And we've also written little summaries associated with each one.
+That's that's what we've added to the mix to make it something that's going to be really good at, uh,
+at, at answering questions so that that is success in our vector data store.
+That is the ingest part of it.
+And now we move on to the the retrieval that the, the question answering part of this the answer.
+So we're going to do some reranking that's very trendy.
+And we're going to do some query rewriting as well to mix with our document rewriting.
+Uh okay.
+So first of all we're going to create another Pydantic object, another object called rank order, um,
+which is something which is quite simply a list of integers.
+That's all it is called order, a list of ints.
+And it is the order of relevance of chunks from most relevant to least relevant by chunk ID number.
+That's what this is.
+That's a new class called rank order.
+And why do we have that?
+Because we want to write a function called rerank.
+And again this is another chance for you to see a simple function which is making an LLM call packaged
+together.
+Now we're going to make a prompt, put it into messages in the OpenAI style.
+And then we're going to use lighter LLM.
+But you could directly call use a call to an API, to a model to carry out an action.
+And again I'm going to use structured outputs.
+I'm sewing quite a lot of seeds here on this.
+I was thinking I'd just give you a hint on it, but you're basically learning structured outputs.
+Uh, we're doing that as well.
+So the system prompt, you are a document ranker.
+You're provided with a question and a list of relevant chunks.
+The chunks are provided in the order they were retrieved.
+It should be approximately by relevance.
+But you may be able to do better.
+You must rank the provided chunks by relevance to the question.
+Most relevant.
+First reply only with a list of ranked chunk IDs, nothing else.
+And uh, then then that's the system prompt.
+The user prompt.
+The user is asked the following question.
+Order all the chunks.
+Here are the chunks, and then I list out the chunks with a chunk id and then I that goes into messages
+with a system prompt and the user prompt.
+This is the system prompt.
+This is the user prompt I know you get it.
+And then finally we call light LM.
+We call completion the same as OpenAI or ChatGPT completions to create, we call completion.
+We pass in the model, we pass in these messages that I just created right here and here.
+This response format, this is structured outputs.
+This is where I say you have to reply in this format.
+It's told that it has to create JSON that meets this spec.
+Uh, and so then we get response message content and we turn that into a rank order object.
+And what I can do I can just add in here print order, I'll print that out so you see what it looks
+like.
+And then this is just some fancy python.
+This is pythonic.
+Uh, this is the equivalent.
+This is like saying, okay, so let's say um, let's say uh, result is an empty list.
+And for I in order look at cursor filling in result dot append that we could build up the result and
+then return result return results like that.
+Thank you.
+Cursor.
+But all of this that you see right there can be done in a fancy list comprehension like that.
+And as numpy people here would know, numpy you could use like a super fancy slice thing, which would
+be which would be really nifty.
+But but this is pretty good.
+Uh, so there you have it.
+This is going to print the order and then return the chunks reordered.
+So first of all, first of all, let's just have a simple fetch function fetch context unranked.
+Let's not rerank them yet.
+So this is basically the the alternative not using lang chain just doing retrieval ourselves.
+And we're just going to first of all you remember with with Lang Chain we've got a retriever object
+and we call the retriever object invoke retriever dot invoke.
+And it just does everything for us.
+But but it's not clear.
+Like what's the embedding model and what's Croma here we get to do everything nice and cleanly separately.
+Step one we we do OpenAI embeddings create with the question.
+The question comes in, we turn it into a query okay.
+Step two we go to chroma.
+We query the collection given this query and we say that we want k results.
+That is our retrieval.
+And then finally we are going to uh then then come in and collect the the documents and metadatas.
+And then we're going to return those chunks, we're going to, to um, to, to append that to a collection
+called chunks.
+So little chunks.
+Okay.
+So let's see this at work.
+Uh, let's oh wait, I've got it right here.
+So, so we've got a question.
+Who won the I o t award.
+Do you remember who won the award?
+Maxine won the IoT award.
+Let's see what happens if we do a fetch context.
+Unranked.
+So it's turning it into a vector.
+It's then retrieving it from chroma and coming back with a top chunks like this.
+Uh, so that that all happened, and I just printed out.
+Let's print a little bit more than that.
+Uh, you can see we've got we've got a bunch of different documents that have come out, uh, related
+to this here.
+They all are.
+Um, let's, let's now, um, we'll come back to that, that second question.
+Hang on.
+Let's let's now rerank this let's come in and say reranked is rerank of this question and these chunks.
+So we're calling this Rerank function right here.
+We're calling that Rerank with the same with the question again and with the chunks, the unranked unranked
+chunks that we just got.
+Okay.
+Let's run this.
+Okay.
+It's reranked them.
+And this is the order.
+It reranked them in the same first one.
+And then for three the chunk number two came right down at the end.
+Let's let's print this out and see how it looks for chunk in Reranked.
+So here we go.
+You can see that that career advancement is still the first one that came, but the second one is other
+HR notes that came up to the top there.
+And I'm expecting that probably these two are the two that mention the I t award.
+Well there we go.
+Let's do another one.
+I have got a hard question, a trap, a nasty question that I slipped in there, which is that I made
+Jessica.
+Jessica, you.
+I think she's called Jessica.
+You, uh, has deep down in her HR record that she went to the University of Manchester and we are going
+to now ask a difficult question about who went to Manchester University.
+And we're going to retrieve 20 documents from the database.
+And if you try this question on the prior version from a couple of days ago, you'll find that it can't
+get the right answer from yesterday.
+Go and give it a try if you've still got that running.
+And I hope you do, because we're about to make it better.
+Try asking who went to Manchester University and it will tell you I don't know.
+So now we're going to dig into that and do some reranking with it.
+--- Lecture 6 ---
+Okay, so we're asking who went to Manchester University and we're going to retrieve 20 documents and
+see how we do.
+And I do believe if you do this before we do the semantic chunking and you try it with the prior version,
+it doesn't get it right and it's lower than than ten, the top ten that we pull.
+But as of now, because we've done the semantic chunking, it doesn't do terribly.
+It does bring it back.
+It's the fourth document along.
+And in fact that is that is index four.
+It actually means it's the fifth document along because uh, zero is the first document.
+So the fifth document down in the stack contained the word Manchester.
+Uh, so, uh, it did find it eventually, but it was quite far down.
+Now, what happens if we rerank we call the rerank to reorder things.
+You can see that it's put the fifth document at the top now.
+So now if we get it to say where is Manchester?
+You'll see that Manchester is in the very top spot.
+It was able to sift all of these documents and shove Manchester right up to the top.
+And so let's see what is in the content of this first document.
+You can see that this is about Jessica Liu.
+I think Jessica Yu is Jessica Liu.
+That's right.
+Is the name of the person who was, uh, described as going to University of Manchester.
+So that's working very nicely.
+Okay.
+Uh, then everything else is just going to be so easy.
+Fetch context is just something which will take the unranked version and then rerank it.
+And it's designed to sound just like the fetch context that we had before.
+And now we're really in the end game.
+It's time to to answer the question system prompt.
+You're a knowledgeable, friendly assistant representing the company.
+And sure.
+Um, you're chatting about ensure Elm now.
+I hope you remember one of the points was about improving your prompts.
+And so I thought, well, I should do my own take my own advice.
+So I put in here.
+Your answer will be evaluated for accuracy, relevance and completeness.
+So make sure it answers the question and fully answers it and blah blah blah.
+Like, I'm really trying to hammer at the LMS so that it does a good job in all three dimensions, and
+telling it that it's going to be evaluated is like, uh, you know, hopefully really, really makes
+it focus, pay attention to, to to those objectives.
+And then we give it some context.
+With this context, please answer these as question.
+Be accurate, relevant and complete.
+There's no harm in being repetitive in system prompts as well as in courses.
+Uh uh.
+So and you'll notice that this otherwise is very similar format to when we use lang chain.
+Same same kind of thing.
+I've got like a little tag in here.
+That's my system prompt.
+And, and this, this is the, the extent of it.
+This is the, the thing that's going to turn this into messages.
+Um, I take a question, I take the history and I take some chunks.
+I build my context.
+It's just joining together all the different chunks.
+I call my system prompt format changing, flipping this context field here for the context that's passed
+in here.
+And then I return role system for the system prompt.
+I add in the history and the user for the user's question.
+That makes our messages for our Rag Pipeline.
+Super easy.
+Final rag trick to do is query rewriting.
+One more thing to do, which is one where we take the user's question.
+We don't just take the question as it is, we try rewriting it first to see whether our LLM can do better.
+And so here we have query rewriting Onshow.
+And now you can see something that you're hopefully super used to.
+Now this is just an example of a function that calls an LLM.
+There's no structured outputs.
+This time it could not be easier.
+We describe a message you're in conversation with the user.
+This is the history of your conversation.
+This is the user's question.
+Respond with a single refined question that will be used to search the knowledge base.
+Important.
+Respond only with the query.
+Nothing else you can imagine.
+I had to do this a few times because it kept wanting to tell me more, ask more, follow on questions
+and things, which is not the point.
+So you have to practice and experiment with these prompts and try each one separately.
+And then the code is so simple I'm using light LM again, which is similar to chat completions.
+Create model is the model.
+That's the message.
+And then I return response zero dot message content.
+That's it.
+So that is rewrite query.
+It takes a question.
+It optionally takes history.
+And then it responds with the new query.
+So what happens if we call that with who won the Ieti award.
+We get back something pretty similar.
+Who was the recipient of the Ieti award?
+It's just changed one to recipient.
+But you know, whatever.
+Sometimes it can do better.
+And particularly if there's history, it can do better.
+So now we can turn this into an answer question function.
+This is the other key function we had to write.
+We had to write answer question.
+And we had to write uh fetch content.
+Those were fetch context.
+Those were the two functions that we implemented before.
+So this is the answer question function.
+It takes a question and it takes the history.
+And look at how simple it is.
+We uh we rewrite the query.
+We then get the chunks.
+We make the rag messages, we call completion for the model and the messages, and we return the response.
+That's it.
+That is rag with no lang chain that nothing more than this.
+If you're expecting something that was hundreds of lines of code and lots of rag stuff.
+It's not.
+It's just a few lines of code.
+Rewrite the query, get the chunks.
+Get the messages.
+Call OpenAI, return the response.
+There we go.
+Let's ask it.
+Who won the I o t award?
+And there we go.
+We get Maxine Thompson won the I o t award in 2023.
+It's a response you can see there that happens to be accurate.
+It happens to be complete.
+It's got the last name and it happens to be relevant.
+It hasn't given us any spurious information.
+And you can see that there was some nice reranking that went on.
+Uh, and uh, yeah, these were all the bits of relevant context.
+You can see one other thing that we're going to do when we turn this into code, which is once we've
+done this reranking, we don't need to pass all of these chunks to the final LM, because now we can
+be pretty sure that the bottom ten are going to be less relevant.
+So once we've done this, we might as well chop it off at some point and be more efficient with our
+LM.
+That's one of the cool things about using Reranking.
+Okay, let's, uh, we're almost ready for showtime.
+Let's ask the question.
+Who went to Manchester University?
+Uh, and, uh, we get back the answer.
+Jessica Liu attended the University of Manchester.
+It works.
+It works nicely.
+And, uh, you you can check that it doesn't work before.
+At least it didn't work for me.
+Now, one thing I'll tell you is that this doesn't always work.
+I discovered initially that it.
+That it didn't work.
+It did a bad job of working.
+And to my great disappointment, I discovered the reason that it sometimes doesn't work is because of
+query rewriting.
+Query rewriting sometimes counts against us because when we call query rewriting, it tends to like
+to add the word ensure elm in there.
+It tends to like say saying who from ensure elm blah blah blah blah blah blah blah.
+Even though I added in here, don't mention the company name unless blah blah blah.
+I had to put that in there and it stopped saying that, but it still does sometimes.
+And when it does that, the rag retrieval is less reliable because it surfaces tons of documents that
+are generic documents about ensure elm and not and Jessica's document like goes goes all the way down
+and sometimes it doesn't get reranked up.
+And so it becomes because of reranking it becomes a bit less reliable.
+Sorry, not because of Reranking because of rewriting, it becomes a bit less reliable.
+I hope you're following me here.
+Rewriting the query, unfortunately, has added in more words like ensure elm.
+That ends up diluting the rag retrieval and meaning that the relevant context doesn't get surfaced.
+That's a problem.
+And that that final problem we will also solve in the last step of this, which is now we're going to
+take all of this and we're going to implement it in Python modules in an implementation directory.
+And then we're going to take it for a test drive.
+--- Lecture 7 ---
+Okay.
+I hope you're excited.
+It's the final, final part of the day.
+Five, the final day of Rag Week, and it's all about what we're about to do.
+I have taken the implementation folder, which has two two modules.py and ingest.py.
+Remember them and I've cloned it.
+I've duplicated it to make another one called Pro implementation.
+Did you see that they're already Pro implementation is where we will now go.
+And I've got two things ingest and answer.
+And they are just going to be like swap in replacements so that we can just import a different package
+and everything are our UI and our evaluator importantly should work exactly as is.
+Isn't that cool that that's the whole point of doing it this way.
+So let's start with ingest.py.
+So ingest py.
+It's exactly the same as the code that was in that that notebook we were just looking at.
+I've copied, I literally copied and pasted the code I added in a couple of comments, because I sort
+of feel like you expect me to.
+Uh grouchily did that, but not many comments.
+Uh, because, you know, this is the good Python should should read like English.
+You should just be able to read it and know what it does or I've not done my job.
+Uh, but I've made a couple of small changes.
+One of them is I've added in this thing called tenacity.
+Tenacity is a very convenient utility that lets you, uh, just add a little decorator like that, a
+decorator around a function.
+And if that function throws an exception, it will retry it with a backoff that will, that will, uh,
+get slower and slower, an exponential backoff.
+And it's a common little trick and I'm doing it for handling rate limit errors in case you happen to
+get that.
+So it's a way of making this more stable.
+Now I'm not I've done it in a way where I should I should really be checking to see if it's a rate limit
+error, otherwise raising it in a different way.
+But but I've kept it this way just just for now.
+But you can come in and improve this if you would like.
+Okay, so other than that, there was one other thing I think I made to this.
+We're using GPT four one nano.
+Um, which means that in total this should this should cost about $0.50, I would say.
+Um, but keep an eye.
+Always keep an eye on on the costs as they could change.
+Everything else is the same.
+Make messages.
+I've got the back off here I mentioned, and.
+Oh, yes, the other thing I've done is so simple.
+Again, it's just beautiful.
+Python is.
+It's very, very easy to use something called multiprocessing to have something run across multiple
+replicas of Python.
+Separate pythons are spawned to run a bit of what you're doing in a, in a pool.
+Uh, and all you have to do is say with pool, uh, and then you can do something here where it will
+basically, uh, it will take instead of instead of iterating over the documents, it is going to send
+them off to the pool.
+And they will work on five different different chunks in parallel, making this run five times faster.
+Now, it's possible when I do that, that you might get a rate limit error because I've, I've got an
+ability to, to do many of these.
+But but you might not in which case there's this workers variable.
+This chooses how aggressive it is in terms of how much it hammers GPT.
+I'm going to I'm going to try and go for it here.
+I'm going to put that up to ten and see what happens.
+So that I'm running ten chunks in parallel at a time.
+Um, but that is all that is happening with this ingest, uh, module right here.
+And it just remains us now to try this out.
+So I might regret doing that pool of ten.
+We'll soon find out.
+We go into week five folder.
+We're going to go not into the implementation folder but into the Pro implementation folder because
+we're pros now.
+And do you've run and it is ingesting and it is now going to be spawning ten different Python processes.
+They're all going to be hammering at GPT four, one mini, GPT four one nano, and together they off
+they go.
+And if you're wondering why there's a long pause to start with, it's because all ten of them were running
+in parallel at the same time.
+And now, one by one, each time one process completes, it gets sent, the next one in the list.
+Python handles all of that for you just with that with pool command.
+So easy.
+You can google pythons docs to see how easy it is, and some of you might might prefer to use the concurrent
+features.
+The other way of doing it, and still more of you who've done the Agentic course might want to use async
+code to do it, which is which is even better.
+Um, but is slightly longer than using these kinds of multiprocessing pools.
+Anyway, I was, I was thinking of of leaving it, but it's so fast and I'm prattling away that it's
+probably going to finish before I manage to finish this, but I will.
+I will cut to the next video when this completes in like 20s.
+Well that's cool, it finished.
+It made 534 documents.
+If you're wondering why it was more than than 400, I actually I changed that average chunk size from
+500 down to 100 because it just it tends to prefer bigger chunks.
+So I wanted to try and try and force a few more.
+Uh, but we still we just get 500 documents, but that's still a decent number.
+It took one minute and 20s to run, so it was about ten times faster than when it was running serial,
+which is cool.
+Uh, but you may want to have a smaller number of workers.
+Let me change this back to five, so I don't I don't accidentally check that into the repo.
+Uh, or maybe I'm going to start you off on three, uh, and then if you want it to be faster, then
+by all means, pump that up.
+Uh, if you if you, uh, want want to hammer your machine a bit harder.
+All right.
+That is, uh, that is a parallel ingest pie.
+All that remains is for us to go to the pro version of answer pie, where, again, I made just a couple
+of changes from the notebook version.
+Okay, here we are.
+We're in pie.
+I told you, it's copied and pasted from the notebook.
+Just a couple of small changes.
+First, change the model.
+The model I've decided to go with here is using the open source GPT oss 120.
+So this is the open source model that OpenAI published.
+It's quite powerful.
+I'm doing it through grok.
+And if you don't have a grok account, don't worry.
+If you've got an open router one you can use this through open router.
+Otherwise just uncomment this line here.
+Use GPT four one nano.
+You also get good results.
+OSS actually does better, but they're otherwise they're quite similar.
+All right so we're going to use OSS 120.
+We're going to use.
+Otherwise this is all simply copied and pasted across.
+Again I'm going to use the the tenacity package which gives us this really elegant exponential backoff
+to handle.
+If you get any any problems with rate limiting.
+Otherwise the same system prompt as before.
+Oh, I should mention I'm going to be retrieving k chunks from the database, but I'm only going to
+be selecting the top ten after reranking I mentioned I would do that.
+It's a nice little trick to make sure we don't have irrelevant context going to to the final LM.
+I'm actually going to be giving more than 20, as you will see, for a clever reason.
+We're going to be using another trick.
+Okay.
+Otherwise this is all the same.
+This is Reranking with retry.
+This is makes the the rag message.
+This is the rewrite query also with a with an exponential backoff.
+Very simply rewrites the query to a new query.
+That is going to be hopefully better for retrieving context.
+Okay.
+Now this is this is fetch context unranked exactly as before.
+It takes the query, it collects the embeddings, and it then turns them into chunks and returns the
+chunks.
+That is, fetch context unranked.
+But I have made a change here to fetch context.
+So to dwell on this for a second, because we're introducing another from the from the list of making
+multiple queries.
+Query expansion was the name of it, although we're doing it in a very particular way.
+You remember I mentioned that I had a problem with query rewriting, that it was hit and miss.
+Sometimes it helped us and wrote a good query.
+Sometimes query rewriting hurt us.
+It hindered the process because it wrote a query added in some extra words, like the name of the company
+in Shoreham, and that that diluted the rag lookup and meant that we got some some general content rather
+than specific content for the problem that we were asking.
+And so that was problematic.
+So I thought, ah, it's I don't even know if I want to include this because it makes some numbers better,
+some numbers worse.
+And then I thought, okay, well, that's a great example of when you can use query expansion.
+Don't don't throw out the old query and only use the new query.
+Treat them both as two different queries.
+And so that's that's a great way of doing it.
+So look what I do I have fetch context for the original question okay.
+Well first of all let's rewrite the question.
+rewritten question is rewrite query original question.
+Now we have rewritten question after calling the rewrite query function here that's made that lm call
+okay.
+So then chunks one is getting the unranked from based on the original question chunks to get the unranked
+based on the rewritten question.
+So we've now got two sets of 20 chunks.
+I've then written a slightly janky merged chunks function.
+I bet there's a more pythonic way of doing this that maybe I'll do it before you get your hands on it.
+Or you'll you'll ask me from from doing something that's just like a loop.
+Uh, but anyway, I merge the two.
+And why aren't I just adding them together?
+Because I imagine that often they will surface the same chunks.
+And I think it will be super confusing for the re ranker if it's asked to rank identical chunks.
+So I merge them and throw out duplicates.
+And that is what we rerank and we're rank it against the original question, not the rewritten question,
+but because we're trying to answer the original question from the user.
+And so we say, given that original question, what's the most relevant context for that?
+And that way we ensure that we get the best of both.
+And you know, you can imagine we could take this further.
+We could have the, the the query rewriter not return one rewritten question, but return a list of
+questions of new queries.
+And then we could we could go through each of them and then call the reranking on the complete pool
+of chunks.
+And that would be super powerful.
+And that would be dialing this up a notch.
+And you should do it.
+It will be easy.
+Easy peasy.
+Just just a couple of extra lines here and you'd have not just expanding the query to two queries,
+but expanding it to N queries.
+Uh, and then at the end here, look at that.
+I just truncate everything by final K by the ten.
+So I just take the top ten after reranking.
+So easy.
+Look at all this.
+It's just a few lines.
+Uh, so uh, then, then we end up with answer question.
+And again if you're expecting, answer question to be some big, long, complicated thing.
+Remember this was like 7 or 8 lines with long chain.
+And because of the way I've rewritten this, it's actually incredibly short.
+Look, we we come in with a question.
+We do chunks is fetch the context for the question.
+Fine.
+Messages is make the rag messages given a question, the history and the chunks.
+We then call completion with the model and the messages and we return the response.
+That's it.
+We're done.
+We've just written a complete Rag pipeline with several advanced techniques.
+We've got we've got document rewriting.
+We've got query rewriting, document pre-processing, query rewriting.
+We've got reranking.
+Uh, we've got we've got lots of stuff going on here and we've got now query expansion in the mix as
+well.
+Uh, so, uh, not not to mention semantic chunking.
+Uh, so lots going on.
+Uh, the time has finally arrived.
+This is the moment of truth.
+It's time for us now to bring up the user interface and then the evaluator.
+--- Lecture 8 ---
+Okay, I hope you're excited for our moment of truth, because I certainly am.
+This is the last segment of the last day of week five, Rag week.
+We're going into app dot Pi, which is the user interface, the Gradio UI that Claude built for me before.
+And you'll see at the top here is this line from implementation dot import answer question, which is
+our key function, our business logic.
+Well look we can we've got the same function in our Pro implementation.
+So we should be able to literally just change the package to that and run this in exactly the same way,
+not change anything else.
+And it should just work.
+Let's see.
+Let's bring up a new terminal window.
+Let's go into week five.
+Let's go and do a you've run app dot Pi.
+Let's let's see what we get here.
+I haven't changed anything.
+The user interface looks exactly the same.
+That's comforting.
+Let's start with a good old who is Avery.
+And now it's going off.
+It's doing a query rewrite.
+It's doing a lookups and bam!
+Up has come something.
+Let's see what we've got.
+We've got a big answer.
+Avery Lancaster Co-Founder chief executive Officer of insurer Elm.
+And then here's a table with information about her.
+In short, she's a visionary entrepreneur who founded insurer Elm and has been steering its growth and
+culture as CEO ever since.
+So, uh, tons of stuff succinctly summarized.
+And in this elegant table, this is the the presentation of this is all credit to GPT OSS.
+It loves generating markdown and doing it in a structured way.
+And so you often see this.
+So if you're seeing if you're using for one nano, you might not be seeing it as nicely done as that.
+Over on the right here you can see the chunks.
+There should be ten chunks in here the chunks should be relevant to Avery.
+And you'll see that that within the chunks you'll see that they are semantically chunked.
+They are chunks that each have a piece of meaning.
+And they've got a nice rewritten summary like like this document rewriting at the top, along with a
+little heading that I added to make sure that there's good context associated with each chunk.
+Terrific.
+Okay, so let's try something else.
+Let's try, uh, who won the I o t award?
+Let's see if we can do that.
+And we know what's happening.
+It's query rewriting.
+And it says the IOC Award for 2023 was awarded to Maxine Thompson, senior data engineer.
+And over here on the right, you can see the Maxine Thompson staff.
+And you can see that it's getting all of the right information.
+Excellent.
+And no other employees are listed as recipients of that award.
+It can do this.
+It's working.
+All right.
+And again nicely formatted.
+Let's try, uh, who went to Manchester University?
+The hard question.
+Hard question in there that the previous version was not able to do.
+Let's see how it works.
+Query rewriting Reranking.
+Ranking.
+Everything is happening.
+What answer are we going to get?
+We're getting a long pause.
+Maybe it's a big answer.
+Hopefully it's not going to be, I don't know, at the end of all of this.
+Well, it's certainly thinking about it.
+There we go.
+The employee who studied at Manchester University is Jessica Liu.
+And look, it even said that the record said University of Manchester.
+Uh, and there's some notes.
+And here you can see that the top relevant context is about Jessica Liu holding computer science from
+the University of Manchester.
+See, the way that it's clearly, uh, reframed it the right way.
+So that's excellent.
+It worked.
+It worked.
+Well, the query reranking worked.
+It's the top chunk that got surfaced.
+And so here you have it.
+You should now experiment.
+Use this to ask hard questions.
+Observe that it's able to maintain the history as well.
+Because of the way that we're doing the rewriting and the way we're passing in the full conversation.
+And we have just built a powerful Rag system and it's working great.
+Yes, I know what you want, and I want it too.
+We want to do an evaluation.
+That's what we're here for.
+That's what you come along for.
+So to do that, we just have to make one small, tiny change.
+As I'm sure you're expecting.
+In the evaluation package, there is this eval pie.
+Here is eval pie.
+It runs all of the evaluations.
+We're not going to change any of our methodology for evaluating.
+But what we do need to do right up at the top here is that we do need to make sure that we're not importing
+from implementation, but we're importing from pro implementation.
+And it's the same answer question and fetch context.
+Those two functions, the function signatures are unchanged.
+So it should just work out of the box and observe that that I'm specifying gpt4 on Nano here.
+So we're using the same model for judging.
+So we're not changing the, the the way that evaluations happen because that that could definitely mix
+things up.
+You have to be careful about that.
+So so we are sticking to the same judge, the same evaluation.
+Everything is the same.
+The only thing that's changing are these four characters pro underscore.
+Uh, and yet you and I know that there's a lot behind those changes.
+Okay.
+Um, so with that, uh, let's bring up a new terminal and let's, uh, go UV.
+Evaluation.
+Evaluator.
+Evaluator.
+Sorry.
+Week five.
+First of all, in week five, uh, CD week five.
+There we go.
+And now you've run.
+Evaluate.
+It's hard once you've run evaluator dot pi.
+There we go.
+You see, this is why I don't sit there typing all of this code.
+You'd have to put up with all of that.
+All right, so here we are.
+Well, I hope you have carefully written down in some notes somewhere how this began.
+Uh, I'm going to kick this off now.
+It's not going to be fast.
+As I say, if you if you want, you can update this to use, um, a pool.
+If you're using something like grok, then you'll get lots of rate limit errors if you're not careful.
+Uh, so the safest way is just to have it run one by one like this and go and get a get a coffee.
+Um, I do want to remind you, I've got, I've got, uh, notes down of the very first time we ran this.
+We had an MRI of 0.729298.7298.
+That was where we began in red, and our accuracy was 3.99 in red.
+Um, I didn't I actually haven't got the screenshot of that, but I've got a screenshot of the the best
+that we know.
+This was the one we got when we had biggest chunk sizes.
+We got 0.7475.
+And then this screen I kept of when we ran it after we were using the big embedding model.
+And basically we've got everything in this sort of yellow territory.
+Uh, MRR of 0.7903 um, and accuracy of 4.21 um, and uh, yeah, as I said, the red yellow green was
+just thresholds I set based on like four and 4.5.
+Um, but it gives you a basic sense of how we're doing.
+So this this is where we were before.
+Keep a keep a good careful eye on that.
+This is this dashboard.
+What I'm going to let it do now is run all of this, and then I will kick off, uh, the next one,
+and I will see you for some results.
+Good luck to us.
+Keep fingers crossed for our advanced Rag pipeline and for GPT OS one TB as it carries out our Rag retrieval,
+our evaluations over our curated test dataset.
+And here you have it.
+Great results.
+I'm sure you're expecting good results.
+Here they are.
+We're green across the board for our retrieval 9116, and it's a bit different every time I run it,
+and sometimes I do a bit better this time I think it's on the lower end of what I normally do it, but
+whatever it's, it is what it is.
+No cherry picking here.
+We're in the green 0.9116.
+Compare that to our first run only a couple of days ago, which was 0.7298.
+So from 0.72 to 0.91, that's a big, big change.
+Uh, and that means that we're like almost it's almost as if the first chunk, like nine out of ten
+times, it's the first chunk is the has the content that's needed.
+Uh, and then the this stat is 0.9025 is really, really strong.
+What was that when we when we started out that was 0.7387.
+Uh, and keyword coverage at 96% coverage.
+That was 83.8% when we started out.
+Uh, so really, really cool.
+It's so great to see.
+And then even just just as recently as yesterday, these were our numbers 0.7903.7901 in the yellows.
+So we've really gone.
+We've gone.
+Gone.
+The whole range from red to yellow.
+When we had the better encoder and chunking all the way through to green.
+Now that we've implemented Advanced Rag and it's so satisfying to see this, the raw results, the tangible,
+concrete results of our improvement.
+And yes, I'm going to scroll down.
+Here we go.
+There are our other three stats.
+We scored 4.62 in accuracy, which is the most important stat on this whole page.
+What really matters is accuracy.
+And that was 3.99 before.
+And we've gone all the way up to 4.62.
+That is fantastic.
+Uh, we've also still doing great on relevance.
+We were 4.57 before now with 4.84, and this used to be 3.85 and now it's 4.35.
+So it's our only stat still in the yellow.
+Uh, and uh, it may be because some of the questions, uh, don't, don't have enough answers or it's
+probably because we still didn't score great in numerical for some reason, which I think did well before.
+It was one of our strongest ones before.
+That's a bit odd, uh, and holistic, uh, and again, I get slightly different answers every time
+I run it.
+You might have got different answers.
+So there are our results.
+We can see the fruits of our labor.
+We can see because we've got these evals, because we've done our homework around this, we are able
+to get this kind of results.
+And and the learning point for you is not that this is the right dashboard that you need or that that
+exactly these numbers necessarily, but just that you need some numbers.
+You need to have decided how are you going to evaluate performance in a way that makes most sense for
+your business, in a way that's going to tie most directly to positive business outcomes?
+And then you need to have a kind of framework to be you have to have the golden test data set that you
+can use for your experiments, and you have to be able to generate these evals, and then you have to
+iterate.
+That's the learning point.
+Uh, and that's what you've seen us doing so very productively, just in a matter of a couple of days.
+--- Lecture 9 ---
+And I expand my screen so you can see everything at one time and enjoy.
+Let me zoom out a little bit so you get to see it all together.
+Uh, here we are.
+Enjoy these great results.
+And of course, the action for you now is that the challenge is only beginning.
+This is your opportunity now to beat me.
+Crush me.
+Come in and iterate.
+Iterate.
+This is the results of a matter of hours of me working on this.
+You can do better.
+The trick.
+There's there's no.
+There's no magic trick.
+The trick is work.
+The trick is iterating.
+Measure, iterate, measure and see if you can't move the needle.
+There's lots of things to try here.
+There's some of the techniques that I had mentioned.
+There's obviously doing more query expansion.
+There's trying out different chunking strategies, changing the prompts, just simple stuff.
+Changing the prompts makes so much difference.
+Hierarchical rag.
+Try and fix this problem with holistic.
+I'm not sure.
+Look into what's happening with numerical category.
+That might be an easy win there.
+And with holistic that's the one to fix with hierarchical rag, makes some summary documents and then
+do a query over them and shove them in the prompt.
+And then if you really want a bigger challenge, then the bigger challenge will be to do a gigantic
+rag.
+Let's just dwell for a second on that.
+So a gigantic rag for those that want to take on this challenge.
+And I have actually built a little version of it myself, but I'm not I'm not going to share it yet.
+Make make this a challenge for you, uh, for people, uh, who are fairly new to Agentic AI.
+The simplest thing you can do is just take the tools that we worked on in week two.
+We already built tools, so you know how to add a tool to an LLM, have a tool that just allows it.
+The last LLM call, uh, equip it with a tool so that it can search all of the files for a keyword if
+it wishes.
+And then you could just write a very simple, uh, utility that scans all the documents for a particular
+string.
+And if it finds it, then then return that document in its entirety to the LLM.
+That would be a simple tool that would add a gigantic genetic rag just like that.
+And I tried that and it didn't make a massive difference.
+It did improve things, but not massively.
+But that's a nice thing for you to try it yourself and see.
+But for the proper agentic people who've taken my Agentic course, you can take this further in two
+ways.
+First of all, you can change the entire flow so that instead of doing a rag retrieval and then calling
+the LLM, it calls the LLM, and it gives it a tool that allows it to come in and do a vector lookup.
+And you could use MCP for that if you wanted very easily.
+And you could not only give it a vector lookup, but also a file lookup, you could give it a number
+of different ways that it can query the documents so that it can answer different questions, including
+questions from any of these categories.
+It would be pretty easy to set up tools to allow it to do any kind of search vector or graph or otherwise,
+across all of that data.
+But then there's more for the real agentic coders there.
+Think about the other thing you could do.
+Can you imagine the other thing you could do that would be like, like completely like earth shattering
+for these metrics is you could add a tool or not.
+Not a tool.
+You could add a step which is calling the evaluator.
+You could have it once it generates its output, you could evaluate it.
+And if it's not scoring top marks for accuracy, completeness and relevance, you can kick it back and
+say, hey, you scored poorly on the on the category of relevance.
+Try again.
+You didn't score well on completeness.
+Try again.
+And you could just keep going, keep iterating over it until it scores well and you could have it in
+a loop.
+So it just keeps going until it finally cracks it.
+And if you do this, presumably you could build a system that might take a long time to run, but should
+be scoring five out of five in all categories.
+And then yeah, then then you should take a screenshot and put it on LinkedIn and put it everywhere
+and it will go viral.
+And that would be incredible.
+That would be the the ultimate agentic solution.
+And I would love to see it.
+And I would love someone to be sharing their like four point nines across the board when you get there.
+Of course, with the true genetic solution, you won't have retrieval stats because you're not really
+doing retrieval in the same way.
+It's a much more interactive style of retrieval.
+So that's a great, exciting challenge for you.
+A really fun assignment.
+I can't wait to see people doing it.
+If you haven't taken the genetic course, then don't worry about this super advanced genetic part,
+but just play with all of the other aspects.
+Play with hierarchical rag.
+Um, play with with different models as well different LMS.
+Try varying it to see what kinds of results you get.
+And of course different encoders too.
+There are lots of great open source encoders to try.
+Okay.
+And with that take great pride in our good stats here and I will see you back for the wrap up.
+Well this is of course the end of the week.
+It's the end of week five.
+And so in addition to that little Agentic challenge or just general rag challenge to to beat me and
+to get amazing scores, there is a bigger end of week assignment for you.
+And that is now to go and apply your learning to a different field, to building a different knowledge
+worker.
+And it could be a knowledge worker for your business, because this is such a prototypical business
+use case of generative AI.
+You could also make a private knowledge worker to help you, something which is optimized on your own
+personal data.
+For example, you could put all of your files that you have on your Google Drive or on your local drive,
+organize them and write something that brings them into a vector data store so that you can ask any
+questions that pertains to documents you've written, information you've gathered over the years.
+So you have your your own personal knowledge base at your fingertips.
+You could do it all with open source models.
+It'd be like a cool twist to it so that it doesn't cost a penny.
+It's all running on your computer.
+It also means everything is kept private.
+If you're using open source models, nothing is going to the cloud.
+Uh, and uh, and then make it so that it's a conversational AI that you can talk to with expert knowledge
+of everything across your documents, even more than you remember.
+That would be fantastic.
+And then you can also take that even further.
+And if you're, for example, someone that uses Google Workspace, Google has APIs so that you could
+be accessing your own emails.
+You can do it in a read only mode to avoid any any unexpected behavior.
+And you can read your own emails and your Google Docs.
+And you could do the same with Microsoft Office.
+If you're a Microsoft user, and you could have it so that that's something which you're able to to
+look over and and respond to your emails based on a full knowledge of everything that you've already
+sent and you'd be able to build them.
+Imagine visualizing the vector data store that is, the vector data store of the sum total of all of
+your information.
+Wouldn't that be cool?
+That would be another.
+That would be a great LinkedIn post showing that the vector store of you, and your full map of all
+of the information that pertains to you.
+Uh, so this is a great challenge.
+Uh, I can't wait to see what you make of this.
+I know a bunch of people have been have been working on this really interesting challenge.
+the.
+So the mandatory challenge is beating my my rag numbers.
+This one is the stretch challenge.
+Make a personal knowledge worker for you.
+Make it vast.
+Make it it's knowledge.
+Be across everything you've done and then show it off on LinkedIn and let me come in and amplify your
+success for you.
+I can't wait to see that.
+And with that, that brings us to the conclusion of week five.
+What a week it's been.
+You are 62.5% on your journey to being an LMN engineer, proficient engineer of all things large language
+model.
+And I think at this point, I hope that it now really feels like your 62.5% that this week was a big
+week.
+We really I feel like we crossed a line into the more advanced territory at this point.
+The first couple of bullets here are like, yeah, yeah, yeah, you can generate text and code.
+You get it, you can, you can pick the right LM, but now you can build advanced Rag solutions with,
+with really, uh, like cutting edge techniques that are used in industry today.
+But most importantly, I feel like you get the joke about how important it is to evaluate your performance
+and to use that to put a sort of scientific framework around something that is more of an art form.
+And that's a wrap on rag.
+But as I said at the beginning, don't think, okay, then it's a wrap on on on on LM engineering.
+I'll see you in another course.
+Uh, no.
+The next few weeks are really terrific.
+They're really great.
+It's the capstone project for the next few weeks.
+It starts with a week.
+That is.
+That is a bit of a traditional data science week, but in a in a very juicy way, culminating in running
+with LMS frontier models and fine tuning LMS.
+We're going to cover the whole spectrum of machine learning, deep learning LMS as we try and solve
+a problem, and that's going to dive into week seven and week eight.
+It's going to be really, really great.
+Get some rest.
+Uh, complete the assignments, get some rest, and then I will see you for the beginning of week six
+
+

@@ -1,3 +1,4 @@
+--- Lecture 1 ---
 Well, what a moment.
 You've made it.
 You've made it to the second half of the course and you've made it to rag week.
@@ -161,7 +162,7 @@ contains any names of products or employees.
 And if so, we're just going to shove the whole document in the prompt.
 Super easy.
 We'll see if that works for us.
-
+--- Lecture 2 ---
 Okay, here we are in cursor.
 Best place to be.
 We're going into week five rag week and opening up our day one notebook.
@@ -358,3 +359,563 @@ And it's going to return that in a list.
 Let's see what we get.
 We get, sure enough, a list with one element.
 And that element is the contents of our knowledge base for Avery Lancaster success so far.
+--- Lecture 3 ---
+Okay next to take it one step further, let's call this same function again.
+Get relevant context and say who is Lancaster and what is calm all in 1 in 1 question.
+And we're hoping it's going to iterate through each word.
+It's going to spot that it has context on this person and this product, and it's going to return.
+Here we go a list with two elements.
+One is about Avery Lancaster, one is about the product Carl car LMDh, car insurance.
+Uh, okay.
+That works nicely.
+But look, let me just show you how horribly janky this is.
+If I change this to a lowercase l, it's still going to work.
+It's going to be fine because we turn everything to lowercase.
+But if I say who is Avery instead of who is Lancaster, we lose that because we've just done this horrible
+thing of we've just taken the key of the last name and that's all we've used.
+Now, we could fix that pretty easily and you might want to do this.
+You could just shove in the first name as well, uh, and have it.
+So that's also a key in the dictionary.
+So we could fix for that.
+But we're not going to do it.
+I want to use this as an illustration.
+Who is Lancaster?
+There we go.
+Use this as an illustration that this kind of fake rag, this this very simplistic rag is brittle and
+that if you make any small change to the question, it's not going to work.
+And of course, the true rag we're going to get to is something which is immune to that and able to,
+to handle, uh, more, more vague, more fuzzy matching of the question.
+That's the whole idea.
+Okay, so now I'm just packaging this up into a, into a high level function, additional context.
+It calls the function that we just wrote right here.
+And then if it's empty it says there's no no more context.
+There's no context if it has stuff in it, it says the following additional context might be relevant
+in answering the user's question.
+And then we iterate through and add that in and look, there's a nicer way to do this, isn't there?
+While we're talking about being pythonic, we can say results plus equals that.
+What this is saying?
+That would be a slightly simpler way of doing it like that.
+Okay, so let's run this.
+Um, and now we're going to say, okay, let's print this.
+This the result of calling this function with who is Avery Lancaster?
+Let's see what we get.
+We get the following additional context might be relevant in answering the user's question Avery Lancaster
+of course if we just do, who is Avery?
+It's going to get it wrong.
+It's going to say there is no additional context relevant to the user's question, because it doesn't
+find that if we say, who is Alex Lancaster, what are we going to get?
+We're going to get a different kind of problem.
+We're going to get a problem that it is going to think that this is relevant context.
+The following additional context might be relevant.
+And of course this pertains to Avery Lancaster, not to Alex Lancaster, because our slightly kludgy
+version is just simply taking each word and looking it up in our dictionary, so that that gives you
+both the both types of problem with this kind of simplistic rag lookup.
+Okay.
+And I know you've been wondering when LMS actually going to appear here, but they appear right away.
+We do it with our favorite chat function.
+Remember, the chat function simply takes a message and a in history if we're going to use radio which
+which we are.
+And so our system message is we take the system prefix that we carefully crafted, and we add in the
+additional context that we just got right here.
+Uh, and then we bunch that into a messages list.
+We shove it in as the system, prompt the history and the user message, and then we call OpenAI chat
+completions dot create for our cheap or simple GPT four or nano model.
+These messages and we return responses dot zero message content.
+And that's it.
+That's all there is to our simplistic rag.
+We can bring that up in a gradio interface in the usual way with just a GR interface launch.
+Okay, so here we go.
+I'm going to actually type in-browser equals true.
+So that it pops it right up for you.
+Here it is.
+This is what it looks like.
+This is our chat bot.
+And if this is new to you you've not seen this before.
+You're like, what just happened?
+Then you might have skipped week two, which would be a terrible mistake, because week two is terrific
+fun.
+Go back and check that out.
+All right.
+But for others, yes I know.
+Isn't it great?
+Welcome back to radio.
+I'm going to say, uh, hi there.
+Uh, to my chat bot.
+And it's just calling the, uh, the chat as usual.
+So now I'm going to say who is Avery Lancaster?
+And when I press enter remember what's going to happen.
+It's going to call my chat function.
+My chat function will call the function which takes each word in turn and tries looking it up.
+In my knowledge dictionary it will find Lancaster.
+It will take that text and put it in the prompt along with my question Who is Avery Lancaster?
+And so when we run this, what we get back is an answer that acknowledges that.
+Avery Lancaster is the co-founder and Chief Executive officer, CEO of realm.
+That's great.
+Uh, what is car question mark?
+Let's see.
+That's one of the products.
+And yes, we do indeed get the answer that it's an auto insurance product developed by Insure Elm.
+Very nice indeed.
+And now this next test might surprise you.
+You might not be expecting this.
+I'm going to say, who is Avery?
+Not not Avery Lancaster, but who is Avery?
+What do you think it's going to say?
+Give you a second to make your guess.
+Let's see what it says.
+It says Avery refers to Avery Lancaster, co-founder CEO of In Serum.
+I bet many of you were thinking it was going to say, I don't have the context on that because you thought
+that I was doing this to show you that, uh, that it isn't able to look up Avery.
+But actually, I had a double trick here.
+Uh, strangely enough, despite the fact that our simplistic rag lookup won't work and it won't be able
+to find any context with this, it still answered the question correctly.
+How did it do that?
+Uh, well, you have to remember that we're not only sending in the relevant context, we're also sending
+in the whole conversation history so far.
+And that conversation history includes this information about Avery Lancaster.
+And so it sees that.
+And that's why when it's when it's responding, it includes that in the response when you're testing
+Rag workflows, and you're checking what it can answer and what it can't.
+You do have to be careful of this trap that remember that it will have your conversation history, and
+that might influence it to answer differently.
+So that's something to watch out for.
+Uh, but uh, but but let's do the proper test that you thought I was going to do, bring up a fresh
+chat and ask it who Avery is.
+So here we go.
+I'm going back to the to the code again.
+I'm going to scroll back up and I'm just going to rerun this to get a totally fresh gradio.
+Here it is.
+And now I'm going to say, Who is Avery?
+And this I think is what, what what most of you probably expected to see before when we run this.
+I don't have information about Avery when it takes that word Avery, and it tries to look it up at its
+knowledge, it finds nothing because it's just hard coded to look for last names.
+And so it can't answer that question.
+But of course, if I say, Who is Lancaster?
+Even if I spell it in lowercase, um, Lancaster, there we go.
+It should be fine.
+And it immediately knows that it's Avery.
+And from this point onwards, in the conversation it would answer fine for that as well.
+So anyways, that's an interesting side point.
+The main point is that we have built a rag style lookup system that is able to add relevant context
+based on the words in the questions, but it does it using this super simplistic approach of just taking
+each word, looking it up a dictionary, shoving in relevant contexts.
+The whole idea about Rag is to take this further, and instead of just just trying to match on strings,
+try and use some smart fuzzy matching so that we can do a good job of looking up relevant context.
+Even if someone uses the first name instead of the last name, or even a typo in the last name, it
+would be great if we could say who is Avery and spell her name wrong, and it would still be able to
+correct us and respond.
+That would be amazing.
+So that that kind of problem fuzzy matching, adding relevant context.
+That is what Rag retrieval augmented generation is really solving.
+So anyway, take a minute to educate yourself on this.
+Ask some more questions that we can ask.
+How much does health Lmx cost?
+And so you don't just need to ask her what something is.
+Of course you can ask a more a deeper question like that requiring it to use its expertise.
+But it's the same exact thing happening behind the scenes.
+Health Lmx is being looked up.
+It's finding the details.
+And if you check out the docs, you'll see that this is perfectly answering that question.
+We can say, Who is Thompson?
+And it will hopefully tell us about Maxine Thompson.
+Yes, Thompson likely refers to Maxine Thompson, the senior data engineer at insurer Elm.
+Uh, and, uh, so so it's got all of this information.
+You can ask any of these questions, uh, and you can see that it will do a decent job of responding
+with the information.
+Try that out.
+Add in print statements so you can see what the prompts look like.
+You can see the context that's retrieved.
+And give yourself a really good intuition for what's going on.
+And then we will press on and talk about the big idea behind rag.
+--- Lecture 4 ---
+Okay.
+The time has arrived for us to cover vectors.
+This is the big idea.
+It's the big idea behind rag.
+It's the idea which allows us to do this sort of fuzzy lookup.
+Given a user's question, what might be the relevant context?
+That's got something to do with this question.
+It all comes down to these things called vectors.
+I imagine some of you are super familiar with this already, in which case put me on two x and zip through
+it.
+But for some of you, this is going to be fascinating.
+A whole new world as we launch into the world of vector embeddings and encoder.
+In the last four and a half weeks, we've experimented with a number of different llms with GPT, with
+Claude, with Gemini, deep Seek, to name a few.
+Grok are both Crocs.
+So one of the things that they all have in common is that they are they are all just one particular
+flavor of LLM.
+There are, in fact, two different types of LLM, and we've only been looking at one of them, which
+is by far the most common, which is the one you see all over the place.
+And its official name is an Regressive LM.
+It's a mouthful.
+Auto regressive LM means this is a model which is trained to do one particular job.
+It's trained to take an input sequence and to predict the next token.
+That should come after this input sequence.
+It's regressive in that it looks back over this input and predicts what should come next.
+And as you know, it does it one token at a time.
+It predicts the just the next token.
+And then the trick is we then feed in a new input that's the original input with that extra token on
+the end of it, and we get it to generate the next token.
+And that's repeated again and again.
+And that is what an auto regressive LM does.
+And the reason it does that is because that's how it's been trained.
+That's the architecture supports that.
+And then it's been given lots of training data where there's an input sequence and the next token.
+And so it's trained to get good at that.
+That's called an auto regressive LM.
+And if you ever just told about an LM without without any framing, it's almost certainly an auto regressive
+LM.
+That's what they mostly are.
+But there is another kind And the other kind goes by many different names.
+You sometimes hear it called an encoder.
+You sometimes hear them called an embedding model or a vector embedding model.
+But this is a model, an autoencoder.
+It's an LM which does not generate the next token based on looking back, but rather it takes a full
+input sequence, and it produces one output that is meant to reflect the full input.
+It's some output based on the full input that's passed in.
+Not not just what's to come next, but something that reflects it all.
+Okay, I'm being a bit abstract here.
+What does that mean concretely?
+What would be examples.
+Why would you want to do that?
+Okay.
+So to get concrete there are some very obvious things you might want to use this for.
+This idea of of taking a big input and coming up with one thing.
+And the most obvious application is classification.
+Take take an input and then classify it.
+This whole input to mean something.
+And one example of classification is sentiment analysis.
+Take take a whole sentence and say whether or not this is this is happy or sad, positive or negative,
+and other forms of classification like what does this pertain to?
+Uh, anything like that would be an example of where you might use an auto encoding LM and there are
+lots of other things like that.
+Whenever you might want to come up with one output that reflects the entire input.
+But in particular, there is one function that that is important for us, one application that we care
+about right now.
+And that is when you use, uh, one of these autoencoder models to come up with a set of numbers that
+best represents this input, a bunch of numbers, maybe it's ten numbers.
+And these ten numbers are just meant to reflect the meaning of this input in some way.
+And and you could think of those ten numbers as just just a list of numbers that in some way is meant
+to represent the concept being covered here by this, this sentence, this sequence of tokens.
+And when you do that because ten, ten different numbers, you could think of that as being being what
+a mathematician would call a vector, a set of numbers that represents a point in space.
+If it were three numbers, it would literally be like an x, y, and a z coordinate to a point in space.
+If it's if it's ten numbers, then we'd say it's a it's a point in ten dimensional space, which sounds
+very fancy.
+It's just saying it's ten different numbers that can be thought of as coordinates to this point.
+But but these this is called a vector embedding.
+When you take a set of input sequence, a set of input tokens, and then you map that to a bunch of
+numbers.
+And there are a number of examples of these used in practice.
+One of the very first it was called Bert.
+It was created by Google in 2018.
+It predates GPT.
+It was way back.
+It was before we even used the expression LLM.
+But but Bert stood for bidirectional encoding representations from transformers.
+And yeah, it was it was very popular then.
+I remember being amazed by it when I first first played with it back back then.
+And it's still used today, but very, very popular.
+OpenAI embeddings is a whole category of embedding models from OpenAI.
+The one that that I use is is called the text embedding.
+Three large.
+And there's also a three small as well.
+And then there's a very popular open source model that will be also experimenting with called the all
+mini LLM, L6 v2.
+So these are all examples of of autoencoding llms, also known as embedding models that are able to
+take an input, a series of tokens and turn it into a set of numbers that we call a vector.
+And I just want to tackle something that is a common source of confusion for people that first meet
+this, which is people say, okay, so what's the difference between tokens and vectors?
+And they are super different and it's very easy to explain.
+So let me demystify that right away.
+One way to put it is that tokens are inputs and vectors are outputs.
+But but basically, tokens is just a super simple way of saying we can't put words into a model.
+A model is a mathematical thing that adds things up and multiplies them.
+It can't take a word.
+So at the very beginning, we have to start by having like a number to represent each word, like the
+word, and might be number one, the might be the word number, number two, and so on, so that we
+can map words to a single numbers and that that's what tokens are.
+They're just a numeric representation of the input.
+It's just the input in another form.
+And it turns out that if you try and map every word to one of these numbers, then you have some, some
+issues with with with how many words like what happens when you run out of vocabulary.
+Uh, what do you do with proper names and things like that?
+At one point, we tried to have every character, every letter mapped to a number, but then things
+got really complicated, really fast.
+And so there's this, this nice, happy medium as we explored all the way back in week one, which is
+taking fragments of words instead of words or letters, and that just turns out to work really, really
+well.
+So there is some some hocus pocus about the the way that you create these tokens from text.
+But but it's basically just a sort of a mapping and a few rules, nothing fancy to it.
+Tokenizers are very simplistic bits of code, and the fact that you have to map text into tokens, it's
+just something that you go through to to come up with numbers that can be the inputs into a model that
+is tokens.
+They are the inputs.
+Vectors are what comes out the other side after a model, an LLM has taken in these simplistic tokens.
+And it's it's got some some meaning from it.
+It's understood the relationship between these different words.
+It's understood what, what point you're trying to make, how to represent this information.
+And it's turned it into a series of numbers that that reflect the meaning of the input.
+And it is an output of the model and that is a vector.
+So it always starts with tokens.
+Even encoding models take tokens as their inputs, text goes to tokens, goes into the model and what
+comes out is the vector.
+And and I know what you're thinking.
+The pros are thinking, okay, but it's more complicated than that because actually vectors aren't just
+the outputs.
+Vectors are also what what happens inside an LM between the various layers, you can think of the information
+that's moving from one layer to another as being like vectors at each point.
+And so, in fact, in many ways, the tokens that come in even to an autoregressive model, they start
+by being turned into vectors in terms of the internal representation of an LM.
+But that's a pro a pro thing that you don't need to worry about if you didn't follow that.
+All you need to really understand is that tokens are just a simple way to represent text that comes
+in the input.
+Vectors are a sort of advanced internal transformer representation of the information as a, as a,
+as a series of different numbers in a vector.
+Those are vectors, those are outputs.
+Or maybe there are intermediate outputs.
+But that is the key difference between tokens and vectors.
+--- Lecture 5 ---
+Okay, so you followed everything so far.
+You understand that these encoder models, these vector embeddings, set of numbers that represent the
+meaning of the input.
+But what does it mean to say that numbers represent meaning?
+Well, let's drill down on that.
+How how do these vectors represent the meaning of the input?
+Well first up it can be referring to a character, an individual character, the meaning of a character,
+the meaning of a token, the meaning of a word or a sentence or a paragraph or a document or something
+abstract.
+In my day job at Nebula, we have vectors that represent different opportunities, different job postings,
+and vectors that represent people at different points in their career.
+People's careers are represented by by a vector.
+So vectors can can represent like like something very abstract as well.
+And the vectors and I said that there could be three numbers and represent like a point in space with
+a x, y, and a z coordinate.
+Uh, it can also have hundreds of dimensions.
+It can even have thousands of dimensions.
+And so that's just basically saying it's a thousand numbers that represent this, this, this block
+of text.
+But those 1000 numbers you could think of as representing a point not in three dimensional space, but
+in 1000 dimensional space, whatever that really means.
+And okay, so these represent the and some sort of an understanding of the inputs.
+And this is how in that points numbers that are close to each other would represent things with a similar
+meaning.
+What does that mean.
+Well if you imagine let's suppose it was just three numbers.
+So it really was an x, y and z coordinate.
+I keep saying z with American, but I would say x, y and a z coordinate.
+Uh, if it's got if it's got these, these, these points, then points that are close to each other
+would represent things that mean the same thing, even if the words themselves were completely different.
+So if you have a sentence like what are ticket prices to travel from New York to London, then that
+might be represented by a point right here.
+And you could have a completely different sentence that's like, what's the price of a flight from JFK
+to Heathrow Airport?
+Different words, different concepts, but the same meaning.
+And that if that were turned into a point, it should be a point that's very close in this three dimensional
+space to the first point.
+Points close to each other should represent things with a similar meaning.
+That's the idea.
+The model is trained so that it produces numbers that have this property.
+There is another way that these vectors represent the meaning of their inputs.
+And it's a bit subtle.
+And it was first discovered some time ago, in fact, in the before before Transformers before LMS when
+we were working in the field was called NLP Natural Language Processing.
+In some ways the predecessor to what we're doing at the moment.
+But but there was this algorithm called word to vec and word to vec.
+As I say, it's like like the predecessor to all this.
+It was something which would just take an individual word, uh, like a token representing a word,
+and map that to a vector.
+So each word was mapped to a vector.
+So you would, for example, perhaps have a vector for the word orange.
+And if you looked in the space at points similar to that, there would be similar things to an orange.
+They would be perhaps other fruits like, like, like mandarin and, and tangerine or whatever, might
+be similar to to to orange along with other colors perhaps.
+So.
+So there was a simple way that any one word could be mapped to a vector.
+And people discovered something about this that was that was intriguing and and surprising.
+And with apologies to those that already know this well, but still, let me just quickly go through
+it.
+So let's suppose that you take the word king.
+So king maps to some point in space.
+Imagine it's just three dimensional.
+It's probably thousands, but let's put it right here in space.
+This is King and presumably close to that.
+A similar things like prince and emperor and maybe Charles or whatever.
+So so you've got you've got the word king and similar concepts around it.
+And now let's suppose somewhere else completely different in space.
+Other words, man and woman, two different words.
+I'm placing them here and here also with with similar things around them man and woman.
+Okay, so here's the thing.
+You can you can do maths with these vectors where you add and subtract them, which for people that
+are familiar with vectors knows that that means you're sort of moving around in the space, uh, by,
+by, uh, by this, this amount.
+So we can take the word king.
+We can subtract the location of the vector for the word man, subtracting that x, y, and z coordinate,
+and add in the word woman.
+It's x, y, and z or z coordinate.
+So we're basically taking.
+We're subtracting man and adding woman, which is the same as moving in this direction.
+But we're doing it to the point king.
+So it's king.
+Take out the concept man.
+Add the concept woman and you end up over here somewhere.
+And here's the spooky part.
+If you looked at the closest point to this point in vector space, you ended up with a point for the
+word queen.
+So king minus man plus woman was queen.
+And so it's as if you can, you can mess around with meanings by by taking one of these vectors, taking
+out one meaning, adding in another meaning, and you're sort of moving the meaning from one to another.
+And similarly, you could take the word, uh, Paris.
+Paris.
+Subtract the concept of France.
+Add the concept of England.
+And lo and behold, you end up with London as your closest point.
+And it works.
+And it's crazy the first time you see this.
+And you play around with words and you see this working and you're like, no way.
+And so it's in that sense that these points represent the meaning of the input.
+It seems to represent it such that similar things are close by.
+And also so you can sort of take out meanings and add them in and it just works and it doesn't, you
+know, with word two vec it worked.
+It worked for words.
+But nowadays with encoder models, the same kind of thing works for entire paragraphs of text.
+You could take a paragraph of text, it could be mapped to a vector, and you can then remove some meaning
+and add in some other meaning.
+It doesn't matter what the actual words you choose.
+It matters the meaning that it represents, and you will move to another vector that reflects this,
+this new meaning of some input with something removed and something added in and so on.
+So there we go.
+In summary, these are the ways in which these vectors, these sets of numbers reflect the meaning of
+the inputs.
+And if I lost you a little bit there, it really doesn't matter.
+All you need to know is that these encoders, they take a input and they map it to a set of numbers
+that we call a vector embedding, but it's just a set of numbers such that numbers close to each other
+mean similar things.
+And the arrows amongst you will point out that it's it's not quite as simple as just the points close
+to each other.
+We use something called cosine similarity to decide if something's close, which is just slightly different,
+but it's basically that's a technicality.
+You don't.
+We'll come back to that later.
+It's not super important as far as we're concerned.
+Similar numbers means similar concepts.
+--- Lecture 6 ---
+Okay, so enough theoretical stuff on vectors.
+Now I'm gonna make it real.
+Now I'm gonna give you the big idea behind rag.
+And what makes rag so interesting?
+Here's the point.
+Remember this diagram?
+Remember the little idea behind rag?
+The user asks a question.
+We look it up in our database.
+Okay.
+Now we're going to do something just slightly different.
+The user asks a question and let's say what they what they ask is what a ticket prices to Heathrow the
+name of London's airport.
+If you didn't get that.
+What a ticket prices to Heathrow.
+Okay.
+And and we know if we look that up in our database then there's going to be a problem because our database
+has ticket prices to London, not to Heathrow.
+So we're not going to find the word Heathrow in there.
+Okay.
+So we don't just take that question and look it up in the database.
+First we find a useful encoder model and encoding LM or embedding LM, whatever you call it.
+We use that we turn the question into a vector, we take that question.
+We turn it into a set of numbers that represents its meaning.
+And separately, we took all of our database, all of our knowledge base.
+And for everything in that database, we found vectors associated with that.
+And what we've put in our data store is the text, the information about ticket prices or whatever,
+along with the vector that represents that text.
+We've got all of that in our data store.
+And when you do that, when you have these vectors referring to each of these bits of data, we call
+it a vector data store.
+And that's what we've got.
+And what we do is we say, okay, okay, vector data store, tell me, what information do you have
+that is closest to this point of this question?
+We've just taken a question.
+We've turned it into a point.
+What information do you have that's near that in your vector data store?
+Because stuff that you have that's close to that is going to be things which have a similar meaning,
+even if there's a different choice of words.
+If the user said ticket prices to Heathrow Airport, it's still going to find prices to, to to the
+airport in London or whatever.
+That's going to be close to the points.
+And so it's going to find that information.
+And so this is the kind of fuzzy lookup that I mentioned before.
+You're not just doing a string match.
+You're trying to understand the meaning of the question.
+And you're asking, what information do I have in my database that has similar meaning to the meaning
+of the question?
+And you get that you retrieve the text from the vector data, store the text associated with these vectors,
+and you put that in your prompts to the LLM.
+So it's now got the ticket prices to London.
+The question how much does it cost to travel to Heathrow.
+This might be relevant context.
+Ticket prices to London is all in there.
+That was found in the vector data store.
+Back comes the response with the right answer.
+And here is a super important point that confuses even some pros.
+I just want to make this very, very clear to you.
+This encoder encoding LM that you see there, it has nothing to do with the LM on the right.
+The auto regressive LM, if you remember, is the full name for that.
+It's got nothing to do with that.
+That encoder, LM is being used just to help with this fuzzy search.
+We're using that to turn the question into a vector.
+And we've already used that same encoder to to turn all of the data that we've got in our database into
+vectors as well.
+So we're using this trick, this trick of using these vectors to pluck out relevant information.
+And then that's what's getting sent to the LM on the right.
+So what's going to the LM on the right is not vectors.
+The LM doesn't wouldn't know what to do with a bunch of numbers.
+It just it just talks natural language.
+The input has to be language.
+What's being passed in is the user's question what's the ticket prices to to Heathrow.
+And then relevant information plucked from the vector data store the the natural language, the English
+associated with that.
+That's what's going to the LM on the right.
+So the purpose of this encoder is to help us with this trick of finding relevant content, not necessarily
+content that has exactly the same words, but content that has the same meaning.
+That's what we're using it for.
+And what gets sent to the LM on the right is just useful context in the form of natural language.
+And so that's it for the first day of week five of Rag Week.
+That's enough.
+You've got your basic intuition now about vectors and about using that for a rag lookup a retrieval
+augmented generation.
+Don't worry if you didn't understand everything because we're going to actually get into this.
+We're going to create vectors.
+We're going to store vectors.
+And by the time we're done with it you're going to know this stuff.
+So, so well, uh, what you can already do, of course, is generate text and code with frontier models,
+use tools, use open source models with with hugging face transformers.
+You can choose the right model for your project backed by facts.
+And now you can explain about this business of vector embeddings and how you use a vector data store.
+Look up things similar to a user's question to put in a prompt to the LSM.
+By next time we'll we'll have unveiled Lang chain properly.
+We took a peek at it before we're going to we're going to go into it.
+We're going to use it to actually take a knowledge base, turn it into vectors and put it in a data
+store and a vector store called chroma.
+And what I want to leave you with is just have a think about, uh, as you mull over rag and what it
+is, one of the things that you might start to think is hang on, it feels like all this is a bit of
+a hack.
+It's it's it's not very scientific.
+We're doing this business of taking a user's question and turning it into a vector in order to try and
+make a guess about what's what sort of what's likely, what's plausible to be useful to put to shove
+in a prompt to an LLM.
+And so you might be thinking to yourself, this, this all sounds like, like, like a bit of a bit
+of a hack, uh, you know, to avoid having to put everything in the context just to sort of subselect.
+And the answer is, you're exactly right.
+It is all a bit of a hack is, is is really one big hack.
+And in fact, as you're going to discover later this week, rag comes with a with a whole zoo of hacks.
+There's hack upon hack upon hack to try and get better and better at picking the right, relevant context.
+It really is just this, this very hokey business of trying to use trickery with encoder models to figure
+out the most likely contexts that's going to be useful to the LM.
+So keep that in mind.
+This is very much it's very empirical, which is our way of saying that it's very experimental.
+It's it's really quite a lot of trial and error.
+And you're going to get a really good sense for that when we actually try and build our proper rag pipeline,
+uh, tomorrow and the day after.
+All right.
+I will see you tomorrow for vectors.

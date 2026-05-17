@@ -1,0 +1,528 @@
+--- Lecture 1 ---
+Well, would you believe this is the penultimate day?
+Welcome to the penultimate day of the program.
+It's now.
+We're in week eight, day four, today and tomorrow.
+Still to go.
+Today we go into a gigantic AI.
+We are going to be understanding how you use tools to orchestrate agents.
+And we're going to build a planning agent with an agent loop crucial expertise that you are building.
+For those of you that have actually done my agent course, you know all about Agentic AI.
+Sometimes it's valuable to approach it this way from first principles, building an agentic framework
+ourselves, doing the orchestration ourselves.
+This is really helpful and this helps you deeply understand what it means to have agentic AI.
+And as you know, it's pretty common to use off the shelf frameworks that do a lot of this for you,
+which makes it very quick to get agents up and talking to each other.
+But it's great to know how it actually works behind the scenes.
+That's what we'll do today.
+Now, at the beginning of the week, I defined a genetic AI and gave you some definitions that the modern
+one, the most recent one, which is that it's when you have llms equipped with tools, calling tools
+in a loop to achieve a goal, llms calling tools in a loop to achieve a goal.
+Uh, but when you when you have a AI that that follows these definitions, there are some hallmarks
+of what you produce which which you'll notice which which is what's in common between engineered solutions.
+And that's what you look out for.
+One of them is that typically an AI solution involves breaking a bigger problem into smaller steps,
+where those smaller steps are carried out by individual LLM calls.
+That's a very common, uh, feature of them.
+And this also has that trap I mentioned before, the agentic trap, when people are too quick to divide
+up their problem into steps, particularly when they give human like responsibilities to those steps
+with, with agent names and, and they haven't done it in order to break a problem down.
+They've done it because that's what.
+What human roles would be like.
+And and that might turn out that that's fine.
+But I just do suggest that you start by understanding the problem.
+You divide up into smaller LMS in order to solve the problem.
+Well, not just because it sounds like that would make a good agent.
+Okay, so that's one hallmark.
+Another one, of course, is using tools.
+Uh, tool calling is really where where I came from.
+The idea that you can equip an LM with a tool to carry out some, some extra functionality, and indeed,
+what that tool might do is involve calling another LM.
+And that's how you have LMS.
+Controlling the workflow and calling other LMS and structured outputs is another, another feature.
+And you might think that tools and structured outputs are sound like very different things.
+Tools equipping LM to to take out actions, structured outputs constraining the output that it comes
+up with.
+In fact, they're very closely related.
+Uh, in for most providers structured outputs is actually implemented through tools.
+It's a tool call that generates the structured output.
+So that's interesting.
+Another way to think of it is that one as an alternative to calling tools, you could just generate
+a structured output.
+And in that structured output describe what you want to happen next.
+So in fact, even though tools and structured outputs sound like they're very different things, they're
+quite closely related and they're almost analogous kind of concepts.
+Um, but both of them together are hallmarks of an agentic AI solution.
+And then an agent environment, something which is sort of a construct around your agents that allows
+them to communicate with each other in some way, pass information, or have information in common between
+them.
+That is a hallmark of an agentic solution.
+It's very common, uh, and it's something that we will we will create ourselves homegrown.
+But if you use an agent framework, of course, it sort of comes with that, that kind of construct
+and then a planning Agent.
+Typically, it's another LM call that is able to decide what's going to happen when.
+In in simple agent solutions, this can just be a workflow.
+It could just be Python code that orchestrates what happens when, uh, and in more advanced agent solutions
+like the one we'll do, it can be something where it is an LM call that has tools, and those tools
+allow it to call other agents.
+Or it could be an LM call that generates structured outputs.
+And the structured outputs describe what should happen when either of those would work.
+And then finally, and this one is perhaps the gooiest of them.
+The one that is the most ill defined.
+Is this the sort of idea of autonomy, a sense that this solution is a solution that isn't just a chat
+with a user, it's not just an AI assistant.
+It's something that has some kind of persistence beyond that, that construct of just a chat with a
+user.
+Uh, and uh, yeah, it's got some sort of memory that transcends one interaction that gives you a sense
+you've got an authentic AI, uh, platform.
+It seems to persist, and you can imagine the thing we're about to build that's going to be able to
+to send push notifications every so often, whenever it feels like it, in a way that's going to have
+that sense of autonomy and memory.
+It's something which which which is able to carry out tasks in the background and then sort of proactively
+reach out to us with an answer.
+That kind of thing is like a hallmark, and it's probably the least well defined of them.
+So this gives you a sense of what it means to be agentic.
+We, of course, are going to tick all of these boxes in our Agentic platform, uh, and, uh, and,
+but you'll, you'll generally see that platforms are described as agentic if they tick any of these
+boxes.
+The term is a very, uh, broad term that can apply.
+It's an umbrella term that can apply to any of these kinds of solutions, but for sure, you'll find
+people that will be more have a stricter definition and will say that it's only agentic if there is
+a clearly an agent loop that could keep going forever.
+Something that's more of a Claud code kind of experience.
+And we get pretty close to that with what we're building as well.
+All right.
+And to remind you, what is the thing that we're building?
+Well, you'll remember, there's a scanner agent that we built yesterday that is able to identify promising
+deals.
+And of course, our scanner agent uses structured outputs to turn, uh, the unstructured data scraped
+from the internet and from RSS feeds into something that is a pedantic object that's populated with
+deal information and a price.
+There's the ensemble agent that estimates the true value of something based only on its description.
+It does.
+It does a pre-process to rewrite it in a format that is, that is more ready for models.
+And then, of course, it's going to call a bunch of other models.
+And we have a messaging agent that will write a hype message using Claude for sonnet.
+And then we'll send a push notification using pushover.
+And behind that ensemble agent, we have, of course, the specialist agent.
+And where's that running?
+It's running on.
+And we've got a frontier agent that is using the Rag processor.
+It's encoding the text of the the thing we're trying to price.
+It looks up similar products in chroma.
+And it's then making a call to GPT five one with all that information.
+And it does really well at it.
+And then we've got a neural network agent that is estimating prices using a deep neural network from
+week six.
+Today we're going to be building the planning agent that coordinates activities across these.
+And it's going to do it because we're going to give it three tools, a tool that will allow it to call
+each of those three steps, three agents to the right as far as it's concerned.
+They're just tools.
+It doesn't know that it's an LLM.
+It just thinks of it as three different tools it can call.
+Much like the tools we built in week two.
+And then tomorrow we're going to finish off with the agent framework and the UI.
+And it's going to be uh, it's going to be terrific.
+That's going to be the epic finale.
+Uh, but for now let's go to cursor.
+Let's build ourselves a planning agent.
+--- Lecture 2 ---
+Okay.
+We go into week eight, we're going to day four.
+It's almost over.
+Are we going to day four?
+And uh, here we have The Price is Right.
+Day four the autonomous planner agent.
+Uh, and, uh, here we have it.
+We're going to do some imports.
+We're going to be using GPT five one today.
+If you want to use a cheaper model, then by all means dial that back.
+But but it's going to be very short amounts of tokens okay.
+I want to start by by just getting some test data.
+The scanner agent I've got like a method test scan that just gets back test results.
+So we can have.
+Then let me show you what I mean.
+It brings back a deal selection object.
+This is the Pydantic object.
+That and it's populated it with a fake, uh, set of deals.
+It actually is something I scraped a while ago, so it was once real.
+Uh, but it's just some data.
+Uh, we're going to use test data to start with.
+With this.
+Okay.
+Do you remember how tools work back from week two?
+Do you remember how it works?
+Basically, you come up with a blob of JSON, some janky JSON that describes to a model what functionality,
+what capabilities it has.
+And then when you prompt the model, you tell it, hey, you've got some tools.
+And then you say, do you want to call any of these tools?
+And if it says yes, then there's an if statement and we say, okay, if it wants to call one of these
+tools, then we'll do so and we'll return the results.
+Okay.
+Hopefully you remember that.
+If not, this is some revision a quick moment to to to strengthen your skills with tools.
+Um, and uh, I am going to do that by creating three fake functions.
+Three pretend functions.
+And they are right here okay.
+This function scan the internet for bargains.
+So this tool scans internet for great deals and gets a curated list of promising deals.
+It says it's going to print fake function to scan the internet.
+This returns a hard coded set of deals and it just returns this test results right here turned into
+into JSON.
+That's it.
+That is scan the internet for bargains.
+It's fake.
+It returns test bargains.
+Here's another one.
+Estimate true value.
+This tool estimates the true value of a product based on a text description.
+It's a fake function.
+Fake function to estimate the true value of this always returns $300.
+And then it returns the product description has an estimated true value of 300.
+Let's put a dollar sign in that to make it $300.
+That's it.
+That's our second fake function.
+Next fake function.
+Notify user of deal.
+This tool notifies users of a great deal given a description of it, and it prints fake function to
+notify the user of this, which costs this.
+And it estimated this and it returns just notifications sent.
+Okay.
+So these are fake functions.
+All they do is print something.
+Let's run this first one.
+Scan the internet for bargains I run it.
+It says fake function to scan the internet for bargains.
+And it returns this set of JSON in a text.
+Let's run this this second one estimate.
+Estimate true value.
+Estimate true value says a new iPhone cursor.
+Thank you.
+Uh, fake function to estimate the true value of a new iPhone that always returns 300.
+And it just returns that that string with 300.
+All right.
+Uh, let's do notify user of deal a new iPhone.
+The deal price is 100.
+The estimated true value is 1000.
+And that is the URL.
+And here we go.
+Fake function to notify the user notification sent okay.
+All right.
+Nothing clever here three fake functions I get it I know okay.
+Now prepare yourself for some JSON, rub your eyes and get ready because this is going to be torturous
+JSON, lots of it.
+Uh, this is the JSON for the scan function.
+Do you remember you have to come up with this blob of JSON that describes the name of the function,
+the description of what it does, and then any parameters.
+It's fairly simple for the scan function.
+There it is.
+This is the estimate function.
+It's a bit more janky.
+We've got estimate true value given the description of item, estimate how much it actually worth.
+And there we go.
+The the description is the one uh parameter which is a string, uh, which is uh the description of
+the item to be estimated.
+And then notify function is notify user of a deal.
+It has three.
+Uh, no, it has four parameters um description, deal price, estimated true value and URL.
+And they are all required.
+So this this is the JSON that describes the functions.
+We did this in week two.
+Same kind of thing.
+We created this JSON.
+And of course if you use an agent framework this is the kind of stuff that it does for you.
+You don't need to write this JSON.
+You have a function with with a docstring.
+And there's like a utility that will just generate this JSON for you.
+So this is the kind of thing that one does if you have to, if you're doing it from scratch like we
+are.
+If you're using an agent framework, it builds these sort of janky stuff for you.
+Uh, but but we have to do it manually.
+And now we're going to put all of that into a list of tools.
+Uh, the scan function, estimate function, notify function, that is.
+Now I need to execute that cell.
+Execute that cell.
+Execute this cell.
+Let's see what it looks like.
+Let's just give ourselves a moment to view this.
+Here it is.
+Here are our tools as a big ton of JSON that describes the different things that we're going to let
+our LLM do.
+And remember the secret to tool calling is that it's super boring.
+What happens is this JSON here like that will be put in the system prompt to the LLM.
+And the system prompt will say, hey, you can run any of these tools, or at least the user can if
+you want, respond with with uh, stop.
+Reason is tool calling.
+If you want to call one of these tools, tell me which one I'll run it, and I'll then call you again
+with the result.
+That's that's what tool calling is all about.
+Okay, let's let's now put this together.
+We're going to call an LLM with these tools which are referring to fake functions that don't do anything.
+They just print okay.
+And now we've got a handle tool call function that again you might remember this from week two.
+It's pretty generic.
+It says uh for tool call in the in the tool calls because there might be many.
+It will go through find the function name find the arguments.
+And there's this bit of very I don't know whether this is very pythonic, very elegant or whether it's
+a bit hacky.
+Uh, I just used the fact that in Python globals gives you a list of all of the functions defined globally.
+Uh, I collect the function, named this tool name, and then this is again either very elegant python
+or a big hack, depending on your school of thought.
+Um, but I then call the tool that is described in the response.
+I'm relying on the fact that the name of the tool that comes back, like scan the internet for bargains,
+is identical to the actual function itself.
+So I'm turning that string into a function call.
+What you should really do, if you want it to be safe is you should say something like if tool name
+is scanned, look at that because it knows if tool name is scan the internet for bargains, then scan
+the internet for bargains.
+This this is what you should do.
+This is safe and careful.
+And what I'm doing is, is, is like, uh, I don't know if it's a hacker or if it's ingenious.
+Uh, but this and then this is basically translating that string into a function and then calling it
+dynamically.
+Uh, so, um, yeah.
+You like it or hate it, that's, that's what the trick I'm doing here.
+And then I'm appending the results back to the message.
+So this hopefully is somewhat familiar because we did it in week two.
+So I don't need to go through it more okay.
+And now we're coming close to uh to another another moment of truth for us.
+--- Lecture 3 ---
+All right.
+Are you ready?
+This is really important.
+This system message and user message is the most important system message and user message of the entire
+course.
+So we better we better we better focus here.
+System message.
+You find great deals on bargain products using your tools and notify the user of the best bargain.
+Fair enough.
+We'll go with that user message.
+First, use your tool to scan the internet for bargain deals.
+Then for each deal, use your tool to estimate the true value.
+Then pick the single most compelling deal where the price is much lower than the estimated true value,
+and use your tool to notify the user.
+Then just reply okay to indicate success.
+That's it.
+That is our instruction.
+Let's put that into some messages.
+Let's just take a look at messages.
+There it is.
+That is the same as what I just read to you.
+That is our system message and our user prompt.
+All right.
+Look at this.
+The thing to note about this piece of code, the thing that there's one line that is the really important
+line, and that line is this one right here.
+We say done is false.
+And then we say, while not done.
+And why is that important?
+You might be thinking you are.
+Consider that for a second.
+It's important because that is our agent loop.
+This this is this means that we meet the definition because we have a loop.
+It's a loop with a with an agent that is going to go around and it's got tools, it's an agent equipped
+with tools.
+And when it's responding, uh, to indicate success, it won't call a tool.
+It will just it will just finish.
+That means that done is true.
+The objective is met.
+And so this is an LLM in a loop with tools to meet a goal.
+And the tools it's got are these sets of tools we're passing in right here.
+And these tools are three fake functions that we wrote up there.
+All they do is print something and then they return dummy data.
+So with that I can run this and it's going to make that fake.
+It's going to it's going to really it's going to really use this system message and user prompt arming
+the LM with these fake functions, which it thinks as far as it knows, that they're real tools.
+And we will see what it does.
+Okay.
+Here we go.
+Deep breath and run.
+So it immediately called the fake function to scan the internet.
+That returns a hard coded set of deals.
+Look at this.
+It's just called the fake function to estimate the true value four times.
+And it just made the fake function to notify the user of a deal, and then it returned.
+Okay, it faster than I could commentate that.
+That's what just happened.
+They were all fake functions, but it called them all and it called them all autonomously.
+It called them all because those were the tools that it thought was right to call at that point.
+It is, of course, as you know, it's always tempting to to to try and think of this in a sort of human
+like way.
+What's going on is that these LM calls are generating tokens, the most likely next tokens, and those
+most likely next tokens involve making the tool calls, stopping for reason of tool call for each of
+these tool calls one in a row as described by this JSON blob.
+Here it knows to first make this tool call and then this for each of those deals.
+And then finally notifying the user.
+And I think it got five deals and it decided to only call for prices.
+That was that was its choice.
+Uh, it's uh, it made that autonomous decision right there.
+That is the power of autonomy.
+Um, so even though we were fairly prescriptive and you could experiment with being less prescriptive,
+you could try something really, really short here.
+Uh, we were quite specific about what we wanted it to do.
+It's still it made its own mind up about some of it.
+And but it had all of the right conclusions.
+But the thing is that that it's calling fake functions.
+And that's not what we want.
+We want it to actually call other agents.
+So how will we do that?
+Well, you probably already realized this, but it's going to be really very easy.
+We hardly have to do anything that the LM the planner LM here.
+It doesn't know that these functions are fake.
+It's just calling these tools.
+And it's making that function call which we've just got a print statement in.
+But that function call could itself be just making a call to the other agent.
+It could just say like Frontier Agent Price or anything like that.
+How we implement that function is completely up to us.
+And so that's exactly what I've done.
+So if we look in autonomous planning agent here, this this is a class which, which basically when
+it, when it's when it's created, when it's instantiated, it creates a scanner agent and ensemble
+agent and a messaging agent.
+It creates instances of each of those.
+And then it's got the scan the internet for bargains function and that calls scanner scan.
+That's the thing that kicks off a scan that we did a couple of days ago.
+It's got estimate true value.
+So we did that yesterday.
+It's got estimate true value that just calls self dot ensemble dot price.
+It calls the price function which will then call all of the other price functions.
+And then we've got notify user of deal.
+And that calls messenger notify which which again just just just calls the same function as we did yesterday.
+And then I've got the same JSON blob.
+And now in in the handle tool call I call one of those functions up above.
+I have actually written it a little bit better this time.
+I have a mapping dictionary that maps from text to the to the function itself, so that I'm not doing
+that.
+Nasty globals.
+I don't know if you think it's elegant or a hack, but I'm not doing it.
+I'm doing something a little bit more bulletproof.
+In the spirit of this being productionized code that's ready for deployment with with nicely nicely
+crafted.
+So being a little bit more careful but otherwise the same system message and user prompt.
+And here here we have our agent loop.
+We have done as false while not done.
+And then it loops for every time it calls a tool until it's decided I run out.
+No more tools to call, and then it takes the response and it says that it completed with this reply.
+And that is going to be our autonomous planning agent.
+It's exactly the same thing, except instead of the empty functions, the fake functions, we've actually
+made calls to the other agents.
+Okay, the time has arrived.
+Let's do this.
+So, uh, we'll turn on logging again.
+We're going to get hold of our of our database.
+Have that have that to hand.
+Okay.
+Now I'm going to say from agents Dot there we go from agents autonomous planning agent import.
+The thing we were just looking at right then and let's create it.
+Agent is autonomous planning agent collection.
+Okay.
+Let's let's do this.
+So we're going to create this agent.
+And when we create the planning agent it's going to create those other agents that it depends on.
+And so we'll see what happens here.
+It's going to set up.
+It's going to do a bunch of imports of course.
+Look at that.
+Some colors some colors a bunch of things are happening.
+The autonomous planning agent initializing scanner agent scanner agent is ready.
+Ensemble agent.
+The specialist agent is connecting to modal.
+Everything is happening.
+The agent will have loaded its weights.
+Okay, so now.
+Now the time has come.
+It's going to be time to run.
+Agent.
+Agent.
+Plan.
+You ready for this?
+Let's kick it off.
+All right, so it says the autonomous planning agent is kicking off a run.
+It's calling the scanner.
+And that's that's in green for the planning agent.
+We're now in cyan for the scanner.
+The scanner is about to fetch deals from an RSS feed.
+So it's so it's doing that that scrape deal thing that's gathered 30.
+Or maybe if you've turned it up it might have gathered more.
+And now it's calling OpenAI with structured outputs.
+It's using structured outputs so that we get back a format that is turned unstructured data into structured
+data.
+It received five selected deals from OpenAI as part of that structured output.
+It's now back with the planning agent to figure out what does it want to do next.
+Okay, well, it's going to want to do a few things.
+It's first, it's going to to start by running the ensemble agent to estimate the true value of something.
+And the ensemble agent starts by calling through light LM the I've got it set up to use OpenAI GPT OS
+20 be to be pre-processing the text to turn it into the text with a title and a category and everything,
+so that it's in the best possible state for our LMS to estimate the price.
+And then it got to the specialist agent.
+This is our frontier model.
+So not all frontier model specialist model running on modal.
+That took 30s to warm up, which it did.
+Now the frontier model is running.
+Now it's too fast for me.
+Now you can see the purple is the frontier model.
+The blue is the frontier model.
+So purple is the neural network agent.
+We've got five products have been priced now.
+And now it's come back uh, to, uh, it's come back to the, um, uh, push notification.
+And now it has just made a push and there.
+Did you hear that?
+That was my phone.
+I've just got a message.
+Amazing.
+Deal.
+Alert.
+Get the Dell 16 plus ultra five.
+I got the deal alert.
+I got the catching.
+It happened.
+We just ran our agent framework.
+And wasn't that amazing?
+--- Lecture 4 ---
+So I hope that you are gobsmacked by this.
+This was really, really cool.
+Uh, I think I just just counted it up.
+I think that in total running this framework involved, I've counted this upright, uh, 34 model calls
+in total to do all of this.
+29 Lrms, five, uh, neural network calls, um, including each of the parts of that agent loop as
+a separate call.
+Um, because it was like a different, different call to to to to um, uh, out of that, it's we were
+calling three different frontier models GPT five, GPT five one, and anthropic, uh, Claude, uh,
+45.
+And we were calling three open source models, our fine tuned specialist model, uh, the all mini LM,
+l6, v2, uh, encoder from Hugging Face and OSS, uh, that we used for GPT oss 20 that we use for
+pre-processing.
+So three frontier, three open source models.
+29.
+LMS plus five neural network calls to to our deep neural network for a total of 34 model calls, all
+collaborating together in order to achieve this result of finding a Dell 16 Plus Ultra that got sent
+to me as a push notification that that is quite a platform.
+It's quite a product.
+Uh, so I hope you enjoyed this.
+I hope you've been able to get this to work yourself.
+Remember, if you hit any technical snafus because there's a lot going on here, you can comment stuff
+out.
+You can reduce the complexity of the ensemble model.
+Just just calling one of those models for sure.
+Uh, you can simplify down in many different places if all of the moving parts aren't working for you,
+but I hope they are.
+And I hope you're seeing something like this.
+And if you just want, if you're just in it to get the intuition, then it's just important to see that
+it really wasn't that hard to build this sophisticated platform with six different 6 or 7 different
+models collaborating on this across 34 different calls.
+Uh, with this fantastic outcome.
+All right.
+I will see you for the wrap and take one more look at the architecture that we built and, uh, take
+great pride in it.
+And if you've managed to tweak it and do anything different, I would love to hear about it.
+This is, uh, been so much fun building this.
+And you're probably thinking, was that that was the finale, right?
+That was that was really great.
+No, there's still more.
+There's still a little bit more.
+We've got one day left of this thing.
+One more day.
+It's a short day, but it's a great day and it will be our final, final finale, the finale of finales.
+We will finish the Agentic workflow by adding in things like memory and stuff like that, and by the
+end of it, not only will you be able to do everything on this slide that I'm not going to say yet again,
+you'll be able to do all of this, and you'll also be able to say, you know what?
+At this point, I am an AI engineer.

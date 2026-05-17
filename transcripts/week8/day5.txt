@@ -1,0 +1,312 @@
+--- Lecture 1 ---
+Well, the day has finally arrived.
+How did we get here so fast?
+It's somehow week eight.
+Day five.
+It is the last day of the program.
+What you can already do for sure.
+I'm going through it this time.
+What you can already do, you can generate text and you can generate code.
+And whether you're using frontier models or open source models and also images and audio as well, you
+can use APIs and hugging face.
+You can use tools, structured outputs we added in.
+You can build assistants.
+You can use Rag with and without Lang chain and including evaluations.
+You can follow that five step strategy to solve problems including curating the data set evaluations,
+making a baseline model, fine tuning at the frontier.
+You can confidently carry out the end to end process for training a specialized open source model that
+in some situations, will outperform the frontier, and you can deploy multiple models.
+You can use the serverless AI platform.
+You can build a Rag workflow with frontier models and with a neural network.
+And after today, we will wrap things up with our agent workflow, and you will be able to to tick that
+box and say that you got to the end and you consider yourself an AI engineer.
+That is the plan.
+You're probably absolutely exhausted.
+You're probably thinking, I don't know if I'm an AI engineer, but I know I need some sleep.
+Uh, but okay, let's just quickly recap the three definitions of agents that I said at the start of
+the week.
+Sam Altman OpenAI for a while was putting out there.
+It's AI systems that can work independently.
+The consensus early in 2025 was that it's about situations where an LLM controls the workflow, and
+then the kind of emerging definition is that it's where you have an LLM in a loop with tools to achieve
+a goal.
+And hopefully you've got a good sense that we did all of these things.
+We got an AI system that could work independently, although maybe, arguably we haven't yet completely
+ticked that one because we had to kick it off.
+We've got AI systems where LM controls the workflow, for sure.
+And you saw that loop.
+You saw that while not done, uh, you know that we've got a loop.
+It runs tools to achieve a goal.
+That is why it is a genetic.
+And we also covered the hallmarks of an agentic AI solution, breaking a bigger problem into smaller
+steps using tools or structured outputs.
+An environment where agents collaborate, a planning agent that orchestrates and then autonomy and memory
+existing beyond just the construct of an AI assistant, an AI chatbot.
+Okay, and that's maybe the one part, that last part that we haven't completely ticked that box and
+that that is the box that we will tick right now back in cursor for the last time.
+--- Lecture 2 ---
+
+And here we are in cursor and going into week eight and going into day five, we get day five.
+How did we get here so fast.
+All right.
+So it's now time.
+The final step building the user interface.
+And along with that, another uh, Python module that is going to help us out that I will introduce
+for you in just a second.
+So first of all, that great line import gradio as G.
+And then this from deal agent framework import deal agent framework.
+What is that?
+I told you we weren't going to use any frameworks.
+So what is this exactly.
+And then we're bringing in some of the classes we looked at before from deals.
+Okay.
+So so with that before before we go further, I want to quickly show you what is in this deal agent
+framework thing.
+So here it is.
+Here is the module deal agent framework.
+And it's really just the kind of glue that goes around everything.
+Uh, and it's just sort of to take us out of the notebook construct with just one little bit of extra
+functionality.
+So first of all, it has something that sets up logging and does that properly.
+And this is the class deal agent framework.
+Um, I've added something called memory.
+And that sounds like it's something very fancy.
+Whenever you hear of memory it sounds like this is very something very clever, ingenious.
+But it's typically just talking about loading and saving something from disk.
+In some situations, memory is a is a tool that you give an agent so that it can look things up in memory.
+In other cases, it's just something that you'll shove in the prompt.
+So make sure that it knows about the prior conversation or to to know about deals that it surfaced in
+the past.
+In that case, that's what we're doing here.
+So I've got a function read memory and a function write memory.
+And that quite literally reads and writes from a JSON file called memory and memory JSON.
+I've clicked on here.
+It just has a bunch of JSON to describe prior deals that have been surfaced.
+In fact, because our deals are all pedantic objects, it simply writes those pedantic objects to JSON
+and into this file.
+And that's why the code is so light.
+That's what read memory and write memory does.
+And there's also a class method reset memory that will put it back to just the first two items.
+So there's something a little in there.
+There's a log function.
+And then there's there's a run function that kicks things off and gets everything up and running.
+So this is this is what we have.
+Uh, and with that I am now going to, uh, to, to go back to the code so that we can, we can get
+this thing running.
+Okay.
+So we're going to do these imports, we're importing Gradio and we're creating this deal agent framework
+object.
+Um, all right.
+Now the next thing I'm going to do is create a little gradio app.
+And, you know, this isn't a Gradio course.
+So I'm not going to go super deep on it.
+But I just want to explain we're using GR blocks, which is when you want to build a Gradio interface
+piece by piece, which we did touch on briefly in week two.
+We're giving it a title, The Price Is Right.
+We're saying we want to fill the whole width of the interface to not have margins on either side.
+And we're going to have, uh, two, two fields here.
+Markdown.
+The price is right deal hunting agent guy.
+And then a sort of like a subheading.
+Uh, let's just run this to see what happens if I do.
+So, uh, when I run this, it pops up a screen.
+The price is right here.
+It is a nice gradient UI with, with the with all the usual stuff on an empty screen.
+Ready for some action.
+Okay.
+All right.
+So let's go back to the code again and let me show you the next step in this UI.
+So we're going to create this deal agent framework.
+We're going to have that running.
+And meanwhile we're going to uh just just try and build out the user interface a little bit more.
+I'm adding in a table which is called a data frame, a table with description, price estimate, discount
+URL.
+I'm also going to set up some some initial dummy objects, a deal which is going to have a description
+example description.
+And you know I'm using these things called Gradio callbacks.
+This callback means when the user interface is loaded, I want you to call this function get table that's
+written right here.
+Give it as the inputs, the current deals that I know about and whatever comes out of it.
+Connect that to this this gradio table.
+All right.
+So this may have been a bit abstract for you, but it will come real when I run it.
+You see that the deal agent framework runs, which brings up lots of stuff.
+Then the UI appears and there's a dummy table with an example item in there.
+We're starting to see the beginnings of a user interface okay.
+And now and now I have put this user interface into a Python module and it is called Price is right.py.
+Let's take a look at it.
+It's it's got a bit more I've got some, some funky stuff to deal with with how it's going to uh, collect
+the logs, anything that's written to the log and display it in Gradio.
+And this is a little bit janky, but but otherwise it's all fine.
+It's it's it's pretty Boilerplate stuff that can be a bit wordy, but I'm making it so that it shows
+all of the data on the UI.
+And I've also got something built in here that means that it sets up a timer so that every five minutes
+it will wake up and start things running again.
+Um.
+Meaning?
+Meaning that this will always be running.
+Always chugging.
+Um.
+Always doing some processing.
+And again, if I go back to the day five lab, um, first up, I've, uh, remember I have that reset
+memory function, a convenient function that is going to delete the memory down to just two recent things
+that got surfaced so that we start fresh.
+Um, and then the next thing that I can do is kick off the prices right dot pi by doing a UV run.
+And that of course is is going to basically do a Python.
+It's going to launch that app so that we can see this user interface together and that, that that is
+what we're going to be doing in the next video.
+--- Lecture 3 ---
+Okay, here we go.
+I'm clicking here on UV run.py and I am launching this to bring up our new user interface, uh, in
+Gradio for this application.
+So we are about to see.
+Here it is.
+This is our Gradio UI.
+On the top here is the memory.
+The memory from our agent framework of deals.
+It surfaced in the past.
+On the bottom here, this is the log information from our agents.
+I told you the colors would look cool.
+These are each of our agents giving us the information.
+The messaging agent.
+Initialize everything.
+Initialize the scanner agent is fetching deals from the RSS feed and currently calling OpenAI using
+structured outputs.
+Everything is running.
+It's all going the.
+It's now got to the specialist agent, which is calling the remote fine tune model.
+This is model.
+We're wasting our 30s for it to warm up.
+While it's doing that, I'll mention what you're seeing here of course, is the memory from the 3D plot.
+There's what, you might ask, what is the business value of showing this here?
+Like what commercial purpose does it have?
+It has no commercial purpose whatsoever.
+I just think it looks great and it's my agent app so I can do what I want.
+Here it is.
+And now this is back.
+You can see that that modal is running.
+It's warm.
+So we get the prices.
+We're getting the frontier agent, each agent in turn.
+And now.
+Did you hear that?
+Ka ching.
+It's recommended for $550 a the Dell laptop.
+And it has just appeared right here in the memory.
+We have just got our first recommendation from our agent framework.
+This is up and running and it will keep running.
+This will be running.
+And every five minutes it will wake up and do its thing.
+And if it finds a compelling deal, it will send me autonomously a push notification to tell me all
+about it.
+And so this this is the finale I promised.
+This, I hope you agree is an epic finale.
+This really is the culmination of everything we've been working on for three weeks.
+It's got a 34 different model calls, 29 of which are LMS.
+And so much happening to bring this to fruition.
+And yeah, I advise you, I urge you to have this up and running, sitting there and take great joy
+every time you get that text message, that catching up on the push notification on your phone to tell
+you that your agent has found another compelling deal.
+And back here in cursor, you'll see that we've got the the trace, the logs being printed here as well.
+And I mentioned a few things.
+There are some more.
+I've got another repo where I've built this out a little bit more to use an agent framework and to use
+MCP should you wish to look at that.
+And then one more time I've got links to LinkedIn.
+If you haven't.
+If you've somehow got this far and not connected with me.
+I don't know how you did that, but this, this is then you're my, my, my final appeal that surely,
+surely, at this point, uh, you want to connect with me on LinkedIn or maybe on on X?
+Uh, but, uh, wow, congratulations on making it to the to the end of the final project on day five.
+Let me see you back there.
+You don't want to miss the final wrap up slides.
+I will see you back for the wrap up.
+Well, I'm sure you knew I was going to bring this one up.
+How about it?
+It's the end of week eight.
+You started eight weeks ago over there on the left.
+You were there in week one.
+We did the foundational stuff.
+We were talking about tokens and things which now seem like such old hat to you.
+I'm sure the chat completions, API, OpenAI completions create.
+And then in week two we looked at lots of APIs, UIs, multimodality, our first work with tools.
+Week three we went to Colab for the first time and worked with hugging face pipelines and then the proper
+Transformers models.
+Week four was about picking the right LLM for the task at hand, looking at artificial analysis, AI
+and and generating code.
+Writing something that would port from Python to C++ in week five was rag week.
+Good old rag week.
+We did long chain one zero.
+We did it without.
+We did that evil thing.
+That was cool.
+Week six was curating a data set, building different models, testing out different frontier models,
+and then ending with the fine tuning, the frontier model.
+That didn't didn't do too well, but we made up for it in week seven and we fine tuned open source model,
+a tiny llama 3.2 and crushed it.
+Although of course, in week eight, the frontier came back with a vengeance when it was when it had
+rag to help it out, it was able to triumph, but it was an ensemble model that did better than anything,
+finally getting me my my two handle my 29 point something that I had been after and that also allowed
+us to to end with the epic finale of an agentic framework built from scratch, using tools to orchestrate
+amongst llms with an agent loop, and with that, with that.
+This means that for sure you have.
+Now you have earned it.
+You can wear your your LLM engineer, your AI engineer badge with pride.
+It's it's now about practice, practice, practice, build build stuff and and share it and tag me on
+LinkedIn so that I can be part of of what you're building and what you're sharing.
+Um, but, uh, you have reached the conclusion you are an AI engineer, and it remains for me to thank
+you so much for hanging on in there till the bitter end.
+Till the end of week eight.
+Day five.
+Not everyone makes it through to the end.
+I'll say.
+And so I'm very grateful that you did.
+Thank you.
+And yeah, it's it's something where I would really love it if you stayed in touch.
+If you ping me and tell me you made it to the end.
+Uh, anything that you build, I would love to hear about it.
+Please.
+Please do.
+Obviously, the most important thing to build is thinking of ways that you can apply your new expertise
+for for commercial benefit.
+Think of ways you can deliver impact with what you've what you've learned, whether it's through using
+tools, whether it's through building a rag based system, whether it's fine tuning or something, that's
+a gigantic.
+Look for opportunities to apply this to make business impact day to day.
+That's what it's all about.
+I've got an extra sweetener.
+I've got got a fun project where I tune, fine tune an LLM on my text message history.
+240,000 text messages are in here, and it makes for some entertaining results.
+That's something you might want to check out.
+and my editor would kill me if I didn't mention one.
+One request that we have.
+If you're able to rate this course on Udemy, it makes a huge difference.
+This is one of the main ways Udemy decides whether or not to recommend the course to others, whether
+to suggest it.
+And so if you found it valuable and you think that other people would too, then please do rate it and
+massively appreciate that it makes all the difference.
+And then on another note, uh, if you haven't completely had enough of me, if you're not totally fed
+up of Ed, uh, I do have other courses, as I mentioned once or twice.
+Uh, there's the course that goes much deeper on Agentic AI.
+There's an MLOps course that goes into Productionizing Llms with with things like explainability, observability,
+scalability, resiliency.
+Lots of good stuff.
+And security, of course.
+Uh, so so there's, there's that course which will also deploy your, your LLM solutions to Vercel,
+AWS, GCP and Azure, uh, for, for uh, for whether you're a startup and you want to be able to have
+a subscription SaaS app, or you work at an enterprise and want to deploy to a major cloud provider,
+it's all in there.
+And then finally, I've got my leadership course.
+That's more about the commercial side.
+And it's it's mostly designed for non-technical people, but it's good for for tech people too, because
+it helps give you that commercial perspective, which can be a superpower for engineers.
+So check out some of that on my home page has links to all of it if you're interested in more of me.
+And with that one more time, let me offer my heartiest congratulations on this accomplishment on making
+it to the very end.
+Please post about it on LinkedIn and I'll weigh in to amplify your achievement.
+And I just want to say, you could not have picked a better time to be entering this field.
+What an exciting time to be involved in the field of of of generative AI and a genetic AI.
+What a time to be coming in as an AI engineer.
+Congratulations.
+Please stay in touch.
+I can't wait to hear what you do next.

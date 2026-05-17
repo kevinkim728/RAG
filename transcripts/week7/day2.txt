@@ -1,0 +1,819 @@
+--- Lecture 1 ---
+Welcome to week seven, day two.
+No time for preamble.
+We got to get straight to it.
+We got a cracking day in store today.
+We get into proprietary models.
+We really get into building what, as people say, building our own model.
+Although of course it's fine tuning an open source model.
+You know what you can do already working with frontier and open source models.
+Five step strategy.
+And now Q Laura, this is old hat.
+Today we're actually going to get to doing some.
+We're not going to do fine tuning yet, but we're going to be absolutely poised for it starting tomorrow.
+And it begins by us polishing off our data set so that it's just perfectly ready for fine tuning.
+So let's go and do that right now.
+We're going to go back to cursor.
+First of all no time for slides straight to cursor.
+See you for day two okay so here we go.
+We go into week seven.
+We go into day two.
+We are looking now at doing some final massaging to our data sets to make it perfect for fine tuning.
+The order of play is given here.
+So you know what we're doing this week.
+We're going to start with some imports.
+You will have had to set the kernel if you hadn't already.
+Start with some imports okay.
+And we're going to start by going through with the light data set, the simple quick light data set.
+We log in to hugging face.
+And now we're going to load in.
+This is the same code you're used to doing when we load from the hub.
+The 20,000 training data points.
+There they are okay.
+So what we're now going to do is load in the base model llama 3.23 B.
+And we're going to to set up a tokenizer loading the tokenizer for this base model.
+And let's just calculate with this in mind how many tokens will we have in each of our each of our different
+items.
+And let's just plot that.
+Let me show you what I mean.
+Basically, if we turn our text into tokens, we get different numbers of tokens with each of our different
+data points.
+Some of them have more tokens, some of them have less.
+You may remember before there was a chart which which was cut at 4000 characters.
+When we were looking at the length of these bits of text.
+This is what it's like when we turn it into tokens.
+The vast majority have less than like like 100 tokens in them, but there is a tail and the highest
+has 245 tokens.
+A lot more so there is quite, quite a long tail there.
+Now, when you're running fine tuning, you have to set up in advance what is the maximum number of
+tokens in any of the training data?
+Because it's going to have to build like it's going to have to be able to support anything up to that
+much.
+And the amount of memory that you use up on the GPU is it's linear.
+It's a proportion to the to the maximum sequence length that you need to support.
+So basically, it's quite problematic to say that we could have up to 245 different different characters,
+different tokens in our inputs.
+That means that it will have to reserve memory for lots of space and all of the inputs that don't reach
+that amount.
+245 get padded with a special pad character, and as a result, we use up all of this memory with pad
+characters, and that's a big waste of memory and it slows down training.
+So it's kind of sensible for us to cut off at some point and say that, look, let's, let's pick a
+number like 110.
+Let's say anything that has more than 110 tokens, we will cut it at the 110 point.
+Uh, and so if I were to do that, that means that out of my 20,000 data points, 1255 of them would
+get chopped towards the end, and that's about 5% or so, 5.7%.
+And this this is something that, uh, there's there's no easy answer to this.
+Again, there's no formula for this.
+This is a like a hyperparameter.
+It is a hyperparameter.
+You can experiment with this.
+Having a letting in more data potentially means that you can you can give more information to train
+on.
+So it gives more rich data sets for your training.
+But it uses up much more memory, which slows down how much training you can do at any given amount
+of time.
+So there's a trade off, and that trade off is something to experiment with.
+and my instinct of doing this for a while is that this is perfectly reasonable.
+I've also printed a bunch of these that got cut off to satisfy myself, that most of the interesting
+and important content comes early on in the description, because you remember the way that we write
+these things.
+If I print one out, hang on.
+Just remind you what they look like.
+Uh, let's let's just take, like, um, uh, items.
+Uh, sorry.
+We should take the train.
+Training data.
+Zero summary.
+This is what.
+This is what we're looking at here.
+Uh, so let me print that for you.
+So what what we're seeing, um, is something which has the title, category, brand description.
+All this is bound to be within the first 110 characters.
+And some amount of the detail might get truncated in 5.7% of the cases, it's getting truncated.
+So it feels like that's probably not going to be taking important signal away from the model, but it
+allows us to be much more efficient with training.
+So 110 is the one I've picked to be at 5.7%, and it means we can train really efficiently.
+You could experiment with changing this number and see what you get.
+Typically, changing your data set is one of the most powerful ways to impact performance.
+It's not the most glamorous of hyperparameters.
+People like to explore R and Alpha and all sorts of other things.
+Learning rates, lots of things that people explore.
+This kind of data related hyperparameter might feel less attractive.
+It often makes an enormous difference.
+Um, and particularly for me, it made a big difference to make this a smaller number, because I was
+able to get much more training done in the same time frame by being quite, quite tight with how much
+data I allow in.
+So 110 is that's what we're going to do.
+And now we're going to craft a data set with that cut off.
+So I've got this function here make prompts which is in the items module.
+And let's just quickly take a look at what Make Prompts does.
+Here it is.
+It's got make prompts and it takes a tokenizer.
+It takes a maximum number of tokens.
+And it has this thing do round which is whether or not to to round the number.
+Uh, let me show you what this means.
+Um, so I'm first of all, turning, turning the summary.
+I start with the summary, I turn it into tokens, and if it's got too many tokens, more than maximum
+tokens, then I truncate it at maximum tokens and I turn that back into English again.
+Otherwise I just stick with with the summary.
+If it's if it's within max tokens.
+Okay.
+And now I build something called self dot prompt a prompt.
+And that is going to be question.
+And then the summary and then prefix.
+What is that.
+Here we go.
+Question what does this cost to the nearest dollar.
+And the prefix is price is dollar.
+And that is what's going to turn into the prompt.
+It's going to say what does this cost to the nearest dollar.
+And then some stuff and then price is and then the, the actual outcome.
+Uh, so uh, that is what we're putting into, um, into the prompt.
+So it says price is dollar and then we're not including the actual outcome.
+That's what the model is going to want to try and put there.
+That's what it's going to be trained to get good at doing.
+So that's what we're doing in in in in self prompt for Self-completion.
+We're actually putting in the price itself.
+And there's just this little, little thing I'm doing here that for Self-completion if, if we're if
+we're building the training data, then I do round it to the nearest whole number, because I want to
+train a model to just be able to predict the price to within the nearest cent.
+And now you may wonder why I'm doing that.
+Why not have it predicted all the way to, to to cents?
+And there's a subtle reason for that that I will get to in a minute.
+But if we're building the test data set, then I want it to have the actual final price, because on
+my testing we want to test it always against the true price.
+So this is what make prompts does.
+And to make that real for you, let's actually run it and see what we get.
+So here we go I'm going to run this.
+I'm running make prompts and I'm rounding for the training and validation data.
+But I'm not rounding for the test data okay.
+So let's have a look at one of these.
+Let's let's look at the prompt and the completion.
+Let's start by looking at that just for the for the very first test item.
+So for the first test item it's what does this cost.
+The prompt is what does this cost to the nearest dollar.
+This is our favorite distortion pedal from old blood noise.
+Here it is.
+Price is dollar.
+And that's what the model is going to be trained to put.
+It's going to complete this and completion.
+There is the price and it is rounded to the nearest dollar.
+Uh that is all we have there.
+So this this is what it is being trained to do.
+It's being trained to try and get good at this.
+Uh, so that is the prompt and the completion.
+And now let's look at, uh, what does this look like if we go for a training item.
+Actually let's look at test number one.
+Because actually of course this is a you'll see that because we're looking at the test data set.
+This is not rounded.
+This is showing you the true number the true price.
+Um but here here again is the um.
+Uh, what does this cost to the nearest dollar?
+That is the description of the first test item.
+Let's go for the second test item.
+That's the prompt.
+What does this cost?
+The nearest dollar.
+That's the completion.
+Okay.
+And now let's look at some training data.
+Training data.
+We're expecting to see something very similar except we'll see that the title what what does this cost
+the nearest dollar.
+There we see this completion.
+And there 64.00 is what shows here.
+And let's go for training item one.
+And you'll see what this cost.
+The nearest dollar a mini electric air duster fan electronics price is dollar.
+The completion 79.00.
+So run this for a few examples of the training and test data, and get a sense for what is the prompt
+that we're putting in there, and what is the completion.
+And the reason we're crafting the data this way is that we are going to be fine tuning a model, so
+that when it's given this prompt, it is most likely to provide this as the completion as the most likely
+next token to come.
+--- Lecture 2 ---
+So to summarize again, we have now written something which can produce two bits of text for each of
+our items.
+One is called the prompt and one is called the completion.
+And the prompt has like a question what does this cost to the nearest dollar?
+And then the description of the item, the summary and the completion has the price.
+And we've done it this way because we want to do fine tuning and teach a model how, when it's given
+this prompt, it should complete it with this completion.
+And we're organizing our data in this very efficient way.
+Um, and one of the things I said I would come back to and explain is why exactly is it that for the
+training data, I've done this business of just putting it rounded to the nearest dollar, and I've
+put cost to the nearest dollar here, and, and for the, for the test data, I'm going with the, with
+the full number.
+What's, what's up with that.
+Well well here's the thing.
+So first up recognize that if the model is able to get prices to within the nearest dollar, then we've
+done a terrific job.
+It's if it's within $1 of the true price That's good enough for what we're trying to work with here.
+We're currently our best model right now is out by by $44.74.
+That would be GPT five.
+So you know getting to within a dollar is terrific.
+Um, and but when we're doing our test data, when we're testing and comparing it so that we're comparing
+apples with apples with our previous experiments, we want to make sure we're always testing against
+the true price.
+And that's why for the test data, we're not we're not messing around.
+We're not going to round anything.
+We're going to go with the true price.
+But for training I'm doing this rounding.
+And why is that?
+Well, here's the thing.
+We're trying to teach a model to get good at predicting prices.
+And we want to focus our energy on the most important part of that teaching, which is figuring out
+roughly how much it costs.
+And we're this is basically it's like a regression kind of problem for people, for data scientists.
+We're doing something that's trying to predict a number, but we're using next token prediction as a
+way of doing it.
+We're trying to take a model that knows about natural language and asking it to come up with something
+which is more numeric.
+And that's a sort of interesting thing to be doing, because the model doesn't have built into it any
+sense that the difference between numbers or like a decimal point and things like that, the model just
+is thinking about what's the most likely next token.
+So in order to be able to get the best out of the model and not have it be, be worried about things
+that don't matter as much.
+It's better for us to train it.
+Focusing on the real number, the amount of dollars.
+Because if we train it on the dollars and cents, then when it's trying to generate tokens, as far
+as it's concerned, getting the number of cents right would be just as important as getting the number
+of dollars.
+Right.
+Because it's the loss is calculated based on which tokens it basically gets.
+Right.
+So we'd be training something where it's motivated just as much to get the actual number of cents right
+as getting it.
+Whether it's $10 or $100 would be just as important as whether it's $0.10 or $0.99.
+At the end.
+And that would be a waste.
+That would be silly.
+We'd be we'd be giving it all the wrong kinds of of of loss calculations.
+So.
+So that's the reason that I do this.
+I want to focus training on getting the right number of dollars.
+I don't want to distract the model training it with the number of cents.
+And if you didn't do this, this, this rounding trick, you might have you might think, well, I might
+not have thought of that.
+What would have happened?
+It would be fine.
+It would still work.
+You'd still get outcomes.
+But I believe training it this way, you'd find to be much more efficient.
+It will more quickly hone in on doing a good job of predicting whole dollars.
+So again, it's like a hyperparameter.
+You can experiment with these different prompts.
+You could try taking out the nearest dollar and not doing the rounding.
+And I think you'd find it would take longer to train.
+It wouldn't be as productive.
+Uh, but that's an example of just a good trick to focus training on the right thing.
+And this was, you know, it's not super important that we go into it, but I did want you to have that
+perspective.
+And it's the kind of decision that one makes as a data scientist.
+Uh, experimentally, empirically, you try one, you try the other and you say, okay, this, this
+achieves a better outcome faster.
+Let's do that.
+Okay.
+The other thing we did, of course, when we ran this is we truncated the input.
+We made sure that it was never more than 110 tokens.
+But we also added on a little bit of stuff as well.
+We added on this question and we added on the price is dollar.
+So actually it's the maximum number isn't going to be 110.
+It's going to be a bit more than 110 because we've added on some more tokens.
+So let's figure out what that actually is.
+Let's let's count these things up.
+Uh, find out the total number of, of um, of prompt tokens, including the question and the prices
+dollar and the answer.
+And let's now plot that.
+And what we find is that the average is 101, the highest is 126.
+So it's the 110 that we had.
+And then another 16 tokens that went into that question and the dollar sign.
+So 126 is now the longest sequence that we have here.
+And when we go to to the actually doing training, I'm going to have to tell our trainer, The maximum
+sequence length that it should reserve.
+And I'm going to use 128.
+I'm gonna use 128 because it's good to have a tiny buffer in case there are some extra tokens that get
+shoved on.
+For some reason, we never want to be truncating.
+So I'm going to use 128, but I'm also going to use 128 because because it's a power of two and everyone
+loves powers of two.
+So we should do that.
+We should have 188 as a power of two.
+That makes great sense.
+It makes me feel happy.
+Relieved that we're going with a power of two.
+Um.
+You may.
+I hate to to to confess the honest reality, which is that I did partly come up with that cutoff 110,
+in order that I could have a power of two as my sequence length there is, is actually a real reason
+why you might want it to be a power of two, because it does have to reserve the memory.
+And it's probably good that when you're reserving memory that you have something that is a that is a
+power of two.
+But but it's mostly the superstition, like a data science superstition, that it just feels right to
+have it be 128 is our maximum sequence length.
+So that's silliness.
+But that's what we do.
+And then this final line here is going to push this data set to the hub.
+But remember we started our first data set was called like items raw light.
+And then when we made it pre-processed we changed that just to items light.
+We've now got our final data set which is called Items Prompts light.
+It is the prompts.
+It is a data set which has two things in it.
+It has prompt and it has completion.
+And those two things are the two columns in our data that we're uploading.
+And I didn't just choose them as it happens like like randomly to be prompt and completion.
+Those are in fact the actual column names that hugging faces code expects by default.
+When it's doing training, you can come up with others and you have to tell it, and there's some ways
+to get to do that.
+But if you choose prompt and completion, then out of the box hugging face expects that and will just
+run with it.
+And so that makes life easy.
+That's why I did it.
+You run this cell, I won't do it because I already did it.
+And it will upload that data set targeting face.
+And hopefully you did that and you have a nice light data set.
+I'm now going to clear the outputs restart and I'm going to come back.
+But this time I'm going to have light mode is false and I will run each of these cells.
+I'm now going to be loading in the base model again, and the tokenizer and counting the tokens for
+the entire full data set, and then plotting that chart.
+But now it's going to take longer because we're not doing it for the 20,000 data points.
+We're doing it for the 800,000 in our full data set.
+So it's going to take a few seconds.
+I will see you back with the chart of the tokens.
+Uh, once this thing has has counted up in just a few minutes.
+And here we have the number of tokens in our distribution of the full data set.
+Now that it's loaded, the average is 86.6, quite similar to before.
+The highest is totally crazy.
+There's something in here with 4582 tokens in it.
+And you might say, how can that be when when we, we truncated it at 4000 characters before?
+How can something have that many tokens?
+And I would suggest a quick exercise.
+You can find this and have a look at it and you'll see that it's it's a pretty bizarre product that
+has, uh, description that has tons of product, uh, numbers in it.
+Uh, and each of them turn into lots of tokens.
+And so it ends up being this enormous number of tokens, and it's mostly complete nonsense.
+And so it's absolutely no problem whatsoever in truncating it.
+And so again, we'll use this magic number 110 that I used some very important and complicated principles,
+uh, trying to get to a power of two.
+Uh, so, uh, we end up with, um, 47,000 items getting truncated out of our 800,000, which is again,
+5.7%.
+If we look at the first training item, it is this, um, bronze knob that we saw before.
+And now we can go through and make the prompts for the full data set.
+Remember, for the training and validation.
+We're going to do this truncation, this this rounding thing where we we round the price to the nearest
+dollar because we don't want to distract the model trying to train for cents, because that'll be a
+waste of its effort trying to do that.
+And it doesn't realize that we don't care about the sense we care about the dollars.
+It will think that both of them are tokens, that it has to predict that it has to be correct.
+But for the test data set, we are going to put the real number in there so that when we're doing our
+test calculation, we're doing the same calculation that we did before.
+We're not cheating and doing a different calculation when we do that.
+So that's that's going to run.
+And while it while it completes, let me just say one more thing about this, this business of, of
+how we're using an LM to predict prices.
+Again, this fact that it's that it's basically a regression kind of problem.
+We're trying to do something to predict a number when token prediction is not actually a regression
+problem.
+For people that know about this terminology, When you're when you're running an LM to predict the most
+likely next token, it's actually a classification problem.
+It's actually something where the the neural network is trying to predict.
+It's trying to bucket the next token.
+The most likely next token fits into a different bucket.
+And there are like 128,000 possible buckets.
+And they represent each of the possible next tokens.
+So it's giving a probability distribution.
+It's saying I am classifying what is the most likely next token.
+So in many ways it's trying to classify, uh, the price of an item into a bucket.
+And there's a bin for all of the possible next tokens representing the price of the product.
+Uh, and, um, yeah.
+And so we don't want it to have to worry about classifying the sense that doesn't matter to us.
+And that would be a waste of time.
+We want it to focus on classifying the number of dollars and that that also final point on this, while
+this finishes off, is that in the case of the Lama model, lama actually, uh, It has an interesting
+thing with its tokenizing that all three digit numbers get mapped to one token.
+One token in Lama.
+Many other models it gets mapped to multiple tokens, but for Lama it only goes into one token.
+All.
+All numbers from 0 to 999 get one token.
+And that means that actually the whole price of the product is reflected in one token prediction, which
+is very convenient.
+It's not necessary if you use Quen for this, it will also do very well.
+But it means that lama is a particularly good model for this particular problem, because classifying
+one token happens to to map to guessing a price between 0 and 999.
+You are you are bucketing it into one of these price points.
+So it's a it's a side note.
+It's an interesting one.
+It means that if you are thinking about whether to pick Lama or Phi or Gemma, you don't normally worry
+about tokenization strategies because they don't tend to make a huge difference.
+But in this case, that might be one reason why Lama gets the edge as the best model to pick for this
+particular experiment.
+--- Lecture 3 ---
+Okay, well, that finished and we can quickly print here to see the, uh, the.
+This is just as before the first training prompt.
+Actually, let's go back to the zero training item and see what that looks like.
+This is the interior knob.
+Uh, and here it is.
+This is the prompt.
+This is the completion rounded to the nearest dollar.
+If we go instead to the zero test item, we'll see the prompt and the completion.
+Again.
+These are the two columns that hugging face expects.
+And you'll see there's the prompt.
+There is the completion.
+Let's now just look at the whole of the distribution of tokens in this, so that we see whether or not
+we are cutting off.
+We hope to be cutting off at such a point that with a little buffer, we can be using maximum sequence
+length of 128 for a power of two.
+Let's see.
+Okay.
+It's finished.
+Let's have a look.
+Here is our chart.
+The average 101.
+And good news.
+The highest is 126.
+We can use a maximum sequence length of 128.
+And feel good about our power of two.
+And this will now upload that to Huggingface and we will be in great shape.
+So we have now produced two data sets.
+One is called uh items prompts light and one is called items Prompts Full.
+These data sets, they only have two columns.
+They have prompt and they have completion.
+And that is the that is exactly what Huggingface expects.
+And next we're going to go back to Colab and check out what what these data sets look like.
+And sorry before we look in Colab, let's look in hugging face at these two data sets we just uploaded.
+Start with with light.
+So this is it.
+In hugging face you'll see that that it is.
+First of all, it's something which has three data sets.
+It's got a split of train val and test 20,000, 1001 thousand.
+So that means it's 22,000 rows in total.
+This is what it looks like.
+It has a prompt and a completion.
+The prompt is things like what does this cost to the nearest dollar title category, description, brand.
+That's that's the, uh, the prompt, the completion.
+This this prompt ends with price is dollars.
+And we're training a model to complete this, to give the next tokens.
+And we want it to complete it with the tokens for 64.00.
+And the reason that we're running everything up again is because we don't want to distract the model
+trying to predict numbers of cents.
+We'll just focus it on this, which conveniently in the case of llama, will always be one token.
+Everything from 0 to 999 will just be a 1 to 1.
+99 will just be the single token.
+That's perfect.
+That's the light data set.
+And if I look at the test data set presumably.
+Yeah, we'll see in here that it's the same except in the case the test data set.
+We do in fact have the real numbers so that when we're testing we get that right.
+So that is the light data set.
+And if I come into the full data set here it is.
+It's bigger.
+It's got 800,000 rows 10,000 10,000.
+And you can see the total number of rows 820.
+But otherwise everything is the same.
+It all looks great.
+That's what we've been doing.
+We've uploaded this data set perfect for fine tuning.
+This is how you would do it too, for fine tuning for your task.
+Okay.
+We are now going to open up Google Colab and let's come in to week seven.
+Day two of The Price is Right.
+So, uh, we have to first start by connecting to a T4 again, a free T4 box.
+Be sure it's a T4, be sure you've got the right one, make sure you've got the GPU, come here and
+do a view.
+Resources.
+Otherwise things aren't going to work.
+Make sure you got the GPU Ram in there.
+Excellent.
+So, uh, as always we start by doing the bits and bytes pip install.
+Otherwise you'll get problems later.
+So be sure that you've done that.
+There's also this curious line here.
+Look at this.
+What is this doing.
+Wget Q and then a whole lot of stuff with my name in it.
+What is this with something called Utils.py.
+Well, well so what I've got is I've written a little utility class and running that I've put it in
+the week seven folder in GitHub and this just downloads it onto this colab, and it saves me having
+to have lots of tons of code in here, but it's the same evaluator thing so that we can have that cool
+graphic and not have to have a retype all of the code every time.
+So in fact, in Colab, there's this little file icon here if you go there, basically it's just downloaded
+this file utils.py and plonked it right there.
+And yeah, you could, uh, open this up and look at it, but you would find that utils.py.
+Is there a way that we can view it right here?
+Uh, not that I can see, but I'm sure there's a way that you can get.
+Oh, there we go.
+Double click.
+Who knew?
+Double click on it and we see this file and you might recognize this.
+It is in fact the same, uh, evaluator as before.
+And that's going to mean close that down that we can do some imports.
+And one of our imports here is from util import evaluate.
+That's going to let us do our evaluation.
+Lovely.
+So we're doing some imports.
+And now we have a few constants.
+This is the base model we're going to be using.
+The project name is going to be the name price.
+That's going to be something that we'll be using I've got light mode is false right here.
+Um, but actually, I don't think it's going to matter for for this one, so I'll make this true for
+now.
+Um, that should be absolutely fine.
+And then we're going to load in the data, uh, picking the right data set.
+So this is very familiar code for you I hope because it's basically the same that we are used to.
+And that ran so fast.
+Probably because I've already run it in the past.
+Oh, no.
+Because it's just the constants.
+Uh, we haven't learned anything yet.
+We first have to log in to hugging face.
+So you have to make sure that you've got your hugging face token set and that that tick is.
+Yes.
+And now we log in and it logged in, and now we load our data.
+So we loaded our data set and we separate out the train the validation and the test data loading in
+this is the one that actually is not going to be that quick because I haven't done it in advance, but
+it's quick because, uh, it's a small data set.
+And we'll print the first test item and check this out.
+It's just what we would hope.
+It's a dictionary with two fields prompt and completion.
+What does this cost to the nearest dollar?
+Our favorite V2 distortion noise pedal if you ever needed one of them, now you know all about it,
+and it costs a wonderful $219.
+There it is.
+That's just test number one.
+There it is.
+And let's do train number zero.
+And we're expecting to see that it's nicely rounded 64.00 which is the interior knob.
+Another thing that you always wanted.
+Okay.
+So now we are going to say we would like to have four bit quantization.
+So let's set our quant config right here.
+And we're going to load in our tokenizer.
+This is basically the same code as before.
+I don't know if you remember from week three there's this fiddly stuff that you have to do when you
+tell it this this.
+The pad token should be the same as the end of sentence token and padding side should be right.
+You don't.
+Don't worry about this.
+You just always do this.
+You just always use this code whenever you load in a tokenizer for this kind of purpose.
+It's just just the standard stuff.
+If you don't do it, you just get a few warnings, which is annoying.
+I don't think it actually interferes with anything.
+And so you always see the code like this.
+And at the end of it.
+We'll print the size of it again.
+We're looking for that same number as before.
+We're expecting to see what was it, 2.2GB.
+That should be the size of the quantized llama.
+I think it was 2.2 before we added in the Lora matrices.
+So this will load in.
+This is going to take 30s or maybe a minute.
+And when it's done I'll be right back okay.
+It just loaded in.
+It is 2.2GB I remembered.
+Right.
+Uh okay then here's a new function for you.
+It's called model.predict taking an item.
+And this is something which is going to take our base llama 3.2 model quantized down to four bits.
+And we are going to try to predict we're going to predict what, uh, what what is the result of um
+of, of, of, of asking it to, to complete, to predict the next token that comes after that input
+right off the bat?
+No fine tuning just as it is.
+Uh, and, uh.
+Yeah.
+So so basically we take the, the inputs, we take the prompt column of an item.
+Remember, that's the thing up to the price is dollars.
+And we put that on Tokuda puts it on the GPU.
+And then with torch.
+Nograd.
+You might remember that from our neural network experiment.
+This means that we're not going to do any training.
+We just want it to be an inference mode based model saying we want you to create produce the next token
+given the inputs, and produce up to eight new tokens.
+Just just in case, uh, it comes up with, with something first before the actual number, we'll give
+it an opportunity and then we will turn that we will we will pluck out of it just what it generated
+the new stuff.
+And we will convert that from being tokens back into being letters again.
+And that is model predict.
+Okay.
+So with that let's run this.
+We're going to run.
+We'll first look at what is the first test item.
+In case you have forgotten, the first test item is in fact the, uh, the blood noise distortion pedal
+that actually costs $219.
+So what we're now going to do is we're going to call a quantize llama 3.2 model to complete this.
+It's going to be given this prompt.
+It's going to be asked to predict what are the tokens to come after this.
+And we will see what we get.
+This is what we get.
+Drumroll please.
+We get 349 .99 what is the price.
+So maybe it was what is the price that you have or something.
+It wants to keep talking.
+Uh but that's what it told us 349.
+It was I mean, it was in the right vague territory, but it was pretty far off.
+That is base llama.
+Okay, this is interesting.
+So now we're going to run evaluate.
+We're going to run the cool evaluate utility to see what this does.
+But first I have one more sidebar.
+That's one more super important thing to explain to you.
+--- Lecture 4 ---
+Okay, so I said, I have one more sidebar for you, and it's a really important one.
+This isn't a distraction.
+This is core learning.
+You may have spotted something.
+You may be wondering, which is that the way the structure of the data we're passing into the model
+here is different than the way we did it for frontier models before.
+We've always had like system prompts, user prompts, and assistant responses, and that's how we've
+prompted our models.
+Here we only have prompt and then completion coming after that.
+And you may be wondering why.
+Why are we why are we tackling this so differently?
+And why does our predict here look so different?
+We're not we're not creating an assistant response like we did with GPT.
+Okay.
+There's a good reason for it.
+There are in fact, these two different types of model.
+There are models called base models.
+And then there are models called chat or instruct variants.
+So there's a base and then there's a chat variant or instruct variant.
+They're synonyms.
+You can use either either term.
+And as you actually know there is also now a third type the reasoning or thinking models, which is
+like like another third category.
+But but that isn't involved here at all.
+So we're thinking about either base or chat variants.
+One of those two, the base model, is the starting point.
+That is a model which is given an input sequence, and it is trained to try and predict the most likely
+tokens to come after an input sequence.
+And that's all that it's trained to do.
+It's like predictive text.
+There's some sequence and what's likely to come next.
+And the early versions of GPT were all base models.
+GPT two and three and 3.5 was a base model, and it was kind of weird to try and interact with it because
+it was always just trying to complete whatever it was given.
+And OpenAI were the ones that invented this idea of saying, hey, let's take a base model and let's
+fine tune it a bit more with a kind of structure where there is a system message, a user prompt and
+assistant response, a user prompt.
+Let's teach it.
+This kind of chat style, this this interacting messages.
+And then we'll make it so that when someone talks to it, it gets really good at answering rather than
+just completing the sequence.
+And so these these fine tuned models were known as the chat variants or the instruct variants based
+from a base model made to expect this kind of structure.
+And so when you're working with those kinds of models and typically they're often named the same as
+this but with like hyphen instruct at the end of it.
+When you're working with the instruct models, you do have to structure your inputs to have these special
+tokens.
+The system prompt, the user prompt the assistant response because it's been trained that way.
+And that's the data it expects and that's what it will continue.
+And you can alternatively use just the base model which does not expect this, which won't know which
+which can't have a you can't put in a special token because it's not been trained with them, doesn't
+know what to make of that.
+It just expects input tokens and it will predict what comes next.
+Both models, base and instruct are available and they're also reasoning models too.
+But but that's a for a very different kind of problem.
+So there are these these these two different kinds of models.
+And actually you can use either for fine tuning.
+You can start with either.
+So why have we started with the base model here.
+Well the short answer is you can do either.
+You can do the use the base model or you can use the instruct variant and have all the special tokens
+in there.
+Typically, base models are better when you are trying to teach some new skill, which doesn't require
+a chat and doesn't require instructions of different sorts of instructions.
+There's only one instruction, and you just want it to to predict what's coming next.
+And that's clearly the kind of problem we have here.
+And chat models work better when you are trying to operate in that kind of of sort of instruction response,
+instruction response kind of mode.
+And the instruction might be different and you want it to act according to that instruction.
+So, so those kinds of problems lend themselves better to starting with the the pre-trained instruct
+variant.
+But of course, the short answer is you should always try both.
+You should experiment and pick the one that performs the best.
+And in this case, I did do both.
+Although my instinct was that the base would be better.
+I did try both and actually, yes, the base performed better.
+The instruct variant did slightly worse and needed much more tokens.
+That special tokens set it all up.
+And so it was harder work and the outcomes were slightly worse.
+Not much in it though, but that gives you a good sense.
+In that case, my my instinct is often wrong, but it was right.
+In that case, it is better for this sort of simplistic problem when we've just got a prompt and we
+want to complete it to stick with a base model, have your data organized in this very simple, simplistic
+way.
+And this is very common indeed for fine tuning.
+When you're trying to teach a specialist skill like this.
+Okay, without further ado, let's run the evaluate function.
+And you can see I have taken the whole, uh, function across.
+We get our nice, colorful, uh, results as they appear.
+This is this is the error that's being printed out each time with red, yellow or green depending on
+how far off it is.
+And you can see it's it's not as speedy as we as we are used to because it's actually not parallelizing.
+I'm just doing them one at a time rather than doing anything in parallel.
+For this version in Colab, you can see that we're using up the 2.2GB of GPU Ram and a little bit more.
+And, uh, looking interesting.
+So one more time, what we're doing here is we are running the base model, an untrained and fine tuned
+base llama 3.2.
+We're taking advantage of the fact that it's got some world knowledge.
+So when it's given an input like this and it has to complete it, it should give a completion which
+will be roughly along the lines of what we're looking for based on its training data.
+And we discovered that when we used a frontier model like GPT 5.1, it had such great knowledge, such
+good world knowledge that it did a really fabulous job out of the box.
+No fine tuning.
+And in fact, uh, the GPT model did slightly worse when we tried to fine tune them because they're
+not really, well, well suited to fine tuning like this.
+Um, but in this case, uh, we are we're going to be interested to see how the massively smaller llama
+3.2 and also quantized as well, just just 2.2GB large, how that fares.
+And I will come back.
+We're about halfway through now.
+I'll come back when it's finished for us to see the results.
+Okay.
+The results are in.
+Let me scroll up.
+Here we go.
+110.72 A pretty horrible answer.
+Um, it was, of course, you could see it's been pretty miserably affected by two really, really lousy
+numbers.
+But generally speaking, it's not done well at all.
+R-squared is a big negative number, uh, which is never good to see the error.
+110.72 not very good.
+The base llama llama 3.1 there.
+It should say llama 3.2.
+The base llama 3.2 did not do well against our test data set.
+Well, at least it gives us a starting points.
+110.72 is where we are with Bazlama.
+Hopefully you saw that too.
+And I hope that you've got your prop, your piece of paper and that you've written down on your piece
+of paper.
+My piece of paper has got very busy now.
+I wasn't very neat and I wrote them down.
+Hopefully you're neater than me and you've written down that 110.72, but it's always better to visualise
+it.
+So let's let's take a quick look.
+Here we have it.
+I don't know if you realize this, but 110.72 it's even worse than the constant, the one our worst
+model to date had been just the thing that just guessed the constant, not including the random one
+that was that was silly.
+The constant one was 106.18 and base Lama.
+Worse than just picking the constant base Lama is 110.72.
+Even Ed did better than base Lama, not last year I don't think.
+But this year.
+This year I'm better than base Lama 3.24 bit accuracy.
+Uh, it does a horrible job, a horrible job.
+Uh, so take a look at this visual.
+Remind yourself of everything we've done with our training, and remember the.
+The objective for this week is to now take this base llama.
+Because it's a tiny model.
+It's been quantized down to 2.2GB.
+Just it's titchy.
+It can fit on a on a mobile phone, this tiny model, can we compete?
+I mean, you know, let's see if we can do better than add better than human level or perhaps a lousy
+human level.
+Uh, do better than that.
+Uh, and and can we get closer?
+Maybe.
+Maybe close to a nano variant of a model?
+Uh, so that with just with a free open source on device, tiny size of model, we could have something
+that that could actually achieve a commercial objective.
+That's the goal for the week.
+It's the goal for the next couple of days, uh, which is exciting.
+Uh, so that's what we're going to get after.
+And hopefully this visual makes it real to you.
+And goodness gracious, we're somehow already at the 80% mark your 80% of the way through.
+And hopefully you actually you feel 80% like you feel like there's real expertise now that now that
+we're really building into some some of the more advanced material, a lot of stuff should be coming
+together for you.
+It's looking way back to the times when you were able to to work with front end models, open source
+models, API's, prompt caching using light LM, switching between different models using tools and
+how that works, inference time techniques, building assistance and then onto rag.
+Using rag to retrieve context.
+Using an encoder to be able to to vectorize inputs and answer questions and measure evaluate that.
+Use long chain and don't use long chain.
+And then of course, everything we did last week with curating and pre-processing the data set our baseline
+models, fine tuning frontier models.
+And now this week you can now explain Lora matrices, quantizing models using open source models for,
+for uh, and understanding things like target modules R and Alpha.
+And then selecting.
+You now know the difference between like selecting a base model and a chat variant.
+Uh, and, and you understand that you can select as your base, like Llama or Quen or Gemma, and they
+should all do fine.
+And they maybe they'll be marginal differences between them.
+There is a slight benefit.
+Llama has this tokenization thing that it turns out to be very convenient for the problem that we're
+working on.
+So lots of core expertise built.
+And please, please, please don't worry if you're not following everything.
+Remember there's three different ways you can engage for this.
+For this material.
+You could just be using this to build intuition, get a sense of it.
+Or you could be be be working with the lite model or really digging into the full model anyway is great.
+Next time we're going to look at more of the hyperparameters that are used during training.
+We are actually going to set up an SFT, a supervised fine tuning trainer ourself, and we are going
+to start training our own proprietary LLM.
+It's going to happen.
+It's all going to happen here tomorrow.
+Biggest day of the course so far.
+See you then.

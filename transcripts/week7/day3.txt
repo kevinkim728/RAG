@@ -1,0 +1,1002 @@
+--- Lecture 1 ---
+So look, everyone is different and everyone finds different parts of this crazy AI field interesting.
+But for me, the next couple of days is what it's all about.
+This is the the most interesting and personally the most enjoyable part of the whole journey.
+We're actually going to fine tune our own model.
+At least.
+You know that's how people say it.
+Of course, we're using Meta's Llama 3.2 as our base, but it's going to be our our own model at the
+end of it.
+Once we're finished already, you can work with frontier and open source models.
+You can you can find you can find you the frontier model and make a baseline model.
+And you can now explain.
+Q Laura, today we're going to go through some hyper parameters.
+These are the general settings that you that you make outside the actual parameters.
+They get tuned.
+And we're going to set up a supervised fine tuning trainer.
+And we're going to kick it off and set it going, look at some charts love it.
+And then come back tomorrow for the big outcomes.
+All right.
+So.
+So that's the order of business.
+Uh, and just one more time.
+Don't kill me, but I'll take you through the order of play.
+And so here it is.
+The order of play.
+The Price is Right is the name of the project.
+Last week, curating data, evaluating frontier models, fine tuning frontier.
+This week, fine tuning our open source LLM, we introduced Q Laura.
+Yes.
+Two days ago we did the setting up the prompt data set prompt completion.
+And we explain the difference in a base model and a chat instruct variant.
+And then we evaluated our chat our base our base model, our llama 3.24 bit quantized.
+And the result was 110.72.
+Uh, a miserable result, even more miserable than the human result.
+And that was where we left off.
+And now today is part one of training, tomorrow is part two of training.
+And then we get to the evaluation.
+Okay.
+Let's let's talk hyperparameters.
+And yes, I should also mention, of course, week eight is when we deploy the models at in Rag and
+Argentic products.
+All right.
+Sorry.
+Now on to hyperparameters.
+So we're going to cover five important hyperparameters that affect the Q Lora fine tuning and then five
+hyperparameters for training overall.
+So what are the Q Lora ones?
+Actually we've met these already.
+So the target modules you'll remember this hyperparameter is saying which layers of the neural network,
+which ones are we going to target for our Lora matrices.
+And the target modules I said you often start by targeting the attention layers.
+And then sometimes you add on other layers as well.
+Those are called the target modules.
+R is the number of dimensions of your your Lora matrices.
+R is short for rank I guess, which is another word for dimensions.
+And it's the r in Lora and alpha is once you've done this multiplied Laura A and Laura B, and you're
+multiplying two matrices, which you may remember from linear algebra, you multiply two matrices like
+that, you get one bigger one, uh, and as a result, uh, alpha is how much you scale that up by before
+you add it to the base model.
+Uh, and it's, it's typically, it's always a thing that you just double R that's what you do.
+Uh, quantization is about okay.
+So the model is a proper full floating point number.
+We can reduce the precision down to eight bits or even four bits and see that, that, you know, that's
+definitely going to make your results poorer.
+But it frees up so much memory that you'll be able to do more.
+You'll be able to run more training.
+You'll be able to to try out more intensive things.
+And so when you're thinking overall, you know, you've got a limited budget instead of time to try
+and get to a result, it might make sense to sacrifice some of the explanatory power of your base model
+in order to have so much more room to do much more.
+So that's why you quantize and drop out.
+That's the only new one here.
+Here's a new one.
+Drop out.
+You may have seen that when we were looking at the model, a dropout.
+Is this this this very easy, this very simplistic sounding trick that's used with neural networks where
+you you have some dropout probability and it's most commonly 10%.
+And that's what we'll use.
+You can also try 20%.
+It is sometimes 20% is often another common choice.
+We'll use 10%.
+And what happens is that randomly 10% of these neurons of these little calculations, these these mini
+linear regression units inside a deep neural network get wiped out, get zeroed out.
+When you're passing through, when you're doing your training and a different 10% each time and you
+might be thinking, okay, what?
+Why that sounds sounds very hacky.
+Um, a lot about data science is very hacky.
+So why why exactly do you do that?
+Well, it's a technique to try to make sure that you generalize well, that your neural network doesn't
+overfit to the data, because what you don't want to do is have different parts of your neural network
+be looking to identify an exact input, and when it finds that exact input, come up with an exact output
+that matches your training data, because that's not learning a general pattern and a general skill.
+It's learning something that's very specific with this set of inputs always produce this output.
+And the dropout is just like a technique that tries to encourage the model.
+If it wants to always be doing well with loss, then rather than just changing small, very localized
+areas of your neural network to solve for different problems, it's got to generally make sure that
+the neural network as a whole is good at solving different, uh, different inputs, projecting outputs
+that are likely to be, uh, what we were expecting.
+So it's it's a kind of a it's an odd one.
+It's saying we should be able to to remove different pieces randomly 10% of our neural network.
+And it still does a good job.
+And that's what we try and train it to do.
+And using that technique makes it more likely that it will generalize well and do well with new, unseen
+data.
+So that's what dropouts about.
+It sounds super hacky, but you know what?
+Experimentally it does quite well.
+It does help with this.
+And higher values of dropout tend to mean that you can generalize better.
+But of course, as you could probably guess, higher values of dropout means it takes much longer to
+train because you're doing this, this thing of removing bits.
+So it's got to learn in some way.
+The whole neural network has got to be able to learn how to respond to different inputs, rather than
+allowing it just to cheat and just kind of have different parts of the neural network be focused on
+different types of input.
+So that's the meaning of dropout.
+Again, I'm giving it in a bit of a hand-wavy way.
+I'm trying to give you some intuition for it, but that's good enough.
+That's what it does.
+That gives you a sense of what it means to turn up or down drop out, and how it ties in with generalising
+and overfitting that we covered last week.
+Okay, and now five important hyperparameters for the whole training process overall.
+So epochs we covered last week and epoch of course, is a complete pass through all of your data.
+And you often do multiple epochs because you might think, but why are we putting in the same input
+data again?
+Remember in this in this cycle you're only you're finding the gradients and you're only doing a small
+step in the right direction.
+So it can make sense to make multiple steps as you get better and better.
+There's another reason why epochs make sense.
+Remember that we don't we don't pass data through one data point at a time.
+We batch up our data into batches and those batches every time we start an epoch, the batches are randomly
+selected.
+So it's a different batch of data each time with each epoch.
+So it's not like it's identical input data.
+It's a different set of different selected data points.
+And then that ties nicely to batch size.
+Batch size is how many of these data points do you put in a batch?
+And basically you try and do as much as you can to fit in the memory of your GPU.
+That's really the rule of thumb that people use.
+You keep a bigger and bigger batch size until your GPU couldn't fit it.
+And then and then you reduce down.
+Now there are the more the pro people will point out that it's more complicated than that.
+There are some times you obviously you.
+The ideal case is that you only have a batch of one, that you train one data point at a time, but
+that would take far, far too long.
+It's faster to have bigger batches, but when you have bigger batches, you're training in a in a slightly
+more approximate way.
+It's not as accurate, but there are also some benefits to that as well, because it means that there's
+a bit of a random noise element that's added to your training.
+So there's pros and cons of different batch sizes.
+Generally speaking, the basic rule of thumb is you pick the biggest batch size that will fit on your
+GPU.
+And the other rule of thumb, and this one is crazy, is that people really love using powers of two
+for batch size.
+Like you'll see 16, 32, 64, 128 people always have powers of two.
+And, you know, again, there's this this sense that it makes sense from a memory point of view to
+keep it to being a power of two, and that GPUs perform faster when it is a power of two.
+Personally, I think that's a bit of an urban legend.
+I don't know if it's true.
+I certainly I mean, if you have a batch size of of of 16, a power of two, and you make the batch
+size 17, it's going to be faster, it's going to do better.
+A larger batch is going to run faster through your data.
+There might be some sense at which if you're on a power of two, then it's even more efficient.
+So the jump from 15 to 16 might be a better.
+You might get even more juice than going from 16 to 17, but nonetheless, a bigger batch size is going
+to run faster.
+Uh, so don't if you can fit 16 and you can't fit 32, don't force yourself to stick with 16, even
+though it's very tempting because it's a power of two.
+But you can you can go off a power of two.
+Try 20.
+It's still going to be faster.
+You can try it.
+Uh, and then uh, learning rate.
+You remember we also did look at this once.
+Learning rate is about how big a step do you take each time.
+Uh, every time that you make a step change, you worked out how how much your loss changes.
+If you make a tiny wiggle to your parameters, the gradients, you've calculated that for the whole
+neural network.
+And then you just take a step in the right direction.
+How big is that step?
+That's called the learning rate.
+You often start with 0.0001.
+It's a very common starting point.
+And then this is a this is a hyperparameter that you'll often experiment with trying it.
+And for learning rates people almost always go in factors of ten.
+So you either do 0.0001 or you just try 0.001 or 0.00001 and you try those and see which one works better.
+And then just occasionally you pick like the halfway .0. naught naught naught five.
+Um, but yeah, usually, usually it's a power of ten that you're doing there with learning rates.
+--- Lecture 2 ---
+Now there's a couple more things to say about learning rate.
+The there might be you might be thinking to yourself, why not make the learning rate nice and big?
+A big learning rate means you're taking a big step in the direction of making your loss lower.
+Why not make big steps?
+Well, think of it this way people like like to picture these.
+The loss.
+How?
+Loss is affected by changing your parameters as if it's like a valley.
+You can imagine that your loss might be this, this, this level.
+And as you move the parameter, it comes down and then it goes back up again.
+So it's like like a sort of this valley thing.
+And what we're trying to find in training is we're trying to find that point at the bottom of the valley.
+We're up here somewhere.
+We found the gradient.
+The how much is the loss is affected by wiggling the parameters.
+And then we change the parameter.
+And if we take a very small step, we just go a little bit down.
+If we take a bigger step, if learning rate is higher, we might take a big step down and get close
+to the bottom or close to the bottom of the valley, which would be great.
+But if we take a whopping great step, we might go past the valley and over to the other side of the
+valley and end up somewhere higher.
+We might jump the whole the whole length of this, of this thing, which is sometimes called a minimum,
+a local minimum.
+And so you want to to avoid this situation where you're jumping across like that.
+And so sometimes it can be good to have a learning rate which is quite small, not too big, so that
+you don't jump all the way over to the other side or miss your minimum altogether.
+That's why you might not want learning rates too big.
+Okay, so you're like, fine, I get it.
+We don't want a learning rate too big.
+We don't want to miss the minimum.
+So why don't we make it nice and small?
+Let's make it nice and small.
+Learning rate.
+It'll take a long time to train, but we don't mind that.
+That's good.
+At least we'll get to our minimum.
+Well, there's another problem.
+And that problem is known as being stuck in a local minimum, which is an expression that people use
+in the real world to when they're debating things sometimes and what that means.
+You probably already have a good picture of what that means.
+imagine if the truth is not this nice one valley, but the truth is a valley like that.
+And next to it is a much bigger valley.
+And the real lowest loss point is down here.
+That's what we want to get to.
+Well, if learning rate is too small, there is this risk that if we start over here somewhere, we
+might sort of find our way down to that minimum right there.
+And then if we try and go any further, we go up that wall and we fall back down again.
+We're always trying to move in the direction that minimizes loss.
+So we end up quite literally stuck in this local minimum, this minimum, which is kind of local to
+where we began.
+And we never find our way to the much bigger minimum that's next door.
+And if we had had a larger learning rate, we would have got out of the local minimum altogether, and
+we would have found ourselves in this happy place where there was a lower valley, the great, the global
+minimum, the real minimum that we're trying to find.
+And so that's why you don't want a learning rate that's too small.
+And so you're like, huh?
+Okay, so we kind of a big learning rate.
+We kind of have a small learning rate.
+So what learning rate can we have?
+And of course, the answer is you experiment, you try different learning rates.
+You find out you use your numbers to figure out what works best.
+But there is there are also some tricks.
+There are things called learning rate schedulers that are that are ways to vary the learning rate based
+on how far through training you are or what kinds of results you're getting.
+And so one that we will use in training this this time is pretty simple, but it's called a cosine scheduler.
+And it just basically, uh, it varies your learning rate.
+It starts quite high.
+So you're hopefully bouncing around trying to find the right big global, uh, section to be in.
+And then over time it gets smaller and smaller and smaller so that your steps are trying to then find
+the best possible local minimum and you're not jumping out of where you are.
+So that kind of learning rate scheduler very common approach.
+We're also we're going to do a learning rate scheduler with a warm up period, which means that it doesn't
+start at the biggest number.
+It starts a bit lower, it goes right up to the biggest number, and then it gradually comes down and
+you'll see that pattern.
+We're going to be looking at the learning rate and how it changes.
+So watch out for that.
+You will see it.
+This is a very ordinary approach.
+There are some other really cool approaches.
+There's a way you can have a learning rate scheduler that automatically changes the learning rate when
+results aren't getting better.
+That's a really nice pro technique that works sometimes, but this one is going to work really well
+for us now.
+And it's very, very common.
+And that that finally tells you everything you ever wanted to know about the learning rate.
+Let's go on to another hyperparameter okay.
+So the next one is called gradient accumulation a bit like batch size, but gradient accumulation is
+another way to speed up your training.
+And it's saying okay.
+So the idea is you remember the four steps of training.
+I hope you remember the four steps of training, the forward pass, the loss calculation, the backward
+pass.
+Take a step.
+Well, gradient accumulation is saying what we can do is we can do the forward pass, uh, the loss
+calculation and then the backward pass to calculate the gradients.
+But don't take the step.
+Don't update all the weights everywhere.
+Just hold on to those, those those gradients.
+And just repeat this a second time and add up those gradients.
+And then just do one bigger step at the end of it, because probably that's fine.
+Probably that first step won't have affected your second calculation by that much.
+And so you can do this several times over.
+And it's a way to speed up your, your batch.
+And it has some other nice effects.
+We're not going to use it I find it it adds a bit of noise to proceedings, but I'll have the hyperparameter
+in there.
+So if you want to experiment with gradient accumulation you definitely can.
+You'll see some of the pros and cons in action.
+Maybe you'll get a better result than me, but it's an important one.
+One to watch out for gradient accumulation.
+And then the optimizer.
+So I mentioned of course the fourth step.
+You know the four steps.
+It's forward pass loss calculation.
+Backward pass.
+Take a step in optimization.
+It's called.
+The way you take a step is something which can be very simplistic or it can be quite sophisticated.
+The simplistic one that everyone always starts with is called stochastic gradient descent SGD that I
+mentioned I think last week.
+And that really is basically just what it sounds like.
+You have some kind of gradient and you take some small step, gradient descent.
+So you take a small step in the direction that decreases the loss by the learning rate amount.
+That's SGD, that's all it is.
+But there are some more sophisticated types of optimizer.
+There's one that we will use called Adam that is super popular.
+And these more sophisticated ones have they try and they try and be more cunning about it.
+They do things like they have some momentum.
+So if you've been stepping in one direction for a while, you keep up a bit of that stepping momentum,
+even if your gradients seem to go another way.
+These are all sort of tricks that help you move in the most likely direction.
+And so they take up a little bit more memory, but they tend to have much better results.
+And so Adam is super popular.
+There are a bunch of others.
+Um, and yeah, I think Adam is the one that's used by most people most of the time.
+Or SGD if you're starting out and you want something very simplistic.
+So that's what we'll use.
+That's what the optimizer is all about.
+And it remains to me one more time to remind you of the four steps of training that I've just been alluding
+to.
+But I do want to really impress this on you.
+Uh, remember, this is all about how do we tweak the parameters of the model.
+In this case, we're tweaking the Laura matrices, we're tweaking our Laura parameters based on the
+training data, and we're trying to do it in a way that should generalize so that not only does it get
+better and better with the training data, but it also gets better on unseen data.
+And that's going to be a crucial point for what we're about to do the forward pass.
+That's when you take the inputs and you predict what should the outputs be, including adding in the
+law of matrices.
+Applying them by scaling by alpha.
+Adding them in.
+Get an output that is your first step.
+The loss calculation and we will cover what that loss calculation is another time.
+But you make some calculation about how different was it to to the ground truth.
+The thing that you know should be the outcome that's stored in that, in that, in the completion variable,
+the backward pass is you now go back through and you say, how could I tweak the parameters so that
+I do better next time?
+And remember we're not going to tweak the parameters in llama 3.2.
+There are 3 billion of them.
+No.
+We're going to focus on just tweaking the parameters in our Lora matrices in those small Lora matrices,
+32 dimensions, just going to tweak those parameters because they get applied to the main llama.
+So we tweak them, we figure out what are the gradients.
+And then the final step optimization.
+This is where we use the optimizer.
+It could be stochastic gradient descent SGD, or it could be an Adam optimizer.
+To take a tiny step in the direction so that we do a little bit better next time we get the same inputs
+or something with a similar pattern.
+We're trying to do it in a way that will generalize.
+That's how training works.
+Uh, you you, you know now for sure that we have these hyper parameters, which are the other settings
+that controls the whole way.
+We did this not not related to the parameters themselves.
+Uh, epoch and learning rate are the ones that we've just talked about amongst others.
+Hyper parameter optimization is what it what it means to experiment with these.
+And in many ways, this is just a fancy term for trial and error.
+Okay.
+Take a look at this again.
+Recognize this.
+Remember this from when we trained our own neural network.
+Because we're about to do this with Laura matrices for reals in in a colab.
+Um, and uh, yeah, this this this is the moment I've been waiting for.
+Finally.
+It's here.
+Let's go do it.
+--- Lecture 3 ---
+Okay, here we are.
+Week seven, day three Colab.
+And of course, as always, the link to this colab.
+You'll find it in curser in the GitHub repo in the week seven day three lab.
+Or you can also find in the Readme or you know, anywhere you think you might go and look for it.
+You'll probably find it there.
+Ah, here it is.
+We are in the colab for training days three and four.
+We're going to be working in this, in this notebook and we should enjoy it.
+This is going to be terrific.
+So first up you choose between the light mode and the dark mode.
+The big data.
+The full mode with light mode is false.
+I'm going to start by kicking this off on the light mode because that's what you might do.
+But then we're going to do it for the full mode as well, so that you can take joy in the big data set,
+even if you don't want to run it yourself.
+The light mode is all free.
+Everything is free.
+But to use the light mode, you need to connect to a T4 box.
+You need to make sure it's a T4 box.
+Don't make a mistake with that because it won't work, and you can always check by opening your, uh,
+viewing resources to check that it looks good.
+It's always worth having these resources front and center when you're doing this stuff.
+We're now going to start with some installs, and now we're not just installing bits and bytes.
+We're also installing, importing installing a library called TRL which is the Transformers reinforcement
+learning from Hugging Face, which is the package which is going to do all of the fine tuning that we're
+going to be doing.
+Okay.
+And also we're getting the eval.
+I don't think we use it today, but but we'll we'll use that in a future day.
+Uh, so we then got a bunch of import statements.
+Let me run these right now and these import statements, including importing something called Wonderbar.
+And you may wonder what Wonderbar is.
+And and wand bar is actually short for W and B, which is short for weights and biases.
+Weights and biases is a really fabulous free platform for monitoring training and open source free platform.
+I mean, they have a paid tier two, but you don't need it for this course.
+Um, and, uh, yeah, it's something which is very, very popular.
+Um, and, um, yeah, I don't know that it's that the code is open source.
+I don't know why I said open source, but it's free.
+And, uh, it's something which is, uh, has has, of course, an open source library for connecting
+to it.
+And it's what I will be using for tracking.
+And I very much recommend that you do as well.
+And I'll show you how to set it up super easy.
+And it means that you will have access to, to many things.
+All right.
+But first up we need to look at the constants.
+And now there are a lot of constants.
+And this is controlling ah everything that we're going to do I'm going to zoom out a little bit.
+So we see more.
+And I'm actually I'm going to load in all these constants.
+And I'm going to um, I think I might set this, this loading so that we, you're not waiting for,
+for that point.
+Now we'll get to it later.
+Okay.
+So here are the constants.
+Let's talk through what we've got here.
+The base model.
+You're comfortable with that.
+It's llama 3.2 The project name, we're going to call it price, and we're going to give it that name.
+So that that price, that name is going to appear in Hugging Face, and it's going to appear in weights
+and biases.
+We're going to know to expect the project called price.
+This username here is where you should put your hugging face username.
+This is where we will be saving our model as it's trained.
+This is this is going to be your username.
+Put in your hugging face username right there.
+Lights mode.
+You know true if you want 20,000 data points false if you want 800,000 data points okay.
+The data user.
+So we're also going to collect the data set that we just uploaded.
+And if you uploaded a data set yourself you did.
+You did the stuff.
+You made your prompts and completions and you've uploaded it to hugging face to your account.
+Then you should put your username in here.
+But if you'd rather just use mine that I've already done, it's already there and and it's going to
+be identical to mine.
+Well your one should be as well.
+But but if you, if you just want to stick with the one I've got, leave this data user as editor donor.
+And you'll be just taking my data set and it will work great.
+And so this this picks the data set name either light or the full depending on light mode.
+Okay.
+So far so good.
+One more thing is that we're going to come up with something called the run name.
+We're going to have a run name.
+And I do this because we're going to see this run in weights and biases and in hugging face.
+And I want to make sure we know which one is which.
+So I'm just going to use the current timestamp, the current date like this date and time spelled out.
+It's also common to have like a description of your run.
+Like if you're testing something like I'm trying doubling R or I'm trying more drop out, you might
+have that as text in your run name, and you then see that in wherever you look.
+But after a while that gets quite confusing, because I used to run so many experiments and I'd have
+this long set of different texts, and I found it easier just to put the timestamp and you'll see all
+the different timestamps listed out there.
+But but whatever works well for you.
+And if we're in light mode I'm going to put like a suffix light just so it's clear to us which one is
+which.
+Okay.
+And then I turn all that into a combined project run name, which is the project name, price, hyphen,
+the run name.
+And this is where that will get put on the hugging face hub.
+It will be my username Edna or your username.
+And the model name is going to be this full project name.
+So the name of the model that will be in hugging face is going to be like price hyphen and then the
+timestamp we ran it.
+And maybe hyphen light if it's one of our light models.
+Okay.
+That should all be very clear to you.
+This is all simple stuff.
+This is this is structuring, organizing our runs so that we're coordinated about it.
+All right.
+Time to define our hyper parameters.
+And I've got them in three categories.
+Some overall some Q related ones and some training related ones.
+And then finally, these aren't these aren't really hyperparameters at all.
+There's some stuff about how we track and report at the end.
+So here are the overall hyperparameters.
+How many epochs are we going to run?
+So we'll have one epoch if we're on light mode and this will last in total about an hour to run.
+Otherwise three epochs.
+If we're in the full on let's do everything mode.
+Okay.
+So that's that's that good batch size 32.
+Uh, if we're in light mode 32, I've made it so that that fits perfectly on a free T4.
+But this code stuff changes a lot.
+So what fits for me might not fit for you.
+You might get an exception and out of memory exception when you run this, in which case you should
+feel free to tweak this down to 30 or 25, or keep going down until you don't get an out of memory,
+and maybe start by halving it to 15 and then see how much headroom you have looking at the GPU Ram.
+But as of right now with the code versions are on right now, a batch size of 32 just fits tightly on
+a T4, and on the the the heavy, the full mode, we're going to have a batch size of 256.
+And that's actually going to fill it up with some room to spare.
+Uh, and you may you may say to me, uh, how did you come up with these numbers?
+32 and 256.
+They look suspiciously like powers of two.
+And after giving you that little lecture about how it does not need to be a power of two, I have clearly
+broken my own rules here, and I can't resist, I can't resist, I can't help, it's just like, built
+into me.
+I find it, like, so jarring to do this that I just can't do it.
+Uh, and I do.
+I think the amount of memory you use does jump up quite a bit.
+So there is some truth to this urban myth about urban legend, about about powers of two.
+But, uh, yeah.
+Anyways, power of two.
+It is, um, the maximum sequence length.
+This is a crucial hyperparameter.
+This is about how much memory it reserves and builds the maximum length of any of your inputs.
+Remember, the true number is 126.
+Leaving in a couple of bit of space there for some extra tokens that might get shoved in.
+And so 128 is what I'm going with, which just happens to be a power of two and gradient accumulation
+steps.
+Remember this is like how many steps does it do before it optimizes.
+I've got this at one.
+You could choose a bigger number if that's what you wanted.
+If you want to explore that, that might well get you better outcomes.
+I explored this a year ago and I found that it didn't.
+But but things have changed and you might well get I haven't tried it this year, so.
+So you could do that.
+Those are the overall hyperparameters.
+Okay.
+And now on to Q Laura, and you're expecting this.
+You've seen some of this already.
+We are going to quantize to four bits.
+You can make this false.
+If you wanted to to have an eight bit variant.
+We are going to pick 32 as our R if we're in light mode 32 is really common.
+R often at 16 is less, 32 is common.
+Otherwise we're going with 256.
+That is extreme.
+People don't normally go that high.
+I'm going quite high I actually I've done my tests and this does give better results, but only slightly
+than having a smaller.
+Uh, so so I think I've got a good justification.
+We've got so much data that it makes sense to have a bigger Laura matrix, but this is definitely on
+the high side.
+sighed.
+Laura.
+Alpha.
+We just double Laura r.
+That's what everyone does.
+You can try some other Laura alphas if you want.
+I say I did that a year ago, and I did find that it seemed to work best at twice, but I have to say,
+I found it was very marginal.
+Okay, then, here's just two constants.
+These are the attention layers, the attention layers in the transformer architecture for llama three
+two.
+And these are the MLP layers, the multi-layer perceptron layers.
+Um, the uh the query value key.
+Key and value and output.
+And this is the gate and the up and down projections in the MLP layers.
+So what I'm saying is that if we're in light mode, we will only target the attention layers.
+Otherwise we'll target all of these layers as the target modules for our Q Laura and dropout, I mentioned
+dropout this is that that like super hand-wavy that that really like like hacky thing of let's just
+wipe out 10% of the neurons in the neural network and it's going to help it, not overfit.
+It's going to help it to generalize better.
+Turns out this works pretty well.
+10% is super standard.
+People usually pick 10% or 20%.
+Okay, that's the Q Laura hyperparameters.
+All right.
+And then here we have some more learning rates, you know.
+Well I told you it's usually either oh point naught naught one or oh point naught naught naught one.
+And we're going with the latter right here.
+Warm up ratio is about how long it takes to um, uh, before it hits this this number.
+It's like like how how it how it warms up at the start of training.
+You're going to see this visually.
+And then we're going to use a learning rate scheduler.
+The type will be cosine which is one which does a really nice elegant.
+It starts quite high and then it tails off and does this.
+That's a cosine scheduler we'll use.
+And then the optimizer we will use is going to be a type of Adam optimizer.
+In particular it's it's called Adam w which means there's a thing called weight decay.
+And that's where I set the weight to K.
+And I've got some docs on this lower down if you want to read about it.
+But these are very common choices.
+They're good choices.
+Um, and they're pretty standard.
+Okay.
+And then there's just something here I've got, which is, uh, I just just figure out whether basically,
+are you on a T4 or an A100 a100s can do for your GPU.
+You can do something which is a little bit fancier, um, called a BF 16.
+So I'm just I'm just figuring out whether you're on that computer or not so that this notebook will
+work on, on either type of GPU.
+And finally, some hyper parameters here, which are just about the sort of management of everything,
+um, the vowel size.
+So one of the things we're going to do during training, we're not only going to have the training data,
+we're going to use the validation data.
+Remember that we've got three pools of data training, validation and test.
+Test we do at the very end.
+That's how we that's that's what this is about.
+It's our test data.
+Uh, training is what we'll use for training.
+Validation is going to be held out from training.
+But repeatedly during training, we will test out how we're doing against validation, and that's how
+we know that we're not overfitting and that we're getting better.
+And you're going to see that super visually while we do this.
+So we can pick how many data points do we want it to use.
+And I'm going to say if we're in light mode, we'll do it for 500 points.
+If we're in heavy mode, we'll use 1000 points because you've got more time to kill.
+So we'll we'll do that.
+Um, log steps is how after how many of these batch steps, these mini batches of of this many.
+Um, where are we now?
+Uh, the the batch size here.
+How many of this number of data points does it log progress to?
+Things like weights and biases will be logging.
+That is is log steps.
+Save steps is after.
+How many of these steps does it actually take a version of the model as it's been trained, and upload
+it and save it to the Hugging Face hub?
+So we've got a snapshot at that point, and when it does that, it takes that opportunity to also run
+all of the validation.
+So we'll get at periodic intervals a snapshot of the model and how it's performing against validation.
+And that's a super important trick to use because it allows you to do to do something that people sometimes
+call early stopping, which is that you can you can you can run this for many epochs or for many training
+steps and let it see how the model gets better and better and better and better.
+And after you've trained too much, it might start overfitting and do worse and worse and worse.
+And you can look back, see that your validation loss.
+See when it was at its best possible value, pick that snapshot of the model and that's the one that
+you use.
+That's when it was best before it started to overfit.
+That's a technique that we'll be using during training.
+It's very common.
+And that's why you want to repeatedly save.
+We're going to do it every 100 steps if you're in light mode.
+Otherwise every 200 steps.
+And this log to weights and biases.
+If you're going to do what I do and log this to the free platform weights and biases, then leave this
+at true.
+That's our hyperparameters.
+Congrats!
+We're almost ready for training.
+--- Lecture 4 ---
+Okay, so I've run the constants and you know, your hyperparameters back to front.
+You may think I'm spending far too much time on hyperparameters, but this is where you really learn
+how to how to train your own model.
+Uh, so this use BF 16 thing, uh, that I that I set here that's set to false because I'm on a T4,
+which is just what we expect if we're on an A100, we want this to stay true.
+Okay.
+So I mentioned we're using the Adam W optimizer if you want to read more about them.
+This is obviously more of a pro thing.
+I've got the link to the page in the docs which which describes the kinds of optimizers, and it's got
+some more gory detail on optimizers, if that interests you.
+Do do read up on that.
+Okay.
+Now I imagine by this point you already have a hugging face account.
+It's hard to imagine how you could have got here without one.
+But hopefully you've done that and you already have your API key in here and you have to turn it on.
+There is another API key for you to add in at this point, should you wish.
+And this is the weights and biases uh account.
+So you can go to w and B dot AI.
+I might have said.com before, but it's w b ai.
+This is their home page.
+Um and so this you can see I have a bunch of different, uh, different projects here.
+This is what you get when you, when you come in.
+You'd have to sign up.
+It's free to sign up.
+Um, you get you get to set up different projects.
+You can see price is the project we're doing right now.
+I've got a bunch of others.
+Uh, and, uh, you can, um, you can then once you've done that, go to the avatar menu.
+You need to have created your account.
+I use Google auth.
+So I sign in with my Google credentials and you have to go down to API key right here.
+And I'm not going to press that because when I do it's going to show me my API key right away.
+They don't they don't cover it up.
+Take that API key and copy it.
+And that API key.
+You're going to want to go back into Colab, press this button and put it in here as W and B API key.
+Put in the value and turn it on.
+Now you know if this were week three or week two, then I would go through this in laborious detail
+with you.
+But surely by this point you are complete pros at putting an API key in your secrets?
+I don't need to tell you about that.
+So you've done that.
+If you don't want to use weights and biases, no problem at all.
+Just turn this here to false.
+But I do recommend it.
+It's free and it looks really cool.
+And it's very popular in industry too.
+All right.
+So I'm logging into Huggingface right now.
+And I'm now going to log in to Weights and Biases.
+And I'm telling I'm setting some environment variables to tell weights and biases about my project.
+Um, so that's happening now.
+It's logging in hopefully.
+There we go.
+Logged in as Edna.
+Hopefully you've got a message just like that.
+If you haven't then you know how to debug API keys by now.
+And we're loading in the data set.
+Uh, we're loading in the train Val and test.
+We're going to use train and Val we're not going to use test.
+And it's in.
+And now we're going to call weights and biases dot init which is going to create this project with we're
+giving it the project name price and the run name which is going to appear as a run under this.
+So there it goes.
+It's done.
+It's got something in weights and biases, and you can view the run just by clicking on this link right
+here.
+But there's going to be nothing to see just yet.
+So we won't do that yet.
+Okay.
+So now this is a familiar code which is picking the right quantization.
+And now this is also familiar code.
+We're going to load in the base model Llama 3.2.
+We're loading it in and we're going to print out how large it is.
+It's going to be quantized down to four bits.
+That means you know how large it is.
+How large is it.
+Yes 2.2 gigs.
+You knew that.
+I knew that, uh, it's it's loading in, uh, and when it's done with that, in they come.
+We are now going to set up the configuration for training.
+And this is where, this is where the rubber hits the road.
+This is put in your favorite expression for for for this is where it really happens.
+Um, obviously there's one involving fans, but it's not that it's all good.
+Uh, okay.
+So we first set up a variable called Laura parameters, a Laura config object.
+And this is where we specify the alpha, the dropout, the r and some other constants.
+So you don't need to worry about.
+And then the target modules.
+And we're just of course setting it to be the constants that we defined in our hyperparameters at the
+top of this colab.
+Um, we could have just typed them directly in here, but it's nice nice to keep your constants at the
+top.
+So this defines our Laura parameters.
+How we're going to do fine tuning.
+Our model is still loading.
+And then look at this long list.
+Here is all of our training parameters.
+And it's basically specifying everything about training that we set above the number of epochs the batch
+size gradient accumulation steps telling it which optimizer how often to save this save total limit
+equals ten is going to prevent it for saving on the local Google file system.
+Here more than ten models.
+Otherwise, you can actually fill up your disk over time and the whole thing can crash.
+You can imagine that happened to me once and I lost lots.
+And I was furious.
+And so since then I always have saved.
+Total limit is ten and it cycles.
+So when you get to the the 11th one that it saves locally, it deletes the bottom up.
+And some other things here that don't matter much.
+Uh, I don't think that's the warm up ratio, that learning rate scheduler reporting to weights and
+biases saving.
+This is how to save it to the hub.
+And, uh, that's really it.
+One other thing I want to mention is eval strategy.
+The eval strategy is saying to hugging face.
+How often do I want you to run an evaluation over the validation data that I'm going to give you to
+see how I'm doing on unseen data, and we're going to do that every time that we save the model.
+And we're telling it that, and you're going to see how that works.
+It's going to give us some really important information as this finished.
+Loading.
+Nope.
+Still loading.
+Uh, but we'll run that cell when it finishes.
+And then finally, we create the trainer.
+The trainer is a helper class from Huggingface called trainer supervised fine tuning trainer.
+It's a class that takes care of all of the training for us.
+It's going to do those four steps.
+We hand wrote them using PyTorch last week.
+We don't need to do that this time.
+Hugging face has written some utilities for us, but we're going to call into that and we pass in the
+base model.
+We pass in our training data set, we pass in our validation data set.
+And somewhere I've already I've shrunk this down to just be the first 500 points.
+Let's see where I did that.
+Somewhere here I believe I did right here.
+Look at that.
+I sneakily I took the validation data set and I shrunk it down to just be val size, which we set right
+here to be a smaller number because we don't want to we don't want to do tons of calculations every
+time we're trying to validate, because we're going to do it quite often.
+Uh, okay.
+Sorry.
+So so we pass in the training data set, the validation data set.
+We pass in our Lora parameters and we pass in our training parameters.
+And all of that is used to create an SFT trainer that is set up to do all of the training for us and
+report to the weights and biases ID that we gave it.
+So all of that has now run.
+We've loaded our model.
+It did indeed take up 2.2GB I remembered correctly and so did you.
+And now we have created our fine tuning our SFT trainer here.
+It does some stuff now um, it's just it's noticed that our training data set didn't have a special
+token.
+It's meant to have at the end of it called the end of sentence token, the aeos, which you normally
+put at the end of your training data set.
+Uh, and so it's added that in you remember when I said that I wanted to leave a little buffer in the
+sequence length?
+Uh, and you might have thought I was just only saying that so that I could have a power of two.
+There was actually a real reason for it.
+There really was an extra token that Huggingface slaps in, and it's now just turned all of that text
+into tokens.
+It's got everything ready for both the training data set and the eval data set, and everything is poised
+to actually run fine tuning.
+Finally, uh, and uh, yeah, the only other thing to mention is, you might be wondering with this
+train and Val data set, how does it know?
+Like what's the prompt and what's the what's the ground truth?
+What's the output?
+And the answer is by default, the Huggingface SFT trainer expects you to provide data using the fields
+prompt and completion.
+That's what it looks for by default.
+And that's exactly what we did.
+Uh, in my previous version of this course last year, that functionality didn't exist and we had to
+do all sorts of faffing around that's not needed anymore.
+Now it's all baked in as a default, so it's super easy for us.
+We're ready to go.
+It's time to train.
+--- Lecture 5 ---
+Okay, so here we go.
+We're going to fine tune.
+And you do it with this beautiful single line of code.
+Fine tuning dot train.
+I'm going to I'm going to kick this off and then we'll do do some some talk.
+Uh, okay.
+So first of all, it's got some, some, uh, warning messages here.
+And these can be safely ignored.
+And you might get other warning messages.
+I get lots of people like, like, ask me questions.
+In data science, one becomes quite immune to warnings.
+A lot of hugging.
+Face code gives different warnings, and you tend to be like, if something goes wrong later, I'll
+look back at this, but otherwise I'm not.
+I'm not going to get too, too fussed about it.
+Okay, so training is underway.
+What are we what are we looking for right away?
+First up, we come over here and check that the GPU is okay.
+We we're quite close to the 15GB, but we're not hit it yet, so we're being efficient.
+We're using the GPU.
+It's not breaking.
+If you've got an out-of-memory error, you might have to go up and decrease the batch size until it
+fits in.
+Um, but as it is right now, it's tight, but it's running, uh, and everything seems to look pretty
+good.
+You can see here as well this progress bar.
+And this gives us a sense of how long is it going to take.
+And it's telling us right here that it's going to take 56 minutes.
+So this is all going to run this entire training of the light data set.
+It's going to happen in under an hour.
+How cool is that.
+So that's that's great.
+Uh, and um, yeah, you'll also notice that in this code, once I finished training, I do a final
+model push.
+Uh, just because I don't want it to be that, um, you walk away, the run completes, and this, this
+colab gets shut down, as Google sometimes does, and then you're like, oh, no, I've lost my model.
+So so I've made sure here that it will definitely save it right away.
+Um, and that leads me to point out that that probably if you're if you've been using the free version
+of Colab for a while, you're familiar with the fact that it is a bit flaky and that Google, because
+it's free, Google reserves the right to kick you off whenever it feels like it wants to.
+So that is that is, uh.
+Yeah, sort of, um, an operation hazard.
+And, uh, that's what you get for, for for being on the free tier.
+It generally I would say that I've seen it usually, um, being quite good for an hour.
+So you should be completely fine.
+But if in doubt, be sure to scroll around and make sure that you're clicking and things so that that
+doesn't think that you've you've left it.
+I don't know if that makes a difference, but but uh, yeah, uh, try and try and make sure that it
+stays active.
+I think it will.
+Um, I've got some stuff here to how you could resume if you wanted to, but that's never it's not ideal.
+It's not it's not great to to resume.
+There's some downsides with it.
+Um, so it's best to try and get it to all fit in one.
+Um, okay.
+So with that in mind, it's still, it's it's processing through the first train.
+You can see here, it's done 28 steps out of the 625 steps it's going to do.
+All in all it's doing 625 steps.
+Let's just do bring up my calculator here so I can check this.
+It's 625 steps.
+And each step uh the batch size was 32.
+Um, for this.
+So times 32, 625 steps 625 times 32.
+Perhaps you could do this in your head.
+That would be our 20,000 training data points.
+Uh, so, uh, that's why there are 625 steps.
+Um, and you may remember that I think it's every five steps.
+It's going to be logging the data so far to weights and biases.
+And, uh, what was it every uh, let's go back here.
+Sorry.
+It's every 100 steps.
+It's going to be saving.
+So it's going to be saving and validating about six times in the course of the hour.
+Um, let's go and check out what, uh, the what what are our run looks like right now?
+So if we scroll back up to where we initialize weights and biases, there is actually here a link we
+can go and we can view the project or we can view the actual run itself.
+And that's what we'll do next.
+Okay.
+Well here we go.
+I'm going to click right here on viewing the run up it comes and weights and biases.
+Loading loading loading.
+Here is the run.
+So what are we looking at right here.
+There's lots of lots of stuff to look at.
+We are looking at a train section.
+There's typically a few a few sections.
+So first of all you can see that the name of our run is the current date and time hyphen light.
+That's what you should see as well.
+Um okay.
+So what are we seeing here.
+So the most important diagram, the first thing you look at immediately is this one here, uh, training
+loss, the loss number.
+And I'm going to go through how you calculate the loss later.
+But the loss is the number that you want to see it coming down.
+You're hoping to see over time that loss will come down.
+And we're seeing every every ten steps.
+It's getting reported.
+Sorry.
+Every five steps.
+Look at that.
+Every five steps.
+We are getting a report and we're seeing what's happening to loss.
+And as yet it doesn't look like it's necessarily coming down.
+But it's early days over here.
+On the bottom left is the learning rate.
+You'll see this sort of it started low and it zoomed up.
+That was the warm up period that I mentioned.
+And now you see that it appears to be sort of like a constant number.
+It is 0.0001, which is which was our learning rate.
+But you maybe can start to see that it's coming down slightly.
+That is the learning rate scheduler in action.
+So these are the two two charts to really look at.
+Uh accuracy is the kind of opposite of loss.
+For whatever reason, we all prefer looking at loss because we're used to it.
+Loss coming down is what we're looking at.
+So this is all the training information now training loss coming down.
+It does appear that the training loss did just come down.
+Uh, training loss coming down means that each individual training data point is coming up with a better
+number.
+And that's a good thing for us to see.
+We want to see the training loss coming down, but it's not the most important thing to see.
+What's the most important thing?
+The most important thing is validation loss, not loss on the training data, but loss on the unseen
+data that wasn't used at all, because that's telling us how it's performing against unseen data.
+And now, if you're if you're really following all this, you might say, okay, but hang on a second.
+No training loss is still important because the training data, we're only doing one epoch here.
+So every one of our training batches is in fact new unseen data every time.
+So it is actually just as valid to see the training loss as it is to see the validation loss.
+To which I say good point.
+I'm arguing myself here.
+That's a good point.
+I do agree, but the great thing about validation loss is that you're always using exactly the same
+validation data set that you're not using during training, and you're repeatedly taking that same data
+set.
+So with training data, there's always a lot of noise because every training data batch is a bit different.
+So sure that it might be coming down.
+And that might be because you're getting better at training, but it might just be the random jitter
+in training, in training data sets that are that each batch is a bit different.
+If you see your validation loss coming down, then you can get some confidence that the same data set
+is performing better.
+And that's why we love validation loss.
+Uh, and I always regret the fact that last year when I first did this training, I skipped out on validation
+data loss because I thought it's always new data.
+You don't really need it.
+And as a result, we never got through this discipline of seeing the validation data loss.
+So I'm making up for it this time.
+We're doing validation data loss.
+You don't see it yet because it's got to get to 100.
+And then we will see it.
+And I'm going to not let you see it right now because I want to hold out interesting stuff for for tomorrow
+for training day for.
+So we have training in action.
+We can see it in weights and biases.
+We can see it happening now.
+We can come down here and watch this.
+We can see here that we are uh, we're at eight minutes in with 46 minutes to go.
+Our memory is nice and stable.
+Everything is looking good.
+Training is underway.
+Super exciting.
+It's.
+It's time to to come for the wrap and then prepare for tomorrow.
+And so with that, uh, that's a that's a wrap on on day three.
+I've left it.
+Hopefully you've got tension.
+And I really hope you're running this too, because it's super exciting.
+Uh, what you can already do, in addition to all the stuff about open source, closed source, rag
+and and training with a with a frontier model.
+Now, not only do you know about Q Laura, but also you understand about how you set up all the different
+parameters, how you set up the SFT trainer, uh, and you kick off a training run providing the hyperparameters,
+and you do that with, with the Hugging face TRL library.
+And you can also watch results in weights and biases.
+Next time we're going to dig in to training loss versus validation loss.
+You're going to see your model being saved in the Hugging Face hub.
+And we're going to compare the performance of different runs so that you can do hyperparameter optimization,
+uh, in uh using weights and biases.
+That's all coming together.
+That's like pro training.
+And we will wrap up the training all happening tomorrow in week seven, day four.
+I'll see you then.

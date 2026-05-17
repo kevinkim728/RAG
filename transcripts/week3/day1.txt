@@ -1,0 +1,1061 @@
+--- Lecture 1 ---
+So today I went to the dentist and and I tell you this for two reasons.
+One of them is that I have nice teeth, as you may have noticed.
+But the other reason is because this week, week three, might feel a little bit like a trip to the
+dentist.
+There is some hard work ahead.
+Week three is a time when I think a few people do think, well, there's rag week just around the corner
+and everyone is excited about rag.
+And maybe I could just skip ahead to rag.
+But no, week 3rd May be a little bit harder than week two, but it's gonna be amazing.
+I have great fun things for you, even though we are going to go a bit under the hood and look at some
+technical, gory detail, but I'm gonna make it incredibly fun.
+Okay, welcome to week three.
+Let's get going.
+And at this point you can already talk about Transformers at a high level.
+At least you can talk about tokens, context windows.
+You can code with the chat completions API and you can build an AI assistant.
+But not just any AI assistant.
+A multi-modal AI assistant with images and sound.
+And you can use tools.
+And today it's going to be about a couple of things.
+Two different amazing platforms, Hugging Face and Google Colab are going to be going into both of them,
+setting you up, showing you new ways, including doing some fun stuff on high end GPUs.
+But first, just since it's the beginning of the week, a quick look at the timeline.
+Here it is the eight weeks you started there.
+That's where you were.
+You agreed to spend eight weeks with me.
+I don't know if you knew what you were signing up for, but but this is what you got.
+And your two weeks done, the foundations week and then the frontier models UIs Gradio isn't gradio
+incredible and multi-modality.
+And then this week it's open source week with hugging face.
+And then next week is going to be about picking the right LLM.
+LM and then we do rag.
+Finally it's rag.
+Don't skip there.
+It's going to be so good.
+But it's worth the wait.
+And then six is when we do fine tuning of a frontier model and also some some core data science and
+a bunch of data stuff.
+Week seven is fine tuning an open source model, and week eight is the grand finale.
+That's where we are.
+And that would bring us to you being able to say, I am officially an LM engineer.
+Okay, let's talk about hugging face.
+What is hugging face you've been wondering all this time.
+Well, you know, because you've made a brochure at one point and you printed out everything about hugging
+face, uh, a New York City based startup that I think it started out as, like a chatbot.
+They had a funny history, but they ended up falling into the open source world, and they are now absolutely
+ubiquitous as the people behind open source transformers and open source models.
+It's, uh.
+It's everywhere.
+Uh, and you can't escape from hugging face.
+And in particular, there are two parts to hugging face, two different things that that I'm going to
+cover on two different slides because they're that different.
+They belong on different slides.
+And this one is all about the hugging face platform, like the website.
+If you go to Huggingface, you sign up for an account.
+This is what you get.
+And it has three things.
+It has models, a bunch of open source models that you can download.
+When I first did this slide about a year ago, there were 800,000 models, and I remember saying 800,000
+models.
+What could you possibly do with all of these models?
+Uh, 800,000 open source models?
+Well, now, as of just a few minutes ago, there were 2,134,255 models.
+And no doubt there's a whole lot more by the time you look at it.
+So tons and tons of open source models that people have published for you to look at on the hugging
+face platform, and it is basically a repo.
+It's like GitHub, but it's GitHub for data science models.
+And then very similar to that, it's also GitHub for data sets, for for sets, for information that
+you want to share with other people.
+And again, I put last year a treasure trove of 200,000 data sets, which sounded like an awfully big
+number of data sets.
+But now there's there's half a million of them.
+Lots and lots of data sets.
+And before Hugging Face, Kaggle was the place to go for datasets.
+Kaggle was where everyone went and and now I mean Kaggle.
+Of course, it's still a big deal.
+A lot of a lot of great data sets on Kaggle.
+But when it comes to, uh, to the sort of generative AI to to the new world, to Transformers, people
+do tend to converge on hugging face.
+So the data sets.
+The second thing available on the platform, on the website, and the third thing on the website is
+something called spaces.
+And spaces are like hosted apps.
+They are hosted bits of software that you've written that you want to have up there, available for
+others to see.
+Uh, like a bit like, I guess a Vassal or Heroku, but in a, in a smaller way, in a, in a way that
+is very efficient for data scientists and in particular, one of the types of app that is super easy
+to host on hugging face in a space.
+Our gradio apps and which we know well.
+Uh, and you remember when you, when we did like share equals true that Gradio would host it on their
+servers and but it was a bit janky.
+It involved like this HTTP tunneling thing which, which various corporate networks would get very cross
+with you if you do it.
+Uh, but there is a more robust way, which is to use spaces.
+And if you just type gradio deploy in, uh, it automatically lets you push your code, your Gradio
+app to be a hugging face Huggingface space.
+And that's so easy.
+So when you go onto the Huggingface platform and you look on the website, you'll see that there are
+models, datasets and spaces.
+And if you go to spaces, you can just use any of these deployed apps that people have put up there.
+They're just all available as part of what Hugging Face shares with the community.
+Well, let's go and have a look at this thing.
+Okay.
+Let's go to Hugging Face.
+This is what it looks like.
+Remember this is one of the two different things the hugging face is.
+Don't lose sight of that.
+I know it's confusing.
+This is the platform.
+This is the hugging face platform, the website.
+And I'm not currently signed in.
+That's why there's a login screen here.
+So this is like just what it's open to the to to anybody.
+Anyone can see this.
+And at the top here you'll see in the main nav the three main areas you can go to the models, the datasets,
+the spaces.
+And then there's a bunch of other stuff because there's lots of other things Hugging Face does as well.
+But but these three are the main three.
+So we go to models.
+You click on models and there you see I didn't make it up 2 billion and something.
+Uh and what you get here, these are all the different models that are available, open source models
+that you can use at any point on hugging face.
+Uh, or you can use them locally and, uh, yeah.
+So, so the way it would work if you, if you want to, to find a model which is difficult because there
+are so many of them, you typically start by saying, what kind of thing are you looking to do?
+Text generation is the most common gen AI task, but you might be doing like a text to video.
+You might be doing text to image image generation, uh, in which case you would click here and then
+it filters over on the right here.
+Um, and then there are the most of the models, uh, use PyTorch code, which we'll talk about these
+things later.
+But there are other things too.
+And then there's, there's other, other sorts of things you could choose from.
+There's also languages if you want to be looking at foreign languages, different types of open source
+license.
+Uh, and yeah, there's so many different things you could subselect from, uh, and a number of parameters,
+of course.
+How big it is.
+This might be something you might be like, oh, I only want anything less than 12 billion parameters.
+And you can see it's just filtered over here.
+And when you're looking at these names of models, the first word is the name of the provider, the
+company, the account, the hugging face ID.
+And then that is the name of the model that comes right after it.
+Let's make this a bit bigger.
+Uh, and then over here is how you can sort it by trending or likes or downloading.
+And I most of the time I either go most likes or I go for the most downloads.
+Those are all good indicators.
+And then sometimes it's it's recently updated as a useful one filter on as well.
+So these are typically how you navigate around the 2 million models out there on the Hugging face hub
+as it's, as it's sometimes known the hub.
+Okay.
+And then data sets, you click here.
+And it's the same kind of thing.
+There's the As the 500,000 data sets.
+You can see them all here.
+You can then filter on on them, what kind of data set it is on the size, and then you can come in
+and filter by name and by type.
+If you're interested in something to do with like financial services, like something maybe to do with
+uh, stock tickers or something like that.
+You could.
+I'm spelling it wrong.
+Finance.
+You can see there's Yahoo finance, data finance, tasks, finance, math, finance, complaints, um,
+all sorts of stuff that you'll see here that are different data sets related to finance.
+Why don't we do like, like uh, equities to see particularly something about equities.
+Uh, nothing.
+Did I spell that wrong again.
+Nope.
+Maybe I should do stock.
+See what we've got here.
+Stock market tweets stock tweets sentiment.
+Airbnb stock prices too.
+So lots of stuff that you could come into any one of these and read about what it is.
+See examples of the data.
+The data set card.
+This tells you the historic stock price of Airbnb, an American company.
+Blah blah blah blah blah.
+And, uh, yeah, you can then go in and look at the data.
+And often the, uh, this is actually taking this is obviously also on Kaggle.
+Uh, often these are parts of people's projects they've used to train a model.
+And that's one reason why something might be trending or popular.
+Um, anyway, this is how you can go about, uh, browsing the data sets available on hugging face.
+And then the third of the things I mentioned to you is spaces.
+And spaces.
+Are these like running AI apps that you can interact with.
+And there's a whole bunch of spaces here.
+And if you were to to to look through it all, you'd find that I have a couple of spaces myself and
+one of them you've already seen because Outsmart, the game we played the other day, is a space.
+It's deployed as a hugging face space.
+It's running as a space, and if you're running your own space, you can embed it inside your website,
+which is what I've done.
+So that's a classic example of a hugging face space.
+Uh, and spaces can be radio apps, they can also be Streamlit apps, and they can just be anything
+that will go in a Docker container.
+So there's lots of different ways that you can deploy your AI apps to become a space.
+And if you're signed in, you can just press that new space button and get going, deploying your own
+that way.
+And before going further, it's time for you.
+If you don't already have a hugging face account, if you must be the only data scientist AI engineer
+in the making on the planet without one, you need one.
+You need one right now.
+So go to huggingface, click on sign up and then there's a human security check.
+Uh, not sure if I'm human.
+Uh, go ahead and make sure you pass the human check and then fill in your details to set up your hugging
+face account.
+It is free.
+Do not do not get the pro plan.
+We don't need the pro plan.
+Everything we do is part of the free plan on this course.
+So keep it on the free plan.
+Sign up and then I will see you to talk about the other side of hugging face in the next video.
+--- Lecture 2 ---
+Okay, so this is something completely different.
+That hugging face is.
+And of course they're related.
+But but nonetheless this is different as well as being this this this platform, this hub that's online
+that is basically a bunch of repos of data sets and models and also spaces.
+Hugging face also has code, open source libraries that they've made available that everybody uses.
+Everyone.
+And these are these are open source libraries that implement open source transformer models.
+So using PyTorch and also TensorFlow which is and also Jax.
+These are all different deep neural network libraries.
+But PyTorch is the most popular and that's the one that we'll use most.
+And they've they've written Transformers in PyTorch so that you can then just import some Python code,
+download some weights, and be running the model yourself in, in like in JupyterLab in cursor, or
+as we will in a minute on Google Colab.
+And so the first thing you might have in mind is, okay, what's the difference between running an open
+source model that way versus running a llama, which we did in week one?
+Well, I mentioned this at the time, but I'm going to do it again now.
+But hopefully you're like, I get this llama is like a software product.
+It's something that's been written.
+It runs on your machine.
+You don't get to run the code of it.
+It's like an application and it is able to take files which are very efficient packaged models like
+Gemma and Llama and the others.
+They've been packaged into this file called a GIF file, and then it runs it with efficient C++ code
+locally in a box, and it listens on a particular port, which and it provides an endpoint that's compatible
+with OpenAI, as you know.
+So you can just use OpenAI's libraries and connect to it.
+So think of it as fast packaged pre-baked software.
+Hugging faces libraries is like you get access to the actual code, the Python code, and you can step
+through that code and you can run the model yourself in, in cursor or wherever, and in doing so,
+you can change it as well.
+You can mess around with the tokens.
+You can swap out some layers of the neural network if you wish.
+You can.
+You can do things like fine tuning, and none of that is possible with a llama.
+And so it's so completely different.
+And I hope that now does make sense to you.
+So the other thing that Hugging Face offers is a set of open source libraries for running Python code
+to run neural networks with, with transformers as part of it yourself.
+And that that that is the huge thing that they offer and something which is used everywhere.
+And it started out that one of the the early models that you could run was llama, the model from Mata.
+But but now almost any open source model you could imagine you can run using hugging face libraries.
+And in particular there are six different hugging face libraries that we will use together during the
+remainder of this course.
+And the first of them is a little bit confusing, so bear with me here.
+The first library that I will mention to you is a library called the Hugging Face hub, which you may
+remember I told you was the name of the other thing.
+That Hugging Face does the website and you were like, what?
+And the reason is because this is a Python library that lets you connect to the hugging face hub to
+download the models or the data sets that you can see on Hugging Face Hub and have them in your code
+immediately.
+So that's the kind of connection between them.
+So you can import something which is like hugging Face Hub.
+You can log in through code and you can say, I want this model in code talking to this, this, this
+hub library, and it's connecting to the hugging face platform so that that's the first library.
+Hope that makes sense.
+And then the second library is called data sets.
+And that particularly is a library that when you use the hub library to connect to the hub you can then
+download a data set.
+It becomes part of this data sets library.
+And each each object represents a data set.
+And you can do amazing things with it.
+And it's super efficient.
+And it allows you basically to manipulate vast amounts of data in an effective way.
+And the third library is the big one Transformers.
+This is the library that lets you say like like I want this particular model and I want the code for
+it, and I want to be able to actually run it.
+I want to train it.
+I want to do anything with it.
+You do it with the Transformers library that that is the iconic library at the heart of hugging face.
+Then, pfft, we're now on this.
+The second row is some of the more advanced library.
+PFA is something we'll be using a lot in week seven.
+It stands for parameter Efficient Fine Tuning, and it's a way to, uh, be able to train a model yourself,
+but in a way that doesn't require you tweaking 8 billion weights or however many parameters there are
+in this model, you can do it in a more efficient way.
+And the library is the library that lets that be possible.
+Also uses a technique that is known as Laura or Laura that maybe you have come across.
+And then t which, uh, may remind you of some some ancient MTV show, but in this context, it's not
+that it is the Transformers Reinforcement Learning library, which is again all about training Transformers
+and Accelerate is a particular library that allows you to distribute models across multiple GPUs.
+So this bottom row are the more advanced things that we may touch on distributed training and fine tuning
+and and other stuff.
+So this this set of libraries, this is at the heart of of so much work that happens with open source
+with models.
+And this is the the other part of hugging faces, the two things.
+It's the the platform, the hub as it's called with with repos of datasets, models, spaces.
+And then it is the software, the open source software, the libraries that you can use as Python code
+yourself.
+And we will we will use it a lot.
+And then somewhat confusingly, one of them is called hub and allows you to connect to the hub.
+All right.
+All is clear.
+Uh, let's, uh, let's let's now move on to the the other big topic.
+--- Lecture 3 ---
+The other big topic is Google Colab, and that is the other thing that we're going to be using today
+as we we it's all about new stuff today.
+So Google Colab, you may have already used it.
+A lot of people have used it already and they're like, why don't we start with Google Colab?
+There's a lot of a lot to love about Google Colab.
+First of all, what is it?
+So it is something which allows you to to run a notebook.
+Notebook is this kind of interface we've been playing with in cursor when you have like, like cells
+of code that you run a cell at a time, there's very experimental way of interacting with code.
+So Google has built something that lets you run a notebook like that, except you're running it in a
+browser, you're running it in a browser window, and it's actually running on one of Google's computers.
+So you can like bring up a like a Chrome page, point it at a Google URL, and then you effectively
+have like like a boxes there, and you're remoting in to a Google box and you're able to run the code.
+And when you run the cell, it's as if it's running in your browser, but of course it's not.
+The code is executing on one of Google's machines out there in the cloud, and you're seeing the results
+immediately.
+So it lets you remote in to a to a remote box running on Google's cloud.
+And there are a few things about this that are really great.
+One of them is that it allows you to collaborate in this super seamless way with other people on the
+same code.
+Like in the same notebook construct.
+Google is famous, of course, for Google Docs for really bringing the kind of collaborative office
+idea, uh, to, to the mainstream.
+And so everyone's very familiar with this idea that you can share a Google doc and share a sheet and
+be able to to work together with someone else in it and really collaborate.
+And Google Colab is bringing that same mentality to a notebook so that you can be coding with somebody
+else.
+It's not quite you don't quite get to see the changes in quite the same way, but it's almost as good
+as that.
+And you can both be adding code and running things.
+And so it's such a great way to work together with people and, you know, it's like a it's a different
+mindset to something like a using a repo where you where you check stuff in and merge it and so on.
+It's much more like live working, but it suits the notebook mindset, that experimental mindset, it
+works so well with that.
+So very collaborative as as the name suggests.
+Uh, and it's also integrated with, with the other Google services.
+So, so later this this week we're going to to pull Google Drive in so you can have your Google Drive
+docs available there too, which is very convenient.
+So for many reasons it is convenient.
+But above all else the real the.
+So what is that?
+It gives you access to high end GPUs.
+That's that's the big deal.
+And I probably need to mention, just in case you don't, uh, you haven't got the connection between
+what we're doing and GPUs.
+I mean, obviously everyone knows about Nvidia stock and that GPUs are at the heart of, of modern AI.
+But but if you're wondering why, when we talk about these models with these huge number of parameters,
+these tons and tons, these 8 billion numbers, when you when you're predicting the most likely next
+token, the way you do that is by taking all of these numbers and multiplying them repeatedly by the
+sort of input sets of tokens in some very clever way, which is known as the transformer architecture,
+which is the way that these things will hook together and you're doing lots of multiplications and adding
+multiplications and adding is basically matrix math, linear algebra.
+It's lots and lots of matrix calculations, and they can all happen very efficiently in parallel with
+one another.
+They're all sort of independent.
+So they can all run together in this very, very efficient way.
+But they all have to run.
+And it turns out when, when all this is becoming a big thing, in the early 2000, people were saying
+what we really need is like specialized custom hardware that is that is efficient, that is designed
+for matrix calculations in in fast, real time.
+And you can imagine all of these scientists sitting around there thinking about this.
+And while they were doing it, the other people in the room were busy playing Doom or Quake or whatever
+was big in those days and, uh, using using PCs with which were like hammering away at drawing this
+3D graphics.
+And the way that you do these kinds of games is by doing a lot of quick polygon calculations, which
+involves lots of efficient matrix maths.
+So the graphics cards, everyone was trying to buy a PC with a bigger graphics card.
+Those graphics cards were basically custom hardware designed to run matrix calculations, multiplies
+and adds in parallel like huge numbers of them at the same time so that it could draw, uh, screens
+like 60 times a second or whatever.
+Uh, and so it turned out that this kind of hardware was absolutely perfect for the kinds of AI that
+we were doing at the time and that we are still doing to this day.
+Uh, and luckily for Nvidia.
+And so that is why GPUs you probably do all that already.
+So I'm sorry.
+That's why GPUs are so essential to to modern day AI.
+And they're quite expensive.
+And what you really need more than anything is you need them to have a lot of memory, which typically
+you need, like it's different to the memory of your computer.
+The GPU also has Ram, as games players all know, and you need to have enough to fit all of the model
+on.
+And if you're training, you need a lot more than that too.
+And so you need a lot of memory on your GPU for it to be able to run efficiently.
+And that's a problem.
+And as, uh, that's not a problem, that's expensive and is the constraint.
+And Apple people will know.
+Well, like I might happen to be a mac person, uh, that, uh, one of the great things about Apple
+Silicon is that you have what's called a unified memory, which means that the memory that your CPU
+uses is the same as the memory the GPU uses.
+So you can you can share it together, which is really amazing.
+But for PCs, you typically have to get a graphics card with big enough memory.
+And they're expensive.
+They are many thousands of dollars and boxes which have big Nvidia chips on on them.
+Graphics cards are very expensive.
+You can buy good ones for like $6,000 or something.
+They're expensive, but there's an alternative.
+There is an alternative and it's called Google Colab, where you rent GPUs in the cloud instead.
+And so here are the details you get when you connect to Colab.
+You choose a runtime and runtime is it's name of like the, the, uh, like the instance that you're
+connecting to on the cloud.
+And it includes like a kernel, like we're used to a Python process that's, that's running there.
+And you can get some that are CPU based, meaning that there's no graphics card at all, there's no
+GPU, so you can just use it for everyday tasks, a bit like you can on your own computer.
+You can have ones with a lower spec GPU.
+It's still pretty mighty.
+It's still a powerful GPU.
+The typical one is the Nvidia Tesla T4.
+The T4 is the typical one.
+It has 15GB of GPU Ram, which is a lot.
+And here's the thing.
+It's free.
+It's it's completely free.
+You can have a Google Colab with a T4 GPU, and you can have it for free at any point.
+And we're just gonna do it in just a second.
+Can you believe it?
+And that's what you'll be using for this week, for week three and for week seven on this course when
+we are running on GPUs in the cloud.
+So that's amazing.
+And then if you want to splash out you can pay to have a higher spec one, including an A100 for 40GB.
+But when I say splash out, we're talking about like a few bucks an hour.
+We're talking about like, you know, a Big Mac an hour kind of level.
+I believe we'll do the maths later to see exactly how much it costs.
+But, uh, it's it's, uh, I was going to say it's cheap.
+And you might disagree with me there.
+You might say a few dollars an hour is not cheap at all, but compare it with the cost of buying an
+A100 on a PC that you're going to have for yourself.
+That that is an expensive proposition.
+And when you think of it in that light, to be able to run it for $2 an hour only when you need it,
+and then you don't use it anymore, you don't keep it running.
+You just you only pay for the minutes that you have it alive.
+That's it.
+It seems like it's actually a really great deal.
+And I feel like we are lucky to have this ability to rent super high powered horsepower whenever we
+want it.
+And so, yeah, I think this is fabulous.
+And that's why I always when people say to me, I want to buy a box with blah, blah, blah, blah,
+I say, really, really, because you know that that you can have as many a100s as you want for a fraction
+of that, uh, just, you know, every weekend.
+So anyways, the, the other the final sales pitch for it and then I'll shut up the, the other point
+to make is that GPUs do go obsolete pretty quickly.
+The GPUs that are hot today might not be hot in a year's time.
+And if you buy one, you're kind of stuck with it, but with with Google Colab, you just get the whatever
+they have on offer.
+They have a range of different boxes that you can get.
+And so it's also a nice way to always stay current.
+I guess it's like leasing a car, you know, it's like it's the buy versus versus lease kind of conundrum
+that people think about.
+Anyways.
+That is Google Colab.
+All right.
+So I just took like ten minutes of your time just talking about this thing.
+We need to go and see it.
+Let's go and see it.
+So look there's people constantly ask me how to find the link to the Google Colab that we use in these
+courses.
+And I've put the links everywhere, but but so one place they are is that if you go into the repo week
+three, day one, there is a notebook there in in cursor with a link to the Colab.
+But also if you look in the readme, there's a link to the Colab.
+If you look in the class resources, there's a link to the Colab.
+Like I don't know, you have to just not look anywhere, look up at the ceiling and you won't see it,
+but it's everywhere else, so you got no excuses.
+You can find the link to the colab and I will see you right there.
+--- Lecture 4 ---
+And just to really prove my point, I haven't gone to Colab.
+I've gone to cursor.
+This is cursor right here.
+Here is week three and here is day one in week three and day one in week three.
+Introducing Colab.
+To see what Colab can do, follow the link below.
+This will be your link to Google Colab.
+Here it is.
+I click on the link up.
+It comes now the first time you go there.
+If you've never used Colab before, you will need to log in and and presumably most people have a Google
+account.
+If you don't have a Google account, you will need to have a Google account.
+Don't hate me.
+You'll need to have like a like the basic Google Gmail thing, but they're useful things to have.
+And once you have your come in, it's free.
+You don't need to pay a penny, don't pay anything.
+Come on in and you should see yourself on this screen.
+Week three day one Colab.
+If you have your browser set to light mode, you might see this in like a white background or whatever.
+But.
+But otherwise you should see exactly this.
+You are now in Google Colab, and what you're looking at here should look somewhat familiar, because
+it is basically a Python notebook or sometimes called a Jupyter notebook.
+It's a notebook with code and with with some text, and it's one that we will spend the next few minutes
+of our lives in.
+So let me make this a little bit bigger for you.
+And I'm just going to start with the basics of Colab, with apologies for those that know all this stuff
+already, but just to ground you in this.
+So first of all, you'll see up here is a share button.
+And this this is where you can share things just as you can with any Google doc.
+You can share it with another Gmail user, because this one is my one that you'll be in read only mode.
+The first thing you have to do is do file, and you'd have to do save a copy in drive to save a copy
+of this for yourself.
+Then you could share it with somebody else if you wish to.
+Standard stuff like with any other Google doc.
+Very familiar construct.
+Next thing to show you over here on the right this thing here connect and this word T4, this is everything.
+If I press this button it's going to connect this browser.
+So I'm then talking to a T4 box which is one of these small GPUs which is free.
+And, uh, at the moment, this is just static.
+This looks like code, but it can't do anything until I press connect.
+Now I'm not going to press connect.
+I'm going to go to this little drop down here and say change runtime type.
+So should you.
+And this is where you see all of the possible things that you could connect to.
+A CPU here means I just want to have a plain old compute CPU like my own box, but up in the cloud.
+And so you can do that and it's free.
+A T4 over here is what this is set to by default.
+And it's also free.
+Now there are some downsides.
+So we will talk about but but basically it's free.
+These are different various boxes.
+This a100 this one you have to have a paid account for.
+And I do have a paid account.
+So I'm allowed to select it.
+And I can choose high Ram which is like really beefy too.
+But I'm sticking on the free one on low and not on high Ram and the free T4 because that's what you
+have access to without paying a penny and everything else you leave as the default.
+I press save there and then I can just go connect to a hosted runtime, T4.
+And it's the same as just pressing that button.
+And I'm going to do it right now.
+It says connecting.
+It says three dots.
+It says connecting to T4.
+Done.
+Green tick.
+All this looks green.
+Green T4 down on the bottom right.
+These are all your cues that we are connected live to a T4 box running in the cloud.
+Okay.
+And a couple of other things to show you back here to this drop down.
+And you go to View resources.
+And this pops up and this is what you need to know about you need to look for this.
+This tells you the health of the remote computer.
+And I'm just going to shrink that down a bit.
+Otherwise it takes up way too much room.
+But it tells me my, my the memory of the main computer.
+Uh, 12GB.
+It's perfectly decent.
+The GPU memory is a whopping 15GB.
+That's fantastic.
+And then the disk is a big old disk with 235GB.
+So this this is the thing to watch, and particularly the GPU, because if you fill it up and things
+go wrong, you'll see this going wrong.
+Occasionally Google will be nasty and will bump you off this box.
+That is the trade that you make when you agree to having free compute.
+You're saying to Google, I understand it's a best efforts thing.
+If you get too busy then you might kick me off.
+But worse than that, it sometimes kicks you off and onto a CPU box and it sometimes doesn't tell you
+that it's done, that.
+So suddenly things stop working and you're like, why aren't things working?
+And you don't realize you've been bumped onto a lower spec box?
+So watch out for that.
+Keep that in mind.
+If it happens to you, then you'll know what's going on.
+You simply have to start again.
+You have to connect to a T4 and go back to the top of your lab.
+Okay, a couple more things to tell you.
+And by the way, all this is written down here so you can have a look, but the runtime menu has a couple
+of really important things.
+Restart session.
+That's basically there's of course a Python kernel running behind here and it restarts that Python kernel.
+All of your memory here will clear back to zero again.
+Everything will be reset ie.
+You have to do that quite frequently when things get get full.
+Uh, the other one here is disconnect and delete Runtime that gets rid of everything and you then have
+to reconnect again.
+Now, the difference between them is that when you do that, if you've had to do any Pip installs to
+install packages or install them on your machine, you'll have to do that all over again.
+It's like you're getting connected again for the first time.
+If you do just a restart session, you don't need to reinstall things, you're just simply flipping
+the Python process.
+But if you do a disconnect and delete, you're starting again, like here from scratch.
+And that brings up a good point that you should rest assured that every time that you do leave Colab,
+your data is safe.
+It's gone.
+Everything is wiped.
+This box is completely fresh every time.
+And so, as I say here, the benefits free access to T4's.
+Hooray!
+Share code and collaborate.
+And also, one thing I didn't mention before, one of the great things about Colab is that everyone
+that's using this colab will be using an identical piece of hardware and software.
+If you're connected to a T4 and you're using this, it is guaranteed to be identical.
+And that means that all environment differences and nonsense is taken out of the picture.
+So if you have a defect and you're stuck trying to solve something, and you're trying to work with
+me on it.
+The best way to do it is to put it in a colab and share it with me, because then we can work on it
+together, and we know that we're working on identical spec, and it just eliminates all the noise of
+not knowing.
+Is it an environment problem?
+Are you all these things done right?
+So that's always good to know.
+But the downsides is that it's free.
+So Google might bump you off at any point.
+You need to pip install every time you get a new box, and that can be pretty annoying.
+It can be slow and just generally using it.
+There's some latency.
+It's not running on your own box, you're going off to the cloud.
+And so it's not as interactive.
+And you feel that um, so always start by connecting.
+Uh, always look at the resources if things go wrong.
+Runtime disconnect and delete, reconnect.
+Start again and start from the top.
+Always start from the top of the notebook.
+That should be your your absolute marching orders.
+Things go wrong.
+You disconnect.
+You reconnect.
+Start from the top.
+Okay, that's enough of preparation.
+It's time for us to to to do some stuff.
+Let's let's do some coding.
+--- Lecture 5 ---
+All right.
+So first of all I'm going to take my mouse.
+I'm going to hover around here.
+I'm going to press the plus code button.
+It's very like cursor.
+Uh and I'm going to go here and type two plus two and hold down shift and press enter.
+And we just used a Tesla T4 machine, uh, on the cloud in order to do this important operation.
+Uh, and, you know, we can we can do bananas.
+Uh, and uh, there we go.
+We get we get bananas.
+Um, and, um, yes, you you can imagine all the other great things we could do.
+Uh, a lot of stuff comes installed automatically on radios that you don't even need to pip install.
+So I can do like import gradio as GR.
+And I think that will just run.
+Doesn't need anything installed.
+Gradio just comes on the box.
+So it's as slow as it is on my machine.
+Look at that.
+Uh, you get used to this.
+Obviously that's the stop button.
+You can press the stop at any point if it's taking too long.
+But it did finish.
+Um, if you need to pip install something you can't just do like pip install pip install requests or
+something.
+Uh, you would have to put an exclamation mark in front of it, which is a way of saying don't run this
+as Python, run this as an underlying shell command.
+That's what that would do.
+But for this notebook we don't need to do any Pip installs.
+Everything is good to go.
+The first thing we're going to do is a little bit of code here.
+Uh, to check the GPU of this code, of this box, whatever this is running on out in the cloud by calling
+this this shell command Nvidia SMI to get the GPU info and find out what it is and print it if it is
+a Tesla T4.
+Let's run this code.
+Bam!
+Here's the results.
+It is indeed an Nvidia chip.
+And there we go.
+It is a Tesla T4.
+Good to know.
+And it has 15MB on it.
+And that makes sense because we can see just over here it does indeed, according to Colab, have that
+as well.
+So the code that's running is giving us a consistent story.
+That's good to see.
+Okay, next up comes the most important thing we're doing today.
+Pay attention please.
+There's a fiddly thing to do now.
+One fiddly thing one time only and then fiddly ness is over.
+Okay, we need to connect this colab to our hugging face account, and in fact, we're connecting any
+colab when we're logged in by using a feature that's secrets that are built into colab.
+And this is the alternative to the EMV file.
+You don't have a dot env file on Colab because we don't.
+It's not on our file system, it's out in the cloud.
+Here's how it works.
+First of all, you need to have got yourself a hugging face account, which you did in the last video
+or two videos ago.
+So you're good there.
+Thank you.
+You you you listen to me.
+So at this point, please.
+Let's go to your hugging face account.
+Here.
+I have mine open, conveniently hugging face.
+So this is me signed in, and, uh, you go to your avatar, you go to your profile.
+That is my hugging face profile.
+And I have two notifications.
+I don't know what they are.
+Uh, here are his his, my two apps and some fun things from another course.
+Uh, and, uh, then you come along here and you go to settings.
+So you're looking at your avatar page, you press settings and you go to API to access tokens.
+Access tokens.
+This page here, look at this.
+Now here is the thing.
+Here is the thing.
+Listen up.
+You press create new token.
+Here comes the new token.
+You see this page for the new token.
+The next thing you do is you find this word right.
+You need to press that word right and give it a token name.
+Give it whatever token name you like.
+This can be, you know, my my favorite token.
+And then you press Create token.
+Now the reason you need to write permissions is first of all that gives you access to download models
+from from any repo which you'll need when we download open source models.
+But also we are going to be writing our own models at future weeks.
+And if you don't have this permission, it will cause lots of troubles later.
+So do have write permissions.
+Give it a name, create the token and copy it into your clipboard.
+It should start h underscore and that should now be in your clipboard.
+And now we go back to Colab okay.
+And in Colab you now go to the left here to this little key, and you press the key and it opens up
+this thing that says secrets and secrets are they are just like the dot env file.
+They have a name and a value, just like the dot env file has something equals something.
+And the name for hugging face is underscore token.
+And in that value cell you paste the the lowercase HF underscore and that key.
+And you put in exactly as it is with no spaces and no nothing random on the beginning or end, just
+as it should be, so that you have that in there and you make sure it's switched on here for notebook
+access, which means that this notebook here will have access to that secret.
+And once you've done that, you're golden.
+You've done the fiddly part.
+You can now access this hugging face token from your code, and it even tells you right there that it's
+super simple over here to have access to any of these keys with code that looks a bit like that, but
+instead of secret name, you would put this word here, that word would go there, and then you'd be
+able to access this value.
+It's just a way to have secrets stored separately.
+And these secrets here are associated with your Google account.
+If you share this with someone else, they won't get access to your secrets.
+The secrets, of course, are secret to you.
+And as an added benefit, anytime you're logged in, you'll have access to all of these secrets, which
+makes it super convenient.
+It's like a EMV file that's everywhere on Google Colab for you and only for you when you're logged in.
+So that's the fiddly part.
+Done, sorted.
+You've got it set up.
+Brilliant.
+Let's go on.
+Okay.
+Game time.
+You've filled in your secrets.
+You've connected to a T4.
+You're looking all good there.
+Scroll down.
+So first of all, this is exactly the code that you may remember you saw just here.
+It's the code which is going to allow us to access our HRF token.
+And it's going into a something called HRF token, a variable called that.
+And that's coming from Google Colab importing user data.
+So user data is basically the secrets on the left.
+We're getting HRF token and there it is.
+And then we're calling something called login with HRF token.
+And what is that?
+That that is a function from a package called Huggingface hub.
+And this is the first of those libraries I told you about.
+This is the Hugging face library that's related to connecting to the Hugging Face Hub.
+Okay, let's do it.
+Let's run this.
+And if all is well, if you've done the key properly, if you've copied and pasted, if it has the right
+permissions and everything, you'll have a green tick there.
+And this running on the cloud is now connected.
+It's logged in to Huggingface.
+So what I'm now going to do is run a piece of code that I'm not going to explain how it works, because
+we'll be dealing with that another time.
+It's using something called pipelines.
+And we are going to be first.
+We are going to be, uh, let's see what order do I want to do these in?
+Yeah okay.
+Okay.
+So first of all, we are going to be using, uh, something that isn't going to be using a model, a
+model from the Hugging Face library.
+But it is not a transformer.
+It is actually a different kind of model.
+It is a diffusion model that you may have heard of.
+It is a kind of model that's good at generating images.
+And we're making one from a company called stability, uh, which is, uh, the, uh, the, the stability
+diffusion model, and it's called Excel Turbo.
+And we are going to ask it to generate a class of students learning AI engineering in a vibrant pop
+art style.
+So that is our prompt.
+We are using something called pipelines that we will tackle.
+We'll actually explain this tomorrow, but I'm doing it because this is now hitting our our T4.
+So we should start to see work happening down here.
+It says it's been executing for 22 seconds on the T4 and things are happening.
+Whoa.
+Look at all this.
+Lots of status things.
+So a lot of the time that you spend on Colab is actually spent downloading stuff, because the downside
+of it being a completely clean box every time is that it doesn't cache any files you're downloading
+things from the Hugging Face Hub every single time.
+So all of this is downloading.
+You can see here it says that's almost a 1.4GB of data coming there.
+Uh, and uh, well that's, that's that's five gigabytes of data associated with this model.
+And that's going to take a minute to download.
+You can see the system memories coming up, but so far the GPU memory hasn't really moved at all.
+Uh, and this is looking like we're filling a lot of CPU.
+But fear not.
+Once this thing is loaded, it's going to slam over to the GPU and we're going to run against the GPU.
+Now hopefully you're doing this too because it's free, so why not?
+So you are currently running this.
+You press shift enter.
+You are seeing the stability AI model running for a class of students learning AI engineering in a vibrant
+pop art style.
+All right, I'm gonna I'm gonna vanish for a second.
+It'll be a few minutes for me.
+It'll be a second for you.
+And when I'm back, we'll see what comes of this.
+--- Lecture 6 ---
+Okay, it just finished and you can see sure enough that the GPU Ram zoomed up there and is at 8.5GB.
+One one thing that was important that I didn't mention is that this parameter here number of inference
+steps.
+So, uh, this is a bit hand-wavy, but you may know, the way these diffusion models work is that they
+started with a picture which was had a description of it like a, like a prompt.
+And then they gradually dissolve that away into white noise through through various steps.
+And the way a diffusion model is trained is then doing that in reverse, starting with the fuzz with
+a prompt, and then trying to iterate to get towards the full picture.
+And the number of inference steps is how many of these kinds of steps of changing something that is
+noisy into something that's a real picture based on a prompt.
+So this model, this very, very small scale turbo model achieved this.
+Aha.
+Which is sort of fun.
+Uh, this is is this you?
+Do you look like this?
+This is the class of data scientists in a vibrant pop art style.
+And it's colorful and poppy.
+And, you know, of course, it's not like the OpenAI ones that we saw with the amazing pictures of
+of London and Paris and New York.
+But but, uh, it's free.
+It's a free model.
+And you have all the code, this, this hugging face code we're using here.
+But this pipelines, which is part of one of these hugging face libraries, you've got all the Python
+code running on this box generating this picture.
+And that's kind of cool.
+It's, uh, yeah, it certainly feels very tangible.
+Okay.
+The next thing we're going to do is reset the kernel to bring everything back down again and run another
+model.
+You can reset the kernel by going to runtime and restart session.
+I've also I've put it down here as some code that you can run yourself just by doing this.
+It will also do it.
+It's going to prompt me and tell me that the kernel is gone.
+Uh, and uh, there we go.
+Your session crashed.
+It says automatically restarting and back.
+It comes with everything back down to zero again.
+Same as as as.
+Runtime.
+Restart.
+Okay, we're now going to kick off another model, which is also another one from stability.
+From stable diffusion.
+It's the stable diffusion uh, Excel base which is a bigger model.
+And we'll let this thing run.
+This time we're going to be doing 30 inference steps.
+It's actually it's a bigger image.
+It's going to produce.
+It's not it's not significantly different quality to this one in case you're expecting big things.
+Don't.
+We're running on a tiny box when it comes to image generation.
+They consume a lot of power, but it's still cool to be running ourselves on this free kit.
+And I hope you're doing it too.
+And you know, there's definitely something very tangible about doing it.
+I will see you for the outcome.
+And here we're just watching the end it all loaded.
+You can see the 30 iterations that it's doing.
+This one was on 30 inference steps.
+They're running pretty fast and at the end of it, up pops the image.
+I hope there it is.
+So, you know, it's a bigger image.
+There's more going on.
+It's still a bit a bit messy, but I think that's maybe part of the pop art style.
+Uh, and something a bit surreal and strange happening around here.
+That looks like a bit of a of an AI artifact.
+Uh, but nonetheless, this is something kind of cool to be built, uh, coming just again on our free
+box.
+And then, uh, you can see as well look at the GPU, uh, went all the way up to to 12.7 there.
+So, uh, we're going to restart the kernel again and go back to blank.
+And now I think we're now probably getting to the, to the area where to run this next one.
+It may not run on a typical box.
+It may be time for us to run on a powerful box which I have, which you probably don't have, which
+I want to do just to show you what it's like to run on a more powerful box.
+I will just try it first on a T4 to see whether it runs.
+So this, while it's running, let me just tell you, is a again, it's the same, um, Excel based
+one zero, which is a larger model that is able to, to build this bigger, uh, this bigger look.
+But we're also bringing in a second model to act as the refiner.
+And you can see that, uh, that we, uh, split it 80 over 20 and that that, uh, yeah, the the refiner
+gets to work on, on making it just that little bit better.
+Uh, so that is running now, and we'll see whether it runs on this T4 box.
+I think it probably won't.
+It'll probably run out of memory, which will be a nice time to show you what it looks like when you
+run out of memory on a T4.
+And at that point I will switch to an A100, a powerful box instead, but we'll see what happens.
+I'll see you in a second.
+Okay, so this two stage diffusion did complete successfully on the free T4 box.
+Here's the result.
+And it's definitely a step better.
+There's no doubt it's still got artifacts and some weirdness, but it's kind of cool as well.
+And again, when it comes to a free open source model on free hardware, it's kind of cool to be doing
+this.
+So hopefully you've had this experience too.
+You've also seen some interesting pictures.
+You may be able to prompt it better and get something crazier or more fun or whatever.
+Um, but this is our pop art style data scientists aspiring to be expert AI engineers.
+That would be you.
+All right, so with this, we are now going to, uh, to change and move on.
+Oh, no.
+Just just before just before we move on to an A100.
+I have one more thing to show you on your own T4.
+Let me show you something else.
+So this time I'm going to do it the other way.
+Runtime.
+Menu.
+Restart.
+Session.
+Restart.
+Okay.
+again, look at how close we were to the top of the memory there.
+We really.
+It only just barely squeezed onto our T4.
+But now we've done a restart kernel.
+Everything should be bam all the way back down to zero again.
+And now I'm going to run this next cell.
+So we are now using Transformers, the main library from hugging face.
+Not diffusers, not the image generation.
+But we're back to normal transformers.
+But we're not using it for text generation.
+We're going to use it for to use a free text to speech.
+You remember the TTS model we looked at last time?
+We were using a paid model last time.
+This time it's a free one.
+It's from Microsoft.
+It's the Microsoft Speech five TTS.
+We're loading it in and we're going to say hi to an artificial intelligence engineer on the way to mastery.
+And of course, it first needs to do a fair bit of of loading in.
+And this would be a one time thing.
+This wouldn't if you had this model loaded in memory, you wouldn't need to do all of this downloading
+from hugging face that we're doing now.
+You would only need to do the part that actually runs the model, which is hopefully relatively fast.
+Um, but we'll just let this finish.
+There it goes.
+Coming across uh, and um, okay.
+It's still it's got to, to download some more of the model.
+It's also going so fast.
+I know as soon as I stop it's going to finish, but I will see you in one second.
+And actually for that to work I had to do a little pip install right here.
+So I've added that in there.
+You will need to run that first for this to work properly, but when you do then run it, you get this.
+And then when I press play we'll see what we get.
+Hi.
+To an artificial intelligence engineer on the way to mastery.
+There we go.
+So we just generated some lovely audio on our free T4 box.
+That was successful.
+Congratulations!
+You've used Google Colab to connect to a free GPU box in the cloud and use it to generate a number of
+images, and you've used it to generate audio as well, using diffusers and using a transformer.
+One more thing to do.
+Okay, so I'm now going to connect to a powerful A100 box.
+So I'm going to leave you as I go over to this.
+If you wish you can come along with me.
+Uh, the I'm going to let me do this now.
+Change runtime, type a 100, disconnect and delete runtime.
+Yes.
+And save.
+And are you still there?
+I'm not a robot.
+There we go.
+It connects.
+I moved so fast, it thinks that I'm automated.
+Uh, so, um.
+It's happened.
+It's connected to an A100.
+You can see, because I have 40 gigabyte Ram on my GPU, which is enormous.
+Uh, and, uh, this is going to cost five compute units per hour and $10 costs about 100.
+Sorry, $10 gets you 100 computer units.
+So $1 gets you ten computer units.
+So basically an hour is about $0.50.
+That's about how much you pay for an hour use of this.
+Come on.
+It's not that bad.
+I said I thought it was a couple of dollars.
+It's it's not too bad.
+And just to prove it, let's just print the name of the GPU.
+The same code as before.
+You can see now that it is an Nvidia A100 GPU, and it should have.
+There we go 40GB of Ram.
+And now I'm going to run another image generator.
+And I'm using the famous Black Forest Labs Flux one, which is a model that that image people love to
+talk about.
+It comes in three different sizes.
+Chanel and Dev and Pro.
+And we're going for Chanel, which is the smallest, cheapest one.
+Uh, because we don't have that much time to leave this running.
+A class of data scientists learning AI engineering in a vibrant, high energy pop art style.
+And with just four inference steps.
+So leaving this running, I just got some code to time it as well.
+Again, we're using this thing called a pipeline, which is the easy way to use hugging face code.
+We're going to talk in the next couple of days about the easy way and the hard way and the easy way
+are these pipelines that come kind of pre-baked.
+So the pipeline is running.
+It's starting by downloading tons of stuff in.
+It all comes and then the A100 will be at work.
+This is a super powerful, a beefy box that we're remotely connecting to right here.
+And I will I will go away and wait for a while for this to complete, and I will see you when it's done.
+Okay, that just completed.
+So this was the famous Black Forest Labs, the flux one Chanel model.
+The prompt, you remember, was a class of data scientists learning AI engineering in a vibrant, high
+energy pop art style.
+Look at that.
+It's used 36.8GB of the 40GB available on the A100.
+So it certainly, uh, we made the best use of our hardware.
+Uh, let's see what Chanel was able to come up with.
+Here is the result.
+And I got to tell you, I think this is pretty cool.
+That definitely looks like a vibrant pop art image of a bunch of aspiring AI engineers.
+I'd say that is great.
+And this time it wasn't running on free hardware, but the model was free.
+Free open source model running.
+And I guess, well, actually, you may be wondering how much it costs to do that.
+So I did a little calculation here.
+I got the total number of seconds, calculated the units per hour, and then turn that into an estimated
+cost based on the fact that it costs about $10 to have 100 units.
+And so it ends up that that actually in the end, it took 200 and 40s.
+And my estimate, if I've done the maths right here, is that that cost $0.04 for us to create that
+image in terms of our time on Google Colab, uh, which is actually quite similar to the cost, if you
+remember that we paid for OpenAI, which just goes to show you that all these things end up being being
+pretty similar in the end.
+Uh, so there we go.
+There you have it.
+That is the result of us running image generation on a beefy A100 GPU that we have got access to by
+running in the cloud on Google Colab.
+And this colab, of course, is shared with you.
+So you can come through and run this and have all of the T4 experience yourself.
+And then should you wish to splash out a little tiny bit more, then you can get this A100 experience
+too.
+And of course, where they get you, is that sure?
+It only costs $0.04 to actually generate that image, but I'm still running that A100.
+You have to remember to go to runtime and say disconnect and delete runtime to to stop paying for it.
+Uh, at any time you can come here and go to manage sessions to see all of the sessions you've got running
+and make sure that you stop like this.
+Terminate.
+Off it goes when you're finished with a session.
+And with that, that wraps up our exploration of Google Colab for today.
+Okay.
+And we got a lot done.
+That concludes week three, day one.
+It wasn't that much like pulling teeth in a dentist office.
+There was some cool stuff there.
+And in the meantime, you've been exposed to navigating the hugging face platform.
+You've had your first little look at some of the hugging face libraries, although we haven't gone into
+them yet, but you have run code on Google Colab, and in addition to that, you can of course confidently
+code with frontier models and build a multimodal AI system with tools.
+Congratulations!
+Next time we're going to talk about the two different flavors of Hugging Face API.
+We're going to dig into pipelines and use them for a bunch of AI tasks like generating text, generating
+images and audio.
+So much to do.
+See you then.

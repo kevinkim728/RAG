@@ -1,0 +1,944 @@
+--- Lecture 1 ---
+Hopefully I didn't put you off with that gory detail of data curation yesterday, because we've got
+some more data stuff today.
+But then, then we're done with data after today.
+So already, in addition to all the stuff you can do with generation and with Rag, you can also select,
+investigate, curate your very own data set.
+Today there's going to be a little bit of talk stuff.
+What I want to go through like a strategy for selecting and applying models to solve commercial problems,
+which is what this capstone project is all about.
+And then roll up sleeves and do pre-processing.
+A very interesting way to get the best quality data using Nlms.
+It's also going to be our opportunity to look at a pro technique using batch mode with LM inference,
+which is a great skill set for you to acquire as well.
+All right, so before we get to the to the juicy technical stuff, then let me talk you through the
+five step strategy.
+So you're given a task to build an AI system to solve some problem.
+And you want to know how to begin.
+People often start by asking questions about the architecture, about the technical design.
+As I may have mentioned to you once or twice, and my suggestion is to take a step back and approach
+this as you would any other science project, to to apply a solution to a commercial problem.
+And the five steps are, first of all, to understand the problem that you're working with.
+Then to prepare, select the right model for the task that we already covered in week four.
+Customize that model.
+Figure out how to apply it to the problem at hand and then productionize.
+These are the five steps.
+And it's no surprise at all that my first step was going to be all about understanding.
+It's it's I mean, this is this is like 101 stuff.
+I'm sure you know this already.
+And yet people, people always dive into solutioning so quickly.
+It's crucial, even even in this world, with so much hype about about AI and building AI solutions
+for things that before you dive in and start working with AI, you make sure you understand the problem
+and ask yourself whether AI is even the right solution here.
+First of all, gather business requirements.
+Don't.
+Don't let a business requirement say I need an AI agent for.
+That's not a requirement.
+That's a solution.
+Challenge your sponsors and yourself to be thinking about the commercial problem first and foremost.
+And then when you know the problem you're solving, of course, the next question is how will you how
+will you judge success?
+How will you evaluate that you are actually solving that problem?
+And then look at the data that you've got, the quantity, the quality and the format of the data.
+Is it structured?
+Is it unstructured?
+Uh, do you have enough of it?
+And then uh, also challenge your sponsors to explain the non-functional how much does this need to
+scale?
+What kind of latencies is acceptable?
+What's the budget, uh, how quickly what's the time to market?
+How soon does this need to be live?
+Uh, these are the kinds of questions that you would ask for any project and you should do for an AI
+project also.
+And the second step is then preparation.
+So first you should be looking at non LM solutions, maybe looking at existing solutions that are already
+out there, maybe looking at solutions that are just Python code instead of any kind of AI, and then
+traditional machine learning solutions and use this to build what's called a baseline model, a model
+before you get too fancy, that's your starting point.
+So you can tell when you build something fancy that you're improving on the starting point.
+Because sometimes maybe the starting point is already something that will solve your problem.
+And so that that's a crucial discipline to get after, even if you're sure llms are the way to go,
+give yourself a baseline to work from.
+And then when you're choosing your LLM, you should follow the exact script we put together in week
+four.
+Look at the basics.
+Look at the benchmarks, leaderboards, and arenas.
+Use that to hand-pick a candidate set of llms that you'll use for further R&amp;D And then data curation.
+That's part of step two.
+That's what we did yesterday and what we'll finish today.
+That's about building a good data set that's going to give you the best possible chance for successful
+training.
+And of course, as I said yesterday, you can build multiple data sets and use them to try and train
+with each of them and figure out which one performs best.
+Okay.
+So you've you've first of all understood the problem.
+You've prepared the data set and the candidate models.
+It's now time to actually choose the model that you'll use.
+You've got your candidates, run experiments R&amp;D, build prototypes, train and validate until you have
+the model that's performing best with the problem at hand.
+You know this well from week four.
+You know how to do this.
+That is is is step three and step four.
+Then is applying this model that you've selected to solve the business problem at hand.
+And there are multiple techniques that you could use at this point.
+And you might want to use many of them many of the multiple techniques, um, and these are techniques
+that I've been referring to as we go, just improving the prompts and using things like Multi-shot prompting
+is is one starting point.
+Multi-shot prompting.
+When you give many examples of the of the question answer question answer to try and bias the model
+into making outputs consistent with the inputs, prompting easy starting point.
+Rag would be the second one.
+Rag you know so well.
+Now looking for ways to select relevant context and shove it in the prompt, maybe using embedding models
+and vector similarity to do a good job of finding that context, a genetic AI.
+We haven't spoken about that much, and of course I have a whole separate course on it.
+Uh, but we will be doing that in week eight a little bit.
+We'll be building an agent platform, but in some ways it's really a sort of big extension of of prompting
+and even partly of Rag as well.
+But but it's about potentially dividing up your LM call into multiple LM calls and maybe having one
+of those LM calls decide which of the others to call and what order.
+That's like an orchestrator.
+LM so now you've got some some idea that the workflow is being determined by an LM, and using tools
+as your way of equipping an LM with the ability to do things like digging into the data, uh, or,
+uh, just, just doing different, different bits of research, maybe web scraping as a way to better
+answer the business problem that's using agents.
+And of course, no surprise, the fourth one is fine tuning, uh, fine tuning, which is saying, okay,
+we've got this LM we can give it data that we've collected proprietary data, and we can make it even
+better at this task.
+That's that's fine tuning.
+That's what we'll be doing the end of this week.
+And then all of next week.
+I think it's interesting to take a moment to to look at this and recognize that the first three are
+all inference time techniques that are about ways at at runtime, after you've trained to get more out
+of your LMS based on the way that you call them, the input sequence that you use, and only that last
+one is.
+Got anything to do with actually training a model to do it differently?
+And this is funny because, uh, in in the past, training was where you always began.
+Training was like the big thing everyone did.
+And I've said a few times in the course, there are these two different parallel ways to improve the
+performance of models at inference time and at training time.
+And in recent history, inference time has really grown more and more and more to be the way that people
+where people are spending the most time.
+People are spending a lot of focus on improving inference time, because that's where we've seen the
+biggest bang for the buck in the last year or so.
+But before that, it was always at training time.
+And the reality is that these are two different orthogonal ways that you can improve the performance
+of your model, both at training time and at inference time.
+And so we're going to be focusing for the next two weeks on training time and seeing what what we can
+make of it.
+And we'll make some pretty amazing things of it.
+Uh, and then we'll return to inference time in week eight when we add on rag again, and when we use
+a genetic AI as well, so that we'll be using both training time and inference time by the end of it.
+It's not an either or.
+It can be both.
+Uh, and uh, yeah.
+But these are the four techniques.
+And people often ask like, like, how do I know which technique to use for a particular business problem?
+And, you know, there's, there's, uh, there's, there's a, there's a long answer and a short answer.
+The short answer is you should try them all and, uh, and see which one performs best for the task
+at hand.
+There's no shortcut to R&amp;D.
+Do the R&amp;D.
+Try each of these.
+Try multiple of each of them together and see what performs best.
+But the longer answer will be along the lines of, uh, obviously fine tuning is something that's very
+expensive.
+This is this is something that is a big deal.
+We're going to spend a long time doing this.
+It's going to take a long time to get there.
+Ultimately, fine tuning is something that can teach a model a new skill that will allow it to generalize,
+to do something new, differently and better.
+Whereas something like rag generally is just about providing it information that already exists.
+It's about giving it expertise based on knowledge that you have in a knowledge base, but it won't help
+it to generalize beyond that knowledge base.
+If you're looking to add expertise, subject matter expertise knowledge to a model rag is your go to.
+If you're looking to teach a model a new skill, something it can generalize to new data it's never
+seen before, then fine tuning feels like that's the right answer.
+And that's why, when it comes to estimating the price of a product, it feels like a good fit because
+we don't just want it to be able to estimate the price of products that we've already got in our scrape.
+We want it to to learn that general skill and be able to apply it to new data.
+It's never seen before, and that's why fine tuning feels right.
+But again, one more time, the right answer is try them all.
+Have an evaluation metric measure and pick the approaches that work best for your business objective.
+--- Lecture 2 ---
+So you've understood the business requirements, and then you prepared yourself with a with a candidate
+models, a baseline model, a curated data set.
+You then selected the right model for the task at hand, and then you customize the model to apply it
+to your business problem by experimenting with multiple different techniques, measuring your business
+metric against them, and selecting the techniques that perform best against your evaluation metric.
+Excellent.
+But there's five steps.
+That means there's one more step left.
+What is that?
+Well, of course that is to productionize to then take what you've built and go live.
+And as you probably know, I've got a whole course on that.
+It's a whole discipline of its own.
+It's also sometimes people people call it MLOps.
+It's a whole profession of its own.
+Uh, and a lot of it is about, uh, deciding your hosting and deployment architecture rolling out in
+a production environment or a production cloud provider like AWS or GCP or Azure, and then looking
+at things like scale, can I monitor it?
+Is it secure?
+Compliant?
+Observability is super important for Agentic I can, I can I monitor what the llms are saying to each
+other and track them.
+And then measuring your evals.
+And the main point here, the key point is that evals doesn't stop after step four.
+When you've applied the model to your problem, you need to continually evaluate your model in production
+to see how it's doing and to correct for something called model drift, which is the tendency of systems
+to often start performing worse over time as your real world data starts to deviate from your training
+data.
+So then coming back and continuously retraining and measuring performance is the key part of step five.
+So that is the five step process to applying a model to applying AI or not AI to a business problem.
+And we're basically following these five steps along these lines during this capstone project.
+We've already looked at the requirements yesterday.
+And we'll look just one more time in a second.
+And we've been curating our data set, uh, in the, in the last couple of days.
+So follow along with these five steps and keep these five steps to hand.
+And always give yourself put yourself through the discipline of applying these five steps.
+I tell you, I get so many questions from people who are clearly diving into solutioning and building
+AI for X, and then they're not thinking about what is X and what problem they're trying to solve,
+how are they going to measure success?
+Uh, and then doing R&amp;D, wearing that data scientist's hat, being a scientist, uh, getting into
+the experiments and the research, there's no shortcut to experimentation.
+Okay.
+So now let's have a quick refresher on our capstone project.
+The price is right.
+Remind me the business requirements.
+So given the description of a product predict how much it should actually cost.
+The input is the description of the product, the output is the actual price of that product.
+And the solution is eventually going to be baked into an agentic platform that is going to be able to
+look out there in the wild on the internet and find bargains, figure out are they good bargains or
+not, based on a prediction of the real price, and then alert us if there's something that could be
+an opportunity there so that that is the price is right.
+Um, and the way we're going to evaluate that we're being successful is we're simply going to look at
+the absolute price difference.
+What's the difference between the prediction and a true price?
+It's it's both a model metric and a business outcome metric.
+It's wonderfully simple.
+Uh, and so that's a perfect metric for us to, to really double down on.
+That's what we'll be looking at.
+So the order of play again this is just a recap again of what I already said this yesterday.
+But just so that you know where we are in the story this week is about curating data evaluation and
+frontier models.
+We already curated the data yesterday.
+Today we're going to do this thing called pre-processing, where we're going to use an LLM to rewrite
+our descriptions so that they're perfect for training.
+And we're also going to use the batch mode which is like this pro pro thing.
+Then tomorrow we are going to be working with traditional ML, which I really enjoy.
+I hope you enjoy it too.
+I know it's a it's a bit of like stepping back in time, but it's very satisfying as you'll see.
+And then day four, we then move into the world of neural networks and frontier models, and you'll
+see the progression.
+And then day five, you're thinking this week was meant to be about fine tuning.
+It's not until day five that we finally get to fine tune a frontier model, which you do through an
+API.
+So it's not like you really get hands on with it, but still we will do it and we'll see the outcome.
+And as I say, I do want to set your expectations.
+It's not going to blow your mind.
+Uh, that's going to be the the order of play for week six.
+And then next week is doing real sleeves rolled up.
+We're going to dig in, fine tune our own open source model.
+Um, it's common, by the way, people people use the expression like like build my own, uh, open
+source model.
+Now, of course, we're going to be starting from an existing pre-trained model.
+We're going to use llama for a meta that we've seen in the past.
+Um, we're going to we're going to start with that that you hear the expression, I fine tune my own
+model and that's what it means.
+It doesn't actually mean you started from an absolute blank, uh, and spent millions of dollars training
+it on tokens.
+It means you used a pre-trained model, and then you fine tuned it further with your data.
+That's typically the way if you wanted to train a model from scratch, it's an interesting thing to
+do, but typically it would need to be a toy LLM that could do something like write, write children's
+stories or something like that based on a very limited corpus of data.
+And those are great projects to do, but they don't tend to be commercially applicable with, with,
+with very few exceptions.
+When you hear of it in industry, this is what it means.
+That's what I do in my day job.
+It's what it's what people tend to do.
+Take an open source, existing pre-trained LLM and fine tune it.
+Okay.
+And then in week eight we do all sorts of fancy stuff.
+We go back to rag again and we build an Agentic platform and it's going to be great.
+That's the order of play.
+And I want to remind you, there are these three different ways for you to follow along, and one of
+them is just to get the gist of what's happening.
+Listen to to how I explain the decisions I'm making and get a feel for it.
+Uh, that's that's great.
+It's a it's a really good way.
+You can always come back and do it again.
+If you actually have a project you need to apply it to.
+Number two is if you do want to run this with me, uh, but you don't want to spend days doing it.
+And so you're happy to use the light data set.
+And you remember we uploaded the light one at the end of yesterday and and don't don't actually go through
+and curate the data and don't do the pre-processing I do today, although you can do that on the light
+data set if you want.
+Um, but uh, but but stick with just taking the data that I curate.
+Um, and then the third one is, is like, go big.
+Uh, come with me every step of the way.
+Do the full data, set the 800,000, build your own model.
+And I will say as part of that, I do expect you, I expect you, and I require you to to battle with
+me.
+You need to try and beat me.
+There's no fun in doing this if you're just going to do the same as me.
+The great thing about this whole project is that we're going to come up with a number like, like a
+very definitive number, and I'm going to come up with my best number, and it's going to be much better
+than the number I had a year ago.
+It's going to be really great, but you can do better because the way to do better, it all it takes
+is experimentation.
+There's no magic, there's no trick.
+It's not like you need to know some secret hyperparameter that means it's better you simply it's trial
+and error.
+And if you do enough trials, you're going to beat me.
+And so that's the challenge.
+If you're going to if you're doing number three, if you're going big, then you have to take me on.
+You have to beat me.
+So stay focused, watch what I'm doing, and make sure that you can think of a few experiments to try.
+One of them's going to beat me and I can't wait to hear about it.
+You have to post that and you have to to to show your victory.
+Be proud and victorious in your post explaining what you've done.
+Put it on LinkedIn and I will weigh in for sure and make sure that that I amplify it.
+Okay, so with that, it's time for us to go back to cursor.
+It's time to pre-process our data using batch mode.
+--- Lecture 3 ---
+Okay, here we are in Corsa.
+We go into week six.
+We go into day two.
+And welcome back to the Price Is Right capstone project.
+And we are on day two data pre-processing.
+So here's the thing.
+What we're about to do is use an LLM to rewrite our data.
+In this case the full description of of products into a format which is nice and tight and short and
+a really good description of that product, perfect for training.
+And in fact, in the future, when we're when we're trying to to do inference on new products and never
+seen before, we can use that same pre-processing to rewrite anything in this same kind of structured
+format.
+So it's a really nice technique.
+It's a really good way of doing it.
+And this is something which this, this idea of, of, of turning unstructured data into something structured
+in a particular format.
+It's something that was an unsolved problem only a few years ago.
+It just wasn't possible to do something like this.
+And now it's something that Llms can just do in a heartbeat.
+It's so easy.
+And, and and that's why we're going to do it.
+It's wonderful.
+And it definitely makes a big impact on the results.
+And if you're wondering why my results today are going to be better than they were a year ago, uh,
+that's because I'm doing pre-processing.
+I didn't do this last time, and it's just such a powerful technique.
+Um, okay.
+And as I said, I'm also going to be using this technique called batch mode, which is when you call
+an LLM not using the usual like OpenAI create, but you do it in batch mode, meaning that you queue
+up a large number of requests, you send it off to the LLM, and you come back and collect it later.
+And not only is that very convenient for, for for coding, because you don't need to sort of sit there
+waiting.
+It's also a lot cheaper, in fact, most providers offer this batch mode service at about half price.
+And indeed, we're going to be using grok.
+Grok with a queue.
+The inference platform.
+Not not not Elon's grok.
+Uh, grok with a queue.
+We're going to be using with, uh, OpenAI's open source model.
+We're going to be doing that today.
+Um, and grok with a queue has batch mode, which is very, very similar to OpenAI's batch mode.
+They're basically the same thing.
+So that's what we're going to be doing.
+Uh, and we'll also be using light LM if you remember, light LM because I love light LM so again,
+the business value is that this is something which is a super powerful way to turn unstructured data,
+like our product descriptions, into something that's tight and more structured and parsed in a way
+that wasn't conceivable before.
+So we've got some imports here and now this is the moment for you.
+You can choose just just watch what I do, because at the end I'm going to upload a data set and you
+can just use what I upload at the end.
+Or you can choose to come in and do this in light mode.
+Have light mode equals true and you'll be using that small subset, the 20,000 plus 1000 plus 1000 of
+the training val and test split.
+You can be using that data.
+Or if you turn light mode to false, you'll be using the big guy.
+And uh and which I have done as well.
+But but I won't do it right now.
+We'll use the little one for right now.
+Uh, you can do whatever of those you wish, but definitely follow it.
+Watch me while I do this so you get a sense for it.
+Okay.
+And the first thing I'm going to do is load in the data set that I just uploaded yesterday.
+You remember the name of it was either items raw light if it's the light one or items raw full if it's
+the full one.
+And I'm just going to load in the train validation and test data set and put that together and see what
+we get in it loads.
+Roads.
+In comes all of our data right now.
+And there we go.
+We've loaded 22,000 items, which is the full population of the light data set.
+Okay.
+Next up I'm going to go through these items.
+And I'm just going to assign each one a number, which is just what what order.
+It's in in in the list.
+Uh, so, uh, let me show you what I mean by that.
+If I, if I just look right now at the first, uh, of the items, it's got a field called ID, but
+that right now is, is is set to none.
+After I run this, if I look at this ID again, it's now set to zero.
+And item number one is set to one.
+And item number two is set to two.
+And that's it's going to be handy when we get to to to batch mode as you will see.
+All right.
+Now on to the pre-processing.
+So here is a system prompt for you to look at.
+I'm saying create a concise description of a product.
+Respond only in this format.
+Do not include.
+Sorry.
+Yes.
+Do not include part numbers.
+I've stripped some of them out, but there's still some that got through.
+Title.
+Colon.
+Category.
+Colon brand.
+Colon.
+Description.
+Colon.
+Details.
+Colon.
+Now, the people that in the know would point out that it's often better to ask models to respond in
+JSON, rather than giving something with this sort of slightly janky format here.
+Uh, models are great at generating JSON, and indeed you can take it further and use a technique called
+structured outputs, in which models are required to respond in JSON.
+And that way you can get very accurate results that fit exactly into one one approach.
+And I did do that originally, and we will be using structured outputs in week eight.
+And I was going to do it here.
+But we're working with such a massive data set with so many items that that it turned out that that
+was quite expensive because JSON has a lot of stuff to it.
+And there are some some newish tricks to reducing the weight of the JSON.
+But actually, in our case, I made the decision to keep it really simple and just have it in this way.
+It works really well.
+If you were doing this for production and you had a bigger budget, you might choose to do this JSON
+style instead.
+We'll do that in week eight.
+Uh, but for uh, for now, this this approach works really nicely.
+It's low cost, it's fast.
+Uh, and it's going to work great for us right now.
+So that's my system prompt.
+Uh, so I can put that into, into some, some messages and I can call uh completion.
+I'm going to use grok with a Q.
+And remember you can replace this with, with any model that you wish.
+Looking guide nine for a reminder if you if you want to see how to do that.
+Um, but that's what I'm going to do.
+I'm going to use GPT OS, the open source version of OpenAI's model.
+Um, and it's just the smallest one that is very cheap and it's very fast.
+And I'm going to print out what we get.
+Um, and I'm also going to print how many tokens were used.
+And we'll do this for item zero.
+Let's just have a quick look at what item zero is.
+Items zero dot full.
+So this is the, the uh, the the stuff.
+Let's print it.
+So we actually see it looking nice.
+Here we go.
+This this is what it is.
+It's this, uh.
+Uh f59.
+And 613 Andover interior knob with deadbolt, oil rubbed bronze interior half only.
+So you can see it's very unstructured.
+We've also got all of the different features and bits from the Amazon scrape like listed out here.
+So the question is how is that going to look when we run it through an LLM in fact through OSS 20.
+And we give it this system prompt.
+And then this item, that's what we're going to do.
+Now let's see what we get here.
+We have it I'm running it and bam we get back.
+Do you see how quick that was?
+By the way?
+Wasn't that crazy?
+Uh, we get back, uh, title f59 interior, half knob, oil rubbed bronze, a single piece, oil rubbed
+bronze interior knob that attaches to a deadbolt handle for added security features.
+Easy installation, a four inch minimum door prep, and a lifetime mechanical and finish warranty.
+And you can see this is great.
+I mean, this is exactly what we wanted.
+It's surely clear that this is going to be better.
+It's going to be easier for us to train a model to predict how much something costs based on this description,
+than based on this janky stuff here with with lots of things in it and, and far too much data, we've
+managed to make it much shorter and much tighter.
+There's a lot more signal for the noise, uh, in this rewritten description.
+And that's what pre-processing is all about.
+Use an LLM to update your data so that you form a version of it that is going to be best suited for
+training.
+That's what we've done.
+And you can see that that there was 446 tokens input at what came out was just 125 tokens, and that
+cost us all of 0.011 cents.
+And don't misread that.
+It's not $0.011.
+It's 0.011 cents.
+It's a 1/10,000 of a dollar.
+So so it's definitely cheap.
+That's the great thing about OSS.
+But but of course, the bad news is that particularly for the full data set, we've got a lot of this
+data.
+We've got 800,000 data points.
+And so unfortunately it's a very small number times a very big number ends up still being quite a big
+number.
+So we do need to be cost conscious, uh, even even with such cheap prices.
+Well, there's one way that we can be very cost conscious and that is to use a free local model.
+Let's do that next.
+--- Lecture 4 ---
+So this is using a lama now and with light LM, all you have to do is just switch that to say a llama
+llama 3.2.
+And this is the the API base.
+Uh, so now it's going to be running on my computer right there.
+It's going to be using llama 3.2 to achieve the same thing.
+Uh, oops.
+There we go.
+Hang on.
+Let's run that so my computer, I can see my.
+It was very quick again.
+Uh, my GPU, like, spiked up for a second.
+Uh, so let's see what we got here.
+Well let's compare.
+You can see immediately that llama 3.2 while it was completely free.
+Uh, it's, uh, as you will see from that very precise cost, 0.00 $0.00.
+Uh, it's, uh, it's not done so well in terms of, of the, uh, the, the output, uh, you can see
+that, that it's got like something funny going on with the title here.
+Uh, it didn't, it didn't put the word title.
+It instead put a like a markdown title in their, um, category.
+It says home security, which feels like that's a very specific category.
+I don't actually care that much, but these categories are going to be a hint to the LM that's trying
+to to to guess a price later.
+But still, you want you want a category that feels feels right like that.
+Um, the brand it got right.
+Uh, the description provides a secure and stylish entrance solution.
+It's fine, it's fine.
+Um, but it's clearly not got the precision of OSS 20 b.
+Uh, actually, this has made me just just want to mention one other thing.
+You might notice.
+The output tokens is only 48, and the output tokens here is a much bigger number.
+And yet they look visually the same.
+And this when I when I saw that 125 I remember thinking, surely that's not that's way fewer than 125
+uh, output tokens.
+The thing is, it's worth knowing that when light LM counts the output tokens, it's including these
+things called reasoning tokens, which is the the tokens that OSS OS created while it was thinking through
+how to come up with the best answer.
+So it did have a few of those reasoning tokens as well.
+Because this is closer to 48 here, it's a nice and short description.
+Okay, so for you, if you if you do wish to go through and and work on this, you can choose to use
+llama 3.2 for your data.
+Of course it takes a long time.
+Llama 3.2 isn't exactly super speedy, but you can rewrite everything in llama 3.2.
+And still, this data will be much, much better than the original data.
+But I'm going to use grok with a Q.
+That's how we are going to pre-process all of our data.
+And I'm going to do this for the 20,000 in the Lite data set, and also for the 800,000 or 820,000 in
+the full data set as well.
+And I'm going to use this batch mode as a way to do it really fast and at half the price.
+Let's go do that now.
+So from this point onwards we're going to be focusing on using grok with a Q for the rest of this lab.
+But you can apply something similar to OpenAI directly.
+If you wish to have almost exactly the same API.
+Or you could just loop through and use llama 3.2 for the 20,000 dataset if you prefer.
+But this is what we're going to do.
+So first up we are going to have this this little helper function that is going to make a line of JSON.
+A single line of JSON for each of the different requests that we want to make to grok with a queue.
+That's how batch mode works.
+You remember we we talked about this briefly in week five.
+JSON L is a type of file which isn't just one JSON blob, which is what a JSON file is, but it's a
+file where every line is a separate JSON document.
+That's called a JSON l JSON lines.
+Um, and what we're going to have on each line is something which says what model we want.
+It has messages, which is going to be the usual OpenAI list of dictionaries with system prompt.
+And the the user prompt will be the full item.
+Um, and you can see that what we've got here is mirrors.
+The call we actually made before up here.
+So it's exactly that call we're putting in our JSON file.
+And we're also in each line.
+You also have to put an ID number to identify each line that you're sending in batch mode, because
+you're later going to get back responses for each line in your input file.
+And this is why I set that ID to be the number of each item, because we're going to use that as our
+way of queuing what is in each line.
+Okay.
+So that's called make JSON L.
+And to make this real for you, let me show you what that looks like for make JSON l of items zero.
+This as a reminder is what items zero is.
+I think we know this one.
+Well.
+Now it is this Andover interior knob with Deadbolts.
+This is what happens if I call make JSON L with item zero.
+I get customer id is zero because that's the id we set method is post chat completions.
+And then here you'll see that there is the list of DeCSS system user, and the whole thing is in there
+from the from the from the unstructured data and then reasoning effort low.
+That is what we get back when we call make jsonl.
+It like represents one API call in one line of JSON.
+Okay, so now I've got a function make file which is going to to go through and make a complete file
+by iterating through each item from start to end and make a jsonl file.
+And again, if you're not sure what I mean, it's going to become absolutely clear to you now.
+I'm going to call makefile starting at index zero going up to index 1000.
+I want you to make me a jsonl file.
+Call it zero underscore 1000 jsonl and put it in a folder called jsonl.
+Let me run that.
+It's run.
+Let's go and take a look.
+Here's a folder called Jsonl.
+I've got right here.
+Here's the file we just created.
+And this hopefully is where this will make sense to you.
+It's a file which has.
+If I scroll all the way down, hopefully it will have 1000 lines.
+Let's see.
+It does indeed have 1000 lines.
+And if we go back up to the top again all the way back, here's the first line.
+Each one you can see has a custom ID 01234567.
+And as I go along, you'll see that each one looks like an API call.
+It's got this body here which says what is the model we're trying to call.
+And then here are the messages uh, system, content creator, concise description, etc., etc..
+And so each of these you can look through, each line is passing in a different piece of unstructured
+data from an item.
+And we're going to ask grok to go through this whole file and process all of this together to give us
+our results.
+Okay.
+And remember, if if you're not following all of this, get some intuition for what I'm talking about,
+batch calling and LM through jsonl files.
+And you'll be able to to to reap the rewards of this, I'm going to upload the results.
+You'll be able to to download them and use them as is yourself.
+Okay, so now I'm using, uh, grok uh, provides a library grok, which we're going to use directly
+the if you call OpenAI in batch mode, it's basically exactly the same.
+Grok copied uh, OpenAI on this.
+And it's pretty standard for this, this approach for, for most of the providers.
+Okay.
+So so I'm initializing the grok library by passing in my grok API key okay.
+So the the when you're working in batch mode there are simply these, these steps that you need to do.
+There are these basically the three steps.
+You create a file.
+You then use that file to create a batch.
+And then you retrieve the batch.
+And that's what we're going to do right now.
+So the first thing you do is you create a file in grok.
+We're telling grok I've got this file.
+It's called zero underscore 1000.
+Jason I want you to upload this file.
+And the purpose is it's for batch purposes.
+That's what it is.
+I am just now uploading that file to grok and back.
+It came with a file response, uh, which has an ID in it, and it has how many bytes that it's created,
+the name, the purpose and so on.
+And now I can I can collect that ID.
+So this is now a file that I've uploaded to grok.
+It's sitting up there on grok.
+With this ID done.
+We've created our file time now.
+So we've yeah we've created the file.
+It's time now for us to use that file to create a batch.
+And so for that we don't call grok create we call grok batches create.
+We say we need you to complete this sometime in the next 24 hours.
+No rush.
+Take your time.
+Because that's how we get half price.
+Uh, we give it we say that it's a chat completion that's just standard.
+And we give it the input file, the file that the ID of the file we just uploaded, which has its jsonl.
+Every line is a different API request.
+So we have just created our our batch.
+There we go.
+It's got this batch ID let's collect that ID into uh into sorry.
+Here we go.
+Response ID is where we get that ID and when we're ready we can then do the next step, which is to
+retrieve that batch and see what's happening with it.
+So here we go.
+We did grok create to create the file.
+Then we did grok create to make a batch from the file.
+And now we're doing grok retrieve to.
+Now find out what's going on.
+We get back uh, the here is the batch ID, the completion window, the endpoint, the input file ID
+the status is completed.
+So grok had 24 hours to do it, but it did it just like that, which is usually the case for files like
+this.
+It will be no problem at all.
+It will have happened to you two, I expect if you were doing this.
+No errors.
+Everything looks great.
+So it happened.
+We've been we've been successful already.
+And there is then, uh, another step I should mention, which is to actually collect the results.
+And you do that with grok content.
+So here we go.
+Grok content.
+And I just wrote that to a file called Batch results Jsonl also in the Jsonl directory.
+Let's have a look.
+Uh here it is.
+Batch results is right here.
+And here we have it.
+So this is the contents of the file.
+It's a file with each line is a jsonl.
+Uh, it's a chunk of JSON.
+Look, these custom IDs, they don't match.
+It doesn't come back in the order that we sent it, because this thing went off and there was like,
+a farm of grok processes that handled it and back it came in some different order.
+So we can't rely on the order of the file.
+We need to look at this custom ID and you'll see that here are lots of responses.
+And if you look into them, you'll find that somewhere along the way here we should have indeed our,
+uh, our actual actual, uh, answer if I scroll to the right.
+Uh, here's the body.
+There's an ID in here.
+Uh, and then we're going to we're going to see that there's actually the, the response where we'll
+see the response content.
+Here we go.
+Uh, the message assistant content.
+And you can see right here appearing on the screen, you see this all of these title title titles,
+these are all the titles coming back from the model title category brand, uh, showing through.
+We have got back responses from grok for each of these items.
+Brilliant.
+And now finally, we can just write some vanilla Python code that will iterate through that.
+And then we can collect the ID and then use that to pluck out what is the summary.
+And look at this line here.
+Items ID summary is the summary that we will pluck out from that jsonl line.
+And that is what we will run next.
+And then we will examine the results.
+--- Lecture 5 ---
+And so to quickly recap, and I know you don't need a recap.
+You've been following all of this, but recaps are good.
+It's good to to repeat.
+Repetition is how you learn.
+So we started by making a jsonl file.
+We then did Grok create to upload our jsonl file and make a file in grok.
+It's the same with OpenAI.
+And we then did grok create to say hey, we uploaded a file.
+We want you to turn that into a batch that you should run.
+And then we did grok batches dot retrieve to see how it was going.
+And then finally grok files content with the results output file.
+When it finished, we collected that, saved it to a jsonl file.
+And now we've got this jsonl file.
+With all of the results, what we can do is iterate through it.
+We can again we can we can pluck out the actual ID which is really an index.
+And then we can pluck out the response body.
+Content which if you really follow through that jsonl line, you'll find that's what it takes to get
+to this point.
+While I was agonisingly scrolling through it just then, uh, and then we're going to get that summary
+and say items summary is that summary and it's run already.
+So a reminder that this is the, the uh, items zero dot full.
+This is the full janky thing for the Andover interior knob.
+And now item zero dot summary has been rewritten.
+And there it is.
+This came back from grok and it's been put into item zero dot summary.
+How about that.
+It worked.
+We've just populated.
+We should be able to do this for item number 1000 as well.
+Item number 999.
+There it is.
+It's there too.
+But if we go for item number 1000 I think that's going to be one too many.
+There's nothing there.
+We only did the first uh, 1000, which is from 0 to 999.
+They've all been populated by this batch.
+Uh, and it happened like like in a flash.
+We ran all of this, and it will have cost very, very little.
+Okay.
+And now we've done that.
+It's time to run it for the whole lot.
+Let's do it.
+So we basically have to do exactly what was in the notebook above.
+It was it was done just for one file, uh, from 0 to 1000.
+And we sort of want to repeat that for multiple files and just cover exactly the same logic.
+And the easy way to do things like this, when you hear something like that is you should think, okay,
+that sounds like I should make a Python module to do that and nicely package everything up.
+And that's precisely what I've done.
+And the module is called batch.
+It's in the folder.
+Here it is.
+Batch.
+Uh, and you can see here that it's exactly what we just covered.
+There's a system prompt which is the system prompt that we wrote together moments ago.
+And then it takes the batch size.
+We're going to have 1000 in each one of our files.
+Uh, you can have much more than that.
+You can have up to 10,000.
+Uh, at least I think more than that for grok.
+But I found it's better to keep these files relatively small so they run fairly quickly.
+And so what I've got here is just a few, uh, methods in this, in this class which make life easy,
+make Jason creates the sorry make Jason L creates the JSON l file with each row is exactly what it needs
+to be.
+Make file, build an entire file, uh, and then send file calls create to actually send the file up
+to grok.
+Submit the batch calls.
+Grok create.
+To create a batch from a file is ready, sees whether or not the file is ready by calling the the grok
+batches dot retrieve and then fetch.
+Output is files content and then finally apply output is that little bit of Python that looks up the
+id and then applies it to the item that it was referring to.
+And then I've got just some helper class methods like create that sets everything up, run that calls,
+make the file, send the file, submit the batch and fetch that says.
+If this batch is done, then go and fetch the output.
+Apply the output.
+So I don't I don't want to go through this in very much more detail, because it's just the same as
+what's in this notebook up here.
+Same thing packaged into a module.
+A good way to do it when you want to run something many times over, which is exactly what we're going
+to do now.
+We're going to run that for all of the 20,000, 22,000 in the light data set.
+Okay.
+So I'm going to run batch create light mode is true.
+So it's going to create 22 batches.
+The 22 times 1000 is 22,000.
+And you may have just spotted it just created a new directory called light which has batches and outputs
+as two empty subdirectories.
+Okay.
+Now I'm going to call batch run.
+And when I do that we get one of these nice Tqdm progress bars.
+Remember you can just wrap any, any list, any iterable in Tqdm and it will automatically create a
+lovely little progress bar.
+You see, I use that all over the place, so you're probably used to it by now.
+Uh, so here we go.
+The progress bar is filling up.
+And what we'll see if we open here is you'll see that it's creating.
+Ah, you see it making the one by one making a bunch of JSON files.
+Each of these, of course, contains a bunch of these API requests.
+We're in business.
+We are creating all of these, um, and those batches that are created, those files.
+And it also submitted them to grok.
+So these are all running right now.
+And at any point I can call batch and it will go through and query grok about the status of all of those.
+And it's telling me now that it's finished seven out of the 22 batches.
+And I should tell you if you are choosing to run this yourself, as it said in the comments at the top,
+this this costs just under a dollar for me.
+Uh, the cost might be different in different regions, I don't know, but I expect it's the same.
+Uh, the whole cost was slightly under a dollar.
+Ngrok to run this, which is 50%.
+Half price of what it would call cost just to.
+Just to call them manually one by one.
+And you may say in this case we could actually do it manually.
+So it will cost us $2 instead of $1.
+And it would still be pretty quick because this is very fast for 20,000.
+Maybe you'd have to leave it running for an hour or two.
+But remember, I'm about to do this for the 800,000 and that would be completely impractical to do it
+anyway other than the batch way.
+So run batch dot fetch again.
+See how we're doing.
+You can run this as often as you want, and it will just collect anything that's still remaining.
+It's now finished 18 out of the 22.
+Uh, grok is very quick at getting through this.
+And this is, this is doing, uh, all of the 22,000 in the light data set.
+Run it one more time, finish 21 out of the 22 batches.
+Uh, so.
+So any second now, it's going to be finished.
+And now it has indeed finished all 22 out of the 22 batches.
+Amazing.
+So again, we created these 22 files.
+If I now open up output, you'll see there are 22 output files.
+And these outputs will match each of these input files.
+Although the order in each one might be different.
+And let's just double check that, uh, that everything in our items at this point, every single one
+should now have an item dot summary.
+And sure enough, nothing got printed.
+That means that there are no cases where there was an empty summary.
+We have just populated.
+Let's go and have a look at a few of them.
+We've just populated.
+Look at items.
+Uh, number.
+What number should I choose?
+Number 10,234.
+Uh dot summary.
+We should find that there is a nice summary.
+Print that out.
+Make sure it looks good.
+There it is.
+Red barn.
+Full photography backdrop in photography and video.
+Here it is.
+Let's see what the original text looks like.
+Something that's.
+That's much more janky.
+We've tidied it up.
+We've made it shorter.
+Here it is.
+That's success across 20,000 data points.
+22,000 in in a flash.
+Okay, so you didn't need to do this yourself because you've seen me do it.
+I'm now going to upload it to the hub.
+So you can you can take the benefit of what I've done.
+As long as you get the general idea of this.
+We're using an LLM to rewrite the text, the unstructured text in the janky scrape from Amazon that
+we collected from Hugging Face.
+We've rewritten it so that it's sharp, punchy, full of signal and no noise.
+Something that will be good to pass into an LLM to figure out how much it costs.
+And we used the batch mode of talking to grok, same as the batch mode for talking to OpenAI.
+It's a common technique.
+Write your jsonl file and then create that, that file in the in the provider and then turn that into
+a batch, create a batch based on the file and then collect the results.
+Uh, check, check on the status.
+And then when you get an output file name, collect those results.
+And those steps are very common amongst many LMS providers.
+It's a way to get fast, low cost, kind of asynchronous batch runs of calls to an LMS.
+So it's a great skill to have acquired.
+All right.
+Finally I'm just going to go through all of the items in our 20,000.
+And I'm going to to wipe out the full and the ID because we don't need them anymore.
+We're never going to use that full description again.
+And we don't need to to pollute our data set with it.
+So run that and we've wiped out that data.
+And then finally I'm going to upload that to a new data sets before it was called items raw light and
+items raw full.
+Now I'm just going to call it items light and Items full.
+And if it's light mode I'll only upload the light data set if it's in full mode.
+I'll upload both data sets.
+Um, putting in the 800,000, uh, and then 10,000 val 10,000 test.
+Otherwise just 20,001 and one.
+And I'm not going to run this cell now because I've already done it.
+But you can, uh, and you will be able to have your very own data set.
+But I've done it.
+And so we can have a look at what it looks like in hugging face.
+If I launch this up, it comes in hugging face.
+This is looking at a data set.
+It's my data set.
+It's, uh, items light that you're seeing here.
+And you can see that there's nice little data set navigator here where you can see the title, the category.
+These are all the fields that we got from the Amazon scrape.
+Um, so this may or may not match the category that was assigned by OSS.
+The price we've got here, the weight which is a field that we've done.
+And the summary and you can see here the summary has a title and it has all of the details in it.
+Uh, this this is the data.
+I'm just clicked on it here so we can have a look at it.
+This is the data that was written by, uh, by by GPT oss 20 through grok in batch mode.
+So this is the data as it is.
+That is the light data set.
+We can also look at the full data set.
+Here is the full data set.
+Look over here you can see the number of rows 820,000 rows here where it was just just uh, 20,000 rows
+for this simpler data set.
+Uh, there we go.
+22,000 there and 820,000.
+It's a monstrously large data set.
+So much data.
+It's going to be great for training.
+It's 250MB.
+It's not like a massive file that we've got here.
+So it's going to be fine for you to work with.
+And you can have a look at all of the data that's in here.
+This cost me about $30, I think just under in total to run all of this in grok.
+And it took several hours.
+I had to come back and collect it a few hours later to get everything.
+but it was quite fun and satisfying.
+But you honestly don't need to do it because I've done it already.
+We're just using this data set going forwards, all the Lite variant, but you at least have a good
+sense of how I did it, and you know enough so you could do this too if you ever want to do something
+similar.
+And with that massive congratulations, we're done with data.
+We've got a beautiful, curated, processed data set that is going to it's going to do really well for
+us in our training.
+And hopefully you've got a great sense of what it takes to craft a good data set and the kinds of experiments
+that you might want to run.
+And as a little bonus, we got to explore running in batch mode, which is something that's super useful
+running in batch mode and prompt caching, and are two of the kinds of of tricks to reduce costs that
+are used often.
+Okay, so remember that today, in addition to the calling models for code and text and rag, we we
+covered the five step strategy to how you solve problems with AI starting from identifying the problem
+and the eval.
+Next time we're going to dig into baseline models, what does it mean to create a baseline model?
+I'm going to give you a flavor for traditional ML.
+We're not going to go super deep on traditional ML because this isn't a course on traditional ML.
+And I and I think you'll be annoyed if I get I do tend to I get very excited by traditional ML, but
+I'll try and contain myself and give you enough so that we can build a baseline model, which is such
+a good place to start.
+So so we know if we're going to work with, with Llms that we we are in fact, doing better than we
+could do if we stuck with, with the traditional world.
+So it's a good thing to do, and it will also give us a solid basis for improvement.
+And we're going to use some of the more trendy, modern, traditional ML things as well, like some
+of the models like Random Forest and XGBoost that people love to experiment with.
+Even to this day they are still used often in production, so tons to do tomorrow.
+I'll see you then.

@@ -1,0 +1,799 @@
+--- Lecture 1 ---
+Okay.
+It's week four.
+Day five.
+It's the last day of the week, the last day before rag week.
+And we're going to use it as a final time of judging models because we're judging types.
+You can already code with frontier models.
+With paid APIs that check completions API, you can use open source models in your sleep.
+You can confidently choose the right model for your project based on metrics, and you can use frontier
+and open source models to generate code.
+Today, we're going to be continuing to compare the performance of a zoo of models.
+We'll talk about different types of metric.
+And we're going to build solutions for code generation.
+And I'll leave you to build some for different tasks.
+Okay.
+Let's get to it.
+So I said before that perhaps one of the most important questions that one tackles is choosing which
+LM is right for the task at hand.
+But in fact, I'm going to correct myself.
+I think there's an even more important question which which is sort of a part of that question.
+So it's a subquestion perhaps, which is how are you going to evaluate the performance of your model
+of your solution, that it's such a crucial question.
+It's a question where you have to firmly put on your data scientist's hat to understand.
+What does it take to say this solution is superior, has better performance than this, because only
+when you have a metric that you can measure can you judge which is the right LM for the task at hand.
+So incredibly important.
+We will talk about this a number of times in the coming weeks.
+And I do see it as a critical skill to have as an AI engineer.
+And it's also something that's often it's a common interview question.
+It's a common thing that you would you would ask in a real commercial team.
+So it's something to understand even if it's not as juicy as some other things we cover on the course.
+It is a really essential question, and I want to tell you now about the two different types of metric
+that you will come across that you need to be thoughtful of as you're building out an LM solution.
+Okay, so the first kind of metric that you will come across that is super important.
+Sometimes called model centric metrics or model metrics or technical metrics are the metrics that you
+measure as you are training a model to make sure it improves, or as you are working as a data scientist
+on a model.
+And when you're dealing with training, the normal thing that you look at is called loss, which is
+a measure of how bad is your model.
+And you're normally trying to adjust training to minimize loss.
+And if you come from a traditional data science background, then one of the go to loss metrics you
+start out with is called MSE mean squared error.
+And it's as simple as you take your prediction from your model, you subtract the ground truth and you
+square it.
+And so if you say that someone's predicted credit rating is ten, and their actual credit rating turns
+out to be eight from your from your labeled data, then you take the difference two square it four.
+And that is your MSE loss your mean squared error.
+When it comes to deep learning to to LMS, the metric that we most commonly used is called cross entropy
+loss, and we will look at that later when we do training ourselves in week seven.
+When that time comes along, we will look at the formula for cross entropy loss.
+Uh, and so you will get you will get somewhat familiar with it, uh, the negative log likelihood for
+those that know this stuff.
+All right.
+So that is loss.
+And perplexity is another measure that you come across a fair bit in uh with LMS it's very similar to
+cross entropy loss.
+Uh, it's another measure of how how well your model is doing.
+A perplexity of one means your model is incredibly confident in the right answer.
+That's a that's a good, uh, perfect perplexity, whereas a loss is zero is absolutely perfect.
+Uh, there's no loss at all.
+And then a higher perplexity indicates that the model has less certainty about what it should be predicting
+next.
+So perplexity of 100 would indicate that it's the same as it thinking that there's 100 equally likely
+possibilities for the next token.
+So that's perplexity.
+And then a bunch of other metrics here from traditional data science, uh, the precision and recall
+and F1 they form, there's this thing called the confusion matrix that you may come across, which is
+all to do with if you're making predictions.
+Uh, how how good are your good predictions?
+It's all to do with false positives and false negatives and all that if you've done this before.
+So these are all the kinds of metrics, uh, that you dig into as a data scientist.
+And we will look at some of these in week six and then seven, as we look both in the traditional data
+science world and in the new world, how data scientists like yourself, uh, model and look at the
+performance of their model.
+And these are the ones that are easiest to optimize your model, uh, from because they're calculated
+directly from the outputs of the model.
+And you can run your model, calculate these outputs, and you can do things like training, where you
+automatically tweak all of the settings of your model to try and get your numbers better and better
+to try and reduce your losses.
+That is what training is all about.
+So if these are the metrics which actually tell you what the performance of your model and that you
+can use to train your model, then you might be wondering, well, what's the other type of metric?
+Why do we need another type of metric?
+Well, maybe you can guess.
+There is a very other important type of metric, and it is sometimes called the business centric metrics
+or outcome metrics.
+But these are the true commercial metrics that your business wanted you to solve.
+They're typically like KPIs tied to business outcomes, like like perhaps revenue or return on investment
+or a very common one of course, is customer satisfaction.
+When you think about you're chatting with with with a chatbot, and then you see that thing that says,
+am I doing a good job?
+Thumbs up, thumbs down.
+You're giving user feedback.
+And ultimately, the intention of this chatbot is to have satisfied users.
+That's the final goal.
+No matter how good a cross-entropy loss is, how low it is, and perplexity is low and uh, accuracy
+is high.
+Everything else is looking great, but but, uh, yeah, if you're if you're customer satisfaction is
+bad, if people don't like chatting with your chatbot, then something's gone wrong.
+Uh, and also comparing with benchmarks like the leaderboard, you could have all sorts of great scores,
+but if it's not doing well in at the end, the tests at the end of it, then something is wrong.
+Your AUC roc your area under the curve of the receiver operator.
+Characteristic sounds super tactical.
+It might be fantastic.
+It means nothing if your revenues aren't going up.
+So that is why you need a business centric metrics which you're trying to solve for.
+And and these are the tangible ones.
+And so why don't we why don't we only focus on those?
+Well, of course, I've sort of answered my own question on the slide.
+It's because whilst the business outcome metrics are what you're trying to solve for, typically there
+are many leaps of faith between getting from your technical solution and the actual final outcome.
+Who knows why your customers are pressing the thumbs down.
+Maybe.
+Maybe the chatbot is doing great, but something else is going on.
+Maybe they don't like the UI.
+Maybe it's something that's completely unrelated.
+And maybe, maybe revenue is not going up because.
+Because people don't want your product or something.
+That's got nothing to do with the fact that the model is working beautifully.
+So, you know, there's there's there's other outside factors.
+There's there's too much, too much noise between the model and the final business outcome.
+So whilst the final business outcome is what you're trying to achieve, there's many potential areas
+where you might miss for other reasons.
+It's too noisy and you can't train on it.
+It typically takes time before you can measure this metric revenue.
+You can't.
+You can't run your model and then see what happens to revenue.
+So you can't use it for for real time training.
+So whilst the business metric is what you're ultimately trying to solve for, you obviously can't measure
+that in a frequent way or tie it super directly to the model.
+So you typically optimize with the model centric metrics, and then at some point later you measure
+the business outcome metrics, and it is the responsibility of a combination between yourself, the
+AI engineer and your business sponsors to to make sure you've connected the dots, to make sure you've
+done everything you can so that a model which performs well with its model centric metrics, will translate
+to a business that performs well with its business centric metrics.
+And I know what you're thinking.
+You're thinking.
+Sure, sure, sure.
+But I'm the AI engineer.
+I'm the data scientist.
+My domain is the model centric metrics.
+That's where I live.
+It's the business people that are responsible for the business outcome metrics and or the or the product
+people.
+Product teams often are the people that sit in the middle and interface between, uh, people like ourselves
+and the final business, uh, divisions.
+But what I'll tell you is this is I've said it before, uh, whilst I have some sympathy with that argument,
+I do appreciate that that is our primary responsibility.
+Are these model centric metrics.
+It is a super power for people in our position for for the technical people, for the for the scientists
+and engineers to also understand the business and to be able to connect the dots.
+If you can do that as well.
+It is a superpower.
+And so I would urge you to be thinking and challenging the business metrics to really dig into them.
+Challenge your business, challenge your product people.
+Make sure that you're the one that's connecting the dots.
+Because if you know and understand the technical side and the data science side and the model centric
+metrics, and you also understand the business KPIs that you're trying to solve for, then you are in
+a fantastic position to make really, really significant impact.
+So that's the challenge for you.
+Get that, seize that superpower.
+I've also I've of course got the commercial briefing course too, if you want to get deeper into that.
+But but the the best the best way to do it is to be curious to, to try and find out about the business
+metrics and understand ask the right questions.
+Challenge.
+Make sure you understand how your model is going to translate to business outcomes.
+--- Lecture 2 ---
+And we will come back to this, uh, from week six onwards and do a lot more in the way of discussing
+and understanding evals.
+Such an important topic.
+Okay.
+So back back to the project at hand.
+In our case, of course, we were very lucky that the metric that we were playing with, the metric
+that we had the most insight to, was the business centric metric we were working directly with that
+improve the performance of some code.
+Doesn't happen often.
+I got to tell you, most of the time the model metrics are quite far removed from the actual business
+metric, but in our case, we were working directly with that.
+And it was about the performance of C++ with with with the same with needed to have the same output.
+And so far Gemini 2.5 Pro is our winner.
+It's time now for us to go back to the lab one more time for a harder test, to really put them through
+the their final paces and see who we will crown the final winner.
+And to shake it up, I've decided to change things around a bit.
+And rather than rather than generating C++ code and translating from Python to C++, I have changed
+it.
+So we'll be generating from Python to Rust code rust, which happens to be, I think.
+I think it is the most loved language.
+According to the StackOverflow developer survey for ten years in a row.
+Most loved ten years.
+Let's see if we can figure out why.
+When we translate a hard challenge from Python to Rust, let's go to curse.
+Okay.
+Back in curse, we're opening week four.
+We're going to day five.
+And here we have it.
+As a reminder, it is optional to actually execute C++ or rust.
+You can do either.
+I'll set this up, this lab up for either one, or you can just run it on the C++ website from yesterday
+or just port the code.
+Don't bother with the running your choice.
+Also a reminder I will use some expensive models, but you can pick your own or just run it only open
+source.
+It's about the task, it's not about the compilation and so on.
+So as usual, some imports as usual load in some environment variables.
+Make sure we've got everything keeping open router on the list again as well as grok.
+With a queue we will get all of our client libraries initialized.
+And as before, this is the list of models that we'll use.
+I'm keeping the same set as yesterday.
+And here are they are linked to their client libraries okay.
+Let's now find out about rust.
+So there's a new function in that systeminfo thing that I added in there which is called rust info.
+And if I run that then as well as my system information, it's going to give a whole ton of information
+about whether or not I have a rust tool chain installed on my computer, which I do, and then I will
+run this, that will again ask Gpc5 to give me instructions for how to install rust if I don't have
+it, so it will give you instructions and this is very optional should you wish.
+You can stick with C++.
+Stick with what we did yesterday if you don't want to mess around, it's fun.
+If you know the nerd in, you might be interested and might want to do this.
+It's especially cool if you don't know the language, because there's something very satisfying about
+seeing a model generating something which looks foreign to you.
+You know, it's like, okay, I don't know what this means.
+I'm going to see if it actually works.
+So I find that kind of cool.
+Uh, and, and it has, uh, done it and it's told me that I am already set up.
+I have rust toolchain, and it's told me that this is the command that I need to run, and it looks
+like a pretty legit command, and I've just copied that and pasted it down here.
+But you can leave this being your C++ one from yesterday if you'd like.
+As you wish.
+Now let's go on to the main part and I begin here I've got language equals rust.
+And just change that to C++ if you'd like to stick with C++.
+Everything else should work exactly as yesterday all the way through.
+Everything in this code works for either rust or C++.
+Rust, of course, also is a compiled language, so it compiles all the way down to a native machine
+code, just like C++.
+What famously rust is something which which is considered safe in that it compiles all the way down.
+But what C++ lets you, if you wish, do very dangerous things that can cause the machine to crash horribly
+or cause buffer overflows and security risks.
+Rust does not permit that.
+So so, uh, we've we've, uh, we're gonna we're gonna see how that affects performance of the code.
+If it does and what we're able to do.
+Let's see.
+So, uh, I've got I've got this part, as I say, that that puts in the word rust, but otherwise everything
+is exactly the same as before.
+The same system prompt.
+Your task is to convert Python code into high performance language code.
+That'll be rust, of course.
+Respond only with rust Ross code, and it needs to produce identical output in the fastest time.
+The same user prompt as before.
+The same messages as before.
+The same write output as before.
+The same port as before.
+Just.
+I've also made sure that we wipe out any special tags for rust.
+And then the run python as before, which is going to run the python version of the code and compile
+and run where.
+Now this is.
+So it's the same code here because uh, it's just going to take the compile command and the run command
+that you've got above.
+Okay.
+Now let's look at some python.
+Okay.
+So last time we had some Python code to calculate digits of pi.
+We've got something harder this time.
+There's quite a lot of complicated code.
+And I will go through it later when we, uh, see it presented nicer and talking about it presented
+nicer.
+This is where we're going to do that.
+So we now have a little gradio app that's a little bit more involved than last time.
+I bring in some styles that I've got sitting in another file there.
+You can check out the styles if you want, but but uh, yeah, I'm not much good at CSS, and I will.
+I will tell you that it was, uh, an LLM that generated this CSS right here.
+Of course, that's the way to do it these days.
+Uh, so we take in some CSS, we create our user interface as before.
+It's got it's actually it's now it's now got three rows.
+The first row has the, uh, Python code and the C++ code and then the set of buttons.
+And then there's the second row.
+And the third row has output cells for Python output and C++ output.
+And the other thing I mentioned is we're using a special gradient field called a GR code.
+So let's see what all this looks like.
+If I run this up comes the user interface.
+And it's kind of cool.
+We've got ourselves this, uh, this code block right here and we can see what's going on really nicely.
+Let me zoom out a bit.
+There we go.
+Zoom all the way out.
+We can see this is all the code we're talking about.
+It probably looks super tiny for you.
+You have to squint, but I can make it a bit bigger.
+There we go.
+And I can just quickly tell you what it is that we're going to be running here.
+Okay, so what is this Python code?
+What are we challenging our model with, right.
+Well, to start with, we have something here which is a pseudo random number generator.
+It generates fake random numbers I'm not relying on on like the random library in Python, because I
+want to do something that will be totally reproducible in any other programming language, but also
+because the way I do this, which is with a couple of big, big numbers, and then doing something where
+you multiply, add and take the remainder.
+The way that this is done is, is using a generator function using a yield of a value.
+And that's going to be something hard for the model to understand and translate to other languages with
+different constructs.
+So that was a sort of cool trick to use here.
+So okay, we can generate random numbers.
+So what.
+Well, I wanted the kind of kind of formula here.
+That's the kind of thing you might come across maybe in a game.
+Uh, so maybe if you're a games programmer or games dev, this might be the sort of thing that you've
+had to do.
+But basically I make 10,000 of these random numbers between minus ten and plus ten.
+And the challenge that this code solves is, all right, I've got these 10,000 random numbers.
+Tell me if you could pick any subset of numbers in a row, you could pick the first ten numbers, the
+middle 30, the last 20, any subset.
+Then you could add those numbers up.
+You would get a total.
+What is the highest total that you could get by taking any sum subarray, any any number of numbers
+in a row within this array of 10,000 numbers.
+And you might say, well, hang on, why isn't it just that just keep going.
+Just take the whole list.
+Because remember, it has negative numbers in there too.
+So you might not want to take you might you might get the best possible outcome just by taking the three
+numbers in the middle if they're all positive.
+So it's figuring that out.
+And of course, the way to do that which is shown here, which is a pretty standard approach, is to
+loop all the way through the whole array and as your starting point.
+And then for each one you have like a sub loop here, which then loops to see what the end could be.
+And then you add that up and find the total.
+And you have to just make double sure that you don't accidentally check everything twice, which is
+easy to do if you're not careful.
+And so that is what this does.
+And then I say, you know what?
+Let's do that 20 times.
+20 times with different sets of random numbers.
+Add the whole lot up and return it.
+So there's a lot of calculations happening there, an awful lot.
+And it's going to be hard for the model to understand all that, to translate it and to get exactly
+the same output, let alone make it faster at the same time.
+So we will see how they all do.
+--- Lecture 3 ---
+But before anything, if we zoom out from this a little bit, we should start go all the way out.
+We will start by running this Python code to see how long does this take.
+If we just use Python and, uh, it's not going to be quick because there's a lot of work to be done.
+And this of course is taking the string and calling eval.
+And which is basically the same as just running that Python code and then finding out how long it takes
+in Python land.
+And I do believe I happen to know.
+Well I know you don't know yet, but you're about to find out any second now.
+Uh, and we will then be able to compare that with the rust version.
+Here it is.
+So the total maximum subarray sum, that is the total of doing this 20 times it comes to that number
+109 eight zero.
+So that is the number to look for.
+And the time it took was 33 seconds.
+In Python land.
+That's the number to beat in rust okay.
+So the first model to try will be the one that came bottom before.
+We will go in reverse order.
+Kwan 2.5 coda.
+I have kicked off.
+That of course is running locally on my computer and obviously we're going to hopefully see that it
+can port this code to rust last time.
+Remember with Pi it wasn't able to make the C++ code work.
+This is the rust code that's come up.
+And uh, if it's your first site at rust Code, then here you have it.
+We will now see whether or not this works.
+Run the rust and we get a bunch of stuff, a bunch of problems.
+That is another fail.
+Unfortunately for Kwan 2.5 Coda.
+So next up is GPT.
+Uh, so we should, uh, we should find that again.
+You remember, that was the one that unfortunately disappointed us last time.
+So we will press the port to rust button again.
+This is going to grok with a queue.
+It does make me wonder whether, uh, I somehow had it not set to be reasoning high in the way that
+I'm talking to grok with a queue, because it's quite fast, and it's surprising that it got it wrong
+before.
+Uh, so that might be you guys could probably double check that and tell me if I'm not, if I'm not
+using that properly.
+Uh, but now it's time for us to run this as well.
+Let's see what happens.
+Something's going on.
+It's thinking, okay, it got the right answer, and it ran exceedingly fast.
+That seems to be pretty impressive to me.
+I would say.
+Let's have a quick let's let's copy this down and take note of this result and look at the code and
+see what's going on.
+Uh, so this is the rust code.
+You'll see that, uh, you probably can't see anything at all.
+Let me zoom in.
+You'll see that it's done some some interesting looking things here.
+Uh, but most importantly, it has done something very, very important, which is, uh, impressive.
+It is reimplemented the algorithm.
+It has used something known as candidate Kadane's algorithm, which is an approach which allows you
+to not have to do a loop and an inner loop, but to calculate the maximum sum of continual elements
+or contiguous elements in an array in one pass.
+And so it recognized the kind of thing we were doing, and it knew how to do it faster.
+And that's pretty impressive.
+And it could have done that in Python two.
+But the fact that it did in Python and rewrote it in rust that got compiled is why we've got a staggering,
+staggering performance improvement.
+Check out the difference here.
+33 seconds down to something that is what is that?
+That is that is 304 microseconds.
+Wow, wow.
+I wonder if that's going to be the victorious, uh, from OpenAI OS 120.
+Let's keep a note of that.
+Go back to day five.
+So this is uh, we've got again that um, that Quan 2.5 coder was a fail.
+Or make this the markdown.
+And now we have of course.
+Sorry.
+Markdown.
+And now we have that GPT oss 120.
+Got that time frame.
+Unbelievable.
+Unbelievably fast performance.
+Fantastic.
+Time to try the next model.
+Okay.
+And back again.
+I'm still.
+I'm somewhat, uh, awestruck by the performance improvement we just saw from from OSS 120.
+Uh, now I've gone to Deep Sea Cadet v2.
+I ported to rust, press run rust, and it gets an error.
+Deep Sea Coder v2 is another fail.
+So onwards.
+Next up is Kwan that we're going to do this one.
+The Kwan 330 DB that we're going to use open router as our as our conduit as our provider that is connecting
+to Kwan and will charge us for it.
+Here is the code.
+Let's run the rust and see it also fails.
+Look at that uh, error aborting due to unknown format trait.
+That's interesting, isn't it?
+There we go.
+So?
+So also, Kwan has failed.
+That's next on our list.
+We're not going to give him a second chance.
+Unfortunately, it's.
+This is.
+This is the game.
+Uh, you may have more success if you're running this, you might get a different outcome.
+It's time for us to go to our first frontier closed source paid model.
+We're going with Claude.
+That was in last place before port to rust.
+Let's see how Claude handles this challenging case.
+Uh, it's thinking about it.
+I feel like it's thinking rather longer than it did for the pie example.
+Uh, and here we go.
+We've got the answer.
+I see a bunch of stuff here.
+Let's try running that rust.
+Oh.
+An error.
+There we go.
+I actually think I saw that this this, uh, so this is an example.
+If you run this in C++, it will in fact, uh, probably crash uh, or give a crazy number.
+Rust has more, uh, type checks.
+It does more checking.
+And so it notices that Claude has made a mistake Stake here in using 32 bit numbers.
+When these numbers require that, use 64 bit numbers.
+And I even added a comment.
+A Python comment in here.
+Be careful to support large numbers.
+Just a hint so that the model, when it's going through and doing this, it just has that.
+It's paying attention to that.
+But it didn't help out Claude, sadly.
+Claude 4.5 had failed the test.
+That is a fail.
+Noted down Claude 4.5 fail.
+And we're going to move on to GPT five.
+Okay, here we go.
+We're going to go on to GPT five.
+Here it is port to rust.
+And I feel like I didn't make enough of a deal of the fact that this new interface, I sort of forgot
+to mention really enough time that I've added all of these buttons so that not only I think in the last
+one, all we had was the display of the code.
+This one is one which also shows the output, which I think is really cool, which is the, uh, For
+the final part of this interface, and it's been styled so nicely.
+Um, so it looks great.
+All right, well, this will probably take a few minutes because it's a hard task at GPT five.
+Took five minutes for the easier task?
+I think so, so it could take a while.
+So I'll be right back when it's complete.
+Okay.
+GPT five has completed.
+We're looking at the code.
+I can see already.
+I can see that it's got contains algorithm.
+And there we go.
+It mentions it contains algorithm.
+Uh so it saw that and I also see it's done.
+It's done inlining like Claudia.
+But it appears to have done more.
+I think if I remember right.
+So let's run this.
+But I'm expecting a very good outcome.
+It's run.
+Oh, no.
+Look at that.
+It's gone wrong.
+Oh, no.
+What's.
+What's happened to it?
+Unknown format.
+It's the same thing as we got before.
+That is funny, isn't it?
+It looks like it's, uh.
+It's made some mistake with the way that it's formatting the text.
+Although everything else is working.
+Well, that is too bad.
+That is a great shame.
+GPT five.
+You know we got rules are the rules.
+What am I going to tell you?
+I'm afraid we have to fail it.
+I don't know how this happened exactly.
+It seems like, uh.
+It seems like a real shame this would happen, but GPT five disqualified, and we'll move on.
+Well, I'm still pretty shocked by this.
+I'm shocked by the fact that the mighty GPT five made a mistake.
+I can't help but think that maybe it's my mistake that I've done something wrong here.
+Uh, we'll find out, uh, if I have.
+Then then then let me know.
+Tell tell me what I did wrong.
+Uh, but I do believe GPT five disqualified itself.
+Meanwhile, I have selected GPT OSS 20, uh, the one that triumphed last time.
+The open source model that caught us all off guard.
+It is now running.
+My machine is grinding.
+I wonder whether.
+Yeah, whether if I'm appearing freeze frame.
+It's because my machine is is really, really crunching away to try and get through this.
+I will see you when it completes.
+--- Lecture 4 ---
+Well, this is exciting.
+It's completed.
+So GPT five disgraced itself with with the apparently buggy code, and now it's with its cousin, OS
+20 GB to try and save the day.
+Let's run this.
+Oh, wow.
+This is running.
+There we go.
+Okay, well it's done.
+Great.
+It has, it has done great.
+Look at that.
+It's got the right answer.
+And it's also done it in crazy fast time.
+Let's have a look at the code.
+I can see that looks right.
+The subarray I it didn't mention that it's used Kadane's algorithm but I can see that it has there's
+only one loop not multiple loops.
+And it wouldn't it wouldn't give the right answer if it had got it wrong.
+And so despite.
+Yeah, it doesn't it doesn't mention that it's reimplemented.
+It just did it.
+There's no comments.
+It did it in, uh in perfect style.
+It continues to amaze.
+This is the result.
+This is the result from the, uh, the small open source model.
+Here we go.
+Paste it in there.
+How amazing is that?
+It's just come in here under.
+It's a bigger, bigger brother.
+Which is perhaps just a coincidence.
+Who knows?
+But it's the number we're taking.
+That's the rule.
+I don't make up the rules.
+Well, I do make up the rules, but that's what we're going with.
+Congratulations.
+We've just got two more models to go.
+Okay, so next up is grok for the mighty.
+Grok for I've kicked it off.
+We'll let it run.
+Take one more moment to admire this nice user interface, which is all hooked up as we look back at
+the code here.
+If I go back to this code, just to show you, the thing that I didn't particularly cover last time,
+is that you can see that the, um, the callbacks when you call click for convert, it calls the port
+function as before, puts in the inputs of the model and the python and takes the outputs.
+Then there's a Python run button.
+That's the new button.
+When you click that it calls run Python, that function that runs and times the python and puts the
+output in Python out.
+And when you click the the run C++ or rust, depending on on what language is set to it calls compile
+and run that function that we wrote and it puts the output there.
+So you see again that how how cool and clear gradio is just by setting the listing the buttons and registering
+these events and tying them to callback functions, inputs and outputs, you can easily hook up a user
+interface to your model and to your to your backend callback function.
+All right, well, it's still running.
+I will see you in a minute when it completes.
+Okay, here is the rust code generated by grok for, uh, taking a look at this.
+Uh, okay.
+I can see that looks good.
+Uh oh.
+I'm not sure if.
+Oh, yeah, the right data types, I think.
+I think that looks good to me.
+And, uh, it looks like this is Kadane's algorithm, although it's not mentioning it.
+Exciting.
+Let's run the rust.
+Let's see what happens.
+Here we go.
+Okay.
+And it's done.
+It.
+It got the right answer.
+It got it in a very, very fast time.
+I'm not seeing.
+It's funny.
+It looks it looks different.
+I don't know why it's faster.
+It does look like it's got a different implementation.
+I do see I think that it's been quite clever with its sizes.
+I for a moment I thought it made a mistake, but I think it's been super smart with the way that it's
+done.
+This, uh, so maybe that is what's allowed it to get this number.
+But this is Grok Four's number.
+Let's put it with the others.
+Here we have our list.
+Uh, down we go.
+And so grok four is here.
+Is that the fastest so far?
+No.
+It's not.
+Uh, OSS 120 is still in the lead.
+It's the second fastest.
+One more to go.
+It's time.
+Time for our prior a victor for Gemini two five Pro?
+Is he going to hold its first place or is it going to be dethroned by OSS 120?
+Okay, so we choose Gemini two five Pro and we press the port to rust button and we we wait to see what
+happens.
+Very exciting.
+This this then is the the final, final battle for the ultimate, the ultimate victor.
+And we will let it do its thing.
+And I will see you in a second.
+Okay.
+We have code.
+We have code here.
+There's lots of stuff here, lots of comments like before, it mentions Kadane's algorithm, which is
+good.
+Good to see.
+It's got stuff here.
+I hope that's not the same.
+I see stuff there that looks familiar from before, but let's now run this rust and see.
+Drum roll please.
+Drum roll.
+Here we go.
+Oh yes.
+You see, I thought I saw that the appropriate formatting traits.
+So it's, uh, something wrong just with this print as before.
+How about that?
+How about that?
+And maybe it's something to do with the version of rust that I'm running, which is the most recent
+version of rust.
+I don't know what is causing this.
+I don't know enough about rust.
+I'm a total rookie.
+I don't know enough about whether it's some way that I'm running it or implementing it or something,
+but we did tell it exactly the command we're using to run it.
+So it had that information, but shockingly, with a very similar error.
+We have just had our crown.
+Our victor has been eliminated from the race.
+Gemini 2.5 Pro is out.
+Gemini 2.4 Pro five Pro is a fail.
+And that means that if we come back here, this is a fail.
+And shockingly, absolutely, shockingly well, the one that did badly before the open source model
+that was that was in last place, apart from the fail, is now moved here to first place in our final
+final tally.
+The first place and the.
+This is shocking for so many reasons.
+Uh, but one of the ways it's shocking is it means that open source for the win, not open source,
+running on my computer, admittedly, open source running in the cloud because it's too big to run on
+my computer.
+But this open source model, open AI, GPT OSS 120 GB is the victor, perhaps because of some technicality
+on on now fail failed.
+Uh, Gemini that comes in the in the failed list.
+Uh, comes down here.
+All of these failed.
+The only three that were successful, uh, was in first place GPT OSS 120 b in second place, Elon Musk's
+Grok four.
+And in third place, another open source model, and this time running on my computer, GPT OSS 20 B
+and everything else was failed.
+These are our three victors.
+Open source for the win.
+What what a what a brilliant and shocking result.
+And there is one final point to make, which is how much faster was our native machine code compiled
+from rust than the original Python.
+The original Python took 33.755 seconds.
+This was the faster code right here.
+That was the oops.
+That was the speed 0.000304.
+Let's find out how much faster it was.
+It was it was 111,000 times faster.
+More than 100,000 times faster on this hard problem.
+Wow.
+Ha!
+Wow.
+I hope your mind is officially blown.
+OpenAI GPT OS 120 b.
+An open source model took some perfectly respectable Python code, and by changing the algorithm, converting
+it to rust, that we then compile to machine code and ran.
+We were able to achieve a more than 100,000 times speed up that that is a business outcome metric achieved.
+And with that, that concludes this section.
+I realized there was a lot of geeky stuff.
+We did a lot of things with C++ and rust.
+I don't know whether it appealed to you or not, but hopefully, regardless, the outcome appealed to
+you.
+That is really cool.
+A really great result.
+And how how how fabulous that it was an open source model, that one.
+This is very different from my result last year when I stuck with C++ and I got a 60,000 times performance
+improvement, and it was a frontier.
+It was closed source, that one.
+But this time, this time it's open source for the win, perhaps because of a surprising disqualification.
+Nonetheless, we'll take it.
+Open source.
+It is.
+All right, so now the challenge is for you.
+There are so many challenges that I want to go through about how you can take this project, take it
+in completely new directions, and do some really fun stuff with it.
+So first of all, recreating my results, trying it yourself and add some different models.
+If you're if you're using a lama, throw them whatever.
+Try some coding models.
+I realize we use used grok for.
+There's also a code version of that you could try to see if that gets the edge.
+There's so many different things that you could try to see what wins.
+And please share your results.
+I would love to see.
+I'd love to see what kinds of results people get.
+So we find out who who ends up being victorious, what is the the final winner, and then importantly
+so.
+So for anyone that's done, my agent course that's done.
+Any exploration with Agentic AI?
+This was a very much a piecemeal take a single file and convert it.
+Of course, this lends itself so well to an agentic solution, where you have something that's able
+to iterate through all the files and create a port, a full solution.
+So that would be sensational.
+So that would be a great challenge.
+You could start with just trying to to read through a couple of files and then and then see how far
+you want to take it with multiple LLM calls, a very natural extension.
+And then the other thing to do, should you wish a bigger challenge and others have done this, and
+you'll see this in in the community contributions for many really cool solutions.
+One of them is to write a code tool that can automatically add docstring and comments.
+You can take that UI and then add them in and make it look really nice.
+Play with the UI, play with the callbacks.
+It should just be a quick callback and LM call.
+I think you'll be surprised how easy it is to build some of these things, like docstrings and comments,
+or convert to a different language.
+We've got here C++ and rust.
+Put in something else.
+Let's see some go.
+So that would be great.
+Uh, writing unit tests.
+So putting code get unit tests.
+Combine that with something agentic.
+And you can you can generate unit tests for your whole repo.
+And then if you want to take it a little bit further and do something more commercial and deeper, you
+could have a code generator that writes code that can trade on trading signals, buying and selling
+equities in a simulated environment.
+Again, it's a bit of a nod to something we build on Myogenic course, but you could try that out yourself.
+And I've put a little solution in the extras folder that you could look at, which generates code and
+tries to fine tune to get better and better at doing that.
+That's just a sort of extra, extra thing to look at sometime.
+But but yeah, you shouldn't do that yet.
+You should just write something that uses these API calls, or a llama to write code that uses an API
+to find trading signals.
+So these are some interesting ideas, but also get creative.
+Think of a coding challenge.
+You've got that you would like an LLM to help with and build that into here.
+And remember, uh, the point of all of this is about coming up with a business metric, something you
+want to achieve, looking at the leaderboards to identify candidate models and then seeing how they
+fare and how how it actually accomplishes your business metric.
+So do remember, as you take on your challenge, follow the process, go through it, think about your
+evals.
+Think about things in a disciplined way.
+As a scientist, run your experiments.
+Achieve great outcomes.
+I hope you get outcomes as sensational as are 100,000.
+Speed up.
+And that brings us to the end of week four.
+That is a wrap on week four.
+You You are now officially halfway on your journey to being proficient in LM engineering.
+Congratulations.
+Now you're on the home stretch.
+You're in the second half.
+It's getting closer and closer to the end.
+But more importantly than all that, you're now heading into a rag week.
+The moment that so many, probably including you, have been waiting for.
+But already you can cope with frontier models and with hugging face Transformers.
+You can choose the right model for your project based on metrics, leaderboards, and so on.
+And you can build solutions that generate code using front end models and open source models.
+And you can be wowed by the results.
+Next time you're going to be able to explain the ideas behind Rag, you're going to be able to walk
+through some high level flows for adding expertise to your queries, and you'll be able to to implement
+a toy version of rag, a cheap and cheerful version.
+You'll do all of that on week five, day one coming up tomorrow.

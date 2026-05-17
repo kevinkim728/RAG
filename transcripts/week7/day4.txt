@@ -1,0 +1,871 @@
+--- Lecture 1 ---
+Oh my goodness, how cool is this?
+We are in week seven.
+Day four.
+It is the moment of like hardcore training.
+Everything is happening.
+You know what you can already do with models and rag but but in addition you know how to configure a
+fine tuning batch with the SFT trainer and how to make decisions about all of your various hyper parameters
+and kick off a run and you've set up your weights and biases account.
+Today is the day when we are going to really dig in, and we're going to go back to the very same,
+uh, colab that we're on yesterday.
+It's the same one.
+The link is also there in cursor.
+But but you don't need it because you've already got it open.
+Hopefully we're going back there.
+We are going to review what's happening with our run.
+Let's go.
+So first of all here we are back in week seven.
+Day three.
+Uh, even though it's day four, uh, and it's still running.
+And you may notice that this is running from just just a few minutes after where I left you yesterday.
+And that's because I'm cheating for me.
+For you.
+I hope it's the next day because you're you're rigidly sticking to the days that I laid out.
+But for me, it's just a few minutes later, the when I last spoke to you.
+Funny that.
+But but so here it is.
+And you can see that it's.
+This table shows you that this has completed the first of the 100 steps.
+So it's calculated the validation loss for the first time.
+So this is the loss calculation happening on our validation data set of 500 points that we gave it.
+It's taken 500 data points.
+It's calculated the prediction.
+It's compared it.
+And it's used that to calculate the validation loss.
+And so now if we now go to the the weights and biases we can we can see what's going on here.
+And we can see that there's um there's there's more information here.
+There's the uh the training loss.
+You can see that.
+Let's just refresh the screen.
+Uh, it's done it for us.
+Hang on.
+Uh, here it is.
+Here it is.
+So, so back we are with with this this validation loss.
+You can see this is still, like, bouncing around a bit.
+It does appear like it's come.
+It started at around the 0.3 .0185, and now it's at, uh.
+Hang on.
+Oh, I see, I see, hang on.
+So this axis is misleading.
+Let's let's look into this this diagram right here.
+We can do better than this.
+If I click on here it comes up right here.
+Look at what's happening.
+I've fixed this y axis.
+Um I did this before and it's remembered it.
+So if I change this this to be three, uh.
+And apply.
+Hang on.
+That didn't work.
+Sorry.
+Uh, because I had it on the wrong side that way.
+Three.
+Look at that.
+Okay.
+This is a better sense of what's actually going on with training loss.
+Now, that's more like it.
+So you can see this effect that the training loss came slamming down to start with.
+And then it sort of it's been flattening out a bit.
+And that will look familiar to you.
+You'll recognize that pattern because you saw that pattern when we were fine tuning the uh the frontier
+model.
+The the reason for this very dramatic drop in loss to start with is that very quickly the model realizes
+that we need it to always be predicting a number, and then a decimal point and zero zero and then end.
+And if it always does that, it can immediately get its losses into a manageable territory.
+So it very quickly learns that.
+And that's why you see this steep decline in loss to slam down from about three point something at the
+start, with 3.01 all the way down quickly to 1.3.
+Uh, that's what we saw before.
+So this doesn't surprise us in the least.
+But what we now need to see is we now need to see this line slowly improving over time.
+And it's not like we're yet seeing that, to be honest.
+Uh, we can do some smoothing.
+You remember we did this with with with the frontier as well.
+If we do this, then we'll start to see, uh, some, uh.
+Hang on.
+If I do show original, we see them both.
+You can see that is the smoother curve and that is the jittery curve.
+And yeah, I mean, okay, so now we see it this way.
+It does look a bit as if we're seeing some improvement.
+It looks like we're seeing some benefit to fine tuning, but it's early days, obviously.
+Um, and, uh, so it's, so it's hard to read too much into it.
+I should have applied that.
+Hang on.
+If we want to, if we want to make sure that we see that, that higher y value than I need to do this.
+The reason before I zoomed in on that is because once you get used to the fact that you get that sharp,
+uh, that very abrupt fall at the beginning, it becomes uninteresting.
+You don't want to know about that.
+What you really want to drill down on is this region right here.
+And that's why I very often will bring this up and change this to like a number, like one point for
+this Y range so that we're really homing in on the interesting stuff.
+Are we seeing a trend here or not?
+Um, okay.
+And uh, what we'll also notice is that above these training charts, there are some new charts that
+have appeared.
+And these new charts are called eval.
+And these charts this this is where the magic happens.
+This is what you need to pay attention to, because this is about running the validation data set and
+evaluating the progress with training on the held out data consistently every time, every every 100
+steps.
+So this one here eval loss.
+This is everything to us.
+And again we should always take careful take take take a look at the axis to make sure that we're not
+deceiving ourselves, because it looks like there's been this enormous fall in eval loss, which would
+be amazing.
+But you can see that the axis is this is a very slight change from 1.2894 to 1.2693, so it has dropped
+eval loss has dropped.
+The same data set put through a second time has come down.
+But we know from our previous experience with this that there can be some natural jitter.
+There can be some some randomness to it.
+So we don't want to declare early victory yet.
+But based on two data points, it looks promising.
+So here we are back at looking at running away.
+And what I'm now going to do is something that that you may find a bit objectionable.
+Do you watch those those those cooking shows, those cooking shows where where a master chef is preparing
+some amazing meal and they're teaching you how to do it.
+And it looks looks like simply you're following this and doing all these different ingredients in there,
+whisking it up, doing the stuff you're figuring you're following.
+They've got this, this, this cake that they made and they're taking that cake and they're putting
+it into the oven and you're like, I'm with you.
+I could do this too.
+I got something that looks similar.
+And then they say, oh, and and here's one that I made earlier and they're pulling out something else
+and you're like, whoa, wait a second.
+That looks completely different.
+That looks amazing.
+And I don't know that what you just put in is what you took out.
+That's what I'm about to do.
+So.
+So rather than sitting here waiting for this, which which admittedly, I could, I could do offline.
+I did kick this off yesterday.
+And so I do have a run that's completed already that I'm now going to switch to, as if this just ran.
+But the results are the same every time, so you will.
+If you've been running this, you will get exactly the same results, and you will see that when this
+does eventually complete, it's going to be identical.
+Uh, so I feel like this is not such, such a big fib.
+I'm just I'm just using it for time efficiency.
+Uh, so here I have it right over here.
+Here is a chart.
+Here is what it looked like when I let it run to completion.
+So you can see here we're looking at the training loss.
+First up take a look at the learning rate.
+Look at this.
+Doesn't it look nice.
+Now you know what the cosine scheduler does.
+There was this warm up period when it went from zero up to to the to the.
+You can see it's oh point naught naught 999 up to almost 0.001.
+Um, and then it had this nice little gradual fall off as learning rate reduced and reduced and reduced
+and got really, really tiny.
+And that's what it was at step 625, which was the end of our batch.
+There it is.
+Uh, and if you come over here you can look at the training loss.
+Let's zoom in on this a bit.
+So I'm still I've got this this axis just going up to 1.4.
+We want to really hone in on that.
+I mean it looks promising.
+It's not it's not it's not amazing.
+But let's let's just, uh, just do the smoothing and see what this tells us.
+Hang on.
+Do this.
+Do the show original.
+Um, so, uh, yeah, I mean, check that out.
+That does appear to be what appears to be a fall off and then sort of flattening out a bit.
+So it looks like there was real learning happening there.
+It looks good, you might say.
+Maybe, maybe I shouldn't have had the learning rate scheduler.
+Maybe we should have learned more.
+But I tried that.
+But you should to see see what you think.
+See if learning rate is often.
+That's one of the first hyperparameters people try playing with.
+Do do experiment with that too.
+All right.
+So, uh, okay, I'm going to cancel this.
+That's training loss.
+And I know what you're saying.
+You're saying I don't care about training loss.
+I want to see eval validation loss.
+Well, I got it right here for you.
+Eva.
+Loss tells a pretty nice story.
+Check this out again.
+Be careful of the axes.
+Misleadingly looks like it came slamming down.
+It went from.
+From this number here down to this number here 1.248.
+And it began at 1.29.
+And the interestingly, there was a period when when Eva loss got a bit worse, but then it definitely
+seems to have been getting better.
+It's not like we have a huge number of data points.
+But for what it's worth, this looks like a respectable improvement.
+It does appear that things have improved.
+It appears that there was this was productive training.
+Now this is the Eva.
+Loss doesn't mean much.
+You're like, okay, what does this mean in terms of the number, the business metric we know?
+I haven't even told you how you calculate loss yet.
+I'm going to do that next time.
+But cross entropy loss.
+What is it exactly?
+It's like a math calculation about how good was it at predicting the next token?
+Uh, so we don't know what this means yet, but we will.
+We're going to do that tomorrow, though.
+For today, we're just focusing on the training metrics.
+Okay.
+So that is what it looks like when the batch completes.
+That's exciting.
+It looks like progress was made.
+It looks like in the time of a one hour time with 20,000 data points, we were able to fine tune a llama
+3.2 base model using Qlaira to reduce validation loss, improve accuracy on a held out data set.
+Excellent.
+What could we.
+What could we possibly do now?
+What?
+What?
+What's next?
+--- Lecture 2 ---
+Well, you know exactly what I'm going to do next.
+I'm going to to this is the training set up that's running right now.
+I am going to come in and I am going to, uh, save a copy in drive, which means I'm, like, duplicating
+this whole notebook to make another one.
+Here it is.
+Let me clear the output.
+So this is starting from fresh.
+Let me save this.
+So it's saved.
+This is a brand new, uh, Google Colab.
+And I am going to use this to train again a second time.
+But this time light mode is going to go from true to false.
+We are going to train with the whole lot 800,000 data points, and I'm going to connect not to a T4.
+I'm going to change runtime type.
+I want an A100 with high Ram, and I'm going to connect to this.
+And uh, yeah, it's connecting.
+And you know, Google only has a limited supply of these.
+So it's not like it's always guaranteed that you'll get one.
+But I'm hoping that I will.
+Yes.
+It says I'm connected.
+If I do a view few resources.
+I will see what's going on here.
+I've actually got other I've got the the training that we know about that's running right here.
+And I've got another one of these ones running too, because I'm greedy.
+I'm doing a lot uh, and so I'm using up a bunch of these credits.
+So if you want to do this with me, if you want to get an A100, you need to be off the free plan and
+you need to be paying.
+And Google has a bunch of different ways you can pay that have different deals depending on what you
+want to do.
+Uh, I have a subscription, but you can also just buy, uh, amount of units and pay as you go.
+And generally speaking, like it's something where you should be able to run the full training for one
+epoch for just a few dollars.
+But it's something that you can monitor and see how it goes.
+I've spent about $50 in the last couple of days because I've been loving this.
+I've had lots of sessions going.
+I started out with 1900 compute units and I'm down to 730.
+So yeah, I've gone a bit crazy, but I love this stuff.
+And you should not spend money unless you particularly want to.
+Um, okay, but here we go.
+We've got our sessions Now the Google A100s have 80GB of Ram.
+They are a monstrous.
+They are incredible.
+A year ago they only had 40GB.
+And we are gonna we're gonna really pound this machine and make use of most of these 80GB.
+But we're going to start as usual by doing the the installs.
+And we're going to download my, my file, although I don't think we're going to use it today.
+And then we've got the the usual set of imports to get everything together.
+Let's run that.
+And here we have the constants for training that you're used to these.
+Now light mode is false.
+What does that mean.
+It means we're going to load in the full data set.
+It means we're not going to have light in the in the hyphen of the name.
+It means that we're going to be running with three epochs.
+Now, whilst it took one hour for one epoch before, it's about seven hours for each epoch.
+Even though it's an A100.
+We've got so much data.
+It's an enormous data set.
+So it will be this.
+This is like a 24 hour thing to leave it running for.
+And by the way, Google Colab shuts you off after 24 hours.
+So, so this is, this is, uh, the, the, uh, the most uh, the batch size is going to be 256.
+It happens to be a power of two.
+Uh, and uh, the, uh, the, the Laura R is also 256, which is, as I say, bigger than you normally
+use.
+We're going to use both the attention layers and the MLP layers.
+We're going to have a lot of target modules and keep the dropout of 0.1.
+Learning rate is going to be just before, just as before with the cosine scheduler that I love.
+Um, and uh, let's run this.
+And because we're on an A100, it's now going to stay true to this thing right here, which means we
+get to use a faster data type.
+There's we're going to use the usual optimizers.
+So now we're logging into hugging face.
+Oh we need to grant access.
+Look here I need to grant access to weights and biases as well.
+You should have done that already.
+Uh, okay.
+Now we're going to log into weights and biases.
+And then we're going to load in our data set our training validation test data set is going to load
+in this time.
+We're going to load in 1000 validation data points, not 500.
+It takes about two minutes to do each of those validations.
+So so you know, a bunch of times during the run we're going to be running a validation.
+And it's not doesn't make a huge impact okay.
+Then we're going to log in to weights and biases.
+Here it goes.
+Uh, we've got a new new link here that we can go to to watch our run.
+We're going to pick four bit quantization.
+And you should experiment with, with with something else.
+And we're going to load in our base model how large is our base model.
+And all that matters.
+But you know it's 2.2 gigs uh, which is way, way smaller than, than the normal Unquantized Lama.
+And then we're going to be ready to kick off training.
+So as before, we're going to set our Lora parameters.
+We're going to set our training parameters.
+I might just mention here, you can see here when we're doing training, we tell it this thing about
+the data type that it gets to use, which is just a way that is that is a little bit more efficient
+if you're on an A100.
+So we're going to set that.
+And finally we are going to create the SFT trainer all set up and ready for training.
+And this is where we then are going to kick off our big run.
+But first it's going to have to go through and add that extra token to the end of the data set.
+And then it's going to have to tokenize the whole data set turning text into tokens.
+And this is going to take a minute because it's a massive data set.
+And it's going to have to get through the whole thing.
+So this is one where we'll need to get a coffee and I will see you back, uh, which will be a coffee
+for me.
+It'll be an instant for you when this is finished.
+And we're ready to to to press the big button to kick off fine tuning for the full data set.
+And here we are.
+We've got everything loaded.
+It's time now to run fine tuning dot train.
+Uh, and, uh, as it's the same as before, we're gonna we're gonna have the fine function of train,
+and then immediately afterwards we'll save the model.
+Um, although, uh, Google Colab, if you're on a paid plan, they are much more generous with how
+they leave it running.
+And it's fine to have this running in the background.
+And they will be, uh, more after 24 hours.
+They'll cut it short so you can't have it running for more than than 24 hours.
+So this is going to be kicking off our big fine tuning with an enormous data set.
+And it's going to be interesting to see how much of the GPU do we use up.
+How much of the 80 gigabyte GPU do we use when we are training with 256 batches in our batch size on
+this hefty A100?
+I will see you in a second when things are underway.
+Okay, so this is fun.
+It's kicked off, it's running, and you can see here that on my GPU I have used up 70.1GB, which is,
+uh, which is exciting.
+We're really slamming this computer.
+I have to say, I found it quite unpredictable how much GPU ram I used up.
+I've had this strange experience, which I personally can't explain, which is if I tried doing a run
+where I reduced the number of uh, of um r, I reduced R down to just, uh, more, more reasonable
+32, which is more common, uh, rather than having it the 256 level, I had Laura R 32 for this run
+with all of this because I wanted to see the difference.
+But when I did that, the GPU Ram went up and it ran out of memory.
+And that makes no sense, because having smaller R should use up less memory.
+Uh, and I can't explain it.
+And when I did that, I had to reduce the batch size for it to run.
+Uh, and the results were worse, but, um, yeah, I don't fully know why.
+So.
+So I think the answer is that there's a lot of moving parts with the ways that the the, uh, fine tuning
+algorithm decides how to package things up and send them to the GPU.
+A lot of decisions get made.
+And depending on exactly what you've done.
+Things might fit in memory or they might not.
+So even though I've been able to squeeze this whole run in and I've used up 70GB and it's running great,
+you might find when you kick off this with only a tiny, innocuous change to the hyperparameters, that
+suddenly it's not fitting.
+And if that happens, all you do is you just turn down the the batch size.
+That's the simplest tool that you've got to free up more memory.
+But as it stands right now, with this particular set of hyperparameters, with this particular model,
+we are indeed able to run the whole thing here.
+It's going.
+It's off.
+And if we come down and have a look right here, we'll see that it is merrily going, uh, now the,
+um, yeah, the progress bar is telling us here that actually this is going to take 15 hours to run
+the full run.
+I said, I think it's about seven hours in epoch, so this will be a 15 hour run.
+Uh, so it's quite, quite a monster if you do decide to go for it and run this.
+Of course, you only need to run one epoch.
+You don't need to do three.
+You also, some people get concerned that they've run it for a while, and then they feel like they've
+got enough.
+And they they don't know.
+They don't know what to do.
+There's no harm in stopping this.
+You can stop this just by going runtime disconnect and delete runtime at any point you're saving regularly.
+The hugging face hub, you can use it at any point.
+There's no magic to the fact that we happen to have crammed 800,000 data points in here.
+You can stop after 100,000 or 200,000.
+You'll get good results.
+So, you know, leave it running if you wish, but you don't have to, and you certainly don't have
+to do multiple epochs.
+If you're like me and you're a total sucker for this stuff, then do it and you'll love it.
+Uh, I find this, uh, highly fascinating and entertaining to be running these runs.
+All right.
+Anyway, so it's running.
+Hopefully you're sharing in my enthusiasm.
+And the only thing that'll make you more enthusiastic is to actually start to look at the results in
+weights and biases.
+Fabulous platform.
+Perfect for this.
+Let's go.
+--- Lecture 3 ---
+So I'm going to go now to the point at which we registered for weights and biases, which is right here.
+And there is a link, as before, to viewing the run.
+I can click on this link to bring it up.
+So we see what is going on with our run.
+So it's it's started off and uh, the first thing that you'll note hang on again, we may have no,
+actually we don't have the first data point of the training loss.
+We go straight to training loss.
+That's where my eyes take me.
+Immediately.
+You can see that it looks.
+First off, it looks.
+It looks smoother than before.
+We saw some very jiggly.
+Or it's just gone up.
+The training loss just jumped up.
+Uh, it looks smoother.
+The reason it looks smoother is that we've got much bigger batches, so there's a lot more that goes
+into each batch.
+So we're going to see less noise.
+Sometimes people make the case that it's better to have smaller batch sizes, because that noise, that
+jitter is actually beneficial during training because it helps basically stop you being in a local minimum.
+It causes some random noise to be added to the training process.
+so that is sometimes considered a disadvantage to having such large batch size as 256, but at the same
+time, having 256 means we're able to to really fill up the GPU Ram, and we get through things a lot
+faster.
+But if you're looking for some hyperparameters to change, learning rate and batch size are usually
+some of the first couple that people latch onto.
+You can see the the learning rate itself appears to be going up, and you might say, why is it going
+up?
+When I thought learning rate was going to come down.
+And the reason is because we're still in that warm up period.
+If you have if you run for three epochs, this is an important thing to know.
+If you run for three epochs, then the learning rate scheduler doesn't apply to each epoch.
+It doesn't do this.
+It applies to all three epochs.
+So it basically starts slowly going up.
+And then it will gradually come down throughout the period of the three epochs.
+And that's really smart.
+That makes a lot of sense because you want to start the whole training process with a bigger learning
+rate and gradually over time, over the course of the three epochs, get tighter and tighter.
+That's why it works that way.
+And it's and it's really nice.
+Okay.
+So you can see all of this happening.
+And you may be disappointed to see that we don't yet have an eval set of charts.
+And that's because it's still too early in the training.
+I will put you on hold.
+I will be right back when I'm back.
+I hope to have some eval charts for you.
+So it's now run a little bit longer.
+You can see we're on step 275 out of the 9000 steps.
+It's got to run.
+Uh, and let's just do that calculation that I did a little time ago.
+So there's a total of, uh, let's see now.
+There's 2000, uh, sorry, not 2000, 9000, uh, 9375 steps.
+Each step has 256 batch steps.
+And if I multiply those two together, you can see that that means that there's a huge amount of data
+points.
+How are there so many when we've only got, uh, we've only got, uh, a total of 800,000 data points?
+Well, that's because we've got three epochs, and you could probably do this calculation in your head.
+But if I divide that number by three, then you can see that we end up back with our magic 800,000 data
+points.
+Perfect.
+That makes sense.
+So after step 200 it did an eval calculation.
+And we got our validation loss of 21.27.
+Uh, so now if we go back into weights and biases here we have our training loss.
+So far.
+You can see it's been meandering around.
+It did jump up, but it appears to be going in a direction that looks visually like it's going lower
+and it's just refreshed while I was here, uh, to show us our first eval point right here.
+Not much of a chart yet because it's just an eval point, but there we have it.
+Okay, okay.
+So now again it's it's that time.
+It's the time when I put this in the oven and I pull out the finished product, because I'm not gonna
+wait 17 hours right now.
+I ran this, in fact, this one I think I ran a couple of days ago.
+Uh, and, uh, it's it's run, it's completed.
+It's time for us to go and see what do these charts look like after the full thing has run for its complete
+set of of, uh, whatever it is, 17 hours or something.
+Uh, and it's completed, and we'll look at what it looks like in weights and biases.
+Let's go do that.
+And here I present to you the result of three epochs of training across 800,000 data points, a total
+of 2.4 million data points organized into its batches.
+This is what it looks like.
+Take it all in.
+First of all, on the bottom left, this is the learning rate.
+Over the course of the full three epochs, you see the warm up period.
+You see that beautiful smooth path all the way down as learning rate got smaller and smaller.
+And now look over here, of course, at training loss.
+This is the big guy.
+And remember it started probably a bit higher I just I just truncated it down.
+I've put the axis to start at 1.4.
+Check this out.
+It looks really, really good.
+But there's some warning signs.
+There's some warning signs.
+You see that that it appears to be coming down very nicely.
+And then it seems to be leveling off a bit, and then it suddenly slams down.
+And then it comes down more, more, more, more.
+And then it slams down again.
+And then it comes down more, more, more, more.
+But maybe that's not coming down anymore there.
+Uh, and this slam is a really significant one.
+So what's going on?
+Why do we have these sudden jumps like this?
+What what is happening?
+Can you can you see can you figure it out?
+It's obviously the fact that we've got three epochs.
+That's the first epoch, the second epoch and the third epoch.
+Uh, three sets through all of the data.
+Okay, sure.
+But why?
+Why does it jump down suddenly after the epoch?
+Well, it's not good news.
+It's not good.
+What we're seeing, there's potentially many problems with that.
+And one of them is not, not not a bad thing.
+Just just a visual problem.
+One of them is a big problem.
+So the potential problem that isn't a major problem is just the fact that okay, so on the second epoch,
+the data that's coming in is the same as in the first epoch, just jumbled up differently.
+So it's not a big surprise because it's actually seen that very data before that it can do better when
+it sees the same thing the second time, because it knows the model has been trained with the exact
+answer.
+So it might be pretty good at predicting the price of apples.
+But when it's particularly asked to predict the price of a Golden Delicious apple of this from this
+particular manufacturer, it's seen exactly that before.
+And so, you know it's going to have a leg up.
+Not that we have apples in this data set, but you know what I mean.
+So that's why you would expect to see a bit of a drop, but the time when one one should be concerned
+is when that drop seems unreasonably significant.
+Because if it's really getting that good at recreating prices of things it's seen in its data set,
+then that might indicate that it's it's it's good and it's maybe too good to be true.
+Maybe it's recreating the exact price that it was given in training time in some cases.
+And what's wrong with that?
+Well, that would be a sign of overfitting because, you know, the items like like Golden Delicious
+apples have some natural price range.
+And we wanted it to figure out that the general trend of what was going on, we don't want it to always
+produce the precise price of this apple.
+Every time it gets a description that's like that, that would indicate that that maybe we've gone too
+far.
+It's latching on to the training data, and it's sort of solving exactly for what it's being given,
+which makes it more like a big if statement than than something that is, uh, that is actually learning
+the patterns of the data.
+And what's the problem with that?
+Well, the problem with that, of course, is that then when we give it unseen data in the future,
+it's not going to do a good job because it hasn't learned the general trends, but rather it's sort
+of built a bunch of if statements.
+It's kind of learned precisely to look for gold and delicious.
+And if it sees gold and delicious, it gives exactly this number.
+And that won't generalize well at all.
+And the the general errors will, will go up.
+And I'm trying to speak to avoid saying the thing that that of course is the answer, which is we need
+to look at the validation loss.
+The validation loss is looking at the loss on unseen data, on data that was held out.
+And that is where we should see.
+Are we actually learning or are we getting in trouble here?
+So that of course you can see I've got that.
+Those charts are right here.
+I've got them scrunched up.
+And so now the reveal.
+Let's look at the evals.
+--- Lecture 4 ---
+Okay.
+Here goes.
+So we're looking at the results and weights and biases from our massive run.
+And I'm going to open the evals so we can compare the eval loss with the training loss over here.
+Let's do this.
+Okay.
+To give you a second to take it in.
+But I'm sure you've seen the only the only chart here that we want to see is this one right here.
+Let's let's look at this side by side.
+Wow.
+What are we seeing here?
+Okay.
+There's a lot to take in.
+The first thing to note is that we have, uh.
+First up, we've seen this little spike in eval loss that happened early on.
+And I'm going to explain that in a minute.
+But then we see some nice performance of the eval loss clearly coming down a lot.
+It comes down to 1.24, uh when it began at 11.27.
+So it came all the way.
+Sorry.
+Not 1.24.
+Yeah.
+1.124.
+I mean, I was stopping myself there.
+That wouldn't be so impressive.
+1.124 when it began.
+At 1.27, so that is quite a big drop.
+Uh, that's that's that seems to be like a significant improvement.
+But then, wow, what happened here?
+It just suddenly got massively worse back almost to where we began.
+The Eva loss jumped up and then it stayed about static here.
+And look at that.
+Look at how where I hover my mouse.
+It shows the chart below.
+What happened this moment when it went from the lowest possible loss after 6200 steps at 1.123, it
+jumped up to 1.283.
+Uh, the next step or the next couple of steps.
+And that was when it began epoch number three.
+So this this is absolutely the the key sign of overfitting happening beautifully.
+We're seeing it so clear.
+And this is why this is this is what I missed last year when I didn't track eval loss.
+And I saw it when I then went to run the tests later, I saw that my model was was losing performance,
+but I couldn't tell exactly when it happened.
+Of course I could.
+I could guess that it was happening at the same time as this sudden drop down, but I didn't have the
+evidence.
+Here we have the evidence.
+We've caught you red handed.
+We've caught our model here.
+It is overfitting.
+On the third epoch, it's suddenly the performance gets worse.
+Uh, and you can see it's starting to trail off.
+We weren't getting such good results.
+And then bam!
+So this this is this is the magic of using a platform like weights and biases to really dig in and see.
+It shows us that we were productive for two epochs, and then suddenly we got worse.
+And yeah, that that is that is fascinating.
+And because we've been saving as we go, we've been saving along.
+We've saved after 6 or 600, uh, sorry, after 6000 batch steps, that means that we know which which
+batch step to to pick in our results in hugging face so that we have the best possible results.
+We want the one.
+Oh, no, we want the one up to 6200.
+That's our that's our best, best case right there.
+And then we definitely don't want 6400.
+100.
+Uh, so, uh, yeah, that that is, uh, that is really powerful.
+Really great to see this.
+And hopefully you, you appreciate this.
+And, um, you've, you've, you've seen what's going on.
+And I mentioned I would say a few words about what happened here when it suddenly when Eva lost spiked
+up.
+Well, if we take a look over here at the learning rates, you can see if you look at the chart on the
+bottom left, that this is when the learning rate was at its absolute peak.
+It had warmed up and it was hitting our model with really big learning rate, the biggest it ever got
+to.
+And my guess is what we were seeing there was this business of of jumping out of local minimums, of
+global minimums even.
+And so the learning rate was too high.
+And so our model wasn't training properly, it was just bouncing around.
+And that's why the loss like flew up for a little bit.
+Uh, but then the learning rate got more manageable and we started to see learning.
+So I wouldn't worry about this, but it might be a sign that maybe my, my highest learning rate point
+was just a hair too high.
+And we might do better having a smaller number than that, but it didn't seem to affect too much things.
+Things got back on track.
+But the real, the real learning point here is that we see that a couple of epochs were productive.
+And the third epoch was not.
+And it's not clear that we even need to do a third epoch.
+It might not be possible, but if you wanted to try and get more juice out of this, then you would
+want to try and research.
+How can we do better?
+How can we avoid overfitting on the third epoch?
+And there are many ways to go about doing that with hyperparameters.
+The most obvious one, of course, is to take dropout.
+I told you that that's what dropout is all about.
+I chose a dropout of 10%.
+You could try 20%.
+You might be able to get the same kind of performance here, although it wouldn't do quite as well.
+Presumably it would be a little bit behind, but it might then be able to keep training and get to a
+better point after three epochs, because dropout is higher, resulting in less overfitting.
+But maybe not.
+There's no way to find out other than to experiment.
+And there are.
+There are other things that you can do to to try and do this.
+One of them might be, You could argue, maybe my R is too high and maybe I've targeted too many target
+modules.
+So I've given the model too much flexibility, allowing it to start overfitting.
+So there are there might be tricks to try and reduce the amount of flexibility I've given the model.
+Maybe I went too far, but doing two epochs and getting results is still pretty good.
+So I'm fine with this for now.
+But definitely the challenge for you is going to be to dig in and see if you can't optimize the hyperparameters,
+see if you can't do even better than this lowest eval loss again for 6201.
+That's funny, isn't it?
+It's an easy number to remember 1.12345.
+That is the loss for you to beat.
+Uh uh, one.
+Yeah, yeah.
+That does appear to be my my lowest ever loss.
+So if you can do better than 1.1, two, three, four, five, then then, uh, then you have beaten
+me, at least when it comes to eval loss for this data set.
+Uh, and of course, what we really want to know is what is the actual test performance on this?
+Okay, so that's, uh, those are the results.
+Uh, the next thing I want to talk about is generally hyperparameter optimization and comparing different
+runs.
+So we're looking here at the results of this batch that ran a couple of days ago.
+Uh, but what we can do, if you look up here in the breadcrumbs, you can see that there's my my user
+account.
+It should have your name, projects, price and then these runs and I can click back on price.
+And what I get to see is all the runs that I have done in, uh, on, on, on this, on this test,
+uh, and you can see that I've been, uh, going a bit crazy with this.
+Uh, so, so how does this work?
+So what you're seeing is you're seeing all of the charts together in one place.
+And over here on the left, you get to choose when, as I click here and I click on and off, I can
+turn on and off different charts over on the right, because if you show everything, it can start to
+get really busy.
+Um, here are all my different runs that I've been running.
+Let's take out some of them so it's not too crazy.
+Uh, I the, uh, this one here main is the one we were just looking at.
+Now, when you hover over a run on the left.
+So sorry to to.
+I'm overexcited, so I'm not explaining myself well on the left.
+Here are the names of all of the runs that you've done.
+On the right are the same charts we saw before, but it's got all of the graphs superimposed.
+Uh, and so also when I hover on a run on the left, it highlights that chart on the right.
+And when I turn on and off the I symbol here, it shows or hides one of the runs.
+This one here called main that I'm hovering over now is the one we were just looking at.
+And, uh, that that you can see, um, is, um, is, is, is actually the best results that I got.
+You can see eval loss on the right there.
+The lowest number I got was for the run.
+I just showed you, uh, that that is the my my best.
+Even though it slams up and starts overfitting.
+You can see I've got another one that does pretty well.
+Uh, not that one.
+Uh, one of them.
+It's one of these here, I think.
+Uh, there it is, there it is.
+It's this one, uh, also does quite well, but it doesn't do any better, I don't think.
+Uh, so, uh, all of these start to overfit pretty quickly.
+This one actually did quite well after the first.
+Let's have a look at this one.
+Let's see what the eval loss turned out to be.
+Uh, it turned out to be 1.13.
+So slightly higher.
+Still not my best run.
+My best run is the one that we were.
+We were just looking at this one here that I've called main.
+So this is where you run your experiments.
+This is.
+You're not an engineer.
+You're a scientist.
+You're putting on your science hat.
+You're running different experiments, experimenting with hyperparameters, try different batch size.
+You can see this high LR.
+Low LR is when I tried a lower learning rate and a higher learning rate to see how that affected the
+results.
+And it turned out the one the learning rate I picked was the best one.
+And if you're wondering, wow, you're really great at this.
+How did you pick the best learning rate as one of the earliest runs you've done?
+Well, first of all, I've deleted a bunch of things that were failed experiments.
+But also remember, I did all of this last year and so I've already had a whole bash at making the right
+learning rate.
+So I was starting from the best that I had last year, and this is a whole lot more.
+Turned out that what I got to last year is pretty much still the best hyperparameters for most things.
+Anyway, the trick is to come in here, experiment, do do lots of tests, try things out, try some
+batches with smaller batch size which will then have lots more steps.
+That's why they go longer.
+If I take that one out then then we'll see a bit more of all of our charts.
+Uh, and then look at everything together.
+Use this as your way.
+Uh, look at these training losses.
+Look at the, uh, you can really see how it's very much not the case that a good training loss is going
+to be a good eval loss.
+Why it's so important to measure your eval.
+Uh, and, uh, yeah.
+Use this as your way to, to experiment, test your experiments and, and find the best model for the
+task.
+--- Lecture 5 ---
+Okay.
+And just a couple more quick things to show you.
+Looking here again at this beautiful display of all of our all of our training runs, our training and
+our eval results over here on the left, you've got the different the runs, as I said, and they're
+shown as timestamps.
+And the benefit of doing it this way is that they appear in order of when you ran it like this.
+And it's quite easy to see what you did when.
+The disadvantage, of course, is you can't see in a in a quick glance what was going on at each point.
+Sometimes I've added in a suffix to help me.
+Another way you can do this is you can actually click on the on this menu right here and say Edit Run
+name.
+And this allows you to change a display name that allows you to, to make something say like like over
+here it's for main I can say edit, run name, change the display name to main best.
+And then when I press save this is only changed the user interface, the weights and biases UI.
+It hasn't changed the actual name of the run, and it gives you a way to keep track of what you've done.
+So it's very convenient, particularly when you end up with huge numbers of runs as I often do.
+Uh, so there you have it.
+The final, final thing I wanted to show you is going to hugging face.
+So I'm going to flip over to my my hugging face page.
+You go you go to your hugging face account.
+You click on your avatar and go to your profile page right here.
+And if you come down to models, you'll see all of the models that you've created.
+I've got 199 of them.
+Uh, and uh, you can come into here and look at them all.
+And of course, it's been, it's been given the name of the price hyphen, the run name, which is how
+we uploaded it to the, to the, the hub.
+But you can call it whatever you want in the code.
+Now I want to find the one that ends in 007.
+I remember this is the one that is our best our best one.
+So if I click into this I'm now looking at this model.
+This is the model.
+There's some default readme that I should probably overwrite which says about it.
+And remember there's this Files and versions tab that shows us this is uh, hugging face is essentially
+a git repository.
+These are just the files that are stored against this fine tuned model.
+The adapter model safe tensors.
+This this is the real thing.
+This is 1.56GB worth of precious data that has our fine tuned results.
+There's a file called adapter config, which gives you all of the sort of the basic parameters.
+There's Lora alpha being 512.
+There's R being 256.
+These are the target modules that we were targeting.
+So these are all of the parameters that were used for this.
+Um, but the one thing I really wanted to show you that's so important is this thing right here, history
+48 commits.
+You go here, you click here and you see the different commits.
+And you can come down here and find commit number 6200.
+This one of course.
+This is the one that 6200 was the one which is at the very bottom.
+Our best possible results.
+So this one here has a commit ID that references this very version of it.
+And we can copy that to the clipboard.
+And that means that that in a second or in a second tomorrow when we, when we actually run this thing,
+we're going to be able to say, hey, we want this checkpoint, this version of the model, because
+that was when we were at our best evaluation.
+And that's what I mentioned to you before.
+That's what people sometimes call it early stopping, or they usually say that when you actually stop
+training at that point.
+But it's this ability to look back and say, we're going to hand select the model that performed best
+on validation loss.
+And as a subtle point, this is also why you need your validation data to be separate from your final
+test data.
+Because by selecting the the version of the model that performs best on our validation data, in a way
+we're kind of doing some training.
+We're involving that in our decision making process about what's the best model.
+So if we were to just use your validation data to to also to test, we know we get a good answer because
+we selected it for that purpose and that would be cheating.
+Maybe we just got lucky with some random noise and it's doing better on the validation data for random
+luck.
+That's why it's important that we held out a separate set of data, the test data, the third pool of
+data so that we've got training, validation and test.
+The test data was not used to select the right model.
+And that's how we know that we've been pure and careful, and that the test data will really tell us
+whether our model is any good.
+So anyways, we've copied this into the clipboard.
+That's how we select a particular version of the model.
+That's something that we'll be using tomorrow.
+Okay, that's enough of looking at runs.
+I hope that you've been having fun running your own runs.
+I will see you back for the wrap.
+Okay.
+What a day it's been.
+So we've done our training.
+Hopefully you've done your training too.
+We've we've, uh, got to the point.
+We've got our evaluation.
+Loss of validation.
+Loss is low.
+It's a 1.1234, if I remember right.
+Uh, and, uh, we've, we've got the very checkpoint of the model that did.
+Well, what we got to do now is actually evaluate this, see, see how it is in practice on our test
+data.
+And that is what we're going to do tomorrow.
+I can't wait for it.
+Uh, and then and then at that point, you will know how to confidently carry out the end to end process
+to pick a commercial problem like guessing the right prices and, uh, work all the way through fine
+tuning your own model to be able to solve that problem.
+See you tomorrow.

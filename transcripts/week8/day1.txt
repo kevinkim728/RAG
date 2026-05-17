@@ -1,0 +1,1089 @@
+--- Lecture 1 ---
+Well, I promised you a finale, and a finale is what you're going to get.
+Welcome to week eight.
+Welcome to the last week.
+It's going to be a really storming week.
+Let's get to it.
+So already, you know you can generate code, you can generate text, you can use frontier closed source
+paid models and open source models through a llama through hugging face.
+You can use tools, build assistants, use rag with lang chain and without lang chain and evaluate it.
+You can follow a five step strategy to solve problems, including curating your data, making a baseline
+model, fine tuning a frontier model.
+And now you can confidently carry out the process to fine tune your own model starting from a pre-trained
+model, turning it into something that with enough data and with a good task, you can outperform the
+frontier.
+What a week was last week.
+This time everything comes together.
+This week is going to be about revising all the different bits and pieces we've done along the way,
+and bringing it together into something that weaves agents into the mix.
+Agents, of course.
+Super exciting.
+We're going to bring in agents.
+We're going to also bring in, uh, rag again, a repeat of rag in a way that will hopefully surprise
+you.
+And we're gonna start by today deploying an LLM in a serverless AI platform called models.com, which
+is really terrific.
+So we're going to be doing something that is a sort of nod towards productionizing your product.
+We're going to take a fine tuned LM, deploy it on the cloud with models.com, and then we're going
+to turn it into an agent.
+All of that is going to happen today, but let's just see the diagram one time.
+Uh, you began there all the way over there.
+All the way over on the left.
+It seems like eons ago we did the foundations, the chat completions API.
+We looked at different frontier APIs.
+We did some UIs for the first time and multimodality.
+Then in week three, we dug into hugging face.
+We used the pipelines and then the model transformers libraries.
+And then in week four, we selected the right LM for the task at hand.
+And we built something that made code massively faster porting from Python to C++.
+In week five, we dove into Rag.
+We built a question answering system and we did it with long chain without long chain.
+And then in week six we curated a data set and we ended the week disappointingly fine tuning a frontier
+model without too much success.
+But we made up for it in week seven, as I promised we would.
+We fine tuned an open source model and it outperformed the frontier.
+And now, in week eight, a gentle guy, the return of Rag, and lots of other bits and pieces to come
+together in order that by the end of this week you will be able to say, okay, I got there.
+I am an LM engineer and to remind you of the capstone project, but to give you a bit more, it's more
+sizzle now, the capstone project.
+So we're going to build an autonomous A genetic framework that takes the model that we've built and
+turns it into a product.
+The idea is to feel really agentic, which I will define in just a second.
+But ideally you want something that feels like it's got a kind of it exists beyond just the context
+of a chat with a user.
+And so we're going to want to have a system that is running.
+It's going to be watching for deals published online by subscribing to RSS feeds.
+And when it finds deals that are published, it's going to examine the deals.
+It's going to pick ones that feel juicy and it's going to to estimate the price of how much it really
+costs.
+Who knows how it's going to do that.
+And then once it's looked at that, it's going to say, okay, so so here's a bunch of things online.
+Here's how much they're being offered for as a bargain.
+Here's how much I think they actually are worth based on on all of my smarts.
+And so now I've identified which one is the most compelling deal.
+And so that it can feel really autonomous and out there.
+It's then going to send a push notification to your phone, to my phone and your phone with the deal
+so that we can get hold of that deal and maybe buy ourselves a new TV or whatever.
+So we are going to have seven different agents collaborating on this.
+They're going to be doing all sorts of things, identifying deals, pricing them, and we're going to
+be using, of course, as you figured, our model that beats the frontier to estimate prices.
+But we're going to do more than that too.
+We're going to build a second model to estimate prices as well.
+And it's going to use Rag so that we bring everything together.
+That's the capstone project.
+Conclusion.
+That is the price is Right.
+We will have that up and running and serving you deals by the end of this week.
+And so to give you the order of play, what I have in store for you and I should I should warn you that
+this week is going to go at a fast pace.
+Your pros at this point, you know, this stuff.
+You've got this.
+We can go quickly.
+So of course, in week six, two weeks ago, we we curated our data, evaluated our models, and tried
+out frontier models.
+Last week we fine tuned our open source model.
+So this week, what do I have in store for you?
+Here are the five days ahead.
+The first day today we're going to take our LLM, our fine tuned model and deploy it on the internet
+using serverless AI platform Modalerts.com, which is it's a great way to productionize your models.
+It's what I use in my day job.
+It's it's extremely popular for reasons that we'll we'll talk about tomorrow.
+We're going to then make an alternative Pricer, which is going to use a frontier model with Rag.
+That's going to be super interesting.
+On day three, we're going to to to build a scanner agent that is able to subscribe to RSS feeds, parse
+them and find good deals, and a messaging agent that's able to send a push notification to our phones.
+And then day four, this is when it gets the heat gets turned up.
+We're going to build our autonomous planning Agent that orchestrates activities across the agents and
+decides what to do when.
+And then we'll wrap it up with the grand finale on day five.
+This is what I have in store for you.
+Okay, so I want to remind you again that there are the three different ways you can follow along with
+this.
+It's absolutely fine just to get intuition for what's going on.
+You don't have to run the code, particularly if the last couple of weeks have been very new to you
+and it's felt like this has gotten super advanced.
+It's all good.
+Just get intuition for what's going on, get the concepts.
+However, if you'd like to follow on, that would be lovely.
+You should be able to to stick with the light data set so that things move fast.
+There's a couple of places where you can take shortcuts, especially if something goes goes awry.
+If something goes bump, you can just bypass lots of things.
+I'll try and I'll try and point it out when we when we get there.
+You could also just dig in and figure out how to how to bypass different, different parts of it very
+easily this week in particular.
+And then the third option is you could roll up sleeves and dig in, use the full data set, tweak,
+make some changes to make this even better as we go.
+This is for for for those people that really want to get into the detail.
+This week is going to be a lot of opportunity for that.
+Now, this week, of course, is going to be introducing a genetic AI.
+And as you know, I have a whole course on genetic AI.
+And so we're not going to go into tons of detail on agents.
+But I thought I should I should start by defining what agents are so that you've got some context.
+There are, of course, so many different definitions of agents.
+There are, in fact, memes about how a genetic AI can be whatever you want it to be.
+Generally speaking, people, people think about things like, does it?
+Does it have autonomy?
+Does it have agency?
+Is it a platform which which has a sort of existence beyond just a chat with an individual user?
+Anything like that gives you the impression that you're working with a genetic AI.
+But there are a few definitions that have bounced around, and I thought I'd just lay out a few of them
+now so that you have that context.
+The first definition is one that I don't know if Sam Altman has directly used these very words, but
+he said stuff like this.
+Uh, and so it was sort of like a understood definition for a while from OpenAI that, that agents are
+AI systems that can do work for you in a way that is independent.
+So it's a slightly sort of anthropomorphizing version of it, which is equating it to like human workers.
+And it's saying like it's an AI system that you could consider, like something you can delegate to
+and you can imagine, like OpenAI, what was used to be called operator, it is now called GPT agent.
+This, this idea that you could you can have something and say to it, hey, find me a restaurant reservation
+that's available next, next Thursday for for Chinese food in my area.
+And off it will go and and do the research and find somewhere and potentially look on OpenTable and
+book it for you and all the rest of it.
+And you have that sense that there's something off and running.
+That was the first definition of agents that was sort of bounced around.
+And then around the start of 2025, there was a sort of emerging view that the right way to define agents
+was that this is an AI system where the LM controls the workflow, where an LM controls the workflow.
+This was something that that came out of.
+I saw it in Hugging Face.
+Anthropic was along these lines in their seminal blog post, Building Effective Agents.
+Uh, so the idea is here, you've got some kind of a system where there isn't a fixed order of doing
+things.
+You don't do A, then B, then C, but rather you first prompt an LM and you say, hey, you're able
+to do A, B, or C and you need to achieve a goal of this.
+Now decide what you want to do when.
+And it generates tokens.
+And in those tokens it describes whether you do A or B or C, and you write code that then takes action
+as a result of what the LM has predicted.
+And so it is it's you can think of it as a system where the LM has some kind of autonomy.
+It gets to choose with agency, which steps are carried out in what order.
+And this is really used to contrast with something called an agentic workflow, which at least in Anthropic's
+definition, that was something where there are multiple LM calls like A, B, C, but it's just orchestrated
+with Python code.
+Just do A, then do B, then do C rather than through an LM call.
+And that was a distinction that was drawn between true agentic AI and just agent workflows with multiple
+LM calls.
+And then the third definition, which is the kind of new emerging definition that people are really
+getting behind, is that an agentic system is one where there's a there's an agent, an LM that runs
+tools in a loop to achieve a goal.
+So you've got an LM or maybe multiple llms, and there's some sort of an objective, and it's equipped
+with a set of tools, the kinds of things we did in week two.
+And it in order to, to carry out that objective.
+It can call a tool.
+And then if it hasn't yet achieved that objective, your Python code calls it again in a loop.
+And it keeps being called again and again and again.
+And the kind of place where you really feel this experience is using something like code that I demoed
+right back at the beginning.
+You really see it there with a to do list, and it's looping and it's going through carrying out activities.
+But to a large extent, many of the different things that we do with, with LMS equipped with tools
+involves using a loop.
+So this this applies to most of these kinds of systems.
+So what we're going to build this week we pretty much tick all these three definitions.
+Mostly the one in yellow.
+There's going to be an agent which controls the workflow that involves calling other LMS.
+But to a certain extent there's going to be a loop.
+And so there is there is this idea in there that there's something that loops around until it's ready.
+Uh, so we we do tick all three boxes this week.
+So hopefully that gives you some useful context and sets the stage for what's ahead.
+--- Lecture 2 ---
+So this week we're going to be building seven different agents.
+And now I'm using the agent in a way that's not consistent with the definitions I just gave you.
+The whole platform is like an agentic architecture.
+And often when you do this, each of the different LM calls, you call it an agent as part of your agent
+architecture, but it's not like each one is running in a loop.
+There's in fact only one running in a loop.
+These others are just separate LM calls that are that are being orchestrated in order to achieve our
+goal.
+But you often call them agents or subagents.
+So our agent architecture is the way that these different LM calls will be orchestrated in order to
+solve our problem and meet our business objective.
+And I do want to stress that what I'm about to do is something that I personally frown on a lot, and
+I often push back on people that do this.
+So I sort of feel like I'm guilty of falling into my own trap.
+I often find that people, when they're trying to solve a business problem, jump too quickly to an
+agent architecture.
+It feels like something you want to do, particularly for those of us that are coming from a software
+engineering background that are used to coming up with an architecture for how you'll solve a problem,
+and it's very common for people to to kind of identify human like responsibilities and put responsibilities
+against agents.
+And that, that that's a trap.
+That's not the right way to do it.
+The right way to do it is not to start sort of humanizing and putting responsibilities, but rather
+to focus on the business objective, to test out your prompts, to have an evaluation, and to figure
+out how can you best organize your LLM calls to solve this business objective.
+And I cover this a little bit more in guide 12 in the guides folder.
+So it can be very tempting to dive into an agent architecture.
+And I would urge you to always start by focusing on the business problem.
+Make the simplest possible solution to start with, which is usually just one LLM call, and divide
+into multiple LLM calls because it helps you solve the business problem more effectively, not just
+because it sounds like those are roles that humans would have if they were working on this problem.
+So you'll have to give me the benefit of the doubt that I didn't just dive straight into an ancient
+architecture because it sounded like these were the right agents.
+But I worked on this starting simple with one LM, and I broke it out into multiple as I saw that that
+was the more effective way to solve the problem.
+And that's how you should do it with future problems that you work on.
+Anyways, we're going to assume that's happened, and here are the agents that we're going to be building
+this week.
+I want to first of all start on the on the right because it's easier to start there and work back.
+We're going to build a scanner agent.
+It's an agent that's able to subscribe to RSS feeds, identify appetizing bargains, bargains that are
+potentially worth exploring.
+And it's going to do that promising deals.
+There's going to be an ensemble agent a new word.
+That's a very exciting word.
+This is something which is able to figure out how much is something actually worth in the market.
+And it's called an ensemble because it brings together multiple different models.
+You may remember we met that word when we were talking about random forest models, which are themselves
+ensembles.
+Well, that is going to be our ensemble and it's going to be great.
+And we're also going to have a messaging agent that is going to send push notifications.
+And in order for it to feel like a real agent, it has to have some sort of an LLM call in there.
+So it's going to use an LLM to sort of hype up the message and make sure it's something that is suitably
+enthusiastic for us.
+So those on the right are some of the agents that will be building.
+And then of course, we're going to have a planner, a planning agent.
+This orchestrates activities around these these other agents.
+That's its job.
+There's then going to be an agent framework we're going to use, which is something that can handle
+memory so that the the the planning agent doesn't surface the same deal twice.
+And logging so that we can have the beginnings of observability, something that I tackle a lot of in
+my other courses on Agentic AI and on MLOps production.
+So we're going to do just some basics around that.
+So we've got got something together.
+And then of course we're going to have a user interface on top of all of this.
+Now there are a lot of frameworks out there that help you build these kinds of agentic setups very easily.
+There's one there's a crew.
+AI is very popular.
+One, there's OpenAI agents SDK, my favorite one, uh, as some people know, there's there's Google
+has ADK, uh, there's, uh, Landgraf there's many of these agent frameworks.
+And largely they help you with things like defining tools and calling between llms and handling observability
+and memory and the like.
+And they do so with, with the, uh, handling the glue code for you.
+They're sort of abstractions over LM calls.
+And in their seminal blog post, anthropic called called Building Effective Agents, anthropic strongly
+suggested that particularly when starting out and with simpler problems that you start with out using
+agent frameworks, because in large part, you can achieve all of this just by calling Lrms, and in
+doing so, you really get to understand how it actually works.
+You're not abstracting away important details, and that is exactly what we're going to do this week.
+We're not going to use one of these fancy agent frameworks that does a lot of the nitty gritty for you.
+We're going to be doing the nitty gritty ourselves, and it's going to be really easy.
+We're going to build all this from first principles, just making calls to lrms and using tools, and
+you're going to see it all.
+If you want to use agent frameworks, then of course my course uses many of them and you get very familiar
+with them.
+But it's so valuable to do it yourself.
+And honestly, often doing it yourself is all it takes, just as anthropic suggests.
+Okay, but for today, before we dig into our agent architecture, and you may have noticed that I said
+there were seven agents, but there doesn't appear to be seven.
+That's because there's a little detail that I will show you later.
+But before we get to it, we are going to dive into looking at Modalerts.com.
+The serverless platform for AI teams that says that modal is a is a really terrific platform for running
+your models, uh, for for inference on the cloud.
+They do other things too.
+But but running the inference is one of their most, most commonly used features.
+And it's how I use them in my day job.
+And many people do.
+There are a bunch of others like modal out there and there's there's for AWS, there's SageMaker, which
+is their big platform.
+Um, there's there's uh, run pod.
+There's there's many things like this where modal really sets itself apart.
+Is that, first of all, it's incredibly easy to set up and configure, unlike some of the others.
+When you define your infrastructure, you just do it through a little bit of code, and that's where
+you set up what kind of machine you want and all sorts of features about the platform.
+So it's really convenient.
+Also, with modal, you only pay for the compute that you use.
+You only pay for the clocks that you use up.
+So any time that your platform is dormant, you're not spending a penny.
+And that's really great.
+And finally, modal, at least as of now, has this deal that you get $30 worth of free credits a month,
+and we don't even get close to that kind of level.
+And that means that basically, for the tasks that we do on this course, it's completely free, at
+least as of right now.
+And hopefully it still is for you.
+You'll find out in just a second.
+That's what we're going to use.
+We're going to use modal.
+And I think you're going to love it.
+Let's go do that right now okay.
+So please bring up your favorite browser of choice and go to mode not not model.
+And this is what comes up AI infrastructure that developers love.
+Uh or they might have a different splash screen when you see it.
+But but it's it's, uh, this this is the homepage.
+And you can scroll down.
+You can see they've got some really big names behind them.
+You can read more about what they do and why they are awesome, and inference is what we'll be using
+them for.
+But for sure they have lots of other stuff that they do as well.
+They also offer notebooks.
+Um, a bit like Google Colab.
+You can you can run batches, you can do training in modal as well.
+But we're going to be using it for the most common use case, which is inference.
+You'll be pressing the sign up button because I imagine you haven't got an account.
+I actually for this one I use my GitHub as my my auth, but you can of course use any of the others.
+And I'm now going to log in because I'm already logged in.
+I'm sure you'll need to answer a bunch of questions in order to, uh, to, to sign up.
+And so you'll do that and in you come here and you can see that, that I've been using it quite a lot
+in the last couple of days, and I've still got $27.50 left in this month's credits.
+Uh, and there's no way I'll get through them, and and hopefully you'll be the same.
+Um, and you get to the front.
+There are some there are some apps showing, and, uh, this is, this is showing you shouldn't see
+any apps yet.
+There's apps for me because I've done some deployments.
+And this this is will be your, your home for a little bit.
+So keep this bookmarks and then let's get to cursor.
+--- Lecture 3 ---
+Well, here we are in cursor starting a new week for the very last time.
+Week eight.
+Here we come.
+You can see it's a busy old folder.
+We've got.
+We've got a fair amount to do this week, starting then with week eight.
+Day one.
+Come into the lab.
+Remember to set your kernel if you haven't already.
+I've got this little warning here to tell you.
+Do be sure to to pull the latest code, because I update things all the time and this week is a big
+week.
+And do check the the guide, the git guide.
+If you're not sure about how to deal with git pull and merging and all the rest.
+Okay, so as a reminder, this week we are going to be having a modal today.
+And then we're going to be doing Rag tomorrow, a couple more agents on Wednesday or whatever.
+The third day is with me.
+Today is Monday for you, but it's probably isn't.
+Uh, and then we'll be doing the, the planner and then finally the finale for The Price Is Right,
+the name of our project.
+All right.
+And I am going to start with just a few imports.
+Now we are about to to to do a whole lot of stuff.
+And modal is one of these platforms that likes printing outputs which include emojis in it, which is
+very fancy of it.
+But some PCs don't like that and get upset and fail with lots of errors.
+If you run this next cell, uh, print locale or get preferred encoding, it should say UTF eight.
+It does on Macs by default, but not always on PCs.
+And if it doesn't, then try running that next cell which which should set it to UTF eight, and then
+maybe try restarting your kernel and do that again and just see what happens if if that doesn't work
+and you still get problems when you run modal commands, then there's a simple fix which is don't run
+the modal commands from within the notebook, just run them in the terminal instead.
+Uh, and I will explain that again when we get there okay.
+So next up next up we need to set our tokens for modal.
+And this is a bit of a procedure which which should be super easy.
+and modal, has tried to make it really easy, but sometimes it doesn't work for people, so I want
+to be very careful about it indeed.
+So first of all, we're going to go into modal and look for our API tokens.
+Okay.
+So you click on this link up modal and then go to your dashboard if you're already logged in.
+And then go to your settings avatar right here to settings.
+And you can see that there is a link here for API tokens.
+Now I'm not going to click that because it reveals your tokens right away.
+But you click there and you press the Create New token button.
+And when you do that it's going to show you, uh, you're going to click API tokens and click New Token.
+And it will give you something like this to run modal token set minus minus token ID.
+And then there's going to be a k and then a a like stuff minus minus token secret and then a s and a
+bunch of stuff.
+So that is the the token ID and the token secret a k and a s.
+Uh, now it wants us to run this at the command line, and that's what we will do.
+So open up a terminal window, which is, uh, like that which which is, um, control and and the backtick.
+And you would want to type out this exact command that it told you, with one exception, because we're
+working with UV, you don't run something like modal token set.
+You run this, you say, um, run and then you do modal token set and you can just paste in exactly
+what they have in modal.
+And so you should now be pasting in something that says UV run modal token set minus minus token id
+id.
+And then it should have something that begins AK and then minus minus token secret.
+And that should have something that begins as.
+And when you do that, it should run and it should tell you that it's run and everything should be great.
+Your modal tokens are set.
+Uh, you may have problems occasionally.
+People do.
+For most people, this just works great if you do.
+First up, try running.
+You've run modal token new before you run the you've run token set.
+Uh, if that still doesn't work, there's a suggestion that David s student had that he was able to
+to fix it on his PC, and he gives some instructions here.
+And then the third suggestion that someone had is perhaps the simplest of all is simply take this modal
+token ID and modal token secret.
+The two things, one beginning AK and one beginning a.s. put it in your EMV file and then run load EMV
+and make sure that that is set as an environment variable.
+That should work too.
+And if none of that works, then message me or send me an email and I will get involved and we will
+get it sorted.
+I'm sure it will work, but 99% of you it's just going to work great.
+Modal have tried to make this really easy, so the genius of modal is that they try to make it incredibly
+simple to write Python code that you can run locally on your computer.
+Well, we all know how to do that, but also that same Python code, you can say, okay, I now don't
+want it to run locally on my computer.
+I want to run it on the cloud, on your computer, but I want it just to be the same Python code I've
+written right here.
+And they make that really, really easy.
+And for anyone that's worked with something like AWS Lambda or other serverless platforms, it is by
+no means really easy to achieve what I've just said it might sound like.
+Sure.
+Don't they all do that?
+No they don't, uh, take my, uh, MLOps, uh, AI and production course if you want a firsthand experience
+with that.
+Uh, but we're going to go to look at this file.
+Hello.
+Okay, so Hello.py get rid of that terminal.
+Here's Hello.py.
+It has like a modal import from modal import image we create we do this thing called modal app.
+Hello.
+Don't don't worry about this.
+Just just get a sense for it.
+And then we do this thing called image.
+That's the type of Linux flavor.
+And we install the requests package.
+So this is just something that's that's telling modal.
+What kind of infrastructure would we want this to run on if we decide to run it remotely.
+And then I have this function called hello.
+And I've just got this little decorator that tells modal hey, by the way, if I want to run this function
+on your your world, I want to use this image to do it in.
+So that's just how you tell it.
+Just a simple, uh, simple computer running Linux with requests installed pip installed in it.
+Okay.
+So what does this hello function do.
+It imports requests and then it just looks up what runs this little thing that looks up.
+What's the IP address of what's currently running.
+And then it gets the city the region the country.
+And it says hello from wherever this code is actually running.
+Uh, so that's that's all it does.
+Uh, it just it's going to say say hello from and then, then the current location of the software that's
+running.
+Are you with me so far.
+All right.
+Let's go back to to to day one.
+So I'm going to import that.
+I'm going to import uh hello.
+And I'm going to first of all you do this with app dot run is a little decorator you put around it.
+Sorry.
+Context manager.
+I'm going to say hello Dot, and saying that just means that function we just wrote.
+Hello.
+I just want to run it on my computer.
+I just want to run that right here.
+And when I do that, I'm running this this hello function locally.
+It takes a little bit of time the first time because it's got some some loading in to do and it says
+hello from New York City, New York, US because it just ran for me and that is where I am.
+So that works just fine.
+Wouldn't it be nice if you could take just exactly that code and run it remotely on on one of modals
+computers without hardly changing anything?
+Wouldn't that be nice?
+Yes, that's what the next cell does.
+Let's let's do it.
+Okay, so here is the next cell.
+It's doing the same thing as before with run.
+But now instead of calling hello local we call hello remote.
+And that's all it takes to say take this code, use that configuration that I gave you there and go
+run it modal on your cloud.
+And that is what it did.
+And uh yeah you can see that It says hello from Phoenix, Arizona.
+So it ran somewhere remotely.
+And if we come back here, you can see that the beauty of what modal is doing for us.
+First of all, it's allowing us just to write some code and decorate it.
+And then depending on whether we do local or remote, this code either runs on my computer or it gets
+shipped off to the cloud.
+And the second thing that modal makes it easy for us is it allows us to use code to describe what kind
+of hardware we want to use.
+I say we just simply want a basic Linux box.
+We want to have the requests package pip installed on it.
+That's all we want.
+And now if I call remote, I want you to bring up that box and run this over there.
+And it just worked.
+And you should experiment with with different different implementations, different things you might
+want to do and see how it works.
+This is kind of cool because it actually reports back on where abouts it's running, and in fact we
+can run it again and see if it runs in the same place.
+Is it still in Phoenix, Arizona, or is it somewhere else?
+And this time it's in Washington, Virginia.
+So they have many data centers, I imagine for you it somewhere completely different and you can explore
+with that.
+And in fact you can be you can be specific about where you want it to be.
+So we've I've got one here that a student had had pointed out to me, which is really cool, which is
+if you go to hello, you can see here that I've got a different decorator.
+I'm saying I want this image, but I want the region to be EU.
+And then I've got a hello Europe and the same thing.
+Exactly.
+So if we come back here and run this, we're just running the same code.
+But this time we're sending it over to Europe where it's running and coming back.
+And particularly if you think of something like GDPR, it might be important for you that this is running
+in Europe.
+And there we go running in Germany.
+Uh, and I've also got a link to the different region settings where you can pick what region that you
+want it to run in.
+It uses up slightly more credits, but only slightly more if you're if you're particular about where
+you want it to run and it gives you all the details on their website.
+So do experiment with this.
+Get your own first hand sense of what it takes to write code, and have it running in different places
+around the world.
+--- Lecture 4 ---
+Okay.
+Before.
+Before we do the next part, there's one more little bit of configuration you have to do.
+And again, this is something that is pretty easy that 99% of people get done fine.
+But then just for some people there is a glitch.
+And and so it can be problematic.
+So let me be be very specific about it.
+So this is about telling modal what you're hugging face secret is so that we can log in to your hugging
+face account on your modal boxes.
+And I've got like I call it like a, like a bulletproof recipe here.
+Uh, so the first thing to do is to go back to modal.
+So let me click that link to go to modal again.
+Here it is.
+Here is modal.
+And go into your dashboard.
+Now from your dashboard there is a section here called secrets.
+Press that and here you go.
+We're in the secrets section and press Create New Secret.
+This is where we set up a new secret in in modal.
+And there's a category called hugging Face.
+And you can pick that category.
+And here we are in in this category.
+Now secrets in modal have a name.
+That name is a name that's going to be used later in the code to say, I want to load this secret and
+you have a secret with a name, and the name you want to give.
+It is the same as the default one that will be here, which is hugging face hyphen secret.
+You don't need to call it that, but it needs to match what's in the code.
+And that's what we're going to have in the code by default in the repo.
+So if you don't have that as the name, it's not going to match the part in the code.
+When we try and collect this secret and say, this is a secret that I care about so better, best to
+stick with the defaults, keep it as hugging face secret, and remember that because we'll see it in
+the code, it'll be like gotcha.
+But that is different to this here.
+The key.
+Your secret has a key and a value.
+The key needs to be exactly what it is by default HF token, because that's set as an environment variable.
+When you tell modal that you want to use this secret, it's going to set that as an environment key.
+and the value here.
+Of course, this needs to be your actual hugging face secret HF underscore blah blah blah blah blah
+blah that you can copy in from hugging face.
+Uh, and so once you've you've set this up, you need to have this saying hugging face secret, this
+saying HF token and this with the HF underscore the actual value of hugging face token.
+Uh, and I imagine this is like blindingly obvious to most of you.
+Uh, but but if you get any of that wrong, of course, then strange things happen later.
+And it's unclear why.
+And people have certainly gotten very stuck with that.
+And don't forget to press done, of course.
+And then once you have done all of that, of course, when you go into secrets, you will see this hugging
+face secret.
+And, and uh, when it was last used very recently.
+That's what you should see.
+You do not want to see the second line.
+That was because in the past, modal used to have that as the default and they changed it, which is
+confusing.
+Uh, so this this is the one that you want to have.
+I hope that makes sense.
+If you've got any questions, of course you can always, always ping me on, on on the platform, but
+make sure you've got that set up right and then we'll go back to cursor.
+Okay.
+So here we are.
+And again hopefully this is the bulletproof recipe IMDb.com.
+Click on secrets.
+Add the hugging face secret and fill it in.
+Click done.
+That's what you did.
+Okay.
+Now I want to show you another file here called llama pie.
+So llama pie is so short.
+Check this out.
+Check out how simple this is.
+It imports modal and imports image again.
+And then we're going to make an app called llama.
+And here's where we define the image we want it to be again a simple Linux box.
+We want to pip install torch transformers and accelerate the three, uh, common libraries from hugging.
+Face that sorry this this from PyTorch.
+Obviously these two are from hugging face and then secrets is is where we are defining the secret that
+we wish to use.
+And that is, uh, the one that's called hugging Face secret.
+And this is where if you called it something different, if the name was something different, you'd
+have to change it here too.
+And in all the other files that I have for this week.
+Um, so.
+So this is where we tell modal, hey, we want to use the secret that has that name.
+In other words, we want you to find that secret and make that key be an environment variable with that
+value.
+So it's going to create an environment variable called HDF underscore token which is the one we want.
+This is where we specify the GPU.
+We want a T4 GPU.
+And that is the model we'll be working with.
+And so here we have a decorator as before apt function.
+We specify the image we want the secrets.
+We're going to be using the GPU that we want on this box.
+And we put a timeout so it doesn't go on forever.
+And this code is just absolute standard hugging face transformers code that is going to load in a tokenizer
+load in our model, our Lama model, and just do inference to predict the next tokens after an input.
+That's all we're doing with this very simple function.
+Okay.
+So we go back here to day one.
+Uh, so we're going to import that.
+And now we're going to say uh with modal enable output.
+It's going to have it print lots of stuff.
+And this is where you may have troubles with Unicode.
+Maybe we'll see what happens.
+Uh you could always take that out.
+And then with apt run results is generate this function that we just wrote remote.
+And the text that I want to ask llama to complete is text never gonna give you up.
+Never gonna, uh, which most, most humans on this planet will now not be able to stop Rick Astley
+from being, uh, being playing in their minds.
+I want to rickroll llama 3.2 if you're familiar with that meme.
+So when I run this because I've got this enable output, we're seeing lots of stuff going on as we see
+what's happening remotely.
+And yeah, you'll see it's a very noisy process, uh, view as a scrollable element so you can see it
+all.
+Um, and this can take quite a long time, depending on whether you've done it before and various other
+things.
+So this is something which which I will I will leave you for a minute and be back.
+Uh, and it will take a bit, but then it will run and we will see what does llama 3.2 think is the
+continuation of that.
+And the important point is that this is running remotely on the cloud.
+And it's having to.
+So it's it's spawning up a box with a GPU.
+It's then doing that whole business of downloading the hugging face files.
+So it's having to bring in llama 3.2 into the environment.
+And then it's making that LLM call.
+So I will see you in a second when we have the output.
+All right.
+And it's finished.
+And yes we get never going to give you up.
+Never going to let you down.
+Never.
+And all of that.
+Yes we knew what to expect.
+Uh, if that's too painful for you to, to have Rick Astley, then I've given some other example things
+that llama 3.2 won't be able to help but complete the stuff in red you see here.
+By the way, this is the actual log running on that remote box.
+You can see it did exactly what you're probably familiar with loading in the checkpoints from from hugging
+face.
+And then, uh, you always get this little warning about attention masks that you can ignore.
+Everything is is good.
+Okay, so that worked very nicely.
+I now want to show you another thing which is called preiser ephemeral, and I call it ephemeral to
+distinguish it between what we're going to do later, which is not going to be a femoral.
+Femoral means like sort of fleeting, like it's it exists and then it doesn't.
+Uh, so this is basically exactly the same thing.
+Um, but we are going to actually look for the, the real model, the model that we fine tuned, the
+one that we did in week seven, we're actually going to use that model.
+Uh, so let me let me show you this.
+So we again we import modal.
+We this time we're calling the app Preiser.
+And we install again the package Pytorch's torch we install from hugging faces libraries transformers
+bits and bytes accelerate and the parameter efficient fine tuning their name for the package that has
+the Laura stuff in it.
+Pfft.
+Uh, and again, we get this secret.
+So if you have changed the name, then you need to use your name there.
+Um, and then the constants, we're going to use a T4 box.
+This is the base model.
+It's going to be, uh, this is this is the run name and the revision number that had that terrific
+result.
+Uh, our best results yet.
+So this is our strongest model on the planet that we're using here.
+And, uh, that that is our model name.
+This is basically taken from the week seven day five colab exactly as is.
+And then I've just got a single function price.
+And of course, it's decorated to take the image secrets GPU and timeout that we've got there.
+And price again this this code you can check compare it uh like like they say on things in uh in a pharmacy
+compare with the ingredients.
+Compare this with what we had in Colab in week seven, day five.
+And you'll see that we're just doing the same thing.
+We are doing inference on our fine tuned model right here.
+And then we are going to spit back the price.
+I've just got some janky stuff here, because if it if it generates text with the number in it, I want
+to strip out the number and return the number.
+And that's what this function does.
+So that is the only difference I think with the with the the colab.
+Okay.
+So let's go back to day one.
+Here we have it.
+We're going to import that.
+And now I'm going to to set this going off it goes.
+What this is now doing is it's contacting modal.
+It's spawning a new box.
+It's now going to install all of those packages.
+And it's going to then download the model weights which because this is the big version, this is like
+model weights of more than a gigabyte of model weights.
+So it is going to take a while.
+Again the last one only took a couple of minutes for me.
+Sometimes this can take take take a long time.
+Um, so you might have to wait a fair bit if it.
+Yeah, it shouldn't take more than half an hour, but it has been known to take almost, almost that
+long depending on a bunch of different factors.
+So I will I will go again and be back in a minute when it's finished, and I'll report back on how long
+it took.
+--- Lecture 5 ---
+Okay, well that just finished and it actually only took one minute and 20s.
+So my whole half an hour drama was was was completely wrong.
+And maybe it took longer for you I don't know.
+So as a reminder, I this is what I sent in Quadcast HyperX condenser mic that happens to be the microphone
+that I used to record the original set of these videos.
+It cost me about $130 when I bought it, so this estimate is quite a bit lower, unless I unless I was
+ripped off with how much I paid for it.
+But our model thinks it's a bit cheaper.
+Uh, so that's interesting to note.
+Um, but this did just call our fine tuned model running on the cloud, and it wasn't ideal because
+it took a minute and a half because it had one minute and 20s had to load everything in, but still
+it worked.
+It did its thing running on a T4 box in the cloud.
+Okay, next up, I need to to explain a little technical issue we have.
+Okay, so here's a subtle problem that maybe you've already twigged.
+When we trained all of our data in our proprietary model, we always pre-processed all of our data,
+both in the training data and the test data, to have a particular format.
+Our pre-processed format, which has like a title, a category, and so on.
+So that is the format that the model has been trained to expect.
+So just passing it in in a different format is probably a bit suboptimal.
+It seems to have worked fine, but it's not ideal.
+And if we want this to be reliable, we need to pre-process anything before we send it into the model
+so that it has that same consistent format.
+And pre-processing in this way is very common thing to do.
+Um, so I'm going to use the same code that actually we used before.
+It's a file called Pre-processor, which is in this in this directory here.
+And what we can do is we can say pre-processor dot pre-process and put in some text.
+And if I print that, what we get out is that put through a pre-processor, which by default I'm using
+llama 3.2 running via llama on my local computer.
+If you want you can also specify a different model.
+So this is if I want to use grok on the cloud and have something which is like it gives it a different
+category.
+But this, this allows us to have something which is, which is the, the OSS model, um, and is using
+grok by default.
+It will use this.
+I've also I've got this ability that you can add this to your EMV file.
+If you want to specify that you want to use a particular preprocessor.
+When we deploy our agent platform, your EMV file will control that.
+Um, but this hopefully that makes sense to you.
+If we want to get best performance, then before we call our model, we should convert the text of the
+thing we want it to price into the same format that was used during training.
+And so with that in mind, I can now kick off again the same thing as before app Dot run and price that
+that microphone.
+But instead of passing in just the text version of the original, just the just a little sentence about
+what it is, I first pre-processed it and turned it into something which is more like this, which is
+this we're using, which is the format that the model was trained on, so that it can have a consistent
+format.
+And to be honest, it's perfectly possible that we'll do fine either way.
+But it's it's certainly more consistent.
+It's a better practice to to treat your data at inference time, the same way that you treated your
+data at at training time.
+And so that's why we do it this way.
+So this again, presumably this is going to take about the same amount of time about one minute and
+20s.
+And you you should be able to see see it running too.
+And I will see you in 20s time when it is completed.
+And there we go.
+It's finished.
+And it took one minute and eight seconds.
+And interestingly, it gave exactly the same number.
+Sometimes I'd have gotten a better number in the past.
+I've done it, but for whatever reason, this time the pre-process text is identical, so it didn't
+appear to have any difference at all pre-processing and writing it.
+Let's just make absolutely sure that we did what we passed in.
+Was this, uh, yeah.
+You can see there it is.
+We passed in the, um, the a better version of it that's more consistent with the way it's been trained.
+And we got exactly the same answer.
+So I guess that means that we've trained a model well to be somewhat immune to this, but it's still
+it's definitely a better practice to to do the pre-processing in this way.
+Okay.
+So that has shown you the way that we can make a call to modal in the cloud in order to price something.
+Spinning up a T4 box, populating it with our model and running it.
+The remainder of what I want to show you now is how we make this more efficient.
+We don't want to have to download and build this every time.
+We want to be able to do a deployment.
+So we've got something out there in modal that we can call, rather than this ephemeral idea that you
+just have some code that gets sent each time.
+So that's what we'll do next.
+So the idea is that rather than just calling this function remotely, each time we're going to deploy
+our code to modal and have like a handle to it on the cloud and then be able to call it that way.
+So I've made a new Python module called Pricer Service, and it's basically exactly the same as the
+set of ephemeral Pi.
+Just we'll be using this to deploy it, but it's the same thing.
+I've given it a different name, Preiser hyphen service, but it sets up the same box and it's got the
+same price function.
+This is the one we want to deploy and then use.
+So let's go to to the lab.
+And this is how you deploy a Python module.
+It's modal deploy and then the module name.
+But because we're in a UV environment you do UV run modal deploy.
+And then the module name and you can run it from a notebook by putting that exclamation mark.
+If this gives you any issues with funny emoji stuff, then you might need to to just run UV, run modal
+deploy from from the command line from a terminal instead.
+But when I run this, it will actually run really fast because it knows that I've already done it.
+It will probably take a few minutes for you because it deploys it and and installs it.
+Um, so that has happened.
+And then next up, rather than the way that you call it, is you first of all say to Modell, hey,
+look, I know that I've got a function that I've got in in something, a service that I've named Priceless
+Service.
+And the function is called price.
+I would like you to give me a handle to that function called price.
+And this is now like like you can think of that as, like a function like any other that you could call,
+but it represents a modal function.
+So I run that and we've now got this.
+And then I can just call Pricer dot remote and pass in something that I want to run.
+And it's going to then run that remotely on our deployment.
+So let me kick that off.
+Off it goes.
+I'm going to go to modal so we can see this in action.
+We go to the dashboard.
+You can see that we've got prices service.
+That's what we just deployed.
+And here is price.
+And it's running right now.
+I come into here and you'll see that there it is.
+I just kicked it off.
+It started up.
+It's running right now.
+Let's go in.
+You can see what's going on here in this timeline view this execution timeline.
+See the start up period.
+Execution has started.
+Here are the logs where we can see what it's doing.
+It's fetching two files.
+Stuff is happening and you can sit here and watch.
+Uh, your sort of a voyeur onto your code running remotely on their box, and it's just fetch some some
+files.
+This is the usual, like hugging face transformers code to download the the the model.
+Uh, it's loading in the checkpoints.
+And then we're going to see a bunch of messages as it does its thing.
+And I will see you back in a second when it's complete.
+And there we go.
+It completed.
+It took like one minute and five seconds.
+We can, uh, see, see all of this.
+I think that's that's done.
+Uh, okay.
+And now we should be able to go back to cursor and in cursor.
+We should be able to scroll down and see here that it completed.
+And it responded again with 90.
+So we sent in the text and it ran remotely on our deployed app in modal in the cloud.
+And we got back the number 90.
+Okay.
+Just one more thing left to do with this, and that is to show you prices, service to an improved version
+of this, which I've got right here.
+And because I in the price of service two, if you take a look at it, I've given this the same name,
+the same modal name, price of service.
+So this is actually going to overwrite the deployment that we just made with a new deployment.
+That's a little bit better.
+So how is it better.
+It's mostly the same if you look through it it's mostly the same.
+But there are some differences.
+First up, rather than using a function, it uses a class.
+It's got a class, an object oriented side to it, uh, which has like something which which handles
+set up and then the price method again.
+And why have we done it this way?
+Because this gives us an opportunity to, to load in some data that will be persistent at free of charge.
+This will get cached on the box.
+And it's going to mean that it's able to start up much faster in the future.
+It will take about 30s in the future to start up, rather than the minute, and a bit that it does at
+the moment.
+And the way that you do that with modal is that you can specify, um, a volume, uh, and the volumes
+that we're specifying that you can see here, we're asking to have a cache directory, and for that
+to be something which, which will give us an ability to look at this here, to have a volume that is
+called HRF Hub Cache.
+And so that is giving us like, like a volume, a persistent piece of storage associated with this deployment
+that will always be attached to it.
+And that means that we won't have to redownload the model weights every time the model weights will
+be stored with this deployment.
+So take a look through how this how this works.
+But it's also very, very short and very simple.
+And you can see that you use this decorator to say this is what should run the first time.
+This, this is, uh, this is built, this container is built.
+And then in subsequent times it will just call our price.
+Okay.
+With that in mind, let's go back to to to the lab.
+And it's time for us to deploy process service to.
+And then we will try calling that.
+So I'm going to kick off the deployment.
+And again it's quick for me, but it might not be as quick for you because it will need to actually
+deploy it.
+And it takes a few minutes the first time and then let's run it.
+Okay, here we go.
+I'm kicking this off.
+We're calling this time from name.
+You remember, this is analogous to before we said dot dot from name.
+Now it's a class.
+We get back the class we make a new instance of it.
+We call price price remote.
+And now we come in here go to the dashboard.
+We should see it's running right here.
+Let's come into it.
+Here we go.
+It's pending.
+It's at the moment uh, in the middle of, of getting itself started up.
+Um, it needs to, to, to build it.
+And here we go.
+It's got the usual warnings and I think it's probably finished.
+There we go.
+It's finished already now because I'd already run it once.
+It had already built the container.
+So it is really fast.
+It took just 30s, not the one minute and a bit that it took before, so it's already half the time
+that it took before, which is great to see.
+Uh, and so, uh, that that really gives you a sense of how this works.
+If we go back to the lab, you can see again, you just do pricer dot price remote.
+Uh, so let me just add some more code, another code block here, uh, like that.
+And let's just run it again.
+Uh, and the second time you run it, look how fast it is, because it's already up there and ready
+and it's warm and ready for us.
+It's almost immediate.
+And that that is taking that text, sending it to the cloud, running it on modal, getting back the
+results.
+And that no longer are we sitting there waiting like we were with the ephemeral pricer.
+This, this is real serverless AI.
+We only pay for the actual requests that we make.
+It was so easy to define our code, describe the infrastructure we wanted, the T4 box, the things
+about it, describe the volume we wanted cached, and then we're able to get this class pricer.
+Uh, this this instance.
+Sorry.
+This class professor here creates an instance of it.
+And just by going pricer dot price, we can repeatedly call it, uh, in the cloud.
+Now, there's lots to love about modal.
+And their documentation is great.
+And you can read about all the sort of tricks and techniques with modal.
+And I'd encourage you to do that.
+I'm not going to go too deep into modal, because it may or may not be something that you're using.
+I want to give you a flavor for it.
+Hopefully this is enough.
+So you see how you can write functions or classes yourself.
+Call them locally or call them in the cloud.
+Specify what kind of hardware you have with code.
+It's it's really great.
+It's so easy to use.
+A little pro tip for you here.
+One of the things about modal that's that's both a blessing and a curse is that after a short amount
+of time, modal puts your computer, your remote computer to sleep.
+And it will then take another 30s to spin it back up and load the model into memory.
+Although the model is cached on disk, it's not cached in memory, so it'll still need to load that
+in for 30s every time that it's gone cold, and it takes two minutes before it makes it go cold.
+And that might be to not enough time for you.
+You might find you're often waiting those 30s which can get annoying.
+I imagine at this point we've already probably.
+If I run this now, it's probably going to take the 30s.
+There you go.
+Uh, so you can you can tell modal that you'd like to override that behavior.
+You can actually tell it that you want to have more containers, uh, rather than don't don't fall back
+to zero containers.
+Keep at least one always alive.
+Of course you'll pay more for that, but that's something you can do if you're working with a production
+system that always needs to be able to have a response, something that's perhaps not not not as much
+of a strong step as that is to just tell modal, hey, instead of cooling down my box after two minutes,
+please leave it more time.
+Please leave it up to 20 minutes.
+You can specify you'd like modal to keep your box alive, and this is a snippet of code you can run
+to to keep the box alive for up to 20 minutes at a time, and this one puts it back to two minutes again
+after you've done that.
+But we'll leave it on two minutes for now.
+And you see, it's still pretty quick even when it has to warm it up.
+But if I run it a second time now, it'll be really quick.
+There you go.
+--- Lecture 6 ---
+And now.
+And now I want to unveil our first agent.
+And it's called the specialist agent.
+And it's something which is going to allow us to make a call to price something using our proprietary
+model by making a call to the cloud.
+And all of my agents are in this Python package agents.
+And this one specialist agent is right here in specialist agent.
+And you will notice that it's very short.
+It's a very simple agent.
+Uh, it, uh, it has like an init method.
+And in the init method of this, of this agent class, it says, uh, the Pricer, uh, the class Pricer
+is model name, it's called price service.
+And the name of the class is Pricer.
+And that is our Pricer class.
+And it makes a new instance of that class and it sets it to the instance variable pricer.
+So we are building an instance of our modal remote class.
+And we know because we just deployed it Exactly what that is.
+It's a T4 box with a volume that contains our weights, and it contains a single function, a single
+method price, which is able to remotely price a description.
+And so here is our agent as a function price.
+It takes a description and it simply calls self dot price remote.
+Calling the remote method on our remote.
+On our modal class price.
+Passing in the description.
+Back comes the result.
+So it's it's a very short class.
+And most of this is sort of comments and logging.
+There's actually really only two lines of code here.
+That line and this line.
+That's it.
+That is our first agent.
+And that is all it takes to make an agent.
+There's lots of people.
+People think there's lots of magic to agents somehow, but there really isn't.
+It's something that's wraps around a call to an LLM, which is exactly what we're doing.
+And it's kind of cool that the LLM itself isn't running on my computer.
+It's running on the cloud modals, serverless AI.
+Oh, but I hear you.
+Hang on.
+Ed, you're saying you fibbed.
+You've you've you've not told us all the truth.
+I see that this specialist agent here is a subclass of a class called agent that you've imported.
+You told us you weren't going to be using, like, an agent framework that deals with all of the interactions
+between agents.
+But you've got some something here and some parent class which is going to do some stuff.
+So I better reveal this parent class to you.
+Here is the parent class.
+It's called agent and the parent class, which is the sum total of the agent framework that I've built
+for you here.
+It's just something which has a single log function that just does logging info, and it just picks
+a different color based on the subclass.
+And I've done this for a very important reason, which is that it's going to look really cool.
+So I wanted it so that if each of our different subclasses writes a log message, it will show up in
+a different color.
+So you're going to see all the different agents logging with different colors.
+Purely superficial.
+I mean, I'm sure obviously this is all in the spirit of observability.
+To be able to watch our agents and the way that we can do it in a way that will instantly see which
+one is which, is if they appear in different colors, um, along with saying which, which, which
+agent it is.
+Uh, so that is the extent of the agent framework we're working with here.
+Nothing more than that.
+It really is just a couple of lines of code for our first our first specialist agent.
+All right, let's see it in action.
+Okay.
+Well, first up, I set up logging so that we can see these log messages that I promised you.
+And we're going to import the specialist agent and then create a new instance of this specialist agent.
+And when we do so, we immediately get a log message in red.
+Red is the color of the specialist agent.
+And it tells you that it's a specialist agent.
+Very good.
+And we are now going to ask it to price an iPhone 14 Pro Max.
+Let's see what happens when we kick this off.
+It says specialist agent is calling the remote fine tuned model.
+It's been a couple of minutes since I did it, so it's gone cold, so we'll need to bring up modal to
+to see that.
+Let's bring it up.
+Here it is.
+Go to the dashboard.
+Here's the processor.
+It's running right now.
+Here it is.
+It's pending.
+It takes about 30s when it's coming from cold.
+So you can see it's sitting here and waiting for a container.
+And any second now the 30s will happen and it will run, hopefully nice and fast.
+And then we will, of course, try running it a second time.
+There we go.
+It's just hit and it's going to be very quick.
+Now let's go back to cursor.
+Here it is.
+Scroll down and we should find there we have it some more log messages.
+It's calling the fine tune model and it predicted $700.
+There we have it.
+Let's go instead for an iPhone ten run that now it's super fast and it predicts $350 for that.
+And of course, when it runs the second time round, it's very quick and we get our read messages.
+Everything is working.
+Modal is working.
+This is running.
+It's our first agent.
+It's just code that runs locally here.
+It's just a simple Python class.
+But in calling it, it then makes a call out to where we are running serverless AI.
+We're calling a remote method on a class, and it's then running our weights, our specialist model
+in the cloud and making the price prediction.
+There you have it.
+Our first agent is live.
+Well, I promised you a big week and hopefully it's living up to the promise.
+We got a lot done today.
+We deployed to modal and we built an agent and it's great.
+Well tomorrow is actually the biggest day the whole week.
+Tomorrow is huge.
+We're going to build a ragged pipeline, a new type of pricer, and then also an ensemble model and
+then deliver production ready code to call a number of different models.
+So, so much to get done tomorrow.
+So be sure to get to get a good night's sleep recharge I will see you for rag the return of rag tomorrow.

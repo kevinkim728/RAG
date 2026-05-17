@@ -1,0 +1,499 @@
+--- Lecture 1 ---
+Are you having fun?
+I hope so.
+I'm having fun.
+It's week two.
+Day three.
+We're pushing on with Gradio.
+Already you can confidently use the OpenAI API.
+You can use different frontier APIs, and you can build UIs for the first time.
+By the end of today, you're going to be able to create a chat UI, a much more sophisticated UI, have
+conversation history in the prompt, the missing ingredient from yesterday, and build your first customer
+support assistant.
+Sound like fun?
+Okay, so let's get into it.
+So obviously AI assistant, one of the most common AI use cases.
+You can build something which has like an on brand persona that reflects your corporate culture.
+It can have this this illusion of memory.
+It knows about the conversation so far, and it's able to maintain context.
+And it can have expertise.
+It can know about your domain and answer specific questions as if it's a knowledgeable assistant.
+These are the key ingredients.
+So we're going to be thoughtful about how we use prompts.
+As we build our assistant, we're going to use system prompts to establish ground rules.
+A very common one is if you don't know the answer, just say so to stop assistance from hallucinating.
+Also giving background information.
+Then during a conversation, you can add in context to the system prompt or to the user prompt, but
+usually usually the system prompt as the way to give more information.
+And Multi-shot prompting is when you insert into the system prompt.
+Again, it could be the user problem, but usually the system prompt.
+Concrete examples of if you get this question, this is how you should answer, and you use that to
+bias the model so that as it's predicting what should come next, it's more and more likely to predict
+something consistent with the examples that you gave in the system prompt.
+That's how it works.
+These are the prompts.
+It's time for us to go right away to the lab.
+No more talking to lab.
+Let's go and give this a try.
+Well, I'm looking forward to showing you what I've in store for you.
+Here we go into week two and we're going to day three.
+And up comes day three.
+Conversational AI aka chatbots.
+Well, some imports as usual, including the fabulous Gradio.
+And then as always we load in our env.
+You know this stuff we check we'll use OpenAI key.
+Make sure it's okay.
+But if you use a different key or if you're using a llama, you know how to change this now.
+Or C guide nine if you have any confusion at all.
+But it should be great.
+And I will create a new OpenAI and we'll use GPT four on mini.
+Why not?
+Okay, it's nice and fast.
+It's good in a chat context.
+It's a chat model.
+So I'm going to have a global variable called system message, which I'm going to start with.
+You are a helpful assistant.
+And again I'm going to be in scientist mode, which means it's my excuse for saying I'm going to be
+changing this global variable as we go.
+And it will apply immediately, which is not like you wouldn't do that when you're building out your
+final Python modules, which will do a bit of later in this course and and more in my production course.
+But but it's great for experimentation.
+Which is the right mindset for you to be in right now.
+Okay, so it's now going to be time for us to write our first new callback, which is our first time
+of exploring conversations.
+Okay, so we're now going to write a callback function.
+Callback function, of course, is a function that we're going to give Gradio and say, hey, you can
+call this whenever you want and it's going to have a particular structure.
+It's a callback function that takes two variables and returns something new.
+And we tend to call it chat by convention, but you can call it whatever you want, but we'll call it
+chat.
+And it takes two things.
+The first thing that gets passed in is called message.
+And the second thing is called history.
+And what does that mean?
+Well, Grady is going to draw a user interface in a minute, which is going to be basically a bit like
+an instant message app.
+It's going to have like a section with, with, with backwards and forwards conversation and then a
+field you can type into.
+And when you do that, it's going to call the callback.
+And this field here where you've just typed is going to be passed in as message.
+And this stuff here, all of the conversations so far will be passed in as history.
+It's not that necessarily is going to keep a history.
+It just takes the contents of the UI.
+That's going to be how it will pass it in.
+And so that is the callback that it wants us to write.
+And so we will now write a callback chat which takes message in history.
+And it's going to return the response.
+And that response could be from based on us calling an LLM.
+Or it could be not based on us calling an LLM.
+Let's let's give something a try.
+So the technical name for this, this type of callback function is what you might call AA1 way conversation.
+Uh, let me show it to you.
+I do def chat.
+Comma history.
+So we're going to call a sophisticated algorithm to decide how what what this callback should do when
+it's called with a message and history.
+And the algorithm will be return bananas.
+That is that is our algorithm.
+And now you can see why it has its sophisticated name of a one way conversation.
+Uh, so whenever chat is called, the job of chat is to say how should the computer respond to the user
+that's passed in this message?
+And it's always going to respond bananas.
+Okay.
+So now we want to give this to Gradio.
+And we're going to want Gradio to construct a user interface, which is like an instant message app
+built around this callback.
+So, you know, obviously Gradio is easy to use and all that, but we are going to need to now do some
+work to, to to structure this UI.
+You know, don't you, that I'm making this up?
+There's nothing to do.
+There's nothing to do.
+It's it's one line.
+It's it's you do g dot interface.
+You the function you pass in is chat the callback.
+That's how we tell Gradio.
+This is the thing to pass in.
+There's just this thing called type equals messages that you have to do, which is just telling it that
+we're using a particular approach and then launch as always.
+And when I do this, Up comes this little chat screen.
+Check this out.
+It's got like chat bots.
+It's got an area here.
+It's got like a type of message and a send button.
+It's a whole like, instant message app.
+And I can say, hi there and we'll see what our chat function replies to us.
+Bananas!
+Haha.
+Um, and you can see it's got little tools here to repeat and all the rest of it, but I can say, uh,
+I said hello to you and see what it says.
+It says bananas.
+No.
+Hi.
+Uh, yeah, you get the idea.
+Uh, so it's kind of cool that that with any function that you give and with this chat interface thing,
+Gradio will throw up a UI and you can just have a chat that calls that callback doing whatever it is
+you want it to do.
+Okay.
+I just want to take it a tiny bit further, but still with some silliness.
+Uh, I just want to to give you a little bit more context about what what is coming in with this message
+and history thing.
+So this time I used to say just bananas.
+This time I'm going to have it reply with, uh, this text here.
+You said message and the history is history, but I still say bananas.
+Haha.
+So that's going to be our new chat function.
+So now I should be able to say chat interface.
+Uh, function chat type is messages launch.
+Let's see what we get.
+So so here we go.
+So so this is our user interface.
+And I'm going to say hi there.
+And it's going to print back not just bananas but also all of the things that got called with you said
+hi there.
+And the history is an empty list.
+But I still say bananas.
+Uh, and how are you?
+Uh, how are you?
+Oh, I just said how you are.
+Never mind.
+Uh, you said and how you are and the history is.
+And now you'll see the history is this list of dictionaries.
+It looks very similar to the OpenAI format.
+It's got some extra things in here like metadata.
+But you see there's role user content.
+Hi there.
+Either role assistant.
+You said hi there, and I still say bananas.
+And then at the end it says that.
+So basically what I want to show you is that when Gradio calls this, uh, this, this callback, it
+passes in the message that you just sent and history, it passes in the contents of this user interface,
+the contents of the backwards and forwards.
+And it does so in the format that's very similar to OpenAI's format.
+And that's actually what this little flag here type equals messages is saying, hey, Gradio, when
+you call me back, can you use the OpenAI messages format?
+And so that's what it does.
+And it makes it convenient for us because because most of the time people use this to actually call
+OpenAI.
+And we'll have the messages in exactly the right format to call OpenAI, which is great.
+And so with that, it's time.
+Finally, as I'm sure you knew I was getting here, we're going to rewrite the chat callback so that
+it doesn't just return bananas, but it calls OpenAI passing in the information we've got.
+--- Lecture 2 ---
+Okay, so here we are.
+We're going to write a better chat instead of returning bananas.
+It's actually going to call OpenAI or whichever model you like and return an answer from the LLM.
+But it's the same as far as Gradio is concerned.
+It's the same callback.
+It's calling.
+It doesn't know that we're calling an LLM.
+Okay.
+So first up, there's just a little line here that is not necessary.
+If you're using OpenAI.
+It doesn't make any difference.
+But it means that if you're using Gemini or some of the other models then it will definitely work.
+And it is.
+Do you remember I mentioned that that history variable that I showed you, it looked very similar to
+OpenAI's format, but it also had some extra fields in there.
+It had metadata.
+And that's OpenAI doesn't care if you add in extra fields, but some of the models do.
+So I'm just doing this one line here, which just replaces history with a new version of history that
+only has role and content in it and clears out metadata or anything else.
+And this makes no difference for OpenAI.
+But if you're using Gemini, it means it will work rather than give you an error that it doesn't like
+metadata in there.
+So that's just a small point.
+Look out for that.
+I have it all over the place just so that it'll always work on Gemini too.
+All right.
+And now we should know this.
+Well, we first need to to package everything together into the messages messages that we're going to
+want to send to OpenAI.
+And it's very simple.
+I press tab.
+This curse has done it for me.
+Uh, basically we just want this list of dictionaries.
+We want to start with role system content and the system message, because Gradio is just passing in
+the contents of the UI.
+So Gradio doesn't know that we have a system message.
+So we need to put that in to start with and then put in all of the history that Gradio sent in, and
+then end with the current user's prompt as role user content.
+This message, you see, we take all the history and then we shove in one more message, which is the
+user's message at the end.
+And so this is now got all of the messages in it.
+Great.
+And now we can say response is OpenAI create model is model messages.
+Is messages perfect.
+And then finally we return response dot choices zero dot message dot content the chat completions API.
+There we have it.
+Let's run.
+This is our new callback.
+It looks great.
+New update available.
+I'll get that later.
+Thank you.
+Cursor.
+Um, and now we will do um, chat interface that that same chat interface again and we'll see whether
+now we get the same user interface.
+Just just as easy as before.
+Gradio doesn't know that anything has changed, except we've got this, this new callback.
+And when we type in messages, we're hoping to see something better than bananas as the answer.
+Here we go.
+Are you ready for this?
+I run it, up comes the chat and I'm gonna say hi there.
+Drumroll.
+Hello.
+How can I assist you today?
+That of course, coming back from GPT.
+Hi there.
+My name is editor.
+Hello, editor.
+Nice to meet you.
+How can I help you today?
+What's my name?
+Your name is Ed.
+How can I assist you further?
+Ed?
+All right, so I imagine you get it.
+You're with me.
+But just a really press this point home.
+We asked Gradio to make a chat interface for us.
+We gave it this callback function.
+And so as a result, every time that the user presses something in here, like what's my name?
+Uh, that is considered the message.
+Everything so far is considered the history.
+Gradio takes those two bits of information and it automatically calls the callback chat, passing in
+the message passing in the history.
+And this is in OpenAI format or very close to it.
+We scrub the format to make it just right, only needed for Gemini and a couple of others for grok as
+well, I think.
+And then messages, uh, we construct exactly the right messages, including shoving the system prompt
+at the top, we call OpenAI.
+We return the response from OpenAI.
+So instead of bananas, what comes back and appears in the screen is actually the response from the
+model.
+I know you've got it already, but I like to talk.
+All right, all right, let's move on.
+Let's do more.
+Okay.
+So I'm I'm now going to update that chat callback to do streaming as well.
+And so this time it's exactly the same as before.
+But I've got OpenAI ActionScript and I'm passing in stream equals true.
+And then I can just simply put here for chunk in stream.
+Remember that we're just going to iterate over what comes back.
+And then we're going to get the next chunk of what comes back, accumulate it in this variable response
+and yield response each time so that gradio it will see that this isn't a function anymore.
+It's a generator, a special kind of function.
+It's a function that you can iterate over.
+And as a result, Gradio will automatically not just wait until it's finished and show the results,
+but iterate over it and surely, surely slowly show the response as it comes.
+Surely.
+Uh, all right.
+Uh, then let's just bring this up and see what we get.
+Here it is.
+Uh, so now I can say hi there again.
+Let's try.
+Hi there.
+And you can see that it came streaming.
+And let's make it something, uh, explain the pros and cons of a genetic, uh, architecture, uh,
+genetic AI, uh, for commercial purposes.
+Let's do that and see what we get.
+Is this something that we're having going off on a on a big old diatribe?
+There you go.
+And you can see it streaming away.
+And it's even gradio nicely handles, uh, markdown coming back out of the box, uh, without needing
+to use markdowns or anything this time.
+Looks great.
+Uh, isn't that easy?
+Isn't it?
+Wasn't it easy to build like an interactive chatbot?
+--- Lecture 3 ---
+Okay.
+Next up let's work on the prompts.
+So we're going to improve the system message.
+And let me read you what we've got.
+And note again I'm using this trick of just using a global variable.
+So it's automatically going to apply everywhere earlier.
+So system message you're a helpful assistant in a clothes store.
+You should try to gently encourage the customer to try items that are on sale.
+Hats are 60% off and most other items are 60% or 50% off.
+For example, if the customer says, I'm looking to buy a hat, you could reply with something like
+wonderful!
+We have lots of hats, including several that are part of our sales event.
+Encourage the customer to buy hats if they're unsure what to get.
+Okay, so there's a lot of things going on in that system prompt.
+We're giving it information.
+We're setting the context.
+We're also giving it a tone.
+And this approach is saying if the customer says then you should reply that's giving like an example
+question answer.
+And that would be what we would call one shot prompting, giving it one question and answer that it
+should be able to replicate.
+And we mentioned that before, I think.
+So with that new system message, I can just relaunch the chat and I can say hi there.
+And of course it has the context.
+Welcome to the store.
+How can I assist you today.
+Are you looking for anything special by the way?
+These models are super eager to to to give you their information.
+We have an amazing sale going on with most items at 50% off.
+Our hats are incredible, 60% off.
+I'm not sure what to get.
+Maybe a shirt.
+Uh.
+Uh.
+Great choice.
+We have fantastic selection of shirts.
+Most of them are currently 50% off during our sale, but if you're open to it, I recommend checking
+out our hats.
+So it's doing what we asked for.
+It's encouraging the hats.
+Uh, and you can see that it's that it's very it's persistent and it's reflecting the information we
+gave it and also the tone.
+All right.
+Let's keep going.
+We're going to add to the system message some more information If the customer asks for shoes, you
+should respond that shoes are not on sale today, but remind the customer to look for hats.
+Okay.
+Uh, so this this, uh, because it's giving more examples.
+This is the beginning of what you might call multi-shot prompting, because we're starting to give it
+different examples of how it should handle different situations.
+So I could say, hi there and welcome to the store, a fantastic sales event including hats.
+Uh, I'd like to buy some shoes.
+Right.
+Some shoes.
+Uh, we don't have shoes on sale today, but I encourage you to look at our amazing collection of hats.
+There we go.
+All right, we get the message.
+Thank you.
+All right, let's do one little bit more.
+So you can also dynamically change the system prompt depending on what's happening in the conversation.
+Uh, you can probably imagine this.
+This might be a bit of an aha moment, but look, this is super hacky and you wouldn't do something
+like this in real life.
+It's it's is to show the point.
+And this is a doorway.
+This is a path to many bigger things we'll be doing soon.
+But look at this.
+Look at what I'm going to do here.
+I'm taking a new system message called Relevant system message.
+If the word belt appears in the message that the user is making, then I'm going to change the system
+message to add in this this extra bit of information.
+The store does not sell belts.
+If you are asked for belts, be sure to point out other items on sale.
+Uh, so that only goes in if they ask for belt.
+Now.
+Obviously, as I said, this is a silly example because it's only a little bit of text.
+You might as well always put it in, but I want to highlight the point, so I put that in there.
+Otherwise this is exactly the same.
+Oh look I see I'm missing that, that that cleanup thing which if you're on Gemini that would annoy
+you.
+So let's just go and add that in right here.
+Uh, this little line here that that scrubs the history.
+We should have that as well.
+It's good for you to see me doing this.
+Just put it right up at the top there like that.
+Okay, so now let's run this.
+And now we will do this again.
+And we will say hi there.
+Okay.
+And it says welcome to our store.
+How can I assist you a fantastic sale especially hats.
+Are you looking for anything special.
+So I'll say uh, how are your shoes?
+Are shoes are great quality.
+Very comfortable.
+I should mention not on sale today, but if you're interested, we have a great selection of hats.
+Stylish hats.
+Perfect addition to your wardrobe.
+Actually, I think I want a belt.
+We actually don't carry belts in our store.
+But I'd love to help you find something else you might like.
+Fantastic sale going on and hats are incredible.
+60% off.
+All right, all right.
+It got the message.
+And so you can see, of course, the what happened here is that because I had the word belt in my my
+message.
+The system prompt had this inserted in there, this extra piece of information.
+So, so really that's that's a wrap on the lab.
+And I just want to, to just press home how important what we just did was this, this last little step
+of adding in a bit of extra context, if we needed to, to to equip the model with more information.
+This is your first glimpse into the world of rag.
+Rag which?
+Which people?
+It sounds like it's something so sophisticated.
+It's not anything much more than just saying, let's try and figure out a smart way to shove relevant
+information into the prompt, into the system prompt, which is going to equip our model to give better
+answers.
+And all of the trickery and Rag is about figuring out how can you do something a little bit better than
+something janky like this?
+If belt is, if the text belt is somehow in the user's question, obviously that's going to be very
+hacky and sometimes it will work.
+But if the user doesn't use the word belt, but says something else.
+Then it's just not going to work.
+And it relied on me turning it to lowercase.
+And so, you know, there's so much about this that's hokey, and rag is about doing something a bit
+more bulletproof and smart to select relevant context.
+And you might say, why not just always put this in the system prompt?
+You could do.
+But if this was a store which had a thousand different products, then your prompt would become bigger
+and bigger and bigger.
+With all of this information and the model's accuracy would start to degrade and you'd be spending extra
+tokens and it wouldn't be worth it.
+So this idea of selecting relevant context and adding it to the prompt a powerful technique.
+It is an inference time technique.
+It's got nothing to do with training the model.
+We're using the same model.
+We're finding clever ways to insert relevant information into the prompt to to educate the model, to
+give it expertise so it can answer questions accurately.
+Taking advantage of the fact, in this case, that the store doesn't sell any belts.
+And it brings me to the final point, which is the business applications of this are never ending.
+Conversational agents, conversational assistants, of course, super popular use case and the frontier
+models are so good out of the box at giving good answers, and the way that you can add value for your
+business is by adding expertise into the prompts.
+Of course.
+So, you know, that's how this becomes something better than salespeople.
+Just go to ChatGPT because you're able to add things, add content into the prompting to make it applicable
+to your business, and so that that is the to do for you.
+Figure out how could you build something, use this for your business or for your your home work or
+whatever, but it should be super easy to knock up a demo of having something which is answering questions,
+maybe doing a sidekick for some work that you do have something which which takes information in and
+is able to give expertise and be applied, applied specifically to your business area, to your business
+problems, with expertise in the prompt and a lot of what we're going to be doing over the course of
+the next eight weeks is about figuring out how can we, in an automatic way, improve these prompts
+to to educate our model better and better about our business and our situation?
+These are all the inference time techniques that allow you to get more from a model.
+But you've got enough right now to be building something.
+And so you should you should build something.
+You should put it in community contributions.
+You should share it.
+You also know now that in Gradio you can just put share equals true and other people can use it.
+You can use auth equals to add in some user ID and password should you wish.
+Uh and you should not only should you, you must go and do this.
+I insist and share it.
+Post it on LinkedIn so I can weigh in and I'll have a play with it as well, which I always enjoy.
+And I can't wait to see what you build.
+And I'll see you for the wrap up.
+And so that's it for week two, day three.
+And I would describe week two, day three as short and sweet.
+It was it was quite short and it was very sweet.
+At least I thought so.
+So you have reached the 20% point and hopefully you feel like a bit About 20%.
+You feel like you've got.
+You've got some material under your belt.
+Talking about belts.
+Uh, so, you know, you've got some skills, you know, the foundations of the sort of transformer
+space.
+Talk about tokens and contacts, windows and all that kind of stuff.
+Uh, you you can code with the chat completions API with frontier models.
+You know them well, and you can build now an AI chatbot assistant with an interactive UI.
+You can even share it and give it security, uh, at least basically, uh, and you also know how to
+deal with things like multi-shot prompting to give it examples and you know how to to mess around with
+the system prompt, adding in information as relevant to try and give it expertise.
+Wow.
+It's a lot.
+But next time, next time we get to tools and tools is such a big deal.
+And of course, particularly for for Agentic AI, uh, it's going to be your first first look at using
+tools.
+Super exciting.
+See you tomorrow.

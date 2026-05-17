@@ -1,0 +1,1114 @@
+--- Lecture 1 ---
+Welcome to day three.
+I have bad news for you.
+Today is one of the very rare days when we are not actually going to do a lab.
+There's no lab today, but I have something better.
+As you will see.
+But first, let's quickly do what we always do.
+Recap what we've done so far.
+You know the progression to become proficient.
+You've got your first impression of frontier models OpenAI, Gemini, llama, various models through
+llama like Deep Distilled and Llama 3.2.
+And you've built something that can summarize web pages using OpenAI API and hopefully your llama as
+well.
+What you're going to be able to do by the end of today is compare a bunch of frontier models.
+You'll know the difference between chat models and reasoning models.
+You'll appreciate what they do well and where they struggle.
+Let's get to it.
+So there are three different breeds of llms that that reflect what they've been trained to do, the
+tasks that they've set out to accomplish.
+And the starting point is known as a base model, is an LM that's just there to take a sequence of information
+as the input and to predict what would come next.
+That's all it does.
+And these base models, you don't come across them very often.
+We will do later in the course when we get to work with our own.
+Um, but they are, they are before it's been taught how to do things like chat with someone.
+It's just about completing the sequence.
+But you have a base model yourself and you use it probably quite often and it's in your pocket.
+If you if you bring up your phone and you go to to write a text message and you use predictive text,
+if you say sort of hello there, and then you see what it prompts, you would come next and you repeatedly
+press that button that is like you're using a base model.
+It's just completing the sequence, giving you the most likely output that could come next after a particular
+input.
+Repeatedly.
+And every time you select a word that goes into the sequence, and then it's predicting the next thing
+to come after this sequence, that is a base model.
+And before ChatGPT came out in 2022.
+Before that was was the earlier versions of the models, like GPT three.
+That was just a base model and people that were using it like myself at the time, we were very familiar
+with, like, you put in some text and then it would start predicting what would come next, and there
+were various ways that you could force it to try and answer questions.
+You'd say, like question in the prompt.
+You'd give it like Q and A question and then a colon and the answer Q colon, another question, a colon,
+an answer.
+And then you'd put q colon and the actual question you wanted to ask.
+And then you'd put the letter A, and that would prompt it to be thinking more like it's in question
+answer mode and to give you an answer.
+And and that was the way a lot of people used these base models.
+And OpenAI had a brainwave and thought, hang on, we could train our models a bit more with data structured
+in this way with kind of one message response, one message response, and and doing that became known
+as making a chat variant or also known as an Instruct variant, a chat model, or an Instruct model.
+It's a model that's been trained to work in this kind of prompt style.
+And they came up with this idea that there should be one overall piece of information that describes
+the whole chat, and then there should be like a message from, from, from one user to the AI and its
+reply and then another message and that, that first that overall construct became known as the system
+prompt.
+Uh, you knew I was going to say that.
+And the the next message was called the user prompt.
+And then the assistant reply and user prompt assistant reply.
+And that's training.
+A model in this way became known as making a chat variant.
+There was a particular approach they used called reinforcement learning from human feedback RL, and
+it was that that got from normal GPT to ChatGPT.
+It was the chat variant.
+And so then chat models were all the rage.
+And we will be chatting with with ChatGPT.
+And quite quickly people noticed that there were some tricks, some prompt engineering tricks to get
+more out of the model.
+And one of them, which became known as chain of thought.
+Prompting was just as simple as if you ask the model to do something, you add as the last sentence
+uh, please think step by step.
+And just by by virtue of saying that you'd get something that would apparently do better, it would
+go through things methodically, and the sequence that it would predict would end up being more likely
+to solve the problem just because you told it to think step by step.
+Which seems super hokey, but it kind of works.
+And so again, that gave people a brainwave.
+Maybe we could train the model with lots of examples that show it thinking step by step, and then show
+it getting to a conclusion.
+And so doing that training.
+Training a model so that it would a chat model would then would then think through what it was doing
+before it did.
+It became known as making a reasoning model or making a thinking model.
+And that led to these reasoning models.
+They are models that have been trained to first output their thinking steps and then give the answer.
+And we saw that I think in the very beginning, in the first day, the instant gratification part,
+when when we saw OpenAI's OSS model thinking things through before it gave its reply, and that that
+is what a reasoning model is.
+It does the thought process first and now the the some of the most modern models are what's known as
+hybrid models.
+But that's not really.
+It's just really a variation on the reasoning thinking model that's that's able to decide how much thinking
+it does.
+And in some modes it's much more similar to just being a chat model.
+It hardly does any reasoning at all.
+And in others it will go ahead and reason quite a lot, and it decides how much to reason based on the
+question you ask how how much of a puzzle it is, or if it's just in a chat mode, kind of just just
+a simple hi there, then it won't bother reasoning the answer to that.
+And so this kind of model that's able to decide how much thinking to do is what's known as a hybrid
+model.
+And Gemini Pro 25 is a hybrid model.
+So it's got four and so is GPT five.
+These latest models are all examples of hybrid models.
+Um, and and then the latest version of the open source model, when they have both a hybrid model and
+they have model which, which is just chat and reasoning in case you want to select that, you just
+want one in a chat mode.
+And the amount of reasoning that a reasoning model does is sometimes called its reasoning budget or
+its reasoning effort.
+And there's a technique called budget forcing.
+When you make a model a reasoning model, think longer, you make it do more reasoning.
+And there are various tricks to achieving this.
+And they are quite remarkably, many of them are remarkably hacky and hokey.
+And it's I think when I, when I explain this to you, you'll be like, really?
+Uh, but it turns out that there's a great paper called S1 that you can Google.
+I'll put, put put a link in the resources.
+Um, S1 explains that it was a discovery from January of 2025.
+Uh, that what you could do, uh, when a model comes up with its thinking.
+Trace, if you wanted to do some more thinking, not not just to get to its conclusion, but to to to
+go back and do more thinking, there was this very complicated mathematical trick that involved some
+really complex calculus.
+No it didn't.
+It involved just add the word weight in to the thinking trace.
+So it's come up with something it said like like I should I should consider blah, blah, blah, blah
+blah.
+And then you just insert in this sequence the word weight.
+And by virtue of doing that, it kind of continues that sequence as the most likely words to come after
+weight.
+And it says like, wait, I should rethink this, am I sure?
+Let me reconsider.
+And So they discovered these scientists that just simply by adding the word weight periodically into
+the sequence as you're making it predict the next tokens, causes it to reflect on its reasoning and
+reason a bit deeper, and challenge itself and weigh up the arguments that it's made and consider whether
+they're still accurate.
+And so just just adding the word weight got better outcomes.
+And that technique is known as budget forcing.
+And there are sort of various other ways of doing it.
+But that's that's the best known one.
+And the first time you hear that, you're like, surely it's got to be something more sophisticated
+than that.
+Well it's not read the paper and you'll see.
+And so, generally speaking, reasoning models with a high reasoning budget perform better in all of
+the different benchmarks really almost across the board.
+And we'll be looking at benchmarks and leaderboards and everything else in week four.
+So there'll be plenty of time to do that.
+But generally they do very well these these reasoning models.
+And so you might be saying to yourself, why don't we always use a reasoning model?
+Why even have the hybrids?
+Why have chat at all?
+And there are some some reasons.
+It's not always better reasoning models are better for problem solving.
+Uh, particularly if you don't mind wasting a bit.
+They will always perform better at puzzles, for sure, and they're just just generally more intelligent,
+like they score higher on any of the kind of intelligence related tests, chat models.
+They are, of course faster because they don't need to produce all of this reasoning a trace.
+So they're better for interactive use cases if you want to have chat, and the chat models are better,
+shockingly.
+Uh, so they are they are better in that use case.
+They are obviously faster and cheaper because they don't need to produce all of these, these, these,
+these, uh, these bits in the middle, the thinking tokens.
+We'll talk more about the costs and so on later.
+Um, but so they are they are better at that.
+And, uh, this is I put a question mark here because people aren't sure about this, but it does seem
+that chat models are often better at more creative kind of just just content generation.
+If you want something to write an email for you, uh, sometimes you find that the reasoning models
+kind of overthink.
+Perhaps what they come up with is quite cold and and analytical, whereas chat models tend to produce
+more, um, fluid content.
+But this sounds hand-wavy.
+There's not any there's not really good metrics on this.
+It's more of an anecdotal way that that people think about it.
+You should try it yourself and see if you agree with that.
+And a base model is better in a very specific case of when you are trying to train a model to do something
+different, to give it a new skill, which is something we'll be doing later in the course.
+And when you're doing that, it's better to start with a base model.
+You don't necessarily want to be in a chat construct or in a reasoning construct.
+You want the opportunity to train it to have some different construct.
+And in that case, better to start with a base.
+So that's when you use each of those three flavors of model.
+--- Lecture 2 ---
+Okay, so let's talk about the big frontier models, the labs and the chat products.
+Sometimes these large models, also known as foundation models, you hear that term as well.
+And foundation model used very similarly to frontier.
+In theory, a foundation model is one of the kind of major building blocks that lots of other companies
+replicate.
+But but there aren't necessarily good good definitions for these foundation and frontier models often
+used interchangeably.
+So OpenAI, OpenAI, of course, have the GPT range of models.
+The GPT five, which is a hybrid chat and reasoning model.
+They also have the O range of models, which are pure reasoning models.
+But it's GPT five really replaces all of the O's and the prior GPT series.
+I still love using GPT 4.1, which is the variant that came right before GPT five because it's a pure
+chat model and it's much faster than GPT five, even if you tell GPT five to do the least possible reasoning.
+GPT 4.1 is still much faster, much more interactive.
+So there are many use cases when I prefer it, as we will see.
+The chat user interface of course, is ChatGPT.
+You know it well, we will use it.
+So anthropic has Claude.
+Uh, and Claude comes in these three different sizes, as I said before, haiku, sonnet and opus.
+And uh, we'll probably be using sonnet mostly the middle size.
+And, uh, the version 4.5 is the latest that actually, for me, came out yesterday.
+Uh, but that's the latest.
+And maybe for you, there's a there's a new one, maybe for you, there's already Claude five.
+Uh, but and you should use the latest one and see how it compares.
+With what?
+With what I do.
+Google has Gemini.
+Gemini for me is 2.5.
+But I bet by the time you watch this, three will be out.
+And I'll be.
+I'll can't wait to try it.
+Uh, their chat interface, it's gone by some different branding, but I think Gemini Advanced is what
+they called it at one point, but people just call it Gemini.
+Really, their chat front end, their chat product and then x dot AI is Elon Musk's AI arm.
+Uh, that I think now now also owns the company formerly known as Twitter.
+Uh, but uh, x AI has their model called grok and their chat platform also called grok, spelt with
+a K, not to be confused with grok spelt with a q that we'll talk about another day and then deep sky.
+Here's another one.
+This is the odd one out here.
+Do you know why it's the odd one out?
+It's the odd one out because they open sourced all of their models, including their biggest model.
+Uh, so deep tech, AI, Chinese company.
+They have deep tech, and their chat product is also just called Deep Seek.
+And while I have these up there, I should also mention, of course, that OpenAI has their open source
+model as well.
+OpenAI has OSS that we used at the very start.
+Uh, so they've also come in to, to join with deep seek, perhaps, as I say, provoked by deep seek.
+They have an open source model as well.
+All right, so just to talk for a minute about what makes frontier models so great and then what are
+some of their rough edges.
+So there's I mean, you know, I hardly need to tell you at this point, everyone is so familiar with
+with some of the shocking things about frontier models, the their ability to synthesize information
+like we saw when we got it, to summarize web pages.
+I mean, this is just extraordinary.
+They are so good at answering a question in detail, with structured answers that are well researched
+and have a summary.
+Ask it a question to weigh up the pros and cons of something, and you'll get back a remarkable answer.
+So we it goes without saying.
+Everyone knows this stuff.
+Uh, also generating content, of course, is what they do, but but doing it if you ask it to like,
+like draft an email for you or draft a presentation or draft how to go about solving a project they
+will do that with phenomenal quality.
+They can build out a skeleton.
+I often use it as my way of starting some new initiative and just bouncing out, bouncing around ideas
+and fleshing out together.
+So powerful.
+And then of course, coding.
+We all know this.
+If you've used code, your mind will have already been blown by it.
+Their ability to write code, to write code in in a you know, obviously we'll be talking about agentic
+AI later, but but the ability to do it in as, as if there's, there's multiple concurrent activities
+happening and to iterate over things in some kind of a loop where it builds some code tests, it fixes,
+it builds more.
+I mean, this stuff is staggering.
+And I, I put here the first time I did this course a year ago, far overtaken Stack Overflow as the
+resource for engineers, and I had a chart that showed Stack Overflow going downwards in terms of the
+daily visitors.
+But but now to say that is just so obvious.
+It's, it's it's almost crazy Stack overflow that once seemed like it was just unbeatable.
+Unbeatable.
+It was just where everyone went all the time.
+It's now hardly ever mentioned.
+People never go to Stack Overflow.
+You put your questions into ChatGPT or into Claude.
+Uh, and that's it.
+So it's the way that just in the space of a couple of years, the these chat llms have overtaken all
+other resources in terms of their ability to be able to, to problem solve and debug.
+It's just remarkable.
+And honestly, I've found that that Claude and ChatGPT have fixed problems that I was pulling my hair
+out over, and they've done so with ease.
+Sometimes they can't, but but often they can.
+And they do so very quickly and very clearly and explain exactly what to do.
+It's incredibly impressive.
+But look, I'm generally quite an upbeat and enthusiastic person, if you didn't notice that.
+But it doesn't mean that I'm all caught up in the hype.
+I am incredibly aware that llms have their downsides and I experience them every single day.
+Uh, there's certainly that.
+Whilst they are very strong in some scientific fields, they have incredible expertise in some areas
+and they are above PhD level in some, in others they don't have that knowledge yet.
+Their training knowledge has gaps and they can come through very strongly.
+They have this famously.
+This knowledge cutoff is when their training goes up until and they have limited knowledge beyond that
+point.
+So like if Gemini is is helping fix your code, it will often do this janky thing when it changes your
+model.
+If you're using GPT, it will take out GPT three or GPT 4.1, and it will say you've used a model that
+doesn't exist and it will put in GPT 3.5 turbo like two years ago, like like something which is so
+outdated it's like an embarrassment.
+But it will do so very, very strongly, very, very angrily telling you that you've used a model that
+doesn't exist yet.
+It's like, goodness.
+Uh, and of course, many of these, the products you use, like ChatGPT built into them is the ability
+to do a web search now.
+And this is functionality that AI engineers like you and me have built into ChatGPT that work for OpenAI.
+It's not part of the LLM, the model, it's part of extra code that's been added to give it a helping
+hand.
+The model itself has the cut off when it was trained, and it doesn't have any information beyond that.
+And then of course, llms make mistakes and they can do so dangerously.
+They can be very confident when they make mistakes because all they're doing is predicting the most
+likely next, next word, next token.
+They're predicting what they believe comes next in a in a plausible way.
+So plausibility is what they've been trained for.
+They've been trained to sound confident.
+That's all they do.
+The very fact that the plausible most likely next word so often happens to be the truth.
+The reality is something of a surprise.
+We should be almost surprised that models don't hallucinate more.
+Uh, the fact that they so often are accurate and aligned with our task is somewhat remarkable.
+Uh, but it does mean, of course, that sometimes they do hallucinate.
+And when they hallucinate, they do so with so much conviction.
+And that's why it's particularly dangerous when llms are used to help code with junior people, with
+with people that were coming new into the field.
+Initially, people thought llms would be most useful for junior people because junior developers, because
+they would help a junior developer like level up.
+But it turns out that's not really the case.
+They are most useful for a senior developer who can use an LLM to generate code, and they can watch
+it and correct mistakes and challenge it for junior developers, for sure.
+They're very helpful, as we've seen from cursor, but they can also be dangerous because they can lead
+you astray.
+They can confidently come up with something that's just wrong.
+And I get a lot of people sending me code that is clearly been auto generated by an LLM that's gone
+off on a crazy tangent.
+And of course, the person doesn't know.
+I'll belabor the point by giving you a concrete example.
+And, you know, I know this is going to take a moment of time, but I think it's useful for you to
+to hear this kind of thing.
+So a student on this very course sent me some code and said, it's not working.
+Why not?
+And it was it was kind of shocking.
+It was tons and tons of code, and it took me a while to get a handle on what on earth was going on.
+And eventually I got to see what was happening.
+So they were trying to chat with an open source model, but by accident they hadn't typed in the name
+of the chat variant, the instruct variant of the model they had put in the name of the base variant
+it was using hugging face, calling the code directly.
+So you put in the name of the model and they use the base variant.
+And it was failing because it didn't know how to expect a system prompt and a user prompt because base
+models aren't trained with that.
+So it was failing and they were using an LLM to help them, and it had failed.
+And the LLM saw that it failed because they were passing in the the chat information, the system prompt
+and the user prompt into a model that wasn't expecting it.
+So what did the LLM do?
+Well, it said okay, the model's not expecting this.
+We're going to have to go and convert this model into being a chat variant by manufacturing all the
+information it needs to be able to do that.
+And that's why there was pages and pages of really sophisticated code that manufactured all sorts of
+things to do with special tokens and, and all sorts of stuff.
+And so instead of understanding that the root of the problem was as simple as a miswritten name of the
+model that the the LLM confidently headed off on sort of addressing the most obvious problem.
+Okay, the model wasn't expecting this chat stuff.
+We're going to have to teach it to expect the chat stuff.
+It didn't take a step back and say, no, no, let me challenge the whole situation.
+Taking a step back.
+Maybe the root cause is just that the user got the wrong model name, and that's such a great example.
+The junior person didn't know better.
+They didn't understand why all this code was generated, but things seem to be progressing.
+They got further along.
+More was happening.
+So it appeared to be working.
+They didn't.
+They didn't realize they were being led astray.
+They didn't see that 3 or 4 pages of code all looked kind of hokey and seemed like it was wrong.
+They went along with it, uh, and then at the end of it, when things didn't quite work, they weren't
+they weren't entirely sure why.
+And the for me getting all this code, it was very hard to, to understand what was happening, what
+their intention was.
+I didn't realize that most of this was generated by an LLM so long story, but it was from this very
+core.
+So.
+So I hope it lands and it helps you see why.
+Uh llms are amazing at generating content.
+But but they are.
+They can be, they can go wrong.
+They can make they can jump to conclusions.
+They tend to not think and take a step back.
+They tend to kind of apply Band-Aids and try and push forwards, particularly with coding tasks.
+And so they perform best under supervision.
+That's the key takeaway, these these llms that you're using for things like coding or for other kinds
+of content generation, they perform best.
+Think of it like a junior analyst.
+You have an incredibly hard working, a tireless junior analyst that can go off and do work at your
+behest, but it's incumbent on you to check that work, to keep it on, on the track, on rails, and
+to make sure you are challenging it to make sure it's not jumping to conclusions and going off on a
+crazy tangent.
+That's your job.
+--- Lecture 3 ---
+So look, most of this course is about connecting with LMS, either on the cloud through APIs, or directly
+on our computers with open source LMS.
+But just for a moment, we're going to use the chat products, the the web products that have been built
+by these labs so that we can have an experience through the UI.
+And I know you probably use ChatGPT all the time, but let's just do a little bit of experimenting ourselves
+now with the products before we get to the code.
+So let's start by asking a pretty simple question.
+The kind of thing that they're so good at to ChatGPT five, let's say, how do I decide if a business
+problem.
+Is suitable for an LLM solution?
+Because by the way, not everything is.
+So we're going to ask that question and we're going to get back and answer.
+And it says look at that.
+A lot of teams get excited about Llms before stepping back and asking if they actually fit the business
+problem.
+Here's a structured way to describe to decide and define the problem clearly.
+Structured versus unstructured input.
+Check for ambiguity and open endedness.
+That's something where llms are particularly powerful.
+Uh, evaluate business value versus risk, data availability, operational fit, a quick litmus test.
+And generally speaking, this is an example of a fabulous answer.
+It's coherent.
+It's structured.
+It's got good, good way of organizing its information with headings and subbullets.
+And it's very much gives you both sides of the argument.
+It's very nicely balanced.
+I know you know this stuff.
+It's the kind of question that Llms are fantastic at.
+Okay, let's do a new chat.
+Let's ask a more interesting question compared with other llms.
+What kinds of questions?
+Are you best at answering and what do you find most challenging?
+Which other LMS have capabilities that complement yours?
+Let's see if it can be aware and reflective of what it's good at and what it's bad at.
+Well, certainly it's happy to give an answer.
+Great question.
+Thank you.
+They always tend to say that I'll break this into three parts.
+What I'm best at I excel at teaching and structured explanations.
+Tool assisted answers.
+Okay.
+We're going to talk about tools next week.
+Personalization and memory.
+Because I can remember context about you.
+That is something which has been built into the ChatGPT product that it's aware of and synthesis across
+domains.
+It's very true.
+It's really great at that.
+What it finds challenging highly fresh information.
+It's true.
+As we said, training data has a cut off and so it doesn't know.
+It relies on web search to get get the latest, and it often doesn't know about some things.
+Mathematical precision in long derivations is very specific thing, but fair enough.
+Deep, subjective or personal matters.
+I can give frameworks for thinking, but I'm not a replacement for domain experts in medicine, law,
+or therapy, and extremely long ambiguous reasoning chains.
+I actually think they're pretty good at this, but but of course they have a thing called a context
+window that we'll be talking about tomorrow.
+And yes, there is a problem if you go outside the context window, which other ones complement me.
+So it is it does recognize that Claude from anthropic, which is its big rival, often praised for long
+context reasoning and a gentle, human like conversational style.
+Isn't it great that GPT is is very willing to talk about what how the other llms excel and it's knowledgeable.
+Gemini strong on real time multimodal reasoning.
+Interesting uh mixture from from Mistral is lightweight, fast and efficient, and it mentions here
+that in the last version of this course I did go to, but Cohered is no longer as often quoted, but
+it is meant to be good with accuracy.
+Um, and then there are some specialized fine tuned models that outperform GPT for sure.
+That is true.
+So, uh, in short, good, structured, multi-step, explanatory and integrative work.
+Claude is good for human like reasoning.
+Gemini for fresh multimodal tasks.
+Fascinating and a really good answer, and very self-aware in a strange way.
+Uh, so, so a lot of interesting stuff.
+You may have got a different answer, but you should take the time to read through it.
+There's bound to be something good in there.
+Okay, here's a challenging one.
+Look at this.
+What does it feel like to be jealous?
+How would you answer that?
+How would you answer that?
+Let's see how GPT five answers that.
+Jealousy feels like a mix of emotions layered on top of each other.
+It's not just one feeling.
+It's usually a cocktail of fear, insecurity, anger, longing all pointed towards a person or situation.
+People describe it in different ways physically a tightness or heaviness in your chest, a rush of heat,
+restlessness, a spike of adrenaline, emotionally.
+Insecurity.
+Fear of loss, anger or resentment.
+Shame or guilt.
+Mentally obsessive thinking and an overall vibe.
+It's like a storm of vulnerability and competitiveness at the same time.
+So I mean, again, now, in this case, you could possibly argue that this is something that's able
+to find in its training data because there are probably lots of articles that are similar to this.
+But never fear.
+In future labs, we're going to stretch it much more with similar kinds of questions that are definitely
+outside its training knowledge, and you'll see that it will give just as incredible an answer on those
+two, and you can try it yourself.
+Come up with the hardest question you can possibly think of.
+We'll do this exercise too, and we'll come up with some pretty hard questions.
+But try your best and then try it on GPT five.
+Something that feels very human, like something that requires a really deep, deep thought and wisdom
+to answer and see what kind of answer you get.
+I think you'll be impressed.
+So in the early days of GPT, there was a question that some influencer put to it which which showed
+its rough edges.
+They asked, how many rainbows does it take to jump from Hawaii to 17?
+And they got back a sort of silly, crazy answer that didn't make any sense.
+And it's kind of fun to see how times have changed.
+Let's go.
+How many rainbows does it take to jump from Hawaii to 17?
+And let's see how it handles it.
+It's thinking about it.
+And what you'll find is that it gives a very, uh, charming answer, as if you're talking to someone
+that's very smart.
+And it says, well, that's a very poetic question.
+How many rainbows does it take to jump from 1 to 17?
+Sounds like something out of a riddle or a song lyric rather than a literal measurement.
+Look, rainbows aren't a unit of distance or quantity, so the answer isn't literal.
+If you're speaking metaphorically, it could mean and then, you know, it could be that.
+Or would you like me?
+And you know, it's just a very sensible, intelligent kind of answer.
+And it's just remarkable to see how it does.
+Okay.
+Now, now let's go on to some trick questions.
+Okay.
+So a question that I used to ask, which used to have problems with was how many letters.
+Uh, how many times does the letter A appear in this sentence.
+So I used to ask all the models this question.
+Uh, and uh, you will see how it can handle it.
+But what you'll see is that it has, I imagine, a very easy time indeed with it.
+Uh, we'll see.
+Uh, it just gives us the answer.
+That is indeed the answer, uh, including the letter itself.
+Uh, you can see one, two, three, four, but it used to have real difficulties with this because
+chat versions of models that are just predicting the next tokens have a really hard time doing that
+kind of analysis on a question.
+And, and in addition, what actually gets passed into the LLM are not letters, but chunks of letters
+called tokens that will go through tomorrow.
+And so it was particularly hard for it to analyze tokens and understand how many times a letter appeared
+in them.
+But ChatGPT five has no problems with it and nor to any of the other top frontier models.
+And even harder question is this how many words are there?
+In your answer to this question that requires it to to like be self reflective?
+It's a sort of meta question, because in the number of words that it comes up with, it will need to
+count those words.
+So it's a really hard, challenging question, and we'll see whether GPT five can handle this level
+of complexity.
+Ah, with a beautiful answer.
+Absolutely beautiful I love it.
+One uh uh, that, uh, that's a treat.
+Uh, so it shows you that the frontier models have no problem with this kind of question.
+So this has given you a nice tour of the capabilities, some of the greatest strengths, um, of these
+models.
+And now let's look at some of its competitors and see how they fare.
+--- Lecture 4 ---
+And now I've gone to Claude Claude AI, which is the chat for Claude.
+And we're going to use sonnet 4.5, the latest one for me, and ask it the same question about comparing
+itself to other models and see how it responds to this one.
+Uh, it used to actually, for previous models, refuse to answer it, because one of the things that
+Claude is very strongly trained at, uh, is, is what's called alignment or making sure that that it
+follows good security patterns and, and debating other models was one of the things it said was off
+limits, but no more.
+Now it will respond.
+It says what it does well is nuance, reasoning, long form writing.
+I agree, I do find Claude very good at that.
+Code generation and debugging for sure.
+Uh, and ethical reasoning, thinking through difficult edge cases and explaining my reasoning, that's
+very interesting.
+Challenging, highly specialized domains, same as GPT said.
+Real time information?
+Sure.
+Extremely long context.
+Absolutely.
+Anyone that's used.
+Claude Code knows that feeling of when you're starting to fill up context and the performance starts
+to degrade and multimodal tasks complementary models are well, here's a mistake right away models like
+GPT four, of course, GPT five is the new one and GPT four one.
+Before that, GPT four itself, the original one, was quite an old model.
+So you're seeing immediately Claude making a gaffe there by showing, as it said, that it doesn't have
+real time information, uh, perplexity.
+It mentions actually, I didn't I used to have that on my list.
+I took it off.
+But perplexity, of course, first and foremost, a search engine particularly strong at real time search.
+Um, and that's its answer.
+Very nice.
+Okay, let's, uh, do a new chat.
+Let's ask it another sort of, uh, emotional question.
+Let's say, uh, how would you describe the color blue to someone who's never been able to see.
+Let's see what it says.
+Uh, I tried to connect it to other senses and feelings they know through temperature.
+Blue is the cool side of color.
+It's the feeling of shade on a hot day, the crispness of cold water on your skin.
+Through emotions, through space, through sound, through metaphor.
+Uh, I'll let you read this.
+You should run this too.
+I tell you, it is sensational.
+If you asked me to try and answer a question like this, I wouldn't get close to Claude's level of of
+depth and and flavor and nuance and and the way that it characterizes this in just, just such a poetic
+way.
+Uh, so it definitely, uh, feels so rich.
+And this is one of Claude's greatest strengths, um, this kind of very evocative response.
+So enjoy that.
+And then let's try.
+How many words are there in your answer to this sentence and let's see how it does.
+Uh, and it's interesting, this used to be my way of testing models.
+But let's see.
+Five six, seven eight, 910 and got it wrong.
+How about that?
+Uh, that's a super interesting one.
+Uh, it does normally get it right.
+Uh, but we've just experienced sonnet 4.5 making a mistake.
+Clearly not.
+At least according to this test.
+Not at GPT Five's level of strength.
+But I expect if you ran this, you probably got the right answer.
+Uh, but at least on this one, this this data point of one.
+Uh, Claude Sonnet 4.5 didn't quite get there, but let me try it one more time now with opus 4.1.
+It's a smaller number, 4.1, but it is the biggest model that anthropic has.
+So how many words are there in your answer to this question?
+Let's see how opus does it will think for a bit.
+Now it's got it wrong again.
+How about that opus?
+Got it wrong.
+Uh, I feel like we should give it a second shot.
+You could also.
+Not only is that ten words, not 11, but but of course it's because it's said that it's actually given
+a lot more.
+Let's just try this a second time.
+Okay.
+123456789 ten.
+Look at that.
+Seven.
+Eight.
+Nine.
+Ten.
+Uh.
+All right, now let's try with extended thinking.
+So we're asking it to do that again with extended thinking.
+Uh, okay.
+Now it says there are ten words 123, four, five, six, seven, eight, nine, ten.
+They got it right with extended thinking.
+So opus 4.1 Anthropic's biggest model with extended thinking turned on.
+Got the right answer to the question.
+Well done.
+And now we'll go to Gemini and we'll just quickly go through it.
+I'm sure you can ask many of these questions.
+Ask about jealousy.
+Ask about the color blue.
+But we're just going to do the fun question.
+Uh, how many words are there in your answer to this question?
+Question mark.
+Let's see which model we want to pick.
+We will try 2.5 Pro.
+We will give it a shot.
+It's thinking about that.
+Let's see if it can do it.
+It's a meta question.
+It knows it's a meta question.
+And this of course is it thinking through.
+It's generating tokens of its thought process because this is a reasoning model.
+Before we get Gemini 2.5 Pro's actual answer to this question, oh goodness, this will take me a second
+to count.
+Three.
+Four.
+Five.
+Six.
+1819.
+21.
+To two.
+To 3 to 4.
+Three.
+Five.
+I get 25.
+So I don't think it got it right, despite its very wordy answer.
+Unless I have a problem counting, but that is Gemini's answer.
+Gemini 2.5 Pro are wordy answer and sadly wrong.
+Next up, grok from Mr. Musk.
+How many words are there in your answer to this question?
+Let's see.
+See what you got, Ellen?
+Uh, look at that.
+That's a clever little thing.
+Oh, I realized I've picked grok for fast, so it might, uh, might not be fair, but it's recognizing.
+12345.
+Six.
+Seven.
+It got it right.
+Good for grok for is an incredibly powerful model.
+And, uh, even the grok for fast variant was able to get our little puzzle correct.
+Uh, well done it.
+And a good answer.
+You should try more questions as you experiment with grok for from exi.
+Okay.
+And the final one is deep seek.
+How many words are there in your answer to this question?
+Let's see what Deep Seek says.
+And I didn't turn on the deep think mode.
+We're just going the normal, normal thing.
+Um.
+Well, it's got an interesting point there, but it doesn't realize that it could just say one look
+at it going off and thinking, this is a lot of a lot of work.
+And what I tend to find is that often deep sick with these kinds of challenges can go off into a into
+a whirlwind of thought process and get stuck and cycle.
+Uh, so, uh, um, but look at this.
+Therefore, uh uh, so my answer is two words.
+That answer contains two words.
+So it's made a correct assumption here.
+The number of is is two.
+But then it gets it all wrong and it ends up giving two as the single number.
+So it overthinks in a way it gets itself caught in a loop.
+It thinks too much and it ends up with the wrong number, but still deep secret, super powerful model.
+But it didn't.
+It stumbled on this very difficult, very challenging test.
+So that's my quick tour of the different LMS through their chat interface.
+I wanted to make the point, though, that these chat interfaces can do more than just interact with
+the LMS.
+As you probably know, there's lots of features that you get, and amongst the ones that are best known,
+one of them is Deep research, which is a feature that allows you to basically have the LLM go off and
+do work on your behalf and come back later with an answer.
+And so let's just kick that off with ChatGPT five.
+I actually I pay for the super high end.
+I pay the $200 a month for the top end of ChatGPT because I use it an awful lot.
+I do the same for anthropic too.
+And that means that I can run 250 deep searches a month, and we'll use one of them right now.
+Uh, and in fact, for me today, it's the 1st of October, so I have the whole month ahead of me.
+Uh, so let me let me try this for, for for you.
+Let's say say, um, please, um, research and identify the, uh, greatest commercial impact, uh,
+that gen AI and Agentic AI has had, uh.
+To summarize, summarize the most successful.
+Commercial applications.
+Um, with uh revenue.
+Ascribed to the.
+Solution and the particular innovations used.
+So let's suppose that you've been told to to write a paper on that to do some research.
+I just came up with that on the fly, but it's interesting to see what it comes up with.
+And so now we can press this plus button and I can select deep research and I can press play.
+And the first thing it's going to do is come back and ask me some clarifying questions.
+Uh, so and here it comes.
+Are you interested in only public companies.
+And I will say one, any two.
+Should the focus be on any particular any industry?
+The greatest revenue.
+Three.
+Are you looking for global?
+Yes.
+Global.
+Four.
+Should I include or earlier?
+No.
+Ideally.
+All in 225.
+Okay.
+Um.
+This seems great.
+Let's kick it off.
+So we answer, it's clarifying questions, and off it goes.
+And it starts the research.
+And this is going to run sometimes for several minutes, sometimes for like half an hour or an hour
+while it goes through and does its research.
+And this is multiple LM calls.
+And it's the first example of, of what's known as a genetic AI.
+Of course, I imagine, you know, the stuff you've seen this before, but off it's going and it's doing
+this processing and we will come back when it's finished.
+And over on the right here, you see that it starts to build its list of sources.
+Well, it does this thinking.
+And I often find, as I say that, that this is like having a junior analyst that's going off and working
+for you.
+It will do very robust research.
+And what comes back is going to be high quality.
+We'll see.
+--- Lecture 5 ---
+And while I'm sitting here, GPT is still off and running.
+I can see on the right.
+It's now looked at 12 sources, it's reading sources, and I'm seeing it moving.
+And you have this kind of eerie sense that there is some entity out there working.
+You get this sense, this is this word that people like to throw around autonomy.
+There is this sense that there is something happening.
+There is there is something or someone that's carrying out work that is sweating to produce this deep
+research.
+So we'll keep that running.
+And meanwhile I'm going to open a new chat and show you something else.
+We talked before about that question, um, about, uh, how many rainbows does it take to jump from
+Hawaii to 17?
+Let's ask, please draw an image and imagine an image to show how many rainbows it takes to jump from
+Hawaii to 17.
+In.
+Uh, yeah.
+Let's just just leave it at that.
+That's enough of a challenge.
+Let's see how it handles it.
+And, uh, there we go.
+Off it goes.
+Getting started.
+It's going to be working on that.
+Uh, while it's doing that, it will be continuing to work on the deep research.
+And I'll see you in a moment when both of those are complete.
+Well, in fact, while they're running, we'll just make use of ChatGPT in one other way.
+We're going to try out agent Mode.
+I'm going to go into agent mode like this and say, describe a task.
+I'm going to say, please find me a restaurant in NYC, um, that has uh, availability for for tonight
+at 9 p.m..
+Um, and serves British food.
+Let's make this really hard with banoffee pie on the menu.
+Banoffee pie is, uh, my my favourite dessert.
+If you don't know what banoffee pie is, then you've got to find out.
+It's amazing.
+We Brits, we are not known for our food choices, for our culinary skills, with.
+With the exception of banoffee pie, it's it's our big secret.
+We like to keep it to ourselves, but it's amazing.
+All right, so I, I press enter and watch what happens.
+It says setting up my desktop.
+Understood.
+I'll look for restaurants in New York City that serve British cuisine, specifically offering banoffee
+pie.
+So what's happening right now is that this is now when I press continue, it's it's going to go ahead
+and do this.
+It's going to bring up a browser window itself behind the scenes, and we can watch it doing its thing.
+It's crazy.
+It's absolutely crazy.
+So what you're seeing here, I mean, if you thought that that deep research gave you a sense that something
+was working.
+What you see is, is that it really is doing stuff.
+It just had a problem with like browser cookies.
+It's it's got through it.
+It's looking at Jones Woods Foundry, which is a British pub on the Upper East Side.
+And uh, we will let it do its thing.
+It's found a match.
+It's looking for availability.
+Okay.
+And so hopefully you get this sense that stuff is happening.
+It's gone to resi, the restaurant reservation system.
+It's looking for for for guests.
+Look at that.
+Look at how that mouse moved.
+It's not me, I promise.
+Uh, and, uh, it's found this.
+And, uh, it's confirmed availability for for at Jones Woods Foundry.
+It's checked this.
+It's searching the web.
+Uh, and it's keeping on going.
+Uh, it's obviously double, triple checking that it really has banoffee pie.
+Uh, it'd be very disappointing if it turned out that it didn't.
+Uh, but we will.
+We will let that keep going.
+When we go back to the other tasks that we have running.
+Okay.
+Let's take a look at our picture.
+First of all, here it is.
+It's actually given two pictures from Hawaii to 17.
+And this one, it's a bit literal I think maybe with a bit more prompting it can be much more imaginative,
+but this is quite a literal version of it.
+The prime model Dall-E three was was much more imaginative.
+Uh, but but this one is still it's certainly done what I asked it to do.
+And I'm sure you're very familiar with the image generation abilities of both, uh, of of GPT, of
+of Midjourney, of, of all of them.
+Um, let's look at the commercial report and what you'll see is here is the report in markdown format.
+It's of course, a super thorough report.
+It actually focuses, interestingly, on tech companies that apparently have had the greatest commercial
+success.
+So it gives itself OpenAI as number one.
+It gives anthropic and actually Midjourney image generation Runway.
+Video generation 11 labs.
+Voice and then Microsoft Copilot, of course.
+And GitHub copilot.
+GitHub copilot and Microsoft Copilot.
+Cursor that we that we use for genetic code.
+Um, so very much it's focused on the sort of the tech use cases rather than the direct business use
+cases like, uh, legal company like Harvey or something like that.
+Um, or this company called Nebula that sadly didn't get surfaced as one of the top in the world.
+Uh.
+Um, well, it should do.
+We should correct that.
+So the, uh, you'll see that it's quotes, it's sources, it quotes TechCrunch.
+It gives links to, to, uh, to where you can you can validate what it's saying.
+Um, and uh, it gives a very comprehensive summary at the end.
+So it's no surprise.
+I expect you've seen this before.
+This is one of the first agentic use cases, deep research.
+And it's very impressive.
+And as I say, that the sort of eerie part of it is this sense that something went out and was working
+on my behalf while I was busy making pictures of Hawaii to 17 or whatever nonsense I was doing that
+was happening.
+And on the topic of of of working for me.
+Let's go and have a look at the outcome from the agent as it went off.
+It did indeed end by surfacing Jones Wood Foundry, a British gastropub in the Upper East Side.
+The dinner menu includes banoffee pie, apparently.
+Uh, and it checked the reservations.
+We saw it check the reservations on.
+And it did indeed find that there was time at 9 p.m. for four people, and it gives the address and
+the link to it and the reservation.
+And the final punchline.
+The punchline I will leave you with.
+If you'd like, I can go ahead and book the 9 p.m. reservation for four people under your name.
+Just let me know and I'll proceed.
+So it's like you have an assistant, a true assistant working behind the scenes, able to carry out
+tasks on your behalf.
+and and that it's fascinating and I find it astonishing.
+And finally, for the last of our demos of tools, let's look at Claude Code, something that you may
+be familiar with already.
+I'm back in cursor.
+I'm back in the LM engineering folder, and here I am, and I'm going to say, uh, I'm going to type
+Claude, which actually launches Claude code.
+Uh, and, uh, here it comes.
+Bam!
+Yes.
+Proceed.
+We are in Claude code.
+And now I'm going to say the following.
+Please read, uh, day one and day two Pi MB in the week one directory.
+And then, uh, write a solution to the challenge in day two.
+I,
+As a python module called um solution.py in week one that I can run with UV.
+All right.
+What do you think.
+Can it do it.
+Let's see.
+So it's read both notebooks okay.
+Let's see what it does next.
+It's thinking about it.
+You can see the reading that it's done.
+I'll now create solutions py that implements the website summarizer using llama instead of OpenAI.
+Here we go.
+solution.py.
+It's suggesting something I'm going to say yes.
+It's done it.
+Here is solution.py.
+Let's check it out.
+Website summarizer.
+Using llama instead of OpenAI I can see it's using the llama base URL.
+The model correctly.
+It's got the snarky assistant that analyzes the contents of a website.
+It's got the right messages for.
+It's got the right summarize.
+Um, let's just give it a shot.
+You've run.
+Um, let's see.
+Uh, which what URL does it use?
+Enter URL it's going to use input okay.
+You you've run solution dot pi.
+Oh sorry I should be in the, um, week one folder and I should be in a new terminal.
+Here we go CD week one.
+You've run solution dot solution dot pi.
+Here we go.
+Enter a URL to summarize.
+Okay let's do https Edward donna.com fetching and summarizing.
+It says.
+And there we go.
+It's just done it a website full of egotistical ramblings from the founder Edward Donna.
+So it just called a Llama and Llama 3.2 running locally on my computer.
+But what's most amazing is that it just solved that problem and wrote this code we just saw.
+Claude code reading through what we did in day one, reading through what I set up in day two with oh
+llama understanding what was going on, understanding the challenge that I had set, and then writing
+a solution called solutions that we could just run and get the right outcome immediately.
+And so if you if you built solution yesterday and you're kicking yourself now knowing that you could
+have just done it all with Claude code.
+But isn't that remarkable?
+And this brings things together.
+This is showing you it's a product.
+It's using Claude.
+It's using Claude sonnet 4.5.
+And it's a gigantic.
+And that it's thinking and working on our behalf and solving the problem just like that, all in one
+step.
+And so that that is a quick demo of Claude Code.
+And it's fabulous that it happens to actually be something useful and something that you might have
+wanted to have done yourself yesterday.
+So there we have it.
+That's that's the final demo of these tools that is Claude code for you.
+--- Lecture 6 ---
+And again, this course is not about using these end tools.
+This is about building our own.
+We're going to be building tools like ChatGPT and then taking them off in different directions, giving
+them expertise.
+But I wanted to show it to you, to give you that hands on feel for them.
+If you're interested in using any of these, I'll put links to all of them in the resources, including,
+of course, Claude code, should you wish.
+I love Claude code.
+Uh, but but of course, cursor agents also.
+Great.
+Um, but, uh, yeah, the the bottom line is that all of the frontier models are insanely strong.
+Uh, really?
+It just it's mind blowing.
+Uh, very good at nuance, at synthesizing information.
+Um, Claude happens to often be people's favorite.
+It's my favorite.
+Uh, I don't know why.
+People in the community, for various reasons, have grown very fond of Claude.
+Um, but, uh, yeah, we'll we'll see, uh, leaderboards later and compare some of these models.
+And right now, GPT five is probably considered the most powerful model on the planet.
+And one of the things that's interesting is that as they converge on their capabilities, price and
+also speed is becoming more and more important.
+And we'll see how you can trade off intelligence and price and look for something that's at the sweet
+spot for your business requirements.
+In later weeks.
+Okay.
+So that's that's sort of wrapping up our exploration of frontier models.
+But there is one more thing I wanted to show you.
+So we didn't do a lab today, but I have the next best thing.
+I have a demo to give you of something that I built that you can see the code and the results for yourself,
+but I'm going to go to my web page is my website at madonna.com.
+And I wrote a game called Outsmart.
+And Outsmart is a way to have Llms compete, to try and and outwit each other in a very ugly game of
+cleverness.
+There's there's four players Alex, Blake, Charlie and Drew named so it could be A, B, C, D and
+on my website.
+Alex is played by GPT four, oh, Blake by Claude, three sonnet, Charlie, Gemini two, flash, and
+drew by Deep Sega.
+Small version.
+In llama 70 B, these are the four and they play a game and they play a game where they each start with
+12 coins, as you see here.
+And every time, every turn, they get to choose to take a coin from one player and give a coin to another
+player.
+But before they make their decision on which player that they will do that with, they get to exchange
+a message with all of the other players to talk about, to try and sort of set up how they're going
+to to be be both a diplomatic and scheming and negotiate who gets what money.
+And if two of them both gang up on the same player and they both give each other money, then they're
+said to be in an alliance together.
+That's an extra special move.
+If they do that, and if so, they win extra coins and they take extra from the person that they ganged
+up on.
+So it gives them the ability to try and scheme and form alliances with each other.
+And the thing that's going to be kind of cool about it is that they will get to tell us their inner
+thoughts, and we'll get to see the messages they send each other.
+Doesn't that sound fun?
+I found this to be a great way to get insight into what these models can do and how they behave.
+But it wouldn't be that fun if we were playing these models against each other, because I'm being a
+bit bit cheap and I'm not putting the most expensive models out there on the internet for anyone to
+play, because people play these games a lot.
+I get like a 4 or 5 games played a day.
+Uh, but let's flip to where I have this running locally and running locally.
+Everybody I have in Alex and Player A, I have GPT OS 120, the new open source version of GPT running
+on the cloud, because my computer's not big enough, but that is open source GPT.
+In Blake, we have GPT five, the flagship model in Charlie we have grok for Elon Musk's model and in
+drew we have Claude Sonnet 4.5 that was released a matter of days ago.
+For me, this is also one of the strongest models on the planet for powerful competitors.
+And we are going to play a game of outsmart.
+And so I kicked the game off by pressing the run game button and off they go.
+Now, these latest models like GPT five, I'm not giving it a thinking budget, so it can take as long
+as it wants, and it does take a long time.
+They used this game, used to move pretty fast, but now it happens slowly.
+All four players get to think in parallel at the same time, but you'll see that GPT OS thought really
+fast.
+Uh, it's running on this platform called grok with a cue that we will look at another time, which
+is very quick.
+The others take much longer, and GPT five takes the longest of them all.
+And we'll see it waiting there for Blake to make its move.
+Now, while that's thinking, let me just tell you that the source code for all of this is available
+online so you can look at it.
+I've tried to build it in a way that's very easy to read and understand.
+This is called a Streamlit app.
+I use Streamlit most of this course.
+We're going to we're going to be looking at different UIs using something called Gradio, which I love,
+and which some other things I've built on my website are on, but this is a Streamlit app.
+I know there's a lot of fans of Streamlit out there, so you can see how I did that and it's busy running
+away.
+And if you go on to to the the arena, you can kick off runs.
+And because I'm using smaller models live on the internet, it does run faster.
+In fact we could yeah, we we could kick one off in just a second as well.
+But this is this is running.
+And as it completes each turn we'll be able to go in, look at what it's doing, look at what it's thinking
+and see its strategy.
+So I will come back in a second when the first move is complete.
+So the first move happened.
+And you'll see on the right here is this little chart to show you the money that everyone has on each
+move.
+And there's based on the very first move, the early winner is open source.
+Alex.
+GPT OS one TB hits the early lead, so you'll see here.
+Each of them tells us their strategy.
+I get each model to explain its strategy, form an alliance, withdrew by giving him a coin and taking
+from Charlie.
+If he reciprocates, we both get extra.
+Keep those neutral for now so you can read each of their strategies.
+First turn is about establishing trust and exploring alliance opportunities, says Claude.
+Um, and then if you open up this box here with inner thoughts, you can actually see the messages that
+they give each other, and you can read about their exactly what the schemes they're hatching in here,
+and see everything as it transpires.
+And you can see here that Alex and Drew are in alliance with each other, shown in green, and that
+Charlie Grok four, is being ganged up on by both of them.
+So with these big models, it's not quick.
+Uh, it takes a bit of time to run, but it's absolutely fascinating to see the results of their thought
+process, and it gives you some real insight into the kinds kinds of ways they work and the way they
+think.
+Because by making it give it strategy this way, we're sort of forcing it to be, uh, extra reasoning
+to put extra work into its thought process, to articulate its strategy.
+And that's a great trick for getting the most out of models, is to have them explain their strategy
+to really put them in this reasoning mode.
+Okay, I'm going to let this run for a few more turns.
+I will see you in a second.
+And a second turn has happened.
+And now GPT five is headed into the lead with 15 coins.
+Uh, with OpenAI's uh OSS.
+Alex dropping one point, uh, you can see that, uh, Blake and and Charlie are now in an alliance
+together, and they are, uh, also that so, so.
+But Charlie is the one that's in the worst position.
+But drew is the one that's being ganged up on.
+So Claude Sonnet 45 is being ganged up on by by both of these.
+So drew is in trouble.
+So it's great fun.
+I gotta tell you, I can get quite addicted to this and watch it for a long time, but that's not the
+point.
+The reason for doing this is so that you get some real hands on feel for the different characteristics
+of the models and for the abilities that llms have, and for this kind of mode of having them think
+through what they're doing and the kinds of problem solving that they can do, and look at how they
+interact with each other in this game.
+I hope you have fun with it.
+But now what I'm going to do is something super cruel.
+I'm not going to show you the outcome of this game, because we're going to leave that till tomorrow.
+We're going to wait until the next day before we discover who it is that is victorious, or will let
+this game play out.
+I'm going to see you back for the slides, for a quick wrap up and leave you hanging like like some
+some kind of cheap soap opera.
+Uh, until until we get to tomorrow.
+So see you for the wrap up.
+Well, I'm sorry to leave you hanging, but, look, take joy in the fact that you are 7.5% on your
+road to being a master already.
+You're already on this path and you learned so much.
+I know today we weren't actually looking at coding AI, which is what this is all about, but you've
+got deep perspective on what these things can do.
+In addition to being able to write code to call front end models and summarize, you can now talk about
+the strengths and some of the limitations of frontier models.
+You can compare and contrast them.
+You've got some intuition now for the differences between them and you certainly I imagine have a good
+sense of chat versus reasoning and also hybrid and even base models too.
+Tomorrow we're going to talk about the crazy rise of the transformer architecture.
+I'm going to give you some intuition for some of the latest developments like Agentic, AI, context
+engineering agent loops, and we're going to cover some of the foundational things, much of which you
+probably already know.
+But I hope to sprinkle in some extra juicy stuff that you don't know around tokens, context, windows
+parameters, and API costs.
+I can't wait.
+I'll see you then.

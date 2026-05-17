@@ -1,0 +1,790 @@
+--- Lecture 1 ---
+
+Have you enjoyed week two?
+Have you?
+Because I've saved the best to last the fifth day of week two.
+A big old conclusion.
+I'm gonna.
+I'm gonna really tie this one up with a bow already.
+Of course, you've had your overview of Transformers key terminology.
+You can confidently code with the Chat Completions API, and you built an AI assistant with tools for
+expertise.
+Today is big.
+Okay.
+I'm going to start with a little bit about agents Agentic AI what it is.
+And then we'll talk about agents carrying out workflows.
+And we will complete our AI assistant.
+And it's going to be gorgeous.
+Let's get to it.
+So first off to define agents I'm going to give you a couple of different definitions.
+And there's a famous meme that people have so many different meanings and interpretations of the word
+agent.
+It's almost become a joke that you can't really define agents, or it can be anything you want it to
+be.
+But I feel like there have been two definitions of agents that have really taken hold.
+Uh, a lot of things, really, that there's a sort of loose definition which I don't adhere to, which
+is calling something agentic if it involves multiple calls to LMS in the early days.
+That's what we used to say.
+Anything that that was about multiple LM calls stitched together was considered an agentic workflow,
+an agentic pattern.
+And you can still kind of say that, but not really.
+Really.
+There are two prevailing definitions.
+And the first of them is where you have a system that the LM controls the workflow.
+So an LM that's able to determine what should happen when and sort of stitched up with that is this
+idea of autonomy and LM that is able to make decisions.
+And again remember always stay grounded.
+LMS only generate tokens.
+That's all they do.
+They predict likely next tokens.
+So when I say LM controls the workflow I mean an LM predicts tokens.
+And those tokens can be interpreted to control the workflow.
+All right.
+That's definition one.
+Definition two is a newer definition that's really surfaced recently.
+And it's about an LMN agent runs a tool in a loop to achieve a goal.
+And that gives you this kind of Claude code sense of an agent that sort of has an ongoing thought process.
+And this is the sort of new emerging definition of agents that's taking hold.
+But as I say, many definitions and you can really call whatever you want an agent.
+But but these are some of the flavors that would make sense.
+And there tends to be some characteristics about about agents or hallmark features that you look for.
+An agent typically has memory persistence in some way.
+It often has the ability to do planning to be able to to plan activities in advance.
+There is this sense of autonomy, which again, it's one of these words that's thrown around a lot.
+But the idea is that you're using the fact that an LMN generates tokens as a way of allowing it to make
+decisions about what should happen next.
+And the ability for an LMN to be orchestrating, to be deciding what happens next, using tools, in
+other words, tools that can call other LMS alums and people that have taken the course know it doesn't
+have to be through tools.
+It can be because it's generating JSON output, structured output, and you're interpreting that structured
+output about what what agents do next.
+And the people that really know this stuff know that those two things are basically the same thing,
+that generating structured outputs and using tools is basically the same thing.
+But anyways, I digress.
+The final thing is just to say an agent is something which which uses tools.
+Generally it's equipped with tools so it can take different actions as a result.
+So those are some of the features, some combination of those features.
+The more of them you're ticking off, the more likely it is that you're working with a genetic AI.
+And now we're not about to go and do all of those things because I do them on my companion course,
+a genetic AI and anyone that's come from there knows it full well.
+We use agent frameworks to help and do do all of these things, but what we're going to do today is
+just sort of baby steps in that direction, adding a flavor of agentic behavior.
+Here we're going to do three things.
+We're going to add image generation as a separate LM call that can generate images and then throw that
+on our UI.
+We're going to also we're going to stitch this together, making a bunch of LM calls.
+That's going to create sound as well.
+And then we're going to put that into one nice solution.
+So as I say it's not it's not perhaps uh, full Agentic AI, but it's definitely a step in that direction.
+And it's making healthy use of tools.
+Of course.
+All right let's go.
+Let's go to cursor.
+Let's bring this one home.
+It's our final trip to cursor for week two.
+And let's go in here.
+And we'll go to day five in week two and bring up the finale of our airline AI assistant, and we'll
+do some imports.
+You'll notice that sneakily SQL Lite has been added in.
+This time we will initialize everything, including pointing to our prices DB that's right there.
+And as long as you run the prior lab, it will have set up that prices DB and you'll have it populated
+with some prices hopefully.
+System message.
+You're a helpful assistant for an airline called flighty.
+Lighti give shortcuts, answers and all that.
+All right.
+This is the get ticket price.
+We're doing a quick recap here as we fly through it all.
+This is of course the SQL version.
+This looks in Price's DB and it does a SQL select.
+And let's just check that's working.
+If we ask for London prices we get 7.99.
+If you didn't set up the database you can always just copy across the basic, uh, one that just looks
+up in a dictionary or just writes it yourself.
+Okay, now the price function, this is where we put some janky JSON that describes this tool for an
+LM.
+Here it is.
+You recognize it, get ticket price, gives it a description, destination city.
+And then if I print that out you will see that is the JSON that will get sent to the LM.
+All right.
+Next up we have our chat function.
+We do the little scrubbing of uh the, the uh, dictionary there.
+We uh, of the history.
+We clean that up, um, only for use for Gemini or Grok.
+Uh, we then stitched together our messages.
+We call open chat completions dot create.
+We get back the results, and we will immediately launch an interface on that.
+Let's see how it looks.
+Here it is.
+Okay, this looks familiar.
+Uh, and, uh, but it doesn't have any tools yet.
+This is just the blank one I can say.
+Hi there.
+Uh, what's the ticket price to London?
+And then, uh, it's not it's obviously going to to, uh, not tell me.
+Let's let's see what happens.
+Uh, from New York on Dec one, 2025.
+Hopefully it's going to say, uh, yeah.
+Not yet available.
+So so it's not going to make stuff up.
+It's not going to hallucinate because in our system prompt we told it not to.
+Fine.
+Good stuff.
+Now here is our improved chat function.
+This is again we've got something that cleans it up.
+We have our messages that we create and now we pass in tools equals tools in here.
+And then we have our while loop.
+Remember this is the nice version that's done prettily.
+Does a while loop while it's got to to call some tools.
+We will then call handle tool calls which is just down here, and then append the results to the messages.
+So that's the chat function.
+This is the handle tool calls which iterates through the tool calls.
+If it equals get ticket price then call get ticket price.
+You may have made that a little bit more elegant.
+Perhaps if you if you had time for that.
+Uh, so that's that.
+And now we will run this and now we will give it a try and we will say, hi there.
+Hello.
+How can I assist you with a flight today?
+I'd like to go on a trip.
+Great.
+We would like to travel to.
+To London, please.
+And you can see database tool called getting ticket price.
+The return ticket price is $7.99.
+Success!
+That was a recap of last time and now onwards.
+--- Lecture 2 ---
+So just before we go on, I want to take a minute to explain something that might have been mystifying
+you.
+And if it hasn't been mystifying you, and if you don't really care about this, then you can just speed
+me up and wait until we continue with this.
+But I want to explain how Gradio actually works.
+Like, what is it doing?
+And like, what is this user interface that you see here?
+And why is what is this URL.
+And, and like what's actually going on behind the scenes.
+That means you can write some Python code and suddenly have a UI.
+And it turns out it's actually it's really very simple.
+There's nothing particularly complicated about it, but it's a series of really good ideas that results
+in this almost magical effect of being able to quickly mock up a UI and have an MVP really fast.
+And it's easy to explain because Gradio basically does three things.
+It does three things that I will tell you about one after another.
+And when you see that, when it does those three things, the net result is this kind of magical effect
+of an easy MVP.
+So three things.
+Number one, the first thing radio does.
+You have written some Python code to describe the user interface you want.
+In this case it was very simple interface.
+Sometimes in previous days we've had like GR markdown, GR drop down for a select box, and a few other
+things we've had in there GR text textbox.
+And we've described an interface by creating these radio objects, either a hybrid one out of the box
+chat interface or more specific ones.
+And in doing so, we've told radio what it wants and what we want, and Gradio uses that to generate
+a front end interface.
+It actually uses svelte, the front end framework, which is very nice because it just just generates
+down to basic JavaScript.
+So so it uses this to generate a basic front end description of your website.
+And that's, that's like a generated code based on your high level description in Python, allowing
+us to describe a UI in Python that gets translated into simple JavaScript UIs.
+Okay, well, you probably already guessed that part.
+So what's number two?
+Well, number two is the next thing that it does is that when you call Dot launch, it starts up a server.
+It uses Starlette, the app server framework that allows it to very easily start up a web server.
+And it has it so that that web server is listening.
+And if someone hits that web server endpoint, it serves up that front end that it just generated.
+So it's sitting there waiting for someone to hit it, and then it will serve up the front end for your
+app.
+And that's sort of obvious when you think about it.
+And so it is in fact a web server running there all the time, ready to serve your app.
+It starts.
+They pick a port that seems like it's a it's port seven, 860, I think is the port that it listens
+at.
+But if that's used up, if that's occupied, it just picks the next one and it keeps ticking up until
+it finds a free one.
+You can specify which port you want, but this one, for example, the current one we're just looking
+at now, it's running on my localhost on port seven, eight, 60, and anybody that hits that URL will
+have this auto generated front end served up into their browser.
+And so sure enough, if I click on this right now, up comes a web page.
+This is what gets served up and is now running in my browser window.
+And this is served by the starlet server that's running behind the scenes.
+And indeed, if I go to View Source, we see all of the stuff that's generated.
+It's actually like it's a, it's a page that's running something in an iframe.
+If we want to look, if we want to drill down into the JavaScript to see what we're actually looking
+at here, see if we can find that, uh, by looking around, uh, is this it right here?
+This is that's just the the iframe that it's running within.
+Uh.
+Hang on.
+Here we go.
+This is it.
+This is the code.
+Um, right.
+So so this this is the description.
+If you're familiar with front end stuff, this is like, minified front end code.
+If I do a search for svelte, there we go.
+We can see that it is indeed a svelte front end app that's running, uh, in my browser window.
+And that that is what we are seeing right here.
+I know I'm going a bit a bit into the weeds for you, but to give you a sense that that's all that's
+happened, it's generated a JavaScript page.
+And that is what we're seeing when we hit port seven, eight, seven, six, which is the next free
+port on my local computer.
+Okay.
+And just the final part of step two is you might be wondering how come this appears in our notebook
+like that?
+Well, that's just a feature of notebooks.
+Notebook output cells can show web content.
+And if this is what we're trying to, this is what we've created.
+Then the notebook output can can show that web page within it.
+It's like you can think of it as running a little browser window inside that notebook output cell.
+And that's why we see it right here, as well as being able to go into that web page so that that is
+step two of what Gradio does.
+And now there's only step three to go.
+Have you already figured it out.
+All right.
+So step three is that in addition when we were describing what we were doing, we we will have told
+Gradio our callback functions, some functions in our code that we want to attach to the user interface.
+In this case it's just a simple function chat.
+But there are others that we've played with in previous days and what Gradio does.
+Can you imagine?
+It's very simple in its server.
+If you hit the root then then you get the web page, the generated front end page.
+It also creates routes for each of your callbacks.
+In our case, there's just one chat, so it has a back end route for that.
+And if someone hits that back end route, it will call the chat function the one that we've we've just
+got right here.
+That code will get called if someone hits that route on that server.
+And of course, no surprise in the front end code that it generates, it makes sure that if you click
+the submit button, it's going to call the route that you want the chat route that is going to cause
+the response to come back.
+And it makes sure that whatever comes back from that is populated correctly on the UI.
+All of that is baked into the front end code, so that it calls the right route and puts the results
+in the right field.
+And all of that is reflected in that one line of code.
+And if you look back a couple of days at the slightly more substantive ones, you can see exactly how
+it works.
+Now, you can see how each of those three steps together simply allow you to produce UIs like this.
+And if you're wondering if you're thinking, Ed, this is ten minutes of my life, I'm not going to
+get back.
+What has this got to do with AI?
+It's not particularly, but it really helps you understand how you can build these kinds of apps, how
+they're hooked up to your your, your business logic and the fact, in fact, starlet observers are
+very scalable.
+They can support very high load.
+So this is this is more than a toy.
+It's something that can be used for things like internal apps.
+Um, and it can take you very far.
+Um, you can also build out a separate full front end and still use your Gradio callbacks as your backend.
+So Gradio can run as just in a sort of API mode only, so it can form a nice stepping stone to your
+future strategic app with a custom made front end in another in another language like Next.js app or
+something.
+Uh, so that that can all be part of your natural migration.
+So not only is it quite a high horsepower kind of of, uh, prototyping platform that could be used
+for, for reasonably large apps, but also there's a very natural migration path to taking it to production.
+Okay, enough of the technical chit chat.
+There it is written down there, should you wish to read about it.
+Let's do the fun stuff.
+Let's go on and build a multimodal AI assistant.
+--- Lecture 3 ---
+Okay, first up, this is fun.
+We're gonna do an API other than the chat completions API that we're all bored of.
+We're going to do an API that generates an image.
+There's an OpenAI generate using the OpenAI Python client library, and you pass in a model and a prompt
+a size and response format.
+So this is this is the structure.
+And we're using a model called Dall-E three, which is OpenAI's image generator from from about a year
+and a half ago.
+They've got a newer one with, with GPT.
+Um, but you do you have to go through quite some rigmarole to get approved to be able to call that
+through the API.
+And I don't want to put you through that.
+Dall-E three is much quicker and easier, and I actually really love Dall-E three images.
+Um, now, one thing I will mention though, is that each time you generate an image, it costs about
+$0.04.
+And so all of the other I don't know about all, but almost all of the other calls in this course are
+unbelievably cheap.
+A tiny fractions of a cent, but this one is $0.04 each, so be aware of that.
+I think it's well worth $0.04.
+But if you're if you don't, then don't do it.
+So I the prompt I'm putting in here is that you can call this function artist by passing in a city.
+And it will make a prompt, an image representing a vocation in this city, showing tourist spots and
+everything unique about this city in a vibrant pop art style.
+Okay, that's the prompt.
+With that prompt, let's let's create an image, uh, for New York City and display it.
+And now when we run this, one thing I will say is that it's not super speedy, but it's doing a lot
+here.
+It's generating this image.
+And by the way, we'll be doing this with open source models at the beginning of week three, if you're
+wondering.
+So you can look forward to that.
+Uh, but yeah, this is running now using Dall-E three.
+And there is the result.
+Look at this.
+Check this out.
+I mean the quality of these things is just amazing.
+So this is, of course, a picture of Times Square.
+Strangely, I guess pop art gives it some discretion.
+There is water going through Times Square.
+Uh, and there is a Statue of Liberty here.
+And, uh, there is, uh, obviously it's all illustrative, which we will let it let it do, but I
+think it's absolutely gorgeous.
+I love the, uh, there's there's obviously a sign of yellow cabs.
+There's New York written there.
+It's really nice.
+It's definitely has I guess it's the New York Stock Exchange.
+I think it definitely has a feel of New York, no question.
+Uh, I think this is super, super impressive.
+Um, okay.
+So also I've got another one we're not done with with images.
+We want to have another kind of medium as well.
+So another different API I have for you.
+This time it's OpenAI.
+And you pass in a model.
+We're using this one here GPT four TTS TS, TTS stands for Text to Speech and we give it a voice.
+And I've got some other voices should you wish to try them.
+I'm going to go with Onyx and the input, which is a message.
+So talker is able to talk with a message and we will return the contents of that.
+So I'm not going to do anything with that just yet.
+I'm just showing you a talker.
+Uh, okay.
+Fair enough.
+It's now time for us to bring this all together.
+So I have a slightly beefier chat callback for you, and I will talk this through briefly, and it's
+really an exercise for you.
+You might be confused that this this, this chat only takes history.
+It doesn't take history and the message.
+And that's because we're about to do a bit of custom radio stuff, and we're going to do some messing
+around first, and we're only going to have a callback, uh, with, with a single variable with all
+of the history, including the most recent prompt, you'll see that in a second, but that might cause
+you to pause for a thought for a second.
+So we start by scrubbing the history.
+As always, we put together all of our messages, adding the system prompt and then adding in the history,
+which, as I say, is already going to have the most recent message.
+And then we call open create with our tools, and then we have our while loop that loops through making
+messages.
+Um, and I've just updated our handle tool calls.
+It's now handle tool calls and return cities.
+Because if a tool call happens to involve a city, then I'm going to have it returned.
+And I'm putting that into responses and cities to variables.
+Okay.
+Otherwise everything is very similar.
+No real differences.
+Uh, and then with whatever comes back, I'm just going to shove that in the history.
+And now we just have something here.
+Uh, you'll see this voice equals talker reply.
+So whatever comes back, I'm also going to put that to talker so that talker will will actually generate
+audio for whatever comes back from the LM.
+And I've also got this little if cities.
+So if there were any cities that came back from here, if, if it turns out that that the user asked
+for some cities, then I'm just going to take the first one and make a pop art image of it.
+And then I return from this.
+You remember before the chat, the chat callback, it takes the message in history and it just returns
+the next message.
+Well, I'm having it return three things the whole history, the voice and the image if there is one.
+Okay.
+That's different.
+Let's see how we hook this together.
+Well, first up I want to show you the handle tool calls and return cities.
+Here it is.
+This is basically exactly the same as handle tool calls before.
+But sneakily I make an empty list of cities and whatever city is called in the tool.
+I just add that to my list of cities and I return it here.
+That is it.
+I assure you I've made no other changes.
+It's the same handle.
+Tool calls it just as it says on the tin.
+It returns the cities as well.
+And that's going to be used up here to draw an image if there's a city there.
+Okay, that all I need to run these cells, run that, run that.
+And finally we need to look at the Gradio user interface.
+So there are three different types of graphical user interface.
+I didn't tell you that before, but now I'm telling you.
+Ha.
+Uh, and we first met the type that was called interface.
+That was one of the first ones we made were the shout thing.
+And that is basically the very standard simple UIs.
+You've got one callback function that you specify.
+You give a number of inputs, a number of outputs, and it's done.
+You do that allow flagging equals false thing if you wish.
+If you don't want the flag button and then you've got yourself an interface out of the box.
+Simple interface.
+Chat interface is the one we've been using for the last couple of days.
+That's the standard chat bot style, the one that looks a bit like an instant messaging app.
+That's a sort of Pre-baked UI.
+Again, there's just one callback called chat, which has to have the structure that we now know very
+well, and that that's again another basic canned UI.
+The third type is for custom UIs.
+When you don't want to pick a canned one, and you actually do want to to manufacture the different
+pieces yourself, you want to lay out the different UI components.
+And potentially you want more than one callback.
+You might want to have different buttons that can call different functions.
+And when you're in that world, you're in a, you're in an area called gray box.
+That's what you're doing.
+And I'm going to not I this is not a radio lesson.
+Uh, so I'm not going to go through everything.
+I think I linked to the resources for Gradio before.
+They're so great, so easy to use, but I am at least going to show you a use of GR blocks to lay out
+a user interface.
+So here it is.
+Here is the the GR blocks setup and it comes in three pieces.
+Why do these things always come in threes.
+It comes in three pieces.
+Uh first up you define any callbacks that you've got.
+Well we've already got a callback.
+It's called chat.
+And it's the callback that does everything.
+There's a little extra callback I've got here, which just makes the UI look nice, which is called
+put message in chat bot, and it's a callback, which is going to make sure that when we type a message
+and press enter, it's going to move that message right away into the chat bot window before it calls
+our chat bot.
+Otherwise, it looks a bit janky.
+So this is that's what this does.
+You'll see it in just a second.
+So that's the callbacks.
+The second step is where you define your UI.
+This is what Gradio is going to use to build that svelte user interface behind the scenes.
+And you say with use context managers with GR blocks as UI and then you can do this this use with GR
+to layout each row on your user interface.
+Then I'm going to have three rows.
+The top row has the chatbot screen.
+That's the sort of backwards and forwards the messaging and an image output.
+The next row has an audio output, and the last row has the GR text box.
+Chat with our AI assistant.
+So that is the UI defined right here.
+And finally you have to give Gradio the code that hooks things up together.
+This is tells it which callback needs to be called, when and what circumstances, so that it knows
+how to attach that front end to call different routes on the back end server.
+And this is how you do it.
+You pick something like it, like this text box and saying message dot submit.
+That means if the user hits enter in this box.
+This is what I want you to do.
+I want you to put the message in the chat bot and you give it inputs and outputs.
+And then I'm going to say then call the chat function.
+And here are the inputs and outputs and the output.
+With this chat bot function the inputs should be the chat history and the outputs.
+There should be three outputs and they should go to the chat bot history the audio and the image.
+That's how Gradio should hook them up.
+The chatbot history, the audio and the image.
+Let's go back to our chat function that this chat function returns the chatbot history, the audio and
+the image.
+And that's how it works.
+This will be running on a route and the server will hit it.
+It will return these three things.
+And those three things will then be surfaced on the UI.
+If you're not following all of this, it really doesn't matter.
+You should get intuition for it.
+Feel into it because it's now time to see if this actually works.
+--- Lecture 4 ---
+Okay.
+Moment of truth has arrived.
+Let's run this.
+It's going to have auth.
+It's gonna.
+I'm gonna need to log in as add bananas.
+You can change this to your own.
+Up it comes.
+Bam.
+We have ourselves a user interface.
+We're going to sign in add bananas.
+Here we have it.
+We have ourselves a UI.
+This, as I promised you, has three rows.
+The top row has a chat bot and an image.
+The second row has audio and the third row chat with our AI assistant is our text entry.
+Let's say hi there.
+Hello!
+How can I assist you with your travel plans today?
+Nice, nice.
+Were you expecting that?
+Did you know that was going to happen?
+All right, all right, let's let's try it out.
+Let's give it a whirl.
+Uh, I'd like to go on a trip.
+Great.
+Where would you like to travel?
+To London, please.
+Now, this time, if it's working well, it's going to make a tool call.
+And as a result, London is going to come back.
+And because of that, it's also going to do, uh, image generation, which will probably take it like
+20s or so.
+A return ticket to London costs $799.
+Would you like to book it?
+And there we have it.
+There we have it.
+We have just successfully run our multimodal assistant.
+It generated this super cool image of London with the London Eye and Big Ben and umbrellas.
+Lovely.
+It makes fun of Brits and some London tea and a bus and taxis.
+It's absolutely gorgeous over the River Thames and some pause there.
+Very very nice picture.
+We got audio.
+We of course also got our booking our ticket that used a SQL query with a tool tool use.
+Everything has held together.
+I guess there's like four LM calls involved here.
+The two for the, the one for the tool call, the one for the final results, the image and the audio
+and it's come together and I just I hope you marvel more, more than anything in how easy it was for
+us to build this.
+We just built this literally in a matter of minutes or maybe a couple of hours all in, but really very,
+very easy.
+And it's so powerful.
+It does so much and it's so creative.
+And more than anything, you should be thinking about all the different things you could do to make
+this even better.
+Everything you could do with this.
+This is a canvas in which you can build.
+And I'm enjoying this too much just to stop right there.
+I need to give one more example.
+Let's just do it one more time and say hi there.
+Hello.
+How can I assist you with your flight today?
+And let's just say, is it cheaper to go to Paris or Tokyo?
+Let's see.
+So it's going to make those tool calls.
+And then one of them it will pick to make a picture of it.
+And we'll see what it comes back with.
+We'll see what we get after the 17 or so seconds of thinking.
+Here we go.
+A return ticket to Paris is cheaper at $899, compared to Tokyo at $1,420.
+And there we have it.
+And there is a beautiful picture of Paris with, of course, the Eiffel Tower and everything else looking
+gorgeous.
+There is the fact that it's made to tool calls, and it's able to compare them right there.
+And if I flip over here, we will see, of course, that the database tool was called for both Paris
+and Tokyo, just as we expect.
+And you can count the think of the number of LM calls that are involved in making sure that this whole
+thing hung together.
+So with that, that is a wrap on this little project, on the on the conclusion project, the finale
+of week two.
+And I absolutely love it.
+And of course, we should now talk about your exercises and how to apply this to your business.
+So for sure, if you built tools yesterday, then you should incorporate them here.
+If you didn't, then time to make some tools.
+Maybe the one to set a price, maybe one that can pretend to actually make a booking by writing a booking
+record in, in, in the database, in the SQL database.
+And a student did did that and has provided it in community contributions.
+You have to take a look.
+There's actually a lot of stuff in there that's done different things.
+Another a student actually built something that connected to the Amadeus API, which is like a proper
+booking API to to collect real ticket prices and flight times.
+I think, uh, lots of such creative stuff happening.
+You can use these tools to hook up to database queries or to APIs to add functionality.
+Uh, and even more important than that is to put the the AI airline assistant to one side and again
+apply it to your business.
+Now that you can not only generate text, but you can have images and audio.
+Think of the different bits you can put together, along with tool calling to build something that is
+really quite powerful, something that can actually add commercial value immediately, and you should
+be able to bang it out in a matter of a couple of hours, just as we did, adding in some tools, putting
+in some functionality, throwing a couple of different LM calls and you've got it.
+And, uh, so much that you could do with it.
+And you must.
+The one thing that is a strict requirement is that you have fun with it, because it's just a joy to
+work with Gradio and these APIs and stitch them together, and then of course, submit stuff in community
+contributions, post it on LinkedIn so that I can weigh in and congratulate you and share and amplify
+your achievements and your expertise, uh, with others around you, potentially including future clients
+or employers.
+All right.
+Well, that wraps up the lab for week two.
+I should mention one more time, as it says just here that again, my my editor would kill me if I didn't
+say that that, uh, rating the course on Udemy makes such a difference in terms of other people hearing
+about it.
+So.
+So yeah, if you if you are enjoying it and you want to help me make sure that other people hear about
+this course, then do please rate it.
+I would be super grateful.
+Uh, but now with that, the end of the finale, let's just go back to the slides to wrap up.
+Wow, can you believe it?
+You are somehow 25% all the way through on your journey to being an expert already.
+You're already 25% to being an LLM engineer.
+What can you do?
+You can give an overview on Transformers, the history of them, terminology like tokens, context,
+windows, that kind of stuff.
+You can confidently code using the chat completions API and maybe even a couple of other APIs too.
+Now, and you can build a multimodal AI assistant with a greater UI and making use of tools.
+And if you've done the challenge for the week, you've figured out how to apply this to your business.
+You've built something with commercial value for you, and you've shown it to people around you.
+You've put it in community contributions.
+You've you've posted it on LinkedIn.
+And I've weighed in and congratulations to you.
+That is a big week accomplished.
+Okay, week three is like completely different.
+It's completely different in so many ways.
+We're going to be working with open source models, not not these frontier closed source models, and
+not using Allamah, which is like the packaged way with like an open AI compatible API.
+No more of that.
+We're going to be using hugging face code so that we actually have the code of a neural network, and
+we are running it ourselves, and we're going to use that as an opportunity to get a little bit deeper
+under the hood of what these things actually are.
+And we'll be working with tokenizers, pipelines, Transformers, and we'll be running inference of
+open source models.
+We'll be using GPUs, graphics cards using this amazing thing, Google Colab, which is going to give
+you access to GPUs on the cloud, even if you don't have one on your on your box, or even if you do,
+there'll be a more powerful one on the cloud for you.
+And it's free.
+Uh, okay.
+Lots to look forward to.
+It's a really it's a gritty week next week, but it's a fun one and I can't wait to see you then.
+--- Lecture 5 ---
+Yes, I know that the week is already finished, but I wanted to slip in a little bit extra something.
+Just.
+Just a nugget.
+Something that I think will entertain you.
+It will only take a couple of minutes and I think you'll agree it'll be worth it.
+Please humor me.
+Come on in with me to week two and to this new notebook.
+Extra, extra.
+Did you see it hiding there?
+This is something that's a special extra that I want to go through with you.
+This is something inspired by the tech writer Simon Willison, who has a wonderful blog.
+And one of the things that he likes to do is put models to the test by asking them to draw pelicans
+riding on bikes and some other things.
+And we're going to do something similar now just to explore a bunch of different models, doing a task
+as a as a preview, as a teaser for what's to come in the future weeks, including particularly week
+four when we pick the right model for a task at hand.
+All right, let's get into it.
+We are going to ask a bunch of models to come up with a picture, draw an image, a silly image to test
+them out.
+But here's the thing to keep in mind.
+We've already seen how to use image generation.
+We've already seen how to drive a model to actually draw.
+Create an image.
+And you may know that it uses these diffusion model things.
+We're actually going to use one in week three coming right up.
+But we're going to do something different.
+We're not going to ask it to generate an image, but rather we're going to ask it to draw an SVG.
+And SVG is a type of image file, but in fact what it contains within it is just a straight up description
+in in like in letters of how to draw the lines and shapes that make up an image, it's literally like
+draw a line here, a box here, fill it in, draw a box here, laid out as a series of steps in a in
+a document that's like an XML style document.
+That's what an SVG is.
+So in many ways, asking a model to generate an SVG is actually asking it to think through.
+How would it go about constructing this image and drawing it line by line.
+And that's really interesting because it's more about a model's intelligence of being able to to craft
+this painting than it is about image generation, which is more about using special kinds of models
+that are good based on all of their training data.
+Okay.
+That's the backdrop.
+The other piece of backdrop is about open router.
+I know I've mentioned open router before, but open router is a platform that gives you access to many
+models.
+And it does so by routing your request to the different models.
+And one of the great innovations about Open Router is that you can use one API key, your key to open
+router themselves and use that as your sort of gateway in.
+It is of course, it's it's not an abstraction layer.
+It's a router.
+We talked about the difference between them.
+So I'm going to use open router.
+You can either just watch what I do.
+You don't need to run this if you don't want to.
+But if you'd also like to do this then you should do it too.
+So I've got some imports as usual.
+And here you remember from guide nine in the guides folder that we can use open router base URL.
+We can take an API key.
+I'll just check that the API key is set up and it looks good so far.
+Hopefully you got that.
+And now I'm creating an instance of the Python client library that's configured for open router.
+Okay.
+And now for the assignment.
+And I don't mean an assignment for you, I mean an assignment for the model.
+So we are going to come up with a challenge.
+And in my case I'm going with a panda rollerblading to work.
+But you should come up with something different and interesting.
+Not too complicated.
+You want to give it some creative freedom and something that it could realistically do out of lines
+and shapes.
+So the prompt generate an SVG of this challenge and respond with the SVG only.
+That's the setup.
+And then I have a function artist that takes any model we want to give it, and it calls open router,
+create passes in the model, the messages and the reasoning effort.
+And it times it and it returns the sum summary of it and the results.
+That's the function artist.
+Okay.
+Now let's look at the models.
+So we're going to call artist repeatedly for a bunch of models for the open source version of GPT 120,
+be the GPT five nano with low reasoning.
+We're getting stronger and stronger, I think.
+Deep seek the latest version for me.
+3.2 Kimi Katou thinking is as of for me right now, beginning of 2026.
+The strongest open source model on the planet, I do believe may be different for you, and you can
+feel free to pick whatever you want.
+This is from moonshot AI.
+Chinese AI startup then grok 4.1 fast from Mr. Musk, then Claude.
+Opus 4.5 the top model from anthropic right now GPT 5.2 with high reasoning.
+The strongest model from OpenAI for me right now.
+And finally, Gemini three Pro preview.
+These are our models.
+And when I run this off it goes.
+They are all going to run.
+Now they are running one after another, doing the processing and storing back the results.
+And for anyone that's taken the Agentic track or some of my other courses, you'll know well how this
+could be done as async code, which would mean that they would actually run in parallel rather than
+one by one, but I didn't want to overcomplicate by putting it here.
+So because I've done it like this, this simple, straightforward way, it's going to take like five
+minutes for this to run.
+But for you, if you if you know it, feel free to turn this into something that is async and it will
+take just just a minute or two, but I will see you in five or so minutes when all of our artists have
+wrapped up.
+Okay, that did not take five minutes.
+That took 12.5 minutes.
+I'm sorry if it took that long for you to once.
+It took me five minutes.
+I think there's quite a variability, but it's time for us now to view the results.
+It's going to draw each one.
+I wrote a little script called revealer, which just means that it paints the SVG line by line so we
+can see it coming.
+Let's now run this to see model by model.
+What kind of drawing did they come up with for our panda?
+Okay, I've zoomed out a bit and now we're off.
+This is the first one.
+This is GPT OS 120 b.
+That looks pretty good.
+I quite like that.
+Nice rollerblades.
+Well done.
+An open source model did a fine job.
+All right.
+And after a bit of a pause, this is the next one.
+This is deep seek 3.2 ha with, uh, rollerblades at different heights.
+There's the road.
+A nice and big diagram it's given us that is deep seek.
+Here is now Kimi Katou, the strongest open source model on the planet.
+And wearing a hat or a speech bubble.
+I'm not sure what that is.
+Maybe you could tell what that is.
+I'm not sure.
+Seems interesting.
+An interesting interpretation here is Grock 4.1 fast.
+And that's fun.
+That's fun.
+Uh, again, some hat situation going on.
+Work written assertively here.
+And rollerblades for sure.
+This is Claude, opus 4.5 Anthropic's strongest model as of today.
+Quite impressive.
+Rollerblades, little action lines and the office written as office in case we were in confusion.
+And now GPT 5.2, the strongest model from OpenAI.
+And look at this.
+Look at this Panda.
+And there's like action lines coming I love it.
+Swirly action lines.
+Last but not least, Gemini three Pro.
+Oh, wow Wow, look at that.
+Look at the flailing rollerblades in the action lines.
+That's quite an image.
+That is quite an image.
+Okay, I would say Gemini three Pro for the win.
+That's an impressive bunch of images.
+I absolutely love it.
+So GPT five nano was the only one that wasn't able to make it.
+It had a problem generating, but everybody else did a fine job.
+A great set of drawn svg's, line by line.
+Uh.
+Really impressive.
+Hopefully you twisted it.
+You came up with something different.
+You've got a great set of images, and you're enjoying this hands on experience, exploring the capabilities
+of frontier models and open source models through the Open Router API.
+And that now, finally, really is the conclusion of week two.
+That's the end of the extra.
+I hope you loved it.
+Hope this left you excited about the real scientific ways coming up in week four, but for now, it's
+time to take a breather and then go in to week three for open source models.
+I can't wait to see you then.

@@ -1,0 +1,678 @@
+--- Lecture 1 ---
+Well, if you're back here, then you won't put off by week three, day one.
+And in fact, you want week three, day two.
+And who am I to hold that back from you?
+Here it is.
+Welcome to more open source work.
+And today we'll actually look at some code.
+Well we looked at some code yesterday but we're actually going to go through it today.
+You're already of course at a point where you confidently code with frontier models.
+You build multimodal AI systems with tools.
+And now you know about these two new platforms, Hugging Face and Google Colab and hugging Face itself.
+You also understand is two things.
+It's the hub, it's the code libraries.
+All of that is clear to you.
+And now we're gonna dive in to hugging face.
+We're going to understand the two again.
+Number two.
+Two.
+There are two different levels of code in hugging face, which is itself one of the two different things
+you can do with hugging face.
+And we're going to be focusing on pipelines today.
+We're going to be using pipelines for a bunch of different inference tasks generating text, images
+and audio.
+Let's get started.
+Okay, so yesterday we established that hugging face is a couple of different things.
+It is the hub, the the website, and then it is the code that they have written that you can use and
+that code itself, the hugging face API, the libraries itself also can be divided in two.
+There's two parts to it.
+Uh, there is the lower level code that we will be using a lot on this course.
+When you actually mess around with tokens, with individual calls to models, you're looking at the
+deep neural network, that code, that's where the really juicy stuff happens.
+And a lot of time we're going to be spending, particularly in this week, in week seven, digging into
+that.
+But there's a bit of a learning curve to get there with that code.
+And so hugging face built another another level of library on top of it, which gives you a kind of
+simpler interface so that you can work very, very quickly on common tasks and not have to get into
+so much detail with all the bits and pieces.
+And so there are these two different levels, the higher level one and the lower level one.
+And the higher level one is called pipelines.
+It's a high level API.
+It lets you carry out common tasks very easily.
+The lower level one is is talking about tokenizers and models.
+It's the real granular API where you get to work with the underlying deep neural network, and it gives
+you the most power and the most control pipelines.
+Quick and simple.
+Get running fast.
+Tokenizers and models are where you get to the raw power, so you use pipelines.
+Then when you want to do something that's an out of the box pre-configured task, an inference task.
+So one, when you're trying to run a model to achieve a business objective and the model has already
+been trained, and you could do that with a bunch of code using the hugging face, lower level libraries.
+But they've they've made it simpler for you by just just coding it for you for some common use cases.
+And you can just use these things, these pipelines to make life simple.
+So for example, sentiment analysis is one saying whether a particular sentence is is a good a happy
+sentence or a sad sentence, a positive movie review or a negative movie review.
+A classifier, something which takes something and says is this, say a person or a place?
+A named entity recognition task is one that takes a sentence and tags words and says, are these people
+or places?
+Uh, question answering is a core Jen AI task of given a question and some contexts can you answer it?
+Summarization.
+We did of course, in week one.
+You know it's so well as a core Jen AI task.
+And then translation is another one that we we haven't necessarily directly talked about it, but you
+may have built it in as part of the exercises in in week one as well, and also in week two.
+So these are all super common inference tasks.
+You've got a model, you want to run it.
+And this gives you a way to do it in just a few lines of code using hugging face pipelines.
+And we're now going to go and generate content using pipelines.
+We're going to do some text and images and audio, which we already did, but we'll just do it again.
+Now that you know what pipelines are, you'll have a little bit more to look to.
+And so with that I'm going to first, of course, we're going to go to Google Colab, which is where
+we run this.
+But one more time I'm going to start by going to cursor to show you where the link is to Colab.
+Let's go there.
+Recognize this.
+It's cursor.
+Here we go into week three folder.
+We go to day two which is where we are right now.
+Week three day two hugging face pipelines.
+You click the link that's right here.
+And up comes Google Colab.
+Week three, day two.
+Let's go.
+And so again, the hugging face gives you these two different levels that you can work at.
+One is the lower level one we'll do tomorrow.
+But today we're doing with pipelines.
+And pipelines is so simple.
+You create a pipeline with something like this.
+You create a pipeline by by telling it what task you want to do to create a pipeline object like this
+that doesn't run the task.
+It just creates this thing, my pipeline, which is in fact a function you can call you've now got something
+built.
+And at any point you can call that pipeline with input and you'll get the result and that's it.
+It's as simple as that.
+You create a pipeline with various parameters, the task potentially other things too.
+And then you call it with different inputs.
+And you can obviously do this multiple times in many different inputs.
+This is like a one time activity to build your pipeline.
+That's the pipelines API.
+A couple of Google Colab Pro tips to get you started.
+I want to mention that data science code, like the code we're going to run often, is quite chatty.
+It will give you lots of messages.
+It will give you warnings quite often.
+They love to give warnings, deprecation warnings, which is just telling you that something might be
+removed and it will probably will be removed in the future, but it's still there now.
+But this is telling you it's going to happen at some point.
+And other bits of text and warnings, and you should be somewhat immune to this stuff that plenty of
+it comes along and look at it, glance at it.
+If something alarms you, then sure, dig into it.
+But otherwise just take note of it.
+And if something goes wrong later, remember what you saw and see whether any of it is a clue as to
+what's happened later, but don't let it hold you up.
+I do get lots of questions from people that see warnings and are worried that there's an error, they
+say.
+And it's not.
+It's just hugging face, being chatty.
+You can just safely ignore it and push on.
+So building that instinct for what's a real error and something is broken versus it's just hugging face,
+being talkative.
+That's something just to get with experience for the time being.
+Just just let it let it wash over you when you see various notes and warnings.
+The other thing to mention is that at any point today or yesterday, or in any of these colabs in the
+future, you might find you hit something like this a runtime error Cuda is required but not available
+for blah blah blah.
+Please consider installing blah blah blah.
+It's a very misleading error message.
+People often hit that and then they're like, oh, I need to install things and they start installing
+stuff, and then they email me and they say, I'm stuck.
+And there's like pages of installations and oh my goodness, what are you doing?
+Uh, and, uh, the reason is this what's actually happened is that Google has decided to bump you off
+a GPU box and has put you onto a CPU box in the middle of what you were doing, and you didn't realise
+because Google doesn't always.
+It puts like a note down here somewhere.
+I think it's easy to miss.
+And so suddenly you're in a different computer without a GPU and nothing's installed and working.
+And the solution to this, when it happens is simple.
+You have to go through the steps I mentioned yesterday when you go to the runtime menu, uh, disconnect
+and delete runtime, and then you go to edit and clear all outputs.
+So everything is reset.
+So you're not confusing yourself.
+You don't need to do that, but it just means that you're quite clear.
+And then you go back to the very top of the lab and you run it from the top, sell any Pip installs
+on downwards and all will be great.
+And that getting getting into the discipline of doing that if something goes wrong and if you're bumped
+off the box that's something to to to to keep, keep in mind watch out for that.
+Uh, and don't get sidetracked into lots of weird installations.
+All right, with that out of the way, let's get on.
+--- Lecture 2 ---
+Okay, so you'll see over on the right here.
+I have already connected to a T4.
+You may have to press that button, connect to T4.
+Remember go drop down.
+Make sure this says connect to a hosted runtime T4.
+If you're not sure if it's not a T4, change the runtime type.
+Make sure T4 is selected and always go here and to view resources so that you get this little picture
+here of what's going on.
+Check your gpu Ram.
+You can see I already ran this and look at that gpu Ram, but I've since I've gone to runtime and I've
+done restart session which is cleared up all of my Ram, but it's kept my disk together.
+I'm gonna make that a little bit smaller so it's not using up too much room, but I keep an eye a healthy
+I always over on the right.
+Okay.
+Uh, the another little bit of talk from me.
+I know I said this a fair bit during during last week, but I just want to mention one more time the
+distinction between training and inference that many of you know.
+But just to reinforce, in case you don't, when you use a data science model for the first time, the
+first thing you need to do is feed it with lots of data, lots of examples to train it to be good at
+doing what you want it to do.
+And of course, with GPT, the P in GPT stands for pre-trained, which is saying that OpenAI spent like
+$100 million pumping all the data on the internet and lots more through it to try and get it very good
+at predicting the next token.
+And that training process is a huge palaver, which happens.
+And when it's done, you have a pre-trained model.
+From that point on, the activity you're doing is called inference.
+It's you're saying we've now got a new input which you haven't seen before.
+You didn't see this during training.
+It's something different.
+And we want you to predict what should come next.
+We want you to do your task for this new input and that whole thing.
+Running a model that's been trained is called inference.
+It's a fancy word, but it's just saying run the model and we'll be doing inference today.
+The pipelines API is all about inference.
+Okay.
+Then the first cell.
+Here is a pip install.
+Remember the top cell is always where you put your pip installs and you always have to rerun this if
+you get bumped off.
+If you're wondering what this does, pip install minus q means please be quiet.
+Don't give me lots of output.
+Otherwise pip installs can fill up screens with information.
+Minus minus upgrade is saying even if you already have this installed, I want you to reinstall it carefully
+with the instructions I'm going to give you.
+Data sets is one of hugging faces famous libraries and it comes already Pip installed on every colab,
+but I want to force it to use version 3.6.0, which is a version from about six weeks ago.
+Because after that, hugging face just released an update and they changed a bunch of stuff, which
+means that some some of the hugging face code doesn't doesn't work with that version, blah blah blah.
+This process is known as pinning a version.
+It's pinning data sets to 3.6.0.
+And when you look in this cell, you might see that I've pinned lots more and you might have more in
+future colabs.
+And that's because over time, things change and and people break things all the time.
+And so poor people like me have to come through and pin versions of libraries to make sure it all still
+works.
+It's very common activity that people get into.
+All right.
+So the first thing to do is to run this cell.
+And for me it should run nice and fast because I've already installed that version.
+It should see that, uh, and that that will be happening right away.
+It's done.
+Okay.
+So the next cell is the same one we did last time when we just check the GPU.
+If you've done everything right, then we'll be on a T4.
+It should say here Tesla T4.
+There it is.
+Great.
+And do we have our memory.
+We do have 15GB of of GPU Ram which we love.
+And the next is a whole ton of imports.
+And you'll see here that we are importing some pipelines from transformers import pipeline.
+Uh, that that is the key import we've got here.
+And we've also we're also importing something called diffusion pipeline, which is another set of pipelines
+for diffusion models that we met last time for the first time.
+But they are like they generate images rather than text.
+Okay, that is run.
+The next one is connecting to a hugging face account.
+Now, you did this yesterday because you were great and thank you.
+But if you didn't, then you were bad and are disappointed.
+But you can rectify the situation quickly by going to hugging Face.
+Set up a free account creator.
+Go to the avatar menu tokens.
+Create an API token.
+Be sure it has write permissions.
+If you don't do that, everything will go wrong.
+Uh, and then uh, remember, you add it to your secrets.
+You press this button here and actually you will need to do this.
+Even if you did it yesterday, you still need to activate it.
+Give this notebook access every time it remembers the token.
+You don't need to paste it back in, but you need to give it access to this colab.
+Um, and so, yes, as I say here, even if you already did it, you do need to click on that key button
+and turn on the switch.
+And then when you run it you should see hugging face key looks good so far.
+And it should log in.
+Great.
+Okay.
+Onwards.
+So as I mentioned before, there are two steps to using pipelines.
+The first of them is when you create the pipeline that you want to use.
+And when you do so, you do it by specifying a task.
+And optionally you can specify other things to the task is something like I want to do summarization
+or whatever, whatever you want to do, the model you can specify is which open source model you want
+to use for this purpose.
+You don't need to specify one because hugging face can just pick one automatically.
+So we start by just not specifying.
+And device is where you can say if you want it to use a GPU and we do.
+And the device you specify if you want to use an Nvidia GPU like we have is Cuda.
+Cuda is the name of the specific technology invented by Nvidia, which runs on graphics cards, which
+allows you to do this maths in parallel.
+Massively.
+Uh, it's like a it's a programming language.
+It's it's similar to C++, but it's intended for this kind of parallel compute.
+Uh, and then uh, if you are doing this, if you're trying this locally on your computer.
+Uh, which is bold of you, then if you're using a PC, then Cuda would be the way with an Nvidia chip.
+If you're using a mac, you have to use something called MPs, which stands for Metal Performance Shader,
+which is the name of Apple's graphics libraries for Apple Silicon if you're using an Apple Silicon computer.
+So, uh, once you've done this and you've set this thing up, you can then call it as often as you
+want with different inputs.
+And, uh, it will do that.
+All right.
+You're like, enough explaining.
+Let's do this.
+Okay.
+So here we go.
+Sentiment analysis.
+My simple sentiment analyzer, you can call it what you want.
+This is just creating the pipeline.
+The task is the first thing you pass in.
+Sentiment analysis is an example of a task.
+We'll get all the tasks later.
+Devices Cuda is saying I want to use I've got a T4, I want to use this Ram over here and I want it
+to classify.
+I'm super excited to be on the way to LLM mastery.
+So when I run this it starts with a bunch of texts and warnings and stuff.
+And like I say, it's like, who cares?
+It's saying no model was supplied defaulting to and the name of a model and revision using a pipeline
+without specifying a model name and revision in production is not recommended.
+Well, good for you Huggingface for not recommending it.
+We're doing it anyway, and we're not in production right now.
+Uh uh, and uh, but this is and device set to Cuda is just like, hey, I want to tell you we're using
+the GPU.
+Good.
+Uh, this is the result, uh, the the, uh, assessment from this particular model is that this is
+a positive statement.
+Uh, it's a happy statement, and it gives it a score of, like 99.9% chance of it being positive like
+that.
+Fantastic.
+Your first task that ran on, on not on your computer, but it ran on the computer you're renting from
+Google and it ran pretty easily.
+Congratulations.
+Okay, let's up the ante a bit.
+Let's let's try this thing here.
+Remember, because we've already created the pipeline, we can just call it as much as we want with
+different inputs.
+And we're going to call it with this input here.
+I should be more excited to be on the way to LM mastery.
+And that's a hard one because of course the sentiment is sort of iffy.
+That's not such a great sentiment.
+I should be it's really saying I should be more excited.
+Uh, but that's super hard to, to to see that.
+And you imagine any kind of obvious clues something's looking for is going to see that as being a positive
+sentiment.
+And sure enough, if we run it, it does give it a positive sentiment.
+Uh, it gives it a bit lower percentage chance, not 99.9.
+Now it's just 90.1.
+Uh, but nonetheless, it misclassifies that, I guess, I don't know, maybe it's debatable, but that's
+probably not the right answer.
+So let's try a different model.
+Remember that when you're creating a pipeline, you can specify a model.
+And the model that you put here is anything you can take from hugging face.
+Remember when we were hugging face the the the platform the the hub?
+One of the options, one of the navbar items is models.
+And when you're in there you can search for different models for different tasks, and classification
+or sentiment analysis is one of them.
+And you can then look at different models, use that as a way to browse models and read about them,
+see who makes them, see their results, and see how many stars they're getting, and use that as a
+way to select and try out some models and do some experimenting.
+In terms of this name of this model, just to explain, Bert is a super famous model that was created
+in the early days by by Google.
+It was one of the first of these Transformers.
+Um, the, uh, the uncased word there means that this particular model doesn't care whether something
+is in uppercase or lowercase.
+Everything is just is just converted to lowercase or whatever.
+It ignores.
+Case.
+Case insensitive.
+That's the word I'm looking for.
+Uh, it's a sentiment model, multilingual.
+So it can do this in different languages as well.
+That's interesting.
+Uh, so otherwise this is this is now going to be us exploring, trying out a different model.
+And so let's try first of all, I'm super excited to be on the way to LLM mastery.
+So this is actually this is a uh giving a Star rating rather than just the positive and negative.
+So it's a bit more refined, and it says it's 60% sure that this is a five star rating.
+Okay.
+That's interesting.
+This is the I'm super excited one.
+Let's change it to the more interesting.
+I should be more excited.
+Let's try that.
+I should be more excited, which is probably not awesome.
+Uh, let's see if it can figure that out.
+Yes.
+So it predicts that this is a three star review.
+And obviously we all know from from reviews that in practice, a three star review is distinctly iffy.
+Uh, so I would say that's quite accurate, that it is.
+It is seen that this is in fact a sort of three star territory, not more than that.
+So of course, the action for you is to now go look in the hugging face Harbor, go to models, find
+different classification models, experiment and explore.
+See what you learn by trying different popular models and seeing what you can get to give different
+results here.
+The great thing about pipelines is it's so easy to experiment.
+--- Lecture 3 ---
+Okay.
+Next up, this thing called named entity recognition that I mentioned is the thing that can tag words
+as whether they are associated with different types of thing.
+So here we have a sentence.
+Uh uh, well, first of all we're going to create our pipeline.
+The task is ner named entity recognition devices Cuda.
+Uh, we're then once we've got our NER pipeline, we then can call it and we'll call it with an input.
+AI engineers are learning about the amazing pipelines from hugging face in Google Colab, from editor
+Donna.
+Lots of entities in that will iterate over the results and print each one of them.
+Let's run this.
+We get a bunch of warning stuff.
+Ignore it, ignore it.
+Uh, and uh, look at that.
+I haven't even read what that is.
+It's obviously unhappy about something, but I don't care.
+The.
+Okay, so we've got a bunch of these entities.
+Uh, some of them are org, some of them are misc miscellaneous, and some of them are per person.
+Okay.
+And uh, let's see what they are.
+So they each are given an index.
+Uh, the first of them is AI and the next is engineers.
+And then you'll see that hugging face got split up because it's doing it like token by token, uh,
+which I guess we're going to come onto tokens in a bit, but but you remember them from, uh, from
+from week one.
+Uh, so each token got tagged, but they are all done as, like, as a thing hugging face.
+And, uh, Google Colab gets also done as a, as a misc.
+It doesn't know what that is, but editor Donna gets a person there I am.
+So it's correctly categorized the different things in this sentence.
+Uh, and gives you an index into them.
+So that is the named entity recognition task.
+And there are a lot of, of business activities when it's important to be able to do this, be able
+to pull out of a sentence, what are the things that are being referred to?
+Next up is our nod towards our first time of doing something which is just a baby step towards the The
+Mighty Rag.
+It's about answering questions when you're given a bit of context.
+So supposing we have a question like what are hugging face pipelines?
+And we've got some context which is a bit more detail about it.
+Pipelines are high level API for inference of llms with common tasks.
+So we can then have a pipeline.
+We can make a pipeline that we'll call question answerer which is good at answering questions.
+And the idea is you can always call it with a question and some context.
+And then we will print the result.
+So I'll just run that right away.
+And no doubt it will do a decent job of uh uh, there's it's answer.
+Inference of llms with common tasks are pretty simple.
+Nothing.
+It's not rocket science, this one.
+Uh, but we are using, I think, quite, quite small models.
+By the way, if it's taking a lot longer for you, that's because I already ran this, so I downloaded
+all the models already.
+When you run this, it's going to download the model each time.
+It's going to take a lot longer as it did for me the first time, but I didn't want to be wasting around.
+Uh, so so be be comfortable with the fact that it will take a bit longer, but obviously that time
+has only been spent building your pipeline.
+Once you've you built it, you can run it quickly, as often as you want.
+Same kind of performance as me.
+Um, and.
+Yeah, just to tie the last two together, you might be saying.
+Okay, well, that's very well, but the only way you'd be able to do that is if you were able to,
+to always provide relevant context that matches the question that's being asked.
+Well, here's a thought.
+You could run a named entity recognition on the question.
+And then for the entities that come back, you could look them up in your database to retrieve anything
+you have any information.
+If it's a customer chatting with you about a different product, you could use named entity recognition
+to pluck out the name of the product they're asking about.
+And then you could just look that up in your database and put that in as the context and ask the question.
+You see it all.
+It all comes together.
+That's how you could use these different tasks.
+Now of course, there is a better way and a more general way.
+And we'll be dealing with that in a couple of weeks.
+And it's called Rag.
+But this gives you some of the interesting building blocks that you can put into practice right away.
+And then the next two are just such standard Genii things.
+First of all, summarization.
+This is a pipeline.
+The task we pass in is summarization.
+We then have some text where I blathered away about the hugging face Transformers library, incredibly
+versatile and powerful tool for blah blah blah.
+And then we ask it to summarize it.
+We give it some fields like maximum length and so on.
+And here we get back something nice and concise.
+Uh, the hugging face Transformers library.
+Incredibly versatile and powerful tool for natural language processing.
+It's not that not not that concise, but it's more concise than my waffle here.
+So there you go.
+That is summarization, uh, in a hugging face pipeline.
+Um, and now translation translating, say English to French.
+We'll use this pipeline translation Ian to fr.
+And here is a sentence.
+The data scientists were truly amazed by the power and simplicity of the Hugging Face pipeline API.
+And we will translate that, uh, and uh, for the French speakers on you, you can see whether you
+think this is any good.
+We'll see.
+Uh, it's thinking about that.
+Okay.
+I'm not.
+I'm not gonna read it out.
+Um, my high school level French is not going to survive.
+Uh, you're scrutiny, but there you go.
+That is the answer.
+Hopefully that is acceptable.
+Uh, now, uh, you can also translate between other languages.
+And I put a link there to the Hugging Face Models page already filtered on translations.
+And you can you can pick you can pick by the language.
+You can filter on language and then pick the model that will translate for you.
+There are some very specific languages.
+There's a big movement towards making translators for rarer languages, uh, where this is something
+that could be like a language that's, that's, that's fading out, that people want to encourage and
+have people use it more.
+And it's really great that there are so many models for that.
+So stop talking and run this thing.
+Uh, we can also use this particular one to translate it into Espanol.
+And again, my hopeless level of Spanish is, uh, is not Not yet as good with that as I am with that.
+But but, uh, hopefully this is a good translation.
+You will be able to confirm.
+All right, so those are the two classic, uh, gen AI use cases.
+And you might be thinking, hang on, editor, I can just use ChatGPT for that.
+Or I can just use GPT AI and do summarization and do translation.
+And of course you can.
+Yes, but you have to pay for it and you're doing trillions of calculations.
+This time we're using a much, much smaller open source model that has been optimized just for translation
+or just it's been fine tuned just for translation or just for summarization.
+And so you're able to do something basically for free or, you know, we're on a free box here, but
+if you wanted to do it at scale, you'd have to pay something, but it would be very cheap and very
+fast.
+And you have all the code and the weights.
+So by focusing on a task and using a small model that is specialized on that task, you can do more
+with less.
+You can get get more accomplished at a very cheap price point and very fast.
+So that that is the point.
+Uh, let's move on.
+Classification is something where you can pass in a classifier.
+A zero shot classifier means I'm not going to give you any examples.
+I'm just going to give you a sentence.
+I'm going to give you some buckets.
+And I'm going to say put the sentence in a bucket.
+And so our sentence is hugging face.
+Transformers library is amazing.
+And the labels are technology sports or politics.
+Uh, and uh, let's see what it says.
+See what it says.
+It's going to put it in a bucket.
+It's going to give us some warnings first because it just loves doing that.
+And here we go.
+The labels.
+It's putting it in technology, sports and politics.
+It gives it a 95% chance of being technology.
+It gives it a 3% chance of being sports.
+And it gives it a 1.8% chance of being politics.
+Uh, so so there you have it.
+You should experiment with this and figure out what what kinds of buckets, what works.
+Well.
+And you can also experiment with different models too, and see if anything can can be absolutely confident
+that it is technology.
+Okay.
+And then the next one is the final text.
+Text related one is going to be, uh, text generation.
+That obviously the main thing that Llms do, if I want you to if there's one thing I want you to remember
+about using Huggingface pipelines, it's and now this is going to be using Gpt2 by default.
+Gpt2.
+Remember that timeline Gpt2 is from a bygone era, but it's kind of fun to do this because it gives
+you a little sense of what these models used to do with this.
+Uh, it's going to be super random.
+And it's I do I like to tell people that it's very similar.
+GPT two is very similar to like picking up your phone and just pressing the predictive text button again
+and again.
+If anything, it's even worse than that.
+Even predictive text is better than that.
+Now, if there's one thing I want you to remember about using hugging face pipelines, it's that you
+don't need to be a programmer to understand how they work.
+That's pretty good.
+The best way to learn about them is simply by using it for a few days.
+I can't disagree with that.
+However, there are some things you should do to learn the tools.
+You can use the following commands to add some features into your Hugo lists.
+Now, now we're off.
+Now we're into into some random territory.
+And basically, you know, you can see all this stuff is now complete nonsense.
+Because remember, what llms are actually doing is just generating plausible text.
+They're not they're not actually trained to give you the truth, just believable.
+They imitate the believable tokens.
+The fact that the bigger models are so often truth is something that is remarkable and somewhat surprising.
+But this is what you see when you use a smaller model, an early model, you see this kind of nonsense.
+It's believable nonsense.
+It starts to to, to come up with, uh, this means you can use any tool, such as hugging faces own
+plugin, for example.
+I love the way it's so earnest with its like, like parentheses, but complete drivel.
+So there you have it.
+That is text generation using the default model GPT two from back in the day.
+--- Lecture 4 ---
+And for my next trick, I want to go back to image generation.
+This is the same as the thing that I showed you yesterday.
+Uh, but, uh, now you just know a little bit more about it.
+We're using pipeline again, but using pipeline for diffusion models rather than transformers, the
+image generation models.
+I'm using this one.
+I think the first one I showed you yesterday, the stable diffusion, I think I called it stability
+diffusion yesterday when I was like I suddenly got confused with I was like, that doesn't sound right.
+Stable diffusion is the name of the model from stability AI the company stable diffusion Excel turbo.
+Uh, and uh, this is uh, the prompt we did yesterday, our class of students learning AI engineering
+in a vibrant pop art style.
+And you'll remember it's not like it's fantastic, but it's a it's a perfectly decent image, given
+that we're running on a tiny free, uh, box a T for up in the cloud.
+Um, look at that.
+It's got that complaint.
+Use dtype instead.
+Well, well, we probably can make that change.
+Uh, you can feel free to change torch dtype to dtype as it's complaining with something that is deprecated,
+but it's still going to work just fine.
+We will let it do its thing and I will.
+This.
+This one can take ten minutes.
+So I will see you when it's done and it's finished for me.
+And here it is again.
+Another kind of crazy, hokey but fun image generated of you and I guess me together doing a class in
+a pop art, vibrant style.
+You can see that it's really almost maxing out my GPU.
+It's possible that you'll need to have restarted.
+You need to go to runtime restart session and remember to run that pip install.
+Oh sorry, you don't need to run the pip install if you just restart the session.
+Don't need to bad me.
+Uh, so just restart the session and then uh, you could rerun the pip install, but it won't make any
+difference.
+It's already installed.
+You just rerun this cell.
+Uh, and, uh, that should work nicely.
+And finally, audio generation.
+We did this as well yesterday.
+I'm going to try and run this two on this computer, but it's obviously it's a very nearly maxed out.
+We'll see if it can handle it.
+This is the using again the Transformers pipeline.
+It's done it.
+It's the Microsoft Speech five text to speech synthesizer.
+And um, if you get an error about data sets, then that means that you don't you hadn't run the pip
+install at the top.
+You'll need to, uh, start again with a new server and then run that pip install.
+But let's hear it.
+Hi to an artificial intelligence engineer on the way to mastery.
+Very nice.
+Okay.
+Hello to you too.
+There we have it.
+That is using pipelines.
+You can see it's just exactly the same format.
+We create our pipeline, we call it synthesizer and then we call the synthesizer.
+We just also have to pass in this this special thing which is like a describes the type of speech we're
+looking for.
+Okay.
+That is our tour of the main pipelines available to you from hugging face.
+But wait, there's more.
+There's many more.
+There's lots of available pipelines for transformers and diffusers, and a student suggested that I
+include links to it, which is a great idea.
+And here it is.
+If you go to this page here, previous page sending you there, you get a list of all the different
+kinds of pipelines that you can pick from in the pipelines documentation.
+And then separately, I've also linked to the diffusers page which shows you all these different types
+of diffusion image related pipelines.
+So the the mission for you is to go and explore and experiment.
+This is your moment.
+Pipelines are so easy to use.
+You don't need to worry.
+It's going to be harder when we get a bit deeper tomorrow.
+But for now, this this is all about experimenting.
+And the thing to keep in mind is that you're using open source models, so it's all free.
+So this is all stuff that people have built and shared and it's yours to enjoy.
+So so go do it and take it as an opportunity both to do some serious learning and also some serious
+fun.
+But as you're getting to learn more about Google Colab, I do think it's important that I give you at
+least one more pro tip so that you have a lot of the features of Colab at your disposal.
+So there's one special setting made available in Google Colab that actually a student brought my attention
+to.
+So if you could go to settings, Open Settings to make sure that that you're taking advantage of this
+to miscellaneous and then tick Corgi mode, this setting right here, an important one, and you press
+save.
+Uh, and Corgi mode is a technical term for a mode you can set that has a Corgi running across the top
+of your Google Colab.
+Uh, and you may ask yourself, why exactly did Google feel the need to have a Corgi run across your
+colab?
+And I think Google would say, why not?
+Uh, so so you can you can have Corgi corgis, multiple corgis going across your colab, but you don't
+need to stop there.
+You could also have, uh, there's another corgi coming.
+Lucky us.
+You can have kitties and crabs as well should you desire.
+And if your manager is ever concerned that you're not working hard enough, you can demonstrate how
+hard you're working.
+Um, but then also there is a setting here for the power level of the of the Colab.
+You might be concerned to see that it's set to no power.
+It's it's worth having some power in your colab.
+And if you turn it to some power, then if I say, what exactly is this doing, I wonder then, uh,
+I don't know what happening.
+Uh, it all goes a bit crazy.
+Uh, it has sparks, and then you get a combo score on the right to demonstrate your power, and.
+Okay, this is you're thinking.
+Come on.
+I got some learning to do, but many power used with caution.
+Uh, I always work with many power.
+Uh, so some silliness.
+Google having some fun with you?
+Uh, should you wish to entertain others, then feel free to use the miscellaneous settings.
+But I think at this point I will maybe turn this back to no power for the remainder of the course.
+Wow, you've reached the 30% point with 30% on the way there.
+To you being LM experts, you can confidently code with frontier models.
+You can build a multi-modal AI assisted in your sleep, and as of today, you can use the hugging face
+pipelines for a very wide range of different common inference tasks.
+And additionally, you can do it with corgis running across the top of your colab should you so desire.
+All right, next time we roll up our sleeves, we dig in.
+We go under the hood to look at tokenizers translating between text and tokens, understanding special
+tokens, chat templates.
+And there's going to be what I hope will be like an aha moment for you when you get a real sense of
+how these things work under the hood.
+All right, prepare for that.
+I'll see you then.

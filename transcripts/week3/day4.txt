@@ -1,0 +1,873 @@
+--- Lecture 1 ---
+Today is going to be great.
+Today is a day when we get into some technical detail.
+It's a day for the nerds like myself.
+If you're not so much up for the day's for nerds, then this one you know I'll try and make tomorrow.
+Be not for nerds.
+Tomorrow is more commercial, but today.
+Technical detail.
+Let's get into it.
+So what you can already do, of course, is code with quantum models, build AI assistants and now use
+hugging face pipelines and Tokenizers.
+Today though, is when we get more into models you're going to be working with hugging face transformers
+library.
+The models part of it.
+We're actually going to be running and comparing five different open source models, from running the
+actual Python code that drives a deep neural network ourselves, and we're going to use it as an excuse
+to get a little bit deeper in the in the real stuff about how these neural networks work, what they
+do, what are the layers of the neural network dimensionality, stuff like that.
+But always from a practical point of view.
+That's how I like to explain these things.
+So by the, by the by we're going to cover three other things today.
+Uh, that uh, I'm, I'm interested to talk to you about.
+The first of them is something called quantization, which comes up in various places.
+And it is a kind of a trick.
+It's a it's a hack probably, if you will.
+So most of working with these deep neural networks involves dealing with lots and lots of numbers,
+lots of numbers, which are these parameters.
+If you've seen my YouTube video that you know all about these parameters, there's a lot of them.
+There's billions of them.
+We've looked at line lines of how they've changed over the years, billions of these parameters, which
+are numbers which get multiplied and added to other numbers with big matrix calculations on GPUs and
+all of these numbers, basically the set during training time, they are all typically either 16 bit
+or 32 bit numbers.
+And probably most of you have a good sense of what that means.
+It means that they're composed of of the ones and zeros in a computer, the binary digits, there's
+16 of them, or 32 of them that make up the number.
+And that means that they can take a very large variety of different values.
+They are they can be massive numbers and they have a lot of precision.
+Well, so there is a simplification.
+You can do a way of cutting back the amount of memory that you use up by saying, look, we take each
+of these numbers.
+We store them using these either 16 or 32 binary digits, binary ones and zeros to make up this number.
+What if we stored these numbers at lower precision?
+We had we used fewer bits to make up a number.
+It's equivalent.
+If you imagine each of these weights, you could think of it like a dimmer switch for your lights.
+And you turn the dimmer switch and your lights get brighter or darker.
+And with 32 bits, or even with 16 bits, there's so many possible settings that it's almost like it
+turns smoothly.
+You can represent almost any number that you can think of with lots of decimal places and that that
+that knob turns very, very smoothly when you're reducing it down to fewer digits, like eight bits,
+which means that there's only 256 possible values, or even four bits.
+A four bit binary number can only have 16 possible values.
+Then it's like this dimmer switch is suddenly becoming a kind of click, click, click, click click.
+And like your lights can't go from bright to dark continuously.
+They can only take 16 possible levels of brightness.
+That's what it's like to take all of these parameters, all of these dimmer switches all over your neural
+network and reduce the precision of all of them down to eight bits or four bits.
+And doing that is known as quantization, because you can think of this as like a quantitative, you're
+like a quantizing, turning it into something which has discrete possible values.
+And you're reducing that, reducing the precision so that you can squeeze more into less memory.
+You could take a up much less memory, and the calculations are way simpler.
+That's why you do it.
+And you can do it.
+If you're going from a typically like a 16 bit floating point number, as they're called, a 16 bit
+number, all the way down to a four bit number, you're suddenly saving four times the memory.
+Now wait a minute.
+I hear you saying, okay, hold your horses.
+Wait a second.
+You're telling me you're telling me we've got all of these parameters and we're going to keep all these
+parameters.
+We're just going to reduce the like the information in each one of these parameters by a factor of four.
+We're going to make them four times more simplistic by making it change from having lots of possible
+settings just to having 16 possible settings.
+Surely that is somehow equivalent to just saying, let's take all of these parameters, keep the same
+precision, and just throw out three quarters of them.
+Have a quarter of many parameters with the full precision.
+Surely that's kind of the same thing.
+Like, okay, there's some neural network stuff with connections or whatnot, but you've got the same
+amount of information at the end of the day.
+So that's all you're doing.
+You're just trading information in one place for another.
+And I hear you.
+And that sounds like a very sensible argument.
+But it turns out, for whatever reason, that by reducing the precision of all of these numbers, you
+do indeed you degrade the quality of your neural network.
+It becomes less accurate.
+All of its all the measurements, all the ways you tell how well it's doing go down.
+But they don't go down by that much.
+They just go down by a little.
+And if you were to cut out three quarters of these weights, it would go down by a lot.
+And so it turns out that reducing the precision is like an efficient way to pack more information in.
+And it's not like we're super sure of why that works the way it does.
+We think it's because we didn't need so many parameters in the first place.
+And so this just happens to be a good way to, to to sort of synthesize more of the data into a smaller
+space.
+It just turns out experimentally to work quite well.
+So quantization is this kind of hack that reduces the memory a lot and only causes performance accuracy
+to come down by a little.
+And so we often do it.
+That's the story behind quantization.
+Very experimental very hand-wavy.
+And it just kind of works.
+And one more thing I'll say about quantization.
+You're like for goodness sake, how much how long are we going to talk about this, these numbers?
+Uh, the people in of you that already know about bits and know about, uh, the like, uh, the precision
+of numbers when you hear a four bit number, you probably think I'm talking about like a four bit integer,
+literally the number 0 to 15.
+And you're thinking, okay, but if the numbers used to be like a proper floating point number, and
+now we're going down to a number from 0 to 15, 0 to 15, that's not going to work very well.
+And the answer is sure we don't.
+It's not a four bit integer.
+We take these four bits and we use that to sort of represent the floating point space in some way.
+And there's just a technique for doing it.
+It's a data type that's called nf4, which is like some four bit representation of floating point numbers,
+imagining that they're normally distributed.
+And it just turns out, again, it sort of works fine.
+It sounds crazy.
+If you Google Nf4, you can read sort of write ups the paper about it and see how that kind of works
+and how it's mapped.
+And it's super surprising that it works fine, but it does.
+We're about to try it ourselves, and we'll see that, okay.
+And other things we'll cover.
+We're going to look inside our model and look at some of the layers of a neural network.
+Briefly, to give you intuition, I'm not going to go deep into it.
+I'm not going to show you like a neural network architecture diagram.
+And we're also going to talk about streaming, uh, when you're working with open source models.
+Just a little extra, extra teaser on that.
+These are the topics that we're going to see in our lab.
+Okay.
+And you're probably thinking fine, but when are we going to see them in this lab?
+And the answer is right now let's go Colab.
+See you there.
+--- Lecture 2 ---
+Okay.
+Welcome to the Colab for week three.
+Day four.
+You found this link because you went to cursor.
+Uh, or you went to the Readme, or you went to any one of the million other places where you'll find
+a link to the scroll up, but hopefully you've got it.
+Week three, day four.
+We're going to be looking at the low level API to the Hugging Face Transformers library.
+Working with models directly, they wrap the PyTorch code that actually goes through the layers of the
+neural network.
+We're going to be looking at that code.
+Uh, remember, if you get some sort of funny Cuda error, then disconnect the runtime, connect to
+a fresh T4 start again from the top.
+And over here, uh, you should have connected to a T4.
+It should say connect to hosted runtime T4.
+You should be able to view the resources and you should see the GPU Ram.
+It should be nice and fresh, 15GB left to fill.
+And today we will fill it.
+The first thing to do is to run these Pip installs and they will take a minute.
+Even even on quiet mode, it still insists on being talkative.
+We are installing a couple of libraries here.
+Bits and bytes is the name.
+Of hugging Faces library, which deals with quantization.
+The topic that I just jabbered away about for ages.
+Accelerate is also like a companion library that is to do with being able to run efficiently on GPUs.
+So we bring in both of these, and we are then going to, as usual, bring in a few, um, uh, import
+a few packages that we need to do, and then we're going to sign into Hugging Face.
+But remember you need to go to the key here.
+You need to turn this on or it will prompt you.
+If you don't and which is fine, you can just say yes and then come here.
+Run this so that you log in to hugging face.
+Okay, so, uh, just to talk for a second about having access to the llama models.
+So yesterday, if you followed my instructions, you will have got approval to access llama 3.1.
+Uh, now, today I'm actually going to use a different model llama 3.2.
+And I think in some situations you have to ask again to have access to this or you may already have
+been granted access, but if you click on this link it will come up.
+So click on this link right now go there.
+It's going to come up.
+And I see that I've been granted access to this model.
+You may have to do the same.
+Maybe you have to ask again.
+Maybe you already got access.
+If you have to do it again, feel free to just use 3.1.
+It's a bigger model, so it's going to take longer for you.
+But and 3.2 is much quicker much smaller.
+But but you should do whichever one you want.
+And if you weren't given access to llama then just skip the llama section of this and do the others.
+Okay.
+And so with that in mind, here are the names of the models we're going to look at today.
+We're going to look at llama I've got 3.1 and 3.2 in here.
+You can see that 3.2 is going to I'll comment out this line to avoid confusion.
+If you want to use 3.1 uncomment that line.
+Uh there's llama 3.2.
+And then we'll also look at five from Microsoft, five for Gemma, three from Google.
+We're going to go with the really tiny one, the 270 million parameter one tiny tiny Gemma.
+And then Quinn.
+We're going to use Quinn three the 4 billion.
+So a medium size quite big.
+And we're using the instruct variant, the chat variant.
+And the one that's that's for me anyway, fairly recently a few months ago I believe that's that's meant
+to be 2025 and July.
+Um, so whatever four months ago, uh, and uh, then, uh, just here, we're also going to use deep
+sea because, you know, deep sea is cool, and we're going to use the version of Deep Seek that was
+distilled into Quinn.
+Remember how I explained that they trained Quinn with data produced by Deep Sea, and we're using the
+1.5 billion variant of Quinn, a small Quinn.
+So these are small models.
+But the important point is that these ones are all instruct variants, chat models designed to have,
+uh, user prompt assistant.
+User assistant.
+Quinn.
+This one here, deep seek distilled into Quinn is a reasoning model.
+So it's going to be our first experience running a reasoning model through the code.
+So these are the models I will run that.
+And now this is going to be our message.
+It's going to be tell a joke for a room of data scientists a nice and simple message that we've got
+from them.
+Got from them.
+I mean simple message we got for them is right here.
+Okay.
+Okay.
+So, uh, we are now a quick reminder that you need to accept Meta's terms of service, if you haven't
+already.
+I'm sure you have.
+But if not, then do follow the instructions just as before.
+Um, and if you have problems with meta, then do go to this troubleshooting colab.
+Okay.
+Um, let me see.
+What we're now going to do is, uh, build something called a bits and bytes config.
+So this is where we specify what kind of quantization we want to do to reduce the precision.
+And so um, it's bits and bytes, which is a sort of jokey name.
+It's bits bits and bytes but spelt the geeky way.
+Uh, for eight bits.
+So we're telling it that we want to load in four bits.
+We want to reduce the precision all the way down to four bits.
+This is like an extra thing which allows it to it does it two times.
+And for extra efficiency you can look up why that, why that works well.
+Um, and then this here is the important one.
+This is where we say we want to use this nf4 data type.
+This data type which we're not going to interpret these, these four bits like a number from 0 to 15,
+but rather we're going to map these four binary bits into some normally distributed floating point number.
+Uh yeah.
+If you, if you know what that that's all about.
+So we'll run that.
+Um, okay.
+Now this is where we are going to now create our tokenizer.
+Same code as as yesterday.
+We're going to do frompretrained for the llama model.
+This line here is is just something that you have to do.
+And you always see it in the code.
+It's some fiddly thing that, uh, the tokenizer has some special tokens.
+We saw them yesterday.
+A bunch of special tokens, and one of them is the end of sentence token that comes at the end of the
+sentence.
+EOS and another of them, the hugging face expects is called the Pad token, and it's one that hugging
+face uses to to add extra spacing if it needs to.
+And the uh, for some reason, most of these tokenizers don't have this set, and it needs to be set
+by default to be the end of sentence token.
+And if you don't set that, then you get an error somewhere else.
+So you'll see this in the code everywhere.
+People do this and I wonder why they don't just put this as a default somewhere to to avoid it, but
+for whatever reason you see tokenizer pad token equals tokenizer eos token.
+So we just do that.
+Uh and then we do tokenizer apply chat template.
+We pass in the messages that we just did.
+And we want to put this on the GPU, something we didn't do last time.
+But because we're going to run it we're going to we're going to take this these tokens that we're going
+to make these token IDs, and we want them to be sent off to the GPU because we're going to run fast
+matrix maths.
+And so you have to know that that first of all, you have to have this converted into PyTorch types
+of, of data structures which, which are ready for the GPU.
+So this return tensors equals DT stands for PyTorch.
+It's a very very technical.
+But you just you need to do that.
+If you don't do that there'll be an error.
+And then you do Tokuda.
+Remember Cuda is the name of Nvidia's GPUs technology.
+So that's saying please go and push that onto the GPU.
+This is all if you're thinking how am I going to remember all this.
+This is super standard.
+You see this everywhere.
+It's one of those things you just do it this way and it will just work.
+So we do it now.
+And as I promised you, it will just simply work.
+That's happened.
+We got the inputs.
+They are now sitting there.
+Let's have a look at them.
+Hang on.
+Code.
+If we look at inputs.
+Here it is.
+It's it's this is like a PyTorch tensor.
+A tensor is basically a fancy name for, for a matrix.
+Uh, essentially uh, and uh, it's a matrix of numbers and it's sitting on our GPU.
+And that is what we've just built here.
+And I know I'm not giving you like super detail on this enough so you get some intuition.
+You don't need to be able to to know this back to front.
+Okay.
+So next up you remember the way we created a tokenizer just here we're going to do very similar thing
+to create a model.
+So here it is.
+We're saying we want to use just like we used auto tokenizer before.
+We're saying auto model for causal lm.
+A causal lm sounds like a bit of a mouthful.
+First time you've heard of this, it just turns out that's the name that Huggingface gives to Llms that
+that generate content the way that we do, they're called causal Llms.
+There's another technical name that some of you may have heard of called autoregressive LLM.
+It's the name for one of these things where it spits out a token, and you put that back in and run
+it again, that kind of generation LLM.
+So the general word that that Huggingface gives for it is causal LLM LM these days, when people say
+LM, that's typically that's all they're referring to.
+There are other things that are like encoders and stuff, but but you normally would then describe that
+differently.
+So, so you know causal LM and just LM for pretrained.
+So we're saying we want the one for llama.
+This this is saying um pick pick what.
+This is basically going to pick Cuda because we've got a box with Cuda on it.
+And we're passing in our quant config.
+I should run this because it's going to take a minute.
+It's now going to go off and download the files from llama.
+If you've picked llama 3.1 this will now take like 5 or 10 minutes.
+I think Colab used to have a stronger network connection, but Google might have been might be saving
+some money and it takes longer these days.
+Uh, even this much.
+We're using a really small llama here.
+Uh, 1 billion parameter llama.
+It's still going to take a while.
+It downloads the full precision, and then it reduces the precision for what it has in memory.
+So that's all going to go on.
+And I will see you in the next video when it's happened.
+--- Lecture 3 ---
+All right.
+Do you have a cup of coffee?
+Things are about to get real.
+We've downloaded the llama model.
+We've quantized it.
+We've got it in memory.
+I'm just going to run this code to show that the memory footprint is one gigabyte.
+We filled up a gigabyte of memory with this model.
+And we are now going to look at this model.
+So it's in this it's in this variable model.
+And we're going to we're going to we're going to inspect it and see what is in this model.
+But but let me just describe it to you.
+So this model contains PyTorch code to run the llama 3.2 model and llama 3.2 model.
+It's it's been written using this framework called PyTorch, which is a Python library for writing neural
+networks.
+The first step I have for you is if you don't know what like things, what a neural network is and the
+the parameters in it, then please watch my YouTube intro playlist.
+Take a quick pause to watch my playlist.
+I realized for at least as of now, that that I've sort of stopped two thirds of the way through.
+Like I keep saying, there's going to be another video and there isn't yet, but that doesn't matter
+because you only need to get up to that point to have the intuition you need.
+And if you've got there, and you may already know all this very, very well, you're aware that basically
+a neural network are these layers upon layers, upon layers of sets of little algorithms which basically
+blend the information in the layer above?
+I sometimes describe them as, as audio mixers, because you can think of them as like little sliders
+that control the signals on the layer, blend them in a different way, and then spit out some combination.
+And the transformer is the name of the particular architecture that, as I said before, turns out to
+work really efficiently for being able to get all of this information flowing layer to layer and being
+able to train it or tweak these mixers slightly tweak the way you blend the information so that what
+comes out of the out at the back of it gets better and better at doing what it is you're trying to do
+based on all your training data.
+That's that's what the game is all about.
+So with that, what we're going to do is actually print it out and look at it.
+That's the way that I like to teach this thing.
+A lot of people like to have tons of diagrams, and I don't mean to be dismissive.
+A lot of people I know, actually many people prefer to learn from diagrams.
+And I guess there's some diagrams on my on my YouTube videos.
+But I like to learn from code, and that's what we're going to look at now.
+So one of the really nice things about this kind of PyTorch thing models is that you can just print
+it and you get this kind of visual look, the structure that describes the whole neural network.
+So each of the rows, each of these rows that you see that are printed out here represents some some
+object or group of objects that sort of fall under model.
+So model itself is called Lama for causal LM.
+That's, that's the kind of object it is.
+And it contains this model, the llama model, which contains all of this.
+So you can think of this like a little tree structure of what contains what.
+And and all of this is encapsulated within this one model object that we've got right here.
+So what is there?
+Well, at the top level there are these three things.
+There's there's something called embedding this this one up here.
+And then there's this, this big thing called layers and layers is 15 layers, 15 chunks, one after
+another, 15 layers.
+And then at the very bottom there's something at the end called LLM head.
+So it's embedding then it's it's sorry, it's not 15, it's 16 0 to 15.
+Uh, sorry embedding and then 16 layers and then LLM head at the end of it.
+So what are these these things I'm going to first describe these three big sets.
+And then we'll we'll dig in to the 16 of these layers right here.
+And if you're looking at llama 3.1, there are 32, not 16.
+There's twice as many.
+All right.
+Let's let's talk about each of them.
+So first of all I'm going to highlight this.
+We're going to mention this embedding thing.
+And I do want to mention that what comes in the brackets after here is trying to describe what's called
+the dimensionality of that layer.
+But how many dimensions comes in and how many dimensions comes out.
+And what that means really is how many, how many different numbers are going to be fed in for each
+of these?
+How many possible values will be sent in?
+I'm being a bit hand-wavy if you if you, uh, yeah.
+I mean, I understand that I'm oversimplifying a bit just to give you that intuition.
+So this embedding layer is something that takes in something that can have all of these possible, uh,
+parts to it.
+And what comes out is just something which has 20, 48 dimensions.
+And what this is doing, this embedding layer, it's sometimes known as vector embeddings, sometimes
+known as encoder layer.
+This is something which is just taking the tokens that are coming in as the input.
+And for each of those tokens, it's turning it into something which is a bunch of numbers that best
+represents its understanding of what that token represents.
+It's like a mixed set of mixers that mixes every possible token into a whole.
+2048 different numbers, and this happens to be the number of possible input tokens.
+Do you remember we counted them with llama and it was 128,000, which I thought to start with.
+It was 128,000 and 256 because there were some special tokens.
+Well, here they are.
+This is this is all of them, all the possible input tokens coming in.
+And every input token gets, gets mapped into some compressed set of 2048 numbers.
+That represents that word, that token in in some way that really makes sense to the other layers that
+come below.
+So very hand-wavy.
+This is something that's called vector embedding.
+It's basically translating a single word into a vector with 2048 dimensions.
+Vector embedding.
+That's how it's known.
+And in particular Lama uses a particular technique for this called rotary embedding, which is a particular
+way that makes sure that words in a sequence that the order in which they appear is sort of affected
+in some way that's taken into account.
+And if you want to drill deeper into that, then Google it.
+You'll you'll see all about it.
+Okay.
+So that's the embedding layer.
+It's turned our tokens into this, this, uh, this vector of 20, 48 dimensions, the next 16 layers
+is where all the action happens.
+That is stack upon stack of mixers, as I call them, things that are blending the information in some
+way with lots of parameters.
+That's all happening.
+And we're going to drill into this in just a second, only for those that want to, uh, and then at
+the end of it, this LM head, this thing at the very end, which stands for language model head, that
+is the very final layer.
+That is something which takes in these 2000 dimensions till 2048 dimensions.
+What it spits out has, interestingly, you may think the same number of dimensions as the number of
+tokens.
+That's what comes out at the end.
+And the reason is because what's going to come out is going to be, for every possible next token,
+a probability of how likely is it that that is the token that should come immediately after the input?
+That's the whole game here.
+That's what this entire set of, of, uh, matrix calculations is trying to achieve.
+And so this is this is known for people in the field as a fully connected layer.
+And it outputs the probability of the next token.
+So for people who've who've got any experience with traditional data science, this whole thing could
+be called a classifier.
+It is classifying.
+The next most the next token.
+Because what's coming out is the probability of the next token being in any one of the buckets of 128,256
+possible buckets.
+That's what's going on.
+And so that is why this is a next token prediction machine.
+So again there's the embedding layer that turns tokens into vectors.
+There is then 16 of these layers stacked up against each other.
+And then at the very end there is this language model head language modeling head which comes out with
+the probability of the next token.
+All right.
+So that's the the high level that gives you some intuition for this.
+And next I'm going to drill in a little bit more into these 16 layers, but only for those that want
+it.
+You can also choose to speed me up and zoom through it, because I will be coming back to this during
+during the course to give you that little bit more intuition every time.
+--- Lecture 4 ---
+All right.
+You're hanging on in there.
+You've decided you're gonna go deeper.
+Fine.
+Haha.
+You're calling my bluff.
+So we had the embedding layer at the top that turns things into this 20, 48 dimensional data.
+We know we've got the thing at the very end.
+So what is going on in the middle?
+What are these 16 layers?
+They're called the modules.
+Each one of these things, each one of these is called a Lama decoder.
+Layer 16 Lama decoder layers.
+Some people may know that transformers are often described as combining encoders with decoders, and
+a lot of of the modern day transformers only have decoder layers like this.
+No encoder, just a lot of decoder layers.
+So the decoder in Lama's architecture consists of basically these these three chunks attention layer,
+something called an MLP, a multi-layer perceptron.
+And then this stuff here is called layer norm.
+So what are these all about?
+Well, this one here, this attention piece, this this is the thing that Google invented when they
+put out that paper.
+Attention is all you need.
+This is something which is a set of these blending, these mixers, these algorithms which are designed
+to try and mix the layer above, but in particular, what they try and do is figure out what is it about
+the layer before me that I should be paying attention to?
+And they they learn over time what their their weights are set to, determines how they incorporate
+all the information in the layer above.
+And they do it by learning for different things something called the query, which is what am I looking
+for?
+The key which is which is what is each one trying to inform me?
+The value which is what is, what's the information in each part of this?
+And oh, the output is the final output from doing all of this super hand-wavy I know, but I just want
+to give you the intuition that those are the query key value output, which are the four types of parameter
+that get learned by a self-attention layer.
+And so that's what happens here.
+And you'll see that that the the the input dimensions, this whole thing are 2048.
+The output at the end of it all is also 2048.
+But there's some other stuff going on here and I've linked to this.
+This ChatGPT write up is something.
+It's for llama 3.1 rather than llama 3.2, but it gives a really good walkthrough of some of this.
+And you can also it's one of these things where you can absolutely drill down.
+There's so much that you can get to on, on YouTube, on from talking to ChatGPT, and even from reading
+the original self-attention paper, attention is all you need to get if you want to go a little bit
+deeper.
+But for now, I just want to give you that intuition.
+Self-attention is all about figuring out what matters.
+From the layers that came before me the multi-layer perceptron.
+This is one of the like the core building blocks of deep neural networks.
+This is absolute bog standard deep neural network stuff.
+This is where you connect together your your your layer above to your layer below.
+And the way that it works, the up proj is something which explodes out the number of dimensions from
+2000 dimensions to 8000 dimensions of your data.
+Tons of data.
+The gate is then basically something that's figuring out what matters with all of these dimensions.
+How can I filter the stuff that matters?
+And part of that gate is what's known as a non-linearity, which I will explain in just a second.
+And then after you've done that, after you've gone through the gate, there's a down projection which
+converts it back to the 2000 dimensions that we had before.
+So it's 2000 dimensions, explodes out to 8000, goes through the gate back down to 2000 again.
+That is the multi-layer perceptron layer in each of these 16 chunks.
+Okay, you're through most of it now.
+It's easy.
+Now, this stuff, the the layer norm is just about it's just mathematical trickery to try and make
+sure that the numbers behave themselves.
+And don't don't go flying off either to, to too much or too small.
+So this is all about what they call Normalizing the numbers so that they behave nicely.
+Mathematical trickery.
+Not super important for it all.
+And that's it.
+Those, those.
+And then there's more norming that happens here.
+So that's the overall construct.
+It is the embedding.
+And then 16 of these modules which have attention and multi-layer perceptron.
+And then you end with the LM head.
+That's how it all fits together.
+That is the transformer architecture in a nutshell.
+Uh, and and it's this, that, that just happens to work so well when you pump in lots of data and
+you train it in a way that we will do in week seven.
+So I'm not really talking about how training works yet, but when you train it, it gets better and
+better at the outputs mapping to probable next tokens in a way that starts to exhibit this intelligence
+and quite why that last part happens.
+No one's really very sure, but we do know.
+We do understand why it gets better and better at imitating plausible next tokens.
+It's just a bit confusing that it also turns out to to to be so good at true and accurate.
+Next tokens Okay, so the final part of the puzzle I just want to mention is this activation function
+Selu.
+So first up, if you've watched my videos then you know that I like talking about these these neurons,
+these individual little algorithms, these matrix calculations like they're audio mixers blending the
+signal in the way above.
+And you might think that sounds like it's a bit of an oversimplification, but it's actually not.
+What they do is literally multiplying by weights and adding them together.
+That's the matrix calculation that happens.
+Also known as matmul that you see all over the place.
+But but it is just that calculation.
+It's also what one would call a linear combination.
+It is just a weighted combination of the inputs.
+And there is something uh, that's that's very mean about linear combinations.
+There's there's something unfair about them.
+And the mathematical way of saying it would be to say that a linear combination of linear combinations
+is itself just a linear combination.
+I don't know if that meant anything to you.
+I'll say it again.
+A linear combination of linear combinations is itself just a linear combination.
+And what do I mean by that?
+What I mean is imagine that each of these little, little algorithms is, as I keep saying, like an
+audio mixer that's mixing four volumes, let's say, and let's say that at the beginning, the top,
+the input, the very first input is let's say it's four singers with microphones.
+It's the it's the four Beatles.
+Uh, the four Beatles are sitting there in front of us, uh, and uh, they, they are singing and we
+have a mixer that is able to to blend the four voices into the perfect blend of the four Beatles.
+And it's doing that.
+And the output from that mixer is going into more mixer.
+Another set of mixers.
+And lots of other people have their mixers and they're mixing the four Beatles.
+They're all going into more and more mixers and more mixers, and there's a billion of these.
+And out at the very end of it, there's a speaker attached to the final mixer and it's playing.
+Here's the thing.
+If you were to listen to my mixer, it would be some blend of the four four Beatles singing.
+When you listen to the one at the very end?
+The bottom line is, it's still just going to be a blend of the four Beatles, with some proportion
+of each of them.
+Nothing else.
+There's no way in all of these mixes connected to each other that anything has changed the signal in
+any way.
+That means that the final output is anything more than some different volume of each of the four Beatles,
+which means that you could replace all of this billion mixes with one mixer, which just had different
+settings on it that represent some kind of, some sort of an average of all of the mixes out there in
+some in some way.
+There would be some setting you could set it to that would just replace everything.
+So with all this fancy stuff, with all of these different, with this, this Q and K and V and O projections
+and all of this technical stuff, you could replace all of this with just one simple linear combination
+of the, of the tokens and one number coming out.
+And there's no need for any of these billions of parameters when you could just do it with, with with
+100,000 parameters.
+That would be it.
+Well, that seems like a pain, right?
+So all of this is for nothing?
+No, as I'm sure you can imagine, there is a trick.
+The.
+It turns out that if you have all of these mixers connected together, then if you are able to introduce
+out of each of these mixers some tiny distortion to the sound, something that's just maybe the same
+for every single one of them, but something that messes with the sound in some way that isn't just
+a linear combination is what we would call nonlinear.
+Not not a linear combination.
+Something else.
+As soon as you do that, then each mixer gets to influence the final output in a slightly different
+way.
+And suddenly all of the all of these, all of the mixer levels, all these parameters are meaningful
+and you can't replace everything with one mixer anymore.
+And so introducing this non-linearity becomes absolutely crucial to making sure that that all the parameters
+matter.
+And this was a discovery I think back in like 1950s or something, when people were first thinking about
+how do we how do we build these in a way that could be sort of imitating, inspired by the human mind,
+and they realize the tyranny of linear regression.
+And then they had this idea that was that was kind of inspired by the way a human neuron fires.
+It either fires or it doesn't.
+And that's quite nonlinear.
+Uh, so this idea is that in this gate process, when you go up to lots of dimensions, you then introduce
+something nonlinear in the mix, and then you go down again.
+And by doing that, suddenly everything counts and all these parameters are meaningful.
+And it turns out that what you use for that nonlinearity actually doesn't matter that much.
+Like there's lots of different things that you can try that just twists the output in some way, and
+it just turns out that some just work better than others in terms of how quickly you can train.
+And one of the very common ones that you see used all over the place is called ReLU, which sounds very
+technical and actually stands for it stands for rectified linear unit, which does sound very technical,
+but it's this super simple thing which is like if the input is less than zero, then just flatten it
+to zero, and if it's more than zero, just return the input.
+And this thing which is which is called a non-linearity, because the relationship between input and
+output is not a straight line.
+It's not linear.
+That's good enough.
+That makes the whole neural network do interesting things.
+So ReLU super common.
+The one that's used in llama is called Selu uh, which is called a sigmoid linear function, sigmoid
+linear unit.
+And it looks like this.
+It's very similar to the ReLU but it's just a little bit smoother.
+And it just turns out that it works well.
+So that's why it's used.
+It's super experimental.
+In the early days, everyone used to use a thing called sigmoid that was very common.
+Then ReLU and now Selu is super common.
+Uh, and so it's not all that important to, to sort of know about this or know why, just to know the
+reason behind it is to get around this, this tyranny of linear regression so that the whole neural
+network can't just be replaced by by one tiny weighted combination, but actually everything is meaningful.
+That is what is going on.
+--- Lecture 5 ---
+Oh my goodness, that might be a lot more than you bargained for.
+But you got it.
+And there's more if you want to read about it here, I've got, uh, stuff, but but I do want to say
+that, uh, please be assured you don't need to go into this stuff into detail.
+Your job as an AI engineer is about selecting, optimizing, tuning, and applying llms rather than
+writing this kind of PyTorch code.
+But, uh, it it can be interesting.
+I think it helps to have the intuition, and that's why I cover it.
+Okay, enough, let's run this model.
+So the way that you run the model is you just call model generate, you pass it the inputs.
+These are the token IDs that are on the GPU.
+We say don't don't make more than 80 new tokens.
+Please.
+Let's print the outputs.
+That's going on right now.
+It's going to do everything I just said.
+It's going to pump it through all these layers.
+And one thing I didn't even mention on these layers you probably saw is that they have they've got this
+linear four bit.
+They have been downgraded to four bits.
+If you're not using quantization, you wouldn't see that linear four bit.
+So right now all of that's going to happen.
+It's going to happen while we watch.
+There's some warnings we don't care about warnings uh tension Attention.
+Masks, stuff.
+I'll tell you about attention masks another day.
+And here.
+Here is the output.
+There it is.
+Well, well, great.
+That's a funny joke.
+It's told us, uh.
+Ah, yes.
+This this output, which is a tensor.
+It's on the GPU.
+That doesn't make much sense to us, but luckily, you may remember that we can call tokenizer decode
+and see what on earth it's trying to communicate to us in these numbers.
+And here it is beginning of text start header system.
+And that's all that okay, here's a joke tailored for a room of data scientists.
+Why did the panda pandas go to the statistics club?
+Because they wanted to analyze their love for data, and it was a pandemonium of numbers.
+This joke combines a popular pandas species with a statistical concept and a playful pun on pandemonium.
+I mean, remember, this is a 1 billion parameter model that we've downgraded to only have have 16 possible
+positions.
+So it's not with that with that handicap in mind.
+Not bad at all.
+I think that is perfectly, perfectly possible for a tiny 1 billion parameter model at a quarter of
+its of its size.
+So I'd say nicely done.
+And now sometimes it's good to clean up the memory that's being used because this stuff hangs around
+on the GPU.
+And these are some things to, to run.
+And, uh, student uh, helped iterate on this and get it better.
+So after you do this, sometimes it cleans up the GPU memory, but sometimes it doesn't.
+It sort of hangs around there, but I think it still has freed it up, even though it doesn't show it
+visually on here.
+All right.
+So I've now wrapped that generate function in this big block and this big function here.
+And I've put in some more more parameters.
+I'm making it.
+You can choose whether it quantizes or not.
+You can set the maximum number of tokens if you want.
+I've also got some stuff here about the attention mask to stop that warning happening.
+And if you want to find out about attention masks, then do Google it or we will.
+We will be forced to talk about attention masks in week seven, so you can look forward to that.
+Uh, and then I'm also going to use be streaming.
+That's just a hugging face feature that you can have something called a text streamer.
+You have to tell it which tokenizer you're using, and we will then stream back results.
+When we call model generate we pass in the streamer, but otherwise this is the same.
+It's going to be it's going to take a model.
+It's going to look up the tokenizer.
+It's going to have the janky pad token equals end of sentence token.
+Who knows why we always have to say that.
+Uh it's then going to get the input IDs, turn them to PyTorch, put them on Cuda.
+It's going to get the attention mask.
+And it's going to then choose whether to quantize the model or not.
+Get that model and call model generate.
+That's what this function generate does.
+And so now we can call that function for Phi five for from Microsoft.
+And now this is a bigger model.
+This is like a 4 billion parameter model.
+So you can see it's got like seven gigabytes.
+And this does take this takes like 5 or 10 minutes or something to come through.
+So I'm going to head off and get myself a coffee.
+And you?
+Well, I guess the video is going to flip on right away, but if you're running this yourself, you
+may need to go and get a coffee too.
+And I will see you in just a second.
+Wow.
+And if it feels like it's been ten minutes since you kicked this thing off, well, that's because it
+has been ten minutes since you kicked this thing off.
+It fires it like it's a 4 billion parameter model, and it runs quite quickly.
+It's the downloading the model that takes so long.
+And when you run it on your own machine, it gets it gets cached on your on your hard drive.
+But when you, when you run it on Colab has to download it every time you have a new runtime.
+And uh, yeah.
+So let's hope the joke is worth it.
+Let's see, why did the data scientist break up with a computer?
+Because it kept dumping data on them and they just couldn't handle the relationship anymore.
+And then a special end token that was well needed.
+It was.
+All right.
+Um, but yeah, I think I preferred llamas.
+One.
+Okay.
+Uh.
+And, uh.
+Yes.
+Then then, uh, we'll move on swiftly to smaller models, starting with the absolutely tiny Gemma three
+270 million parameters.
+If you happen to skip fire, I don't blame you.
+Let's go to Gemma.
+Okay, so, uh, yeah, apparently nowadays you do also need to get agreement to use Gemma as well.
+I've been granted access to this model.
+You have to sign the terms.
+But I gather with.
+With Gemma.
+I've never heard of someone not being approved.
+But you might be the first.
+But let me know if you if there's any problems with it.
+But otherwise it should be possible to come in to Gemma.
+I discovered that that you can't use quantization with this tiny Gemma model.
+I don't exactly know why, but I got some horrible PyTorch error when I tried, so I have rapidly turned
+that off and it seems to be working fine now, so this should run hopefully a bit more quickly than
+five four.
+I can already see it's only it's got half a gigabyte to download, which it's uh, halfway through.
+You can see it's executing down there on, on our T4.
+And then once that's done we're going to do Kwon and then Deep seek and then we'll be done.
+I will come back in a second.
+When?
+When this is ready.
+Okay.
+And so Gemma has finished.
+And Gemma's joke to lighthearted joke for remote data scientists is, why don't scientists ever go to
+the beach?
+And then Gemma stopped.
+So whatever Gemma had in mind, we will sadly never know.
+And similarly, it gives other random stuff if you run it.
+So you probably had the same experience.
+The fact that it even had like an attempt at a setup is in itself admirable for a 270 million parameter
+model.
+Really very tiny indeed.
+Okay, that is Gemma.
+Moving on to Quinn.
+I have already run Quinn because this is, again, I think, a larger variant of Quinn.
+So I let it do its downloading.
+Look at that.
+You can see that it brought in like eight gigabytes or so.
+You could see as well.
+My GPU Ram is really stuffed full.
+So here it says tell a light hearted joke for a room of data scientists.
+And it says sure, here's a light hearted, data savvy joke.
+Why did the data scientist break up with a statistician?
+Because of the correlation.
+It was just a coincidence.
+They were always together, and it was not a strong enough p value to justify staying together.
+Oh, it's all right.
+It's like nerdy.
+Uh, I guess it's kind of, you know, correlations and all that.
+I suppose we'll, we'll, uh, we'll say that's all right from all right performance from Quinn.
+Uh, and, uh, it wanted to keep going, but I but I stopped it after it's 80 tokens.
+And then finally I wanted to show you a reasoning model.
+So deep seek R1.
+It's the the famous reasoning variant of deep sea.
+Uh, it's been compressed into a small 1.5GB version, uh, gigabyte, 1.5 billion parameter version
+of Cran.
+And I've said it can generate up to 500 tokens.
+And what you'll see is that the first thing it generates is the reasoning message, the thinking through.
+Okay, so I need to come up with a light hearted joke for a room full of data scientists.
+Hmm.
+Where do I start?
+Well, uh.
+And off it goes.
+It rambles away.
+You can see lots of this stuff.
+And guess what else you can see?
+Wait, you can see maybe blah blah blah blah blah.
+Another angle.
+Or maybe wait another thought or maybe something like.
+Alternatively, and you may remember when I told you before that just this slipping in the word wait
+is one of the tricks that I used, and I believe that alternatively is another.
+So you can see like wait wait wait.
+Alternatively and these, these, these tokens are slotted in there while it's in inference token by
+token that's thrown in there to force the model to self-reflect and keep going.
+But in this case, it kept agonizing over this joke, and even in 500 tokens it wasn't able to come
+to a joke.
+So whilst we can have some insights into the thought process of a small model, we don't actually get
+a particular joke at the end of it.
+Maybe you did better.
+I'm not sure.
+Anyways, the conclusion is that open source models are super fun to experiment with and easy to run.
+Downloading them the first time can be a bit of a bore and but but you get to use them.
+It's for free.
+And as an extra piece of information we've gleaned, they're not very good at telling jokes, but they're
+very good at lots of other stuff.
+And so you should experiment and try find out things they're good at, because we are going to discover
+one of them tomorrow in the commercial project that we'll build, rather than this silliness.
+I think probably llama 3.2 won the prize for for today's session.
+Anyway, that is our exploration of open source models using the model part of the Transformers package.
+And as part of this, we really dug in to what it looks like to have a deep neural network in PyTorch
+code as part of the Huggingface Transformers code.
+And that's a wrap on day four of week three.
+We we really did get get more technical today.
+I hope you enjoyed it.
+Now, in addition to coding with frontier Models building assistance, you now can use hugging face
+pipelines, tokenizers and models.
+And hopefully you're starting to build some intuition about how these things work, how they fit together.
+And tomorrow I'm going to to we're just going to practice.
+Tomorrow it's going to be about really building up the strength of these skills, this expertise by
+some repetitive work of of building stuff and hopefully a more useful commercial product than telling
+jokes.
+And we'll also be be looking deeply into running inference.
+And I also have a little, little nice thing to show you.
+I just want to, to do to open your eyes a little bit more about how inference works, how how it is
+that generating the next token ends up giving the kinds of outputs we see.
+So I want to show you something, a visual for the visual people that feel like I've been doing too
+much coding.
+I've got something visual for you that I think you will like, and I've got that in store for you tomorrow
+as well, which will then wrap up week three.
+I can't wait to see you for week three.
+Day five tomorrow.

@@ -1,0 +1,856 @@
+--- Lecture 1 ---
+Okay, so the fabulousness that is week two continues with week two, day four, and it's another big
+day of leveling up.
+So already already you know the basics of Transformers.
+The terminology.
+You can confidently code with a chat completions API.
+And now you can build an AI chatbot assistant, including an interactive API that can call GPT and Claude.
+After today, you're going to be able to define tools.
+Tools is a big deal.
+It's used.
+It's it's something which is at the the basic building block of a genetic AI.
+It's also used to build functional commercial chatbot assistants, as you will see, because we're going
+to be doing that today.
+And for those of you who've already taken my Agentic AI course, you're already very familiar with tools.
+And so today might might be simplistic for you, but I'll still try and juice it up in some way.
+There'll be something, hopefully, that you're not expecting anyway.
+But what we're going to do is talk all about tools.
+So what exactly?
+What is the situation?
+What does it mean?
+You probably heard it all the time.
+What does it mean to give a model tools.
+You are allowing a frontier model or any model, an LM, the ability to connect to an external function,
+to be able to call a function a bit of code.
+It allows you then to get to get deeper responses, because you can extend a model's knowledge, because
+it can use a tool to to retrieve something, perhaps from a database.
+It can carry out applications, perhaps it can book a ticket and it can enhance activities.
+You can have tools which can do things like executing Python code, or it can run a test case, or it
+can just do some calculation.
+All of these things are tools that you can equip a model to do.
+And we do many of them on my on my other course.
+Uh, but but hang on a second.
+If this is your first time really hearing about this, you might be like, just just hold on, hold
+on.
+So you're going to give an LLM the ability to, to run some code that I've written, which maybe is
+going to retrieve something from a database or something like that.
+So, so wait, that kind of sounds spooky.
+And LLM is like a data science model.
+It's a model that that produces tokens.
+It outputs tokens, right.
+That's what they do.
+It's a neural network that uses weighted parameters, blah blah, blah, blah blah.
+And it uses attention layers and everything else.
+And what comes out of it at the end is the probability of the next token.
+So how is this neural network going to suddenly decide, I'm not going to generate tokens anymore.
+I'm going to do something completely different.
+I'm going to go and call a tool.
+Uh, and not only that, but this is presumably running on the cloud in OpenAI's hardware somewhere
+in Silicon Valley.
+And what it's just going to suddenly be like, I'm going to attach back a bit like maybe a bit like
+a gradio.
+The demos are able to sort of come back in, it's going to come back in and like call some of my code.
+That sounds weird.
+How how exactly is that going to happen?
+How does a neural network start?
+Start running functions and how is it going to run functions on my computer?
+So look the answer is it doesn't.
+The the actual way it works is super mundane and simple and obvious.
+And there's no voodoo whatsoever.
+And let me explain that.
+Let me lay it out very clearly for you.
+Look, in theory, tool calling is that people make it sound like it's like this.
+An LLM is deciding to run code that I've written, like a booking function or a database call or something
+like that.
+So you've got some code that you've written and it's going to make a call to an LLM like this with like
+a prompt and a response, and that LLM is going to decide as part of figuring out this prompt.
+You know what?
+I'm going to execute some code.
+I'm going to run something that's a tool.
+And that tool could be something that does a database, lookup a calculation, run some code itself.
+Like like it could be a coder tool.
+It could do all of those things.
+And this is in theory what what happens.
+But in practice that is not what happens in practice.
+This is what happens in practice.
+In practice.
+The code makes a call to an LLM that says, I want to do this and this and this.
+And with what comes back, the LLM informs the code in order to do that.
+I think we should run a tool, this tool, and it's our code that then goes out, makes that Python
+call, comes back with the answer, and then you call the LLM a second time with the answer and say,
+hey, this is the conversation history.
+I asked you a question.
+You responded and said, please call a tool.
+I called the tool.
+Here's the answer to that.
+Now please answer the question.
+And based on that conversation history and nothing else, because every call is stateless.
+Based on that history, the LLM then returns something, responds in a way that takes into account the
+calling of the tool.
+It's just more messaging in the conversation history.
+And that messaging includes a request to call a tool.
+That's all there is to it.
+The LM is still just generating tokens.
+It's a statistical program that generates likely tokens.
+And those tokens might include, hey, I need you to run a tool for me.
+And maybe you knew this already, but if you didn't know it, you're like, oh, now I see.
+And the one more piece of the puzzle to say is that you might you might wonder, okay, so how does
+the the LM know to respond with these tokens that says I'd like to call these tools.
+And the answer is again very simple.
+In that first prompt, the first message you sent to the LM, you said, hey, I want you to do the
+following, please.
+This is your task, by the way.
+I have the ability to run some tools on your behalf.
+If you want me to run any of these tools, simply reply and tell me to run a tool and then I will get
+back to you.
+That's all there is.
+In that first prompt, you explain what tools can be run in a way that the LM has been already trained,
+so it's ready to expect that format of tool calling.
+You do it by describing it in JSON.
+It's been trained with lots of this JSON.
+It knows then to call a tool, and I can make this super real for you if you've not, not if you're
+still not completely convinced.
+I just opened ChatGPT and I gave it a prompt.
+Out of nowhere.
+I typed in this prompt and you can do the same.
+And I believe for people that haven't quite clicked yet, this prompt hopefully will be the thing that
+pushes you over the edge and be like in a good way, pushes you over the edge.
+Sounds bad, pushes you over a good edge into something great, which is a full understanding of tools.
+Here it is.
+Uh, you are a support agent for an airline.
+Okay, that's my prompt to GPT.
+You answer a user's question.
+You also have an ability to query for ticket prices.
+Just respond.
+Use tool to fetch ticket price for London, to retrieve the ticket price for London, or for a city
+that you name.
+Here's the question.
+User I'd like to go to Paris.
+How much is a flight and look at how ChatGPT responds to that.
+It doesn't respond by answering the user.
+It responds verbatim with use tool to fetch ticket price for Paris.
+So I said to it, you can use a tool.
+Here's how you do it.
+Now here's the question from the user.
+And as a result it said, fine, I want to use my tool.
+That's it.
+That's how tool works.
+You prompt the LLM with instructions including that it can call a tool.
+You give it the question.
+If it wants to use a tool, it says please can I use the tool.
+You write the code.
+You need an if statement in your code.
+If it wants tools, then I'll call a tool.
+And then you call it a second time with a history of the conversation, including the tool call and
+the answer.
+I know you get it.
+You're like, okay, fine, you believe me?
+You've got it.
+All right.
+It's time for us to talk about about why you use tools.
+--- Lecture 2 ---
+So what are some of the typical ways people use tools?
+Well, obviously they're very useful for looking things up in a database.
+I mentioned that already.
+They're useful for actually taking actions you could get in a conversation with NLM.
+An assistant could book a meeting, book airline tickets.
+You could have your LLM be able to to carry out a calculation.
+Something that llms are famously bad at is doing any kind of maths.
+Well, you can give it a tool that can do the maths for it, as we suspect ChatGPT is given tools like
+that, which is why it's now able to do calculations easily.
+Similarly, you could give it a tool that can execute Python code, perhaps in a secure way, like in
+a in a Docker container or something.
+That means that it's ring fenced, sandboxed, so that that kind of when you do that, it's sometimes
+called as having a coder agent.
+It's it's an LLM that has the ability to execute code in order to carry out its task.
+A coder agent doesn't always doesn't necessarily mean an agent that writes code.
+It can really mean an agent, an LLM call that's able to execute code in carrying out its task.
+And then finally for for this list would be an example of where you can have an LLM that can directly
+modify the UI, it can produce a new chart that gets visualized instantly to the user, so it can do
+things that can immediately interact with the user.
+And of course, there are so many different ways you can use tools.
+You can probably think of 100 others that I haven't put here because there are many, many, many.
+But importantly, there's a whole category in particular that I haven't mentioned yet.
+Uh, which is where the greatest excitement is.
+And of course, it's all about a gigantic AI.
+There are, uh, two ideas, two ways you can use tools that form some of the the core ideas behind
+Agentic AI.
+And first of all, put simply, you could use a tool which itself involves another call to an LLM.
+So you could say to an LLM, hey, you have three different tools.
+They do A, B and C, and actually A, B and C are all calls to different llms to take care of that
+task.
+And as a result, you're equipping an LLM with the ability to orchestrate the activities of other LLM
+calls.
+And that, of course, is one of the core ideas behind Agentic AI.
+It allows you to have agentic workflows where an LLM controls the The workflow and where it orchestrates
+activities.
+So that's one core idea.
+And then the other core idea is just this idea that you can have a tool which is like a to do list kind
+of tool, which allows an Lem to plan out a series of activities and then like, check them off and
+then continually refine them and, and have some evaluation criteria that it needs to get to before
+it's sure that it's done.
+The list and all of that kind of functionality allows you to build an Lem system, which operates in
+a loop, able to take on activities and see them through to completion.
+And that whole idea of an agentic loop, of course, that is a core idea behind Agentic AI, and it's
+enabled by the use of tools.
+And you saw it in a very tangible way with Claude code.
+So these, these ideas and many others, uh, all form some of the basis of Agentic AI.
+And so you can see how essential tools are to, to agents.
+And that is some of the common use cases of tools.
+But there are many more.
+Uh, and I think that it's about time that we stopped all this talking stuff, of course.
+And we go to Cursa and we start working with tools.
+--- Lecture 3 ---
+Well, here we are in Casa going into week two.
+We're going to day four.
+Uh, we choose go by so quickly.
+And I love week two.
+Uh, okay.
+Uh, and here we are in week two, day four, project airline AI assistant.
+We're now going to bring together the stuff that we have learned.
+And so, uh, I'm going to do some imports, including the beautiful import gradio as G.
+And now I've got my usual initialization.
+I'm as always load env override is true.
+And then get the OpenAI key.
+You can use a different key or I've even this time put in the little code here.
+If you want you can use an open source model directly.
+Llama 3.2 just about handles this lab.
+I got to tell you, it gets quite confused with tool calling.
+You might want to try a bigger model if you can.
+If you can fit it on your computer like Phi three I think is does does a decent job here.
+Uh, so Phi four or Gemma three.
+Uh, all pretty good, but you should experiment and see.
+I think I think llama 3.2 can be made to work.
+All right.
+System message.
+Remember this is where we set the context.
+You are a helpful assistant for an airline called Mighty Light II.
+Whatever that is.
+Flighty.
+Something like that.
+Give short, courteous answers.
+No more than one sentence.
+Always be accurate.
+If you don't know the answer, say so.
+Remember I said that was a classic?
+A good way to try and ensure that you don't get hallucinations.
+Okay.
+And now a chat function.
+And I'm not going to type this one because you know it so well.
+It's a callback.
+It's a callback.
+The first line is the sort of scrubber that makes sure that our history is nice and clean.
+It's not necessary for OpenAI, but it is for Gemini, grok, and a few others.
+And then we construct the messages, uh, list of dicts with the system prompt, using the system message
+with a history with the user prompt we call OpenAI chat or completions dot create.
+We pass in our model what model we're using GPT four one mini a very nice choice.
+Our messages and we return response choices zero message content.
+And let's have a look at it okay here it is.
+And I'm going to say hi there.
+Hello.
+How can I assist you with your float today I'd like to go on a trip.
+Great.
+Where would you like to travel to?
+To London, please.
+Sure.
+Please provide your departure city and preferred travel days.
+Fine.
+We have a chat bot.
+It's a bang.
+It's system prompt.
+You should experiment with this.
+You can use the system prompt to set the tone.
+You can have it be a snarky chat bot should you wish.
+And you can chuckle.
+As we go through today, I'm going to keep it on the on the normal serious side.
+Uh, and you can see that it's giving short and courteous answers.
+It's doing just what we said.
+So that is a good example of using the system prompt, giving it some information, some context.
+Okay.
+But it's time for us to talk tools.
+Okay, time to talk tools.
+But let's start by writing a simple function.
+It's a function that's going to become our tool.
+But for now, it's just going to be some Python code.
+It's going to be called get ticket price.
+That will tell us the ticket price for traveling to a certain location.
+So it's going to be called get ticket price.
+And it will take a destination city.
+And we'll start by printing.
+Oops.
+Print uh, tool called for uh, city.
+Uh, we need to make this an f string.
+Like so destination.
+Underscore city.
+Okay, that seems good.
+And now what we're going to do is we're going to say price equals ticket prices dot get destination
+city or unknown city.
+And then we will say, uh, well, there we go.
+That seems pretty good to me.
+Thank you.
+The price of a ticket to Destination City is price.
+That seems pretty good.
+Uh, so, uh, let's let's run that.
+Okay.
+Let's see what happens.
+Oh, you know what?
+We're going to want to be able to call this with, uh, with a city and lowercase.
+So let's just say there like that, uh, because I've got the cities here are in lowercase like Berlin,
+and I'm going to be able to call it in capitals.
+So now this should hopefully.
+Yep.
+Tool called for city Berlin.
+The price of a ticket to Berlin is 4.99.
+Um, okay.
+So far so good.
+Unknown city.
+That's not very clear, is it?
+Unknown ticket price.
+There we go.
+Seems good.
+So there's Berlin, and that's if we say, uh, anything in here, then?
+Unknown ticket price.
+Fine.
+If we do London, there we go.
+That seems to be working fine.
+That's a function no AI.
+So far, this is just a basic function.
+It's looking it up in a dictionary.
+Feel free to mess with this dictionary.
+Give yourself some different prices.
+We're going to have this all coming together.
+So I mentioned that when we call an LM and say, hey, you're able to use tools, we have to tell it
+what tools it can use.
+And the way we tell it is with JSON, because models love to receive JSON.
+They're trained on lots of it.
+And there's just a fixed format, a type of JSON that you have to use to provide it, to tell it that
+it can use these tools and that JSON, it's been trained on a lot of it.
+So it expects the JSON in this format.
+And it's a kind of janky format.
+It's quite verbose.
+It's got lots of stuff to it, and it's a bit of a bore to write it every time.
+But you have to ish.
+There is a footnote.
+You don't you don't really have to.
+But but for now, for this, for this, for today, we do have to write the JSON.
+And so I've written it for you because I'm not going to type this.
+It's a real pain.
+So this is the JSON to describe this function.
+We're not it's not calling that function.
+It's just a way of describing it.
+We give it a name, get ticket price a description, get the price of a return ticket to the destination
+city.
+It's got properties, which is the parameters, the arguments, destination city which is type string.
+And the description is it's the city that the customer wants to travel to.
+It's required.
+So this, this bit of clumsy JSON is a way to describe this function to an LLM.
+So it knows, hey, I've got this function.
+It's one that I can call on your behalf if you wish me to.
+That's what this is doing.
+Okay.
+So I've got I've taken in that JSON.
+We're now going to put it in some more.
+It's not it's a Python dictionary now but we will turn it into true JSON.
+Um, we uh we then make, make something called tools, which is a list of these things.
+And again we're going to wrap it in a little bit more, more JSON type of function and this is the function.
+So if I show you what that means if I print this this thing tools, this is the bottom line.
+This is this is what we're going to be sending into an LM into into GPT.
+But it could be into any of them.
+It's a chunk of JSON it contains.
+This type is function function.
+And this is the stuff that we just wrote.
+The name is get ticket price.
+It takes one string property, which is the city that the customer wants to travel to, and it gets
+the price of a return ticket.
+Okay, it's just a bunch of JSON that describes functionality we can run on behalf of the model.
+Okay, and now there's some sort of fiddly bits that we have to do to call OpenAI.
+There's really two parts to the puzzle.
+First, when we call the LM, we're going to need to pass in these tools, this JSON that we just wrote.
+It's going to need to know about that.
+That's the first bit of jankiness.
+The second bit of jankiness is that when the LM responds to us, we're going to have to detect if it's
+looking to run a tool.
+If the answer isn't some answer for the customer, the answer is, hey, I need you to run that tool
+that you said you had.
+And if so, we need to run the tool, get the answer, and then send it back as a new message with the
+whole conversation history as a second call to the LM.
+Okay, let's look at those two bits of Jankiness.
+This is the first bit of well, actually this is really both bits of Jankiness.
+We this is the new chat callback, the new thing I'm going to give you in just a second.
+We scrub the history as before messages set up just as before.
+And here is the OpenAI create model is model messages is messages.
+But oh look there's something new.
+Tools equals tools.
+And this of course is that JSON stuff.
+So we're passing the JSON in when we call OpenAI.
+And then we're not going to return response content like usual.
+First we're going to check this thing called finish reason.
+We're checking response zero reason.
+And if it's tool calls we're going to do something different.
+If so we are going to get the message.
+We're going to call something called handle tool call, which is something we still have to write that
+doesn't do it for you.
+We're going to have to write that in one second.
+Uh, and then we're going to to get back the response.
+We're going to put in our messages in our, in our conversation history.
+The message that came back from from OpenAI are response.
+And then look at this.
+We're going to call OpenAI a second time, passing in the longer set of messages that now has the message
+asking for a tool to be called, and the reply with that tool information in there.
+And finally, with whatever comes back there, we will then return response .0. message content.
+So there's quite a lot there.
+That's what we have to do.
+But you're not going to let me forget that I didn't tell you one thing.
+I didn't explain what this handle tool call thing does.
+Well, I just wrote it right here.
+Here it is.
+This is the big old if statement.
+We we take the message that came from from GPT.
+We, we look for this object called tool call that comes back.
+We look at the function's name and we see if it's looking to run a function called get ticket price.
+If that's what came back from from GPT.
+And if so we we also dig into the JSON that came back from GPT.
+We take the the argument which is the city, uh, we, we get that get destination city and then look
+at this line here.
+Look at this line.
+You know what that is.
+That's just simply calling this this this code we wrote all the way back here.
+That's all it's doing.
+So.
+So what we've got here is a big old if statement.
+If GPT says get I want to call get ticket price then look I call get ticket price and then I stitch
+up a response.
+In my response I have to say, uh, you remember that we have in our response objects.
+We have user, we have system, user and assistant as the possible role values.
+There's another one.
+There is role tool.
+And that's what I've got here.
+Role tool.
+And the content is whatever came back from the call.
+So whatever came back from our function we shoved that as another message in the set of messages with
+role of tool.
+This may be you may be like what?
+Uh, in which case we'll dig a little bit more in, in a second.
+But you probably have the basic idea.
+So if we execute that cell and execute that cell, then it's going to be time for us to bring up a chat
+interface and see if this actually works.
+--- Lecture 4 ---
+Here we go.
+We're going to to run our favorites.
+Bit of a one liner from Gradio app.
+It comes and we're going to say hi there.
+Hello.
+How can I assist you with your flight today?
+I'd like to go on a trip.
+Great.
+Where would you like to travel to?
+And I'm just going to scroll down because I want you to keep your eyes just there.
+Just just down there.
+Uh, I'd like to go to London, please.
+Okay.
+And look at what just happened down here.
+You'll see it.
+Printed tool called for city, London.
+That was the print statement that I wrote in our function.
+And here it says a ticket to London costs $799.
+So it just worked.
+It just went ahead and made a tool call.
+We called it back a second time and we got back that response.
+Wow.
+And because I fear that you might have gotten a tiny bit confused by by what happened as a result of
+this handle tool call, I just want to come back here and I just want to show you, before we call OpenAI
+a second time, I'm going to print the contents of this messages thing.
+So I'm going to say like for message in messages print message.
+And that way we're just going to have a series of prints out here about what exactly is in this set
+of messages that we pass in the second time.
+This is after we've run our tool and we've got our results.
+What is it we send to GPT a second time?
+Let's have a look.
+We run this, run this, and we're going to we're going to relaunch this interface.
+Here we go.
+Hi there.
+Uh, I'd like to go on a trip.
+Where would you like to travel to?
+To London, please.
+All right.
+Let's see what happens.
+Okay.
+Tool called for city London.
+And now it's printing out what's being sent to GPT.
+The second time you see that, there's the roles system content.
+You're a helpful assistant for an airline called flight, blah blah blah.
+User says hi there.
+Assistant says hello, how can I assist with your flight today?
+The user says, I'd like to go on a trip.
+The assistant says, great, would you like to travel to?
+I said to London, please.
+Now look what's next.
+What's next is the message that came back with role of assistant, and that it wanted to call a tool.
+And all the details of the tool call are in here.
+It says like, uh, destination city London name is get ticket price.
+That was where I had the if statement.
+If it calls that and the next item in here is role of tool.
+You see the way we've had role system role user role assistant, user assistant user tool content.
+The price of a ticket to London is 799.
+And actually, one extra detail here is you'll see that the tool call ID that's put right there matches
+the tool call ID that's just there.
+And you will find that in the code.
+You'll see that I carefully put the tool call ID in there.
+And you have to.
+So this I hope I haven't lost you.
+It's not super important if you're not following all of this, but it's just, uh, it's just helpful
+to see this in practice that we make these two different calls to get.
+The first one is where it says, hey, I want you to call a tool.
+And the second one is where we pass back all the information, including the results of running the
+tool.
+And that is what results in it responding with that.
+There you go.
+Fantastic.
+All right.
+I'm now going to pull out that that print statement.
+And you can you can put that in if you wish to see it.
+And you should experiment with this and get a good sense of it.
+Let's run that again.
+I want to do something just quickly to show you that there is a slight problem with this.
+That's quite a subtle problem you may have already noticed this subtle problem, I don't know, but
+let me let me say hi there.
+How can I assist your flight today?
+Uh, so I'm going to say, um, what are the ticket prices to London and Paris?
+And what's going to happen now is IAM error.
+Computer says no.
+Uh, yeah.
+Lovely.
+And when when Gradio has errors, it's a slight gradient.
+Is not easy to debug, I will say, because there's a lot happening under the hood.
+And it's always, always a challenge with some of these, these frameworks that do a lot for you.
+People call them batteries included frameworks.
+Uh, because because some of the debugging can be difficult.
+But I happen to know what the problem is.
+And the problem is that that the way that I wrote this code is a little bit clunky.
+I only I'm always looking precisely at tool number zero.
+I don't support a case where an LM wants to run multiple tools, and it turns out that that's very easy.
+You just have to be careful with the fact that you could have multiple tool calls.
+Sorry.
+Not there.
+That's response choice is zero.
+That's fine.
+It's here.
+That is that is my little mistake.
+I just take tool call by taking the first tool call.
+All right.
+So it turns out this is very easy to fix.
+Uh, and nice improvement for us.
+Look at this.
+Uh, what we can do here is, um, have a new, new function instead of handle tool call.
+We will have handle tool calls.
+And this is how handle tool calls works.
+It doesn't just take the first tool, but rather it iterates for tool call in message tool calls.
+So if the LM asks to run multiple tools, we'll simply iterate through each one.
+That's nice right?
+And then we have our janky if statement again right there.
+And uh, very nice.
+There it is.
+And we can now hopefully we'll say hi there.
+Okay.
+How about this is, uh, which is cheaper?
+A flight to London or to Paris?
+Spell it right.
+Paris.
+Let's see.
+Let's see what happens.
+Let's look down here.
+Uh, look at that, uh, tool called for city.
+London.
+Tool call for city Paris.
+And there it gives the answer.
+So this is just that simple.
+Code has allowed it to loop and call each of the tools that the LM asked for.
+And then the LM, of course, is smart enough when it gets back those results to interpret it and give
+a meaningful answer that the flight to London is cheaper as a result of running both tools.
+Isn't that cool?
+And now there's one more technicality.
+You could.
+I'm not entirely sure how you could make, uh, make it fail this way.
+I imagine there's a way.
+Uh, let me try.
+Let me try.
+Let's bring up a fresh user interface.
+Um, first, Please, uh, find the price for flights to London.
+And if it's under $1,000, please check the price to Paris.
+And only.
+And only if it's so.
+I want to force it to first make one tool call and then make the other.
+Uh, and, uh, something goes wrong here.
+Uh, and it stops.
+Uh, and the reason is because if you look at my code, I only support one sequential, uh, set of
+tool calls.
+I now support multiple tool call requests in that first response, but once it comes back, it then
+makes another call without the tools.
+And that's it.
+It's just a single if statement.
+So it doesn't support any kind of looping.
+It doesn't support the LM making more than one, uh, set of tool calls sequentially, if you see what
+I mean in any response, it can say, I want to call multiple tools, but it can't respond.
+And then I call it again and then it says, all right, now I'd like to do another tool that's not supported
+and allowing it to support.
+That might sound like it's going to be a lot of work.
+It's sort of like like an infinite loop kind of thing.
+It turns out you can do that just by changing that, if to a while.
+Just that one change, that one word, uh, because we don't want it just to have a single if we want
+it to say while it's wanting to call tools continually do this while it's wanting tools and then provide
+the tools in here because I wasn't providing the tools the second time.
+Uh, and, and it, it would just magically work if we do it this way.
+Uh, you might say, is there any risk here that it keeps going forever?
+Uh Llms don't tend to do that.
+Like they tend to, to stop.
+So I don't think it's a material risk.
+But obviously if that is a concern for you, then then you should put something in here that has some
+iteration and stops after a certain number.
+Uh, it's probably not prudent to have it be something that could, in theory, keep going forever.
+So all I have to do is run that.
+And now I can just rerun this this here because, uh, yeah, we'll just use that new chat function,
+uh, just and see, see how that goes.
+Hi.
+Please check ticket price to London.
+And if it's under $1,000, then please check Paris.
+Um.
+Only if.
+Only if.
+See if this works.
+Uh, it certainly does.
+It got it right.
+And you can see that it called London and then Paris.
+Uh, very nice indeed.
+So now we've improved the tool calling so that it can call multiple tools at a time.
+And it can repeatedly call tools one after another after another, until finally the finish reason is
+no longer tool calls and then it will be done.
+--- Lecture 5 ---
+Okay, so it's also nice to make this feel a little bit more real world commercial.
+And one way to do that is to instead of just having this looking in some Python dictionary to actually
+have it do a database query against a SQL database.
+And the easiest way to do this without needing you to do lots of configuration and set things up is
+to use SQL Lite, which is so quick and easy and just part of the UV project, and you can just use
+it.
+So we can just import Sqlite3 and we can write some database queries.
+If you'd rather build something a bit more industrial strength, you should feel free to replace these
+SQL queries with something like a Postgres lookup or something like that.
+Or indeed you could also use a API like Supabase, or you can set up a SQL in in a in a managed service
+and then be making an API call instead.
+But I think that this is a good compromise using SQL Lite with a local database.
+And that's what we'll do right here.
+And I've got this database here.
+Prices DB that I'm going to delete it.
+So we start from nothing.
+Uh, and it's gets ignored.
+So you won't have it there yet.
+Um, so we're going to say we want a database called prices DB and the first thing we're going to do
+is run this little, little SQLite statement here that create the table.
+If it doesn't exist, it's going to have a city and a price on it and commit that and bam prices DB
+just appeared.
+SQLite is so easy to use.
+And now I'm going to have a new get ticket price.
+Uh, something that will replace the prior janky get ticket price.
+This time it takes a city and it will say database tool called Getting Price for city.
+And uh, here we go.
+We then say with with a connection to SQLite.
+With our database, we are going to select price from prices where city equals.
+And then we pass in the city lower.
+And obviously I'm using the proper approach there.
+That doesn't make me liable to SQL injection attacks which is always, always a good way of doing it.
+And then we will return ticket price to city is and the result or no price available for this city.
+So a nice little simple SQL query.
+You don't I don't don't need you to know SQL if you don't need it.
+All you need to know is look at this.
+If I do get ticket price for London, well right now I'm going to get nothing because my database is
+empty.
+It's going to say database tool called Getting Price for London.
+No price data available for this city okay.
+And now I've just got a little utility method set ticket price a utility function.
+Give it a city, give it a price and it will insert into prices.
+Uh, and update if if it's already there.
+And there you go.
+It puts in the city in lowercase and the price okay.
+And so now we can just take the dictionary I had before.
+You should add in your own city or anything else you want just just to prove it.
+Uh, and then we will call set ticket price for each of them.
+Bam!
+I've run that.
+We've now written some prices to our database.
+Let's see.
+Let's call get ticket price London.
+And there we go.
+The price is 7.99 which is in our database in our SQL database.
+Let's do it for Tokyo.
+And there we go.
+We get 1400.
+There it is 1400.
+Let's just check this works.
+Let's make Tokyo 1420.
+Put that in the database.
+Get ticket price for Tokyo.
+It's now 1420.
+Okay.
+We have a database.
+Okay.
+The moment's arrived.
+It's now time for us to run this chat interface.
+Uh, now, you might be thinking.
+Hang on.
+Don't we still need to to, like, do the, like, the chat callback and execute all of that?
+Now that we've rewritten our tool?
+And again, Python is an interpreted language.
+We've we've recreated we've changed get ticket price to a new implementation.
+So it's when when it gets to the point of calling get ticket price, it's going to call the new implementation.
+Uh you'll see.
+So let's run this Uh, so let's say, uh.
+Hi there.
+Hello.
+How can I assist with your flight?
+Today, I'd like to go on a trip.
+Great.
+Could you please tell me the destination?
+Yes.
+I'd like to go to London.
+I'd like to go to London.
+And there we go.
+Database tool called Getting Price for London.
+The return ticket to London is 7.99.
+Would you like to proceed?
+How about that?
+We have written tool calling.
+Now it can call multiple tools.
+It can do them multiple times in a row.
+And when it does so it is doing a SQL query against a SQL database a relational database with ticket
+prices in it.
+This is foundational expertise for building commercial LM solutions.
+All right.
+So the exercises for you, it begins first of all by digging in and make absolutely sure you understand
+this.
+Like do put print statements in, put print statements in to see what's going in in the messages.
+Test this.
+Make really sure you've got a good handle on what's going on, and get to that point when you completely
+appreciate that there's no voodoo.
+Here it is Llms are just generating tokens.
+These are just tricks, clever techniques to figure out how can we do more with the tokens that it generates
+in order to allow us to, to, to give commercial functionality to something which is just a next token
+predictor.
+Okay.
+And once you've really got a handle on it, how about this add another tool to set the ticket price.
+I've already given you the function.
+You simply have to wrap that in some JSON.
+You have to add in a little extra if statement where we have an if statement, and then it will just
+work, and you can then do it so that you could, you could say, okay, I've discovered the ticket
+price is and you could have it.
+So it writes the ticket price.
+And then you'll find that any future time you'll be able to come back to the chat, you'll be able to
+read in the ticket price and you will see it working nicely, and I hope you will really enjoy that.
+Now, I do want to mention there's something a little bit hokey about this implementation, which you
+may find out.
+If you found this out, then congratulations that it takes a bit of digging to see this.
+Uh, there's something I'm doing which is which isn't optimal, uh, for the way that the tools are
+being recorded.
+And here it is.
+I'm using Gradio to keep track of the conversation history and the way that Gradio does that is it's
+just mapping this user interface right here.
+And that's the user interface, which is used, uh, to, to populate that history that gets passed
+in, uh, if we go back here, um, when, when it calls, um, the chat callback, this history is
+coming straight from the UI, and that works really well as a, as a simple trick to be able to keep
+track of the conversation history.
+But there is one little hitch.
+Do you see the hitch?
+The little hitches?
+It means that this stuff here.
+The tool call and the tool call response gets apparently forgotten.
+Like when when radio calls back with a history.
+This isn't going to be there.
+Uh, which turns out that it's usually fine because the model is clever enough.
+It gets this information and it sees that it called a tool.
+I mean, it figures out that it got that return price from the fact that it sees that it's stated it.
+So it just sort of works out fine.
+Most of the time.
+But that is obviously something that would not be acceptable for a commercial solution.
+And the proper way of doing it would be to not rely on radio for the conversation history, but rather
+to actually use a database to be saving the conversation history, and to be using that as a way to
+to properly keep track of everything that was said, including the tool calling.
+So that's it's a technical detail, but if you spotted it, then well done.
+That is something that works fine for this MVP, but would need to be improved for a more robust solution.
+But I have to say I do.
+I take advantage of the UI part for for things that I've written, certainly for internal apps, and
+it's completely fine.
+So that's the point I wanted to make.
+Another point I wanted to make is that you may have noticed that I didn't stream back results.
+I just printed them.
+I used a simpler thing and there was a reason for that.
+It turns out that streaming back when you're also trying to support tool calling is perfectly possible,
+but it's really janky.
+You have to do all sorts of nonsense to see whether the finished reason is tool calls, and to be like
+piecing together the JSON to call the tool.
+You can you can Google it and you'll see that I think on OpenAI's forum there's some examples of how
+to do it, but it's it's messy, there's lots of code.
+And I didn't want to overwhelm you with really hacky stuff.
+And that's why I didn't stream back results.
+And besides, it's fine for these short, short messages.
+In practice, most of the time when you actually work with tools.
+You don't write all of this code and have this JSON.
+You normally use a framework that does it for you.
+Like on my agents course, we often use OpenAI agents SDK, and it deals with all of the stuff about
+creating the JSON and selecting the tool.
+And so it makes things a lot easier.
+And it also handles the streaming back.
+So you often don't actually get to handcraft the JSON and the tool cooling as we did today.
+It's a good practice to do.
+It means you really understand this stuff and you can do it this this traditional way, the long way.
+But there's often shortcuts to let someone else take care of it for you, like OpenAI agents SDK.
+And when you do that, then it will handle streaming as well.
+But I just wanted to explain that in case you're wondering why why this doesn't have streaming.
+And one final footnote, last of the footnotes, it is that, uh, the, the if statement that I told
+you about the, the if uh, let's find it now The, the if the tool is, um, is the tool that has that
+matches our function, then call our function this one right here.
+If tool call function name is get ticket price then call get ticket price right here.
+That is that is very clunky.
+Uh, as you can see.
+And when you write the set ticket price, you're going to have, if it's get ticket price, then call
+get ticket price.
+If it's set ticket price then call set ticket price.
+Now Python is Python, and Python is a beautiful language.
+And that means that there are always elegant ways of doing things like this.
+And if you want, you can try and find the elegant way to do it.
+When you simply take the string that the model asked for, you see, if you have a function with that
+name and you automatically ask Python to to find that function and run it.
+And then you don't need an if statement, you can just basically hook up your model directly to you
+calling the right function.
+So should you wish for a little juicy challenge.
+Then that's the one for you.
+When you add the set ticket price.
+Don't do it with with an if statement.
+Do it with some Python magic that will automatically call the function and handle a case where the function
+doesn't exist.
+To to be safe.
+So I hope hope you enjoy that little extra challenge.
+Should you be a Python type and want to do it in a nice and pythonic way?
+Uh, then then that that is your extra challenge.
+And then the final thing I want to mention, of course, it hardly needs to be said, but giving actions
+to your LLM, of course, is so pivotal to being able to add commercial functionality to any LLM call
+you imagine you can now your this AI assistant can do more than just tell you ticket prices.
+It could actually book a ticket for you.
+It could do all these different things.
+So the thing for you to think about now is think of all the ways that you could use tools in business
+applications.
+Think of the AI assistants you could build, and the kinds of tools they could call in order to, to,
+to actually make commercial impact be valuable.
+So do put yourself through the exercise of thinking that one through.
+All right.
+I will see you for the wrap up.
+Well, if today was super satisfying and really building some core expertise, we will finish it off
+tomorrow for week two.
+Uh, perhaps my top equal favorite week.
+Uh, we will, of course, uh, get to the point where you already can give an overview of transformers
+and terminology and tokens and context windows and blah, blah, blah.
+You can confidently code with the chat completions API.
+You can build an AI assistant.
+And now now in the mix, you can add tools for true commercial functionality.
+Tomorrow we complete week two.
+We'll talk a bit more about agents, and we will complete a multi-modal AI assistant with a little bit
+of agents and tools thrown into the mix.
+I can't wait.
+I'll see you then to wrap up the week.

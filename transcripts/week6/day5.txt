@@ -1,0 +1,1106 @@
+--- Lecture 1 ---
+Welcome to week six.
+Day five.
+Welcome, finally, to fine tuning a frontier model.
+Now look, I've had this image up on this slide for the start of every day this week with Laura strapped
+around her brain.
+And you've probably been thinking, What is Laura?
+When is that going to explain what Laura is and how that's related to fine tuning?
+And, well, the answer is I'm going to actually be really explaining that next week, which is when
+we fine tune an open source model and we roll up our sleeves and we get to the guts of a model and fine
+tuning and building these things called Laura matrices and target modules and all sorts of stuff.
+But, but with with fine tuning a frontier model, you're really just making API calls to tell OpenAI,
+hey, I'd like you to fine tune this.
+You don't really get to get into the guts of doing the training yourself, and it's generally understood
+that OpenAI uses this technique called Laura themselves when you call them to do this fine tuning.
+But they don't reveal that particularly.
+And they don't they don't announce how they do fine tuning.
+So we're not actually going to be looking at the guts of Laura today.
+We're just going to be trusting that that's what's happening.
+And that's why I'm not going to explain.
+I'm not going to tell you that Laura stands for low rank adapters, because you don't need to know that.
+I didn't just say that, but we're going to do that next week.
+And for now, just know that we've got Laura strapped onto this brain in the OpenAI cloud.
+Okay, so with that already, of course you can work with open source models and frontier models.
+You can create Rag solutions and you can solve problems with a five step strategy, including curating
+data, pre-processing data, making a baseline model, and so on.
+Now finally, you're going to be getting to, uh, how do you fine tune a frontier model?
+We'll go through the process, create the data, run it and test it.
+Let's go.
+So when you work with OpenAI to to fine tune the model, and we're going to be using OpenAI for our
+fine tuning.
+And other providers support fine tuning.
+And it tends to work in a very similar way for all of them.
+So what we'll do with open AI, which is the most common for this stuff, but it would be very easy
+to translate it to others.
+The way it works is that there are three stages, and it's actually quite similar to what happened when
+we used grok in batch mode.
+It's got a lot of similarities with batch mode, and that's why that was quite useful that in day two
+this week you got that first experience with it.
+These are the three stages.
+The first stage is that you need to create training data, a training data set in a particular format.
+And that format is a JSON file, a file that you are now intimately familiar with, a file where every
+line is a separate document JSON document.
+So you put your training data set in JSON format and you upload it to OpenAI.
+The second step is when you run the training and you'll start to see results.
+You'll see the loss coming from each of your training batches.
+You'll see loss coming down and you can monitor it and see what's what's going on during training.
+And then thirdly, you take this and you evaluate the results.
+You tweak the results and then you repeat them.
+Okay.
+So with that prep I'm now going to take you in to go and actually doing some fine tuning.
+But before that I want to show you, uh, some stuff on OpenAI's website to explain the different types
+of fine tuning that they offer and tell you which one we're picking and why we'll go do that now.
+So I'm now on the OpenAI platform site in their docs.
+If you go to platform and then click docs, you'll be here too.
+And there's great documentation for the various APIs OpenAI offers.
+And you can scroll around to see that, uh, for example, they have a lot on what they call the responses
+API, which is their alternative API to chat completions, which we know well, which they tell you
+is something that they encourage you to go on to.
+They say that that is that is the future.
+That is a bit of a trick.
+That is, they're doing that because they want to lock you into their ecosystem, because if you use
+the responses API, you get to take advantage of some of the paid functionality, but it won't be instantly
+fungible with other models.
+So personally, I advise actually not using the responses API sticking with the chat completions API,
+but there is lots of stuff here that is, it's OpenAI proprietary, but it's great.
+Uh, there's there's agent stuff that you can read about that.
+Of course, I cover a lot of on my agents course, there is some real time stuff that's super interesting
+here.
+Um, there's, uh, the real time API right here, if you're interested in exploring having, like,
+real time, uh, text to speech or speech to text and things like that, then you'll get a lot of it
+here.
+Um, but I want to take you to fine tuning, which is what we're doing today.
+And when we look at fine tuning, you'll see that they have a number of different types of ways that
+you can fine tune an OpenAI model.
+And starting with the basics, it's important to understand that when you fine tune a frontier model
+like OpenAI, you're getting your own private version of it only for you.
+It's something which which you'll be able to use for a period of time.
+And that's that's key.
+That's all of these give you an ability to have your own private little version of an OpenAI model.
+And of course, it's also worth whilst we are going to dig into what Laura means next week, you've
+probably got the general sense that this is all about being able to change a small number of parameters
+and have a small number of parameters affect the bigger model.
+So when I say that OpenAI gives you your own private copy of this, what you're actually getting is
+a small copy of a small number of parameters.
+And those are used to to slightly nudge the bigger platform, the bigger GPT.
+And your little parameters here get tuned in a way that that gets applied to this big model.
+And now I'm explaining what I said.
+I was going to leave till next week, but Laura stands for low rank adapter and rank is another word
+for dimension.
+It's saying that it's it's something which adapts the big model, but it's got fewer dimensions, smaller
+set of parameters that adapts the big model.
+That's how it works.
+You train one of these, this is what you get saved, and this gets applied to the big model when you're
+at inference time.
+But we don't have to worry about any of that because OpenAI does all of that for us next week we are
+going to have to worry about it.
+So so here we have it.
+These different types there is supervised fine tuning.
+This vision is obviously we're not we're not working with images right now.
+So we'll skip that one DPO direct preference optimization and RFT reinforcement fine tuning.
+So these three SFT and RFT are the three big ones that we'll look at now starting with supervised fine
+tuning.
+So this is one where what you provide is examples of input data and the output that should come, the
+correct responses.
+And it's something which lets you train an open AI model with examples for your specific use case.
+The result is a customized model that more reliably produces your style and content.
+You can use it for now with any of these three models GPT four one, the big Guy, the mini, and the
+nano variants.
+So you see why I picked four one, not five one.
+They don't yet support it for the models more recently than this, but maybe they do by your time.
+And please keep note of whatever you see here, because you might have to update the model name if what
+they support now is different to the one that we'll be using, which is this one right here.
+So this is best for classification when you're trying to classify things into buckets for translating
+with some kind of nuance, for generating content in a style, and for correcting for some kind of failures.
+If things if your main model keeps doing things wrong, you want to give some examples of how to stop
+it doing that.
+Uh, that's how it works.
+That is SFT supervised Advised fine tuning okay and DPO direct preference optimization is about.
+When you want to to refine a model based on some good examples and some bad examples.
+It's really it's an example of where you've surfaced a couple of different possibilities to your users.
+And your users have given a thumbs up or a thumbs down to the, to the different variations that they're
+seeing.
+And you want to to to hone your model to, to fine tune it.
+It's hard not to use that word.
+Uh, so that it's more likely to give this kind of thing than this kind of thing based on this preference,
+this this thumbs up, thumbs down, kind of tweaking.
+So this is something that's that's considered very a very powerful way to make a model have, uh, be
+more nuanced, be able to be slightly shifted in one direction.
+And it's typically like it's stuff like getting the right style and tone in a conversation, um, maybe
+focusing on the right things.
+It's saying here, it's enables the model to learn from subjective human preferences.
+That's the idea.
+And this is really the successor to something called RL that you might have heard of, reinforcement
+learning from human feedback, which is something that was the big breakthrough that got from the prior
+GPT to ChatGPT in 2022.
+It was this kind of technique.
+So that is DPO direct preference optimization.
+Okay.
+And now for the most advanced one and possibly the most fashionable one RFT reinforcement fine tuning
+to get expert level performance within a domain.
+The idea is it's fairly similar to supervised fine tuning, but but instead of having it's a case where
+you don't have a set of correct answers, it's not like you have labels for all of your data, but rather
+you can have a program which is able to grade the different responses, and it will shift things based
+on that grade.
+And that program that does the grading can in fact be an LL.M.
+An LL.M.
+People sometimes say that's LL.M.
+As a judge, an LLM with a particular prompt, which helps it assess whether or not an answer is a good
+answer or not.
+And this is it's very subtle, but it allows you to again, it's about nuance.
+It allows you to align a model with nuanced objectives, because you can have an LLM assess what's happened
+against those kinds of nuanced objectives.
+So this is how you can really shape a model to craft it to be, to be effective at perhaps, um, not
+not having security loopholes or something like that or.
+Yeah, medical diagnoses.
+That's the kind of thing that an LLM as a judge can decide whether or not this is a sensible diagnosis
+based on the on the conditions and based on the facts.
+Um, so, uh, these are some of the examples.
+The key it's similar to SFT.
+The difference is that you use SFT when you have specific labels and you use RFT when you don't have
+labels, but rather you have a way to judge whether or not what's been produced is good or bad with
+some kind of a grader, and you're going to build the grader, and it's going to use that dynamically
+to decide what to do.
+That is reinforcement.
+Fine tuning.
+RFT and RFT can only be used with reasoning models because it's all about shaping the reasoning based
+on this, this feedback.
+And so right now oh for mini, we've way, way moved past the O's, but for mini is the only one that
+you can use for this.
+Okay, so that explains the different types of fine tuning that you can do through the OpenAI API.
+And I'm sure you've already got the idea of which one suits us in this case, the the one that is clearly
+the right use case for us is SFT supervised fine tuning because we have labeled data.
+So we've got the facts.
+We don't need a grader because we've got the perfect answer.
+We could write a grader that just compares it to the perfect answer and decides, but that would be
+a complete waste of time.
+We don't need to do that because we've got the real answer here.
+Uh, and so we're in a case of SFT and I should say this is generally by far the most common of the
+approaches.
+It's not as fashionable as using DPO and using RFT, which are more subtle, nuanced things that handle
+sort of special cases.
+But SFT is what people do.
+Most often this is the go to.
+This is when you've got labeled data and you want to fine tune a model.
+Remember, we're not actually going to fine tune the real GPT because that's enormous.
+Even GPT four one nano is no doubt billions of parameters, maybe a trillion.
+We're not going to be doing that, but rather we behind the scenes, we believe that OpenAI is going
+to be training some smaller set of parameters, which we'll use to apply to the big one, and that's
+what it's going to keep and maintain for us.
+We're not going to have total visibility to that.
+We're going to use some API calls to be setting things up, running the training, measuring the results,
+and all of that is what we will do in the next video.
+--- Lecture 2 ---
+Okay, here we are into week six into day five.
+How quickly the days have gone by.
+You're thinking, no they haven't.
+Not this week.
+This week was a bit, uh, a bit more pro.
+Okay, so day five, fine tuning a frontier model.
+We're going to use OpenAI's API to fine tune our private variant.
+We're going to use GPT four one nano.
+Not many.
+Uh, and uh, it's going to be uh, it's going to be it's going to be great.
+We're using supervised fine tuning, which is the most common by far and clearly the right fit for our
+use case.
+So I'm loading in all data.
+As you'll see, it doesn't matter whether you here you do the false or true.
+Um loading in the full 800,000 data set.
+Let's do that and print out our data to make sure we've got it.
+And we're going to be using the OpenAI client library.
+You remember OpenAI is OpenAI.
+This seems like ages ago that we did this stuff, uh, all the way back in, in week two.
+Um, so that is our Python client library that we will be starting there.
+And then we're going to talk about how many data points are we going to use for fine tuning.
+So look, here's the thing.
+OpenAI recommends that you do not use many data points for fine tuning.
+They recommend starting with only 50 to 100 data points and then only increasing if you want to.
+The the reason for that is that SFT, you're you're working here with a massive pre-trained model,
+and the idea of fine tuning OpenAI is to just add on some hints, some give it some some ways to, to
+understand what it is you're after.
+Maybe you want it to always reply with a bit of sarcasm.
+Maybe you want it to always refuse to answer personal questions.
+It's something that you're trying to teach it in addition to what it does, and it shouldn't take too
+many examples for that.
+So, as you may get a bit of a hint here, what we're trying to do, which is teach a really very different
+skill, and we have masses of examples That's not exactly a great use case for fine tuning a frontier
+model.
+It's a better use case for fine tuning an open source model for building something yourself.
+Not so great for fine tuning a frontier model.
+We're still going to give it a good old stab.
+Now, look, I'm going to go a bit crazy here, and I'm going to try putting in 20,000 points, a ton
+of data, because I really want to try and teach a frontier model this skill.
+It costs me $3.42.
+So it's still not hugely expensive because Nano is a very cheap model.
+So I wanted to go with a really cheap model and give it tons of examples, because the way I see it,
+we can't expect it to pick up too much expertise unless it sees a range of prices, at least for every
+category.
+But you should not do this many, so I'm doing 20,000.
+You should just do the 100.
+I'm going to change this to 100 for when you run it, so that I'm going to, uh, I suggest we go with
+with with with a hundred 100 examples.
+I'm going to go with a bigger number.
+But you you shouldn't do that.
+So let's just see here if I, if I do Len fine tuning train, mine is going to still say 20,000 because
+I changed this after I ran it.
+But you should say 100.
+It's going to cost you nothing.
+And that's a good a good number to be with.
+Okay.
+So now let's get to our prompt.
+Now I actually I made this prompt a bit better yesterday I think.
+So let's go and use the prompt that we ended up with yesterday.
+Let's keep everything the same.
+So what was the final prompt that we went with yesterday?
+Estimate the price of this product.
+Respond only with the price.
+No explanation.
+Let's take exactly that and put that right here.
+Uh, estimate the price of this product.
+Respond with the price.
+No explanation.
+And then here we have the price.
+And, um.
+Yeah, I see here we let's let's make it give the whole price like that Iceland dot price.
+Um, so we're giving it this, this, uh, this, this data as a list of dictionaries, which has the
+price of the product, and then it responds with just the price.
+So let me give you an example.
+If we look at the the training point number zero, it says estimate the price of this product, respond
+with the price, no explanation.
+And there's the stuff about some interior knob deadbolts included and what comes back role assistant
+content.
+And that's the price.
+So this this is what we want it to learn how to respond.
+We want to say, hey, look, if we give you this user prompt, we want you to respond with this assistant
+response.
+That's what we're structuring our data as.
+Lots of examples like this.
+So it can learn that this is the type of assistant response that should come as a result of this user
+request.
+Okay.
+That's the game.
+That's what we're going to do.
+We now want to put together 20,000, in my case 100 for you examples of this.
+Package it up and tell OpenAI, hey, go and make me a variant of GPT four one nano that has learned
+from this data.
+Okay.
+So we're going to have a function called make jsonl.
+Sound familiar?
+It's quite similar to what we did in day two.
+So it's going to go through it's going to take a set of items.
+It's going to iterate through those items.
+It's going to call this messages for function to turn it into messages.
+Turn that into JSON and dump that into a line of JSON file.
+Okay.
+So what does that look like if we take the first three training points?
+Well look it looks like this.
+It's a three lines of JSON which has messages.
+And then we've got exactly the the stuff that came from here.
+We've got uh, like estimate the price of this product.
+There's the details of the product.
+And at the very end here is the response that that should be coming back from the model.
+Okay.
+Very nice.
+So that is a jsonl representation of three of our training data points.
+Okay.
+Here's another little function called write Jsonl.
+It will take the items and a file name and it will write that to a file.
+Great.
+This is super easy.
+So we're going to use that same folder jsonl over here that we use before when we were doing our batch
+mode.
+Let's write a new file called Fine Tune Train for all of our fine tuning data set.
+And by the way, we're also going to have a separate data set called validation.
+You may have noticed I also like put put to one side 50 data points to be used for validation.
+So we'll we'll we'll also use them.
+We'll write that to to to a file as well.
+Uh here we go.
+And we've now written two files fine tune train and fine Tune validation.
+Let's go into our jsonl folder and make sure that we can we can see that uh where are we now?
+Jsonl.
+Here we go.
+There's fine tune train.
+There it is.
+Look at all these.
+And fine tune validation.
+There should be 50 of these.
+And here we go.
+Here there should be for you 100.
+Make sure there's only 100 for me.
+There's going to be 20,000 because I'm crazy.
+Uh, so I want to spend another $4.
+I want to do my best to get us something, uh, worth.
+Worth our time.
+Uh, so there we have it.
+Uh, go back to day five.
+Okay, so now what we're going to do is tell open AI, I want you to create a file.
+Upload a file, uh, of of this, of this jsonl I'm going to give you.
+And the purpose is going to be fine tune.
+And this is where we do it.
+And I'm hoping this is going to be quite similar.
+This is going to be familiar.
+You're going to be like oh I recognize this.
+We before had grok create.
+We passed in a file and our purpose was batch.
+When we told grok, hey, we want to upload a file for batch purposes.
+Guess what?
+OpenAI has exactly the same kind of API.
+I think I mentioned that to you already.
+Uh, and it's OpenAI create and you could put purposes batch or in this case the purpose is fine tune.
+And so that's what we do.
+And we have now we are uploading a file to OpenAI for the purposes of fine tuning.
+And it's really thinking about this one.
+And it will be fast for you because you've only got 100 items in there.
+I run it and here we go.
+It has a file ID.
+Remember that we had that with grok as well.
+And we can do the same for our validation file.
+And this is what that looks like.
+Great.
+We've just uploaded two files to OpenAI.
+And in case you don't believe me, I've got a little link here to platform OpenAI.
+Let's click on that.
+Up we come into OpenAI.
+Here we are in the storage section.
+And you'll see up here a couple of files a couple of JSON files that I just uploaded seconds ago.
+Status is ready.
+It's 27kB.
+Uh, the validation file, this one, the training file is 11MB.
+Because I've got the 20,000 things in there.
+Yours, presumably will be much smaller.
+Yours will be about 50 K or so, 60 K.
+So there are the files uploaded at the ready sitting in OpenAI.
+Time for us to do it.
+They even say the purpose is fine tune.
+It's there.
+They're sitting there.
+They're ready.
+It's time for us to fine tune.
+--- Lecture 3 ---
+Okay.
+Onwards.
+Step two.
+Fine tuning.
+So this time we do OpenAI.
+Fine tuning.
+Create.
+Okay.
+It's that's an API call.
+This is a new one.
+This is this.
+We didn't this isn't similar to any of the grok ones.
+We need to provide a training file.
+Well that's easy.
+That's the train file.
+We got a validation file.
+That's a validation file a model.
+We're going to use GPT four one nano.
+This is the exact thing I took from that documentation page.
+You should check the documentation page if you're running this.
+And make sure you take the same model ID across the seed.
+Means means you remember that we're starting from a fixed set of random numbers, and you know why it's
+number 42 and the hyperparameters.
+We're going to do one.
+Epoch.
+The epoch is one pass through all the data.
+There will be no point in doing multiple passes through the data.
+Why would there be no point?
+Well, because we've got tons of data.
+If we wanted to do more data, we should just add more data in rather than doing two passes over the
+same data.
+We've got buckets of data, so so we're spoilt for data.
+That's not our problem.
+No need to a second epoch batch size.
+This is something which you would want to vary and experiment with.
+This would be an example of something which is hyperparameter optimization.
+Uh, trial and error.
+Uh, for you, I would actually recommend you have that on one because you've only got 100 points.
+Honestly, you can you can afford to go through each one.
+But I'm doing so many points that it's smart for me to do it faster and have 16.
+So I'm going to run this and it's going to kick it off and off.
+It's gone.
+That is the fine tuning job.
+I'm going to change this back to one so that when you run it, it's one in there and you have a batch
+size of one, which is smarter for a small a very small set of data.
+Okay.
+So now that we've done that, what we can do is we can say, hey, I want to list what are my fine tuning
+jobs that are currently running.
+And by putting limit is one, I just want the latest one.
+The one I kicked off most recently.
+And here we go.
+We get we get back a fine tuning, uh, job.
+You can see there this is running.
+You can see that that matches the job.
+That was just right here.
+Uh, and we can see when it was created.
+It's not got any errors yet.
+That's good.
+Uh, and, uh, it's got some hyperparameters.
+The batch size, uh, learning rate is automatic.
+It's going to figure out what learning rate it wants to use.
+And, uh, you can see everything else that is happening here.
+Okay.
+So we can now collect this job ID by by taking this, uh, this piece of data and get that ID.
+Let's just grab that ID.
+Let me just print that to make sure we've got the right job ID.
+There we go.
+You can see that that ID right there matches this ID here and this ID here.
+This is indeed the ID of what we're running.
+We can now call OpenAI fine tuning retrieve for this ID to get the latest information about it, that
+here it is.
+We can see again, no errors so far.
+That's good.
+Uh, and uh, the fine tuned model is none means that it's not finished yet, and that is no surprise.
+It might have finished for you already with your small data set, but for me, it's going to take a
+minute.
+Uh, this is the learning rate it's decided to use for, for whatever reason.
+Uh, and, uh, yeah, we can see it's got lots going on here, but what it's doing is it's currently
+validating the files they like, uh, the OpenAI has written stuff that that checks through the files
+in particular to make sure that I'm not trying to do something evil.
+I'm not trying to train a model for bad purposes.
+So it's checking through my data to make sure there's nothing sneaky in there.
+And, uh, hopefully it will not find anything sneaky because these are all products scraped from Amazon.
+Nothing very scary in this training data set, but off it's going.
+Going through everything.
+Um, and we can now call OpenAI Finetuning events.
+You pass in the job ID and you say, hey, just give me up to ten events and let's see what they look
+like.
+And what we can see is there's only been two events so far, and those events are that it has created
+the fine tuning job and it's currently validating the file.
+And this is something which is going to take a minute or two minute or ten, maybe even 20.
+So I will be be gone and I will come back when we've got more to discuss.
+And I should mention that, as before, we can also go in and look at the fine tuning that's happening.
+It's at OpenAI.
+Fine tune and up it comes.
+This is the fine tuning section on the left.
+This is the same the same place.
+This is the dashboard.
+If you've if you've come into the platform click on dashboard.
+Scroll down here.
+You'll see fine tuning is here.
+A moment ago we were at the storage part of this looking at our files that are right here.
+We're now in the fine tuning section, and you can see that what it's doing right now is validating
+this file for you.
+This should have completed quite quickly, so you might already be seeing the next part for me.
+I'm sitting here watching it validating.
+It's been validating for five minutes so far.
+I'm going to let it keep going.
+And once it's validated, we'll have some more things to look at.
+Okay.
+And now it's no longer verifying the data set.
+Fine tuning is happening.
+So I'm seeing here fine tuning I see that that swirling progress.
+And over on the right here I see information about it.
+The training method is supervised.
+The base model is that GPT four one nano.
+And if I scroll down I can see epochs is one batch size.
+Remember is 16.
+This is the learning rates that it picked and the seed.
+Um and I see it's actually it's a learning rate multiplier.
+So it's probably the learning rate is probably a much, much smaller number than that.
+But this is how much it's further reducing it by would be my guess.
+Uh, but but OpenAI don't reveal all the internals of how the training works.
+Just some of the of the details.
+Okay.
+And it's got you can see it just popped up there.
+I think it's actually about to finish.
+Uh, so what you can see here is the change in loss in this chart over the course of the batch.
+So loss started quite high.
+And slam down accuracy, which is like the opposite started low and slammed up.
+Uh, and you can see here is the status.
+This is very similar to what we saw in code.
+The fine tuning jobs starting the files validated it finished validating.
+Uh oh sorry, I'm going the wrong way.
+Created validating at, uh, 41 minutes past it.
+Finished validating.
+It took about eight minutes.
+And then, uh, it started the fine tuning job.
+Um, now there's something here which looks which looks worrying, which is our first indication that
+all may not be going according to plan.
+Anything look wrong to you?
+The problem is.
+So it looks, first of all, great news that loss has come slamming down.
+But this is something which you almost always see in training and is not to be distracted.
+The reason this happens is that the the format of all of our training data is very similar.
+Our labels, we always begin with a dollar sign and then the answer.
+And then that's the end of our of our message.
+And very quickly the model learns.
+That's the format of all of our answers.
+We don't have the the price is we have a dollar sign.
+And as it gets that format and structure right, the loss comes flying down.
+We'll talk about how loss is actually calculated next week.
+But but of course to start with it's coming up with with different bits of text.
+And it quickly establishes that this is the right answer.
+And so down it comes.
+The thing that I find a bit concerning is, and actually, this purple line appears to be at odds with
+what I'm about to tell you.
+But it seems to me that from that point onwards, I don't see a trend which is showing the loss further
+reducing.
+So it looks to me visually, it's of course bouncing around because sometimes it's a bit off, sometimes
+it gets a bit right, but it's not really learning very much.
+Oh, and look, that purple line that OpenAI is trying to draw.
+The trend is sort of showing that that it can't really see.
+It thinks it's doing better and then it's doing worse again.
+Uh, so it looks to me like I'm not seeing great amount of learning happening beyond that initial benefit
+of getting the right format.
+And this is kind of consistent with what they say about, you know, maybe you need 5050 examples for
+it to clearly get the right format of the response.
+So that part is working fine with just a small number of examples.
+But in terms of getting better at actually having the expertise to predict model product prices, I'm
+not necessarily seeing that from the data here, but of course the proof will be in the pudding.
+Uh, so this is it still still fine tuning.
+This is an interim result.
+I will come back when we've got some some final outcomes to look at.
+--- Lecture 4 ---
+Okay, so training is in the final stages.
+I've come back and I've actually zoomed out a bit in my browser so we can see more of what's going on.
+Fine tuning.
+Still still in progress here.
+If we scroll down we can see here this chart.
+Hang on, I'm going to put it back to to to how it began.
+This chart is showing us the the results.
+Again it's very bumpy.
+Hard to see if there's a trend here.
+There's a couple of ways that can help to try and spot a trend.
+One is that you can smooth the line a bit, which you can see I was doing before, to try and see if
+you can spot a trend doesn't look like it.
+And you can turn on, put this into a log mode and maybe it does look like it's getting a hair better
+by the end.
+There's a very slight trend when we look at it in this way that really sort of exaggerates smaller changes
+at the margins.
+Okay.
+And then this is same, same chart for accuracy.
+Uh, and here we can see the time frame of what happened.
+We set off the batch for me at 40 minutes past 41 minutes past validation took about eight minutes.
+And then it was doing the fine tuning.
+Fine tuning took just shy of 20 minutes.
+That has completed.
+It's currently evaluating that the fine tuned model still meets OpenAI's various policies.
+In terms of we haven't taught it to do something evil.
+We've taught it to figure out how much things cost.
+Not not not something, something unpleasant.
+And so hopefully they will quickly figure that out and tell me that I can use this model.
+Another thing we can do is flip over to metrics, where we see the numbers in a table, and we will
+see here the training loss that is calculating the loss for each of our little batches of data.
+But also we'll see validation loss.
+What is that.
+Well that's taking our validation data set the 50 data points that we provided that are not used for
+training purposes.
+They are held out.
+And it repeatedly tests with the same 50 items so that we can judge in an unbiased way whether we're
+getting any better during training.
+So this is how we can actually hopefully tell.
+Uh, so we start with 1.138 as the starting point.
+Okay.
+Let's see what happens.
+1.138 goes to 1.179.
+That's a lot worse.
+So unfortunately, and of course, there's some random noise in here, so it's hard to know if we're
+within the plus or minus.
+But the first time that we did this validation test, it was worse the 1.138.
+Uh, let's see what else we come up with.
+Uh, 1.141 is pretty similar to the starting point.
+Uh, you can see the scroll bars 1.133.
+Is a hair better than where we began.
+But I do believe the next one was, let's see, 1.284 was significantly worse.
+And to me, what this indicates is again that there's just random jitter that the true validation error
+has a big plus or minus a big sort of error bar around it.
+And we're just sort of bouncing around that.
+I doubt that we're actually making a model that's worse.
+But look here we have 0.932, apparently a much better validation loss.
+Let's just go all the way to the end and see where we end up, see what this tells us.
+Work our way back 1.225.
+So for what it's worth, we end up, it seems the last validation loss calculation, uh, was was higher
+than when we began.
+But I wouldn't read too much into it because you can see the numbers bouncing around too much.
+It indicates that we're not.
+If we are making improvement, it's within error bars, so we're not going to see it with this relatively
+small data set of validation data.
+Um, okay.
+So that that is our our interim results.
+The batch has now succeeded.
+It's finished.
+That is the name of our completed batch.
+It's time for us to now go back to the code and put this to work.
+So here we are back in cursor.
+And you remember we had done this open air.
+Events.
+If I run this again last time we just got two events.
+Presumably now we will see the full set of events.
+That's consistent with what we just saw in the UI.
+Here they are.
+You can see that there was some some finishing steps here.
+And then the new fine tuning model was created evaluating against usage policies, moderation checks
+completed.
+Usage policy completed.
+The job successfully completed.
+Hurray!
+Time for action!
+So the fine tuned model name is OpenAI.
+Fine tuned retrieve, fine tuned model.
+That was the field that used to be none up here somewhere.
+This field here is now going to be populated.
+Let's see it.
+Let's print out what the name is.
+Uh, there is the name.
+And presumably that is going to be exactly the same as what we just saw in the user interface a moment
+ago.
+You could also just copied and pasted it from there, of course, but this is how to do it programmatically.
+Okay.
+So here is our test message.
+Now I've got to update this to match exactly with the prompt that we used before.
+Uh, this is our prompt.
+This is the message.
+Let me take this.
+Let's go back down here and replace this message with that.
+So estimate the price of this product.
+Respond with the price.
+No explanation.
+This time.
+We are only putting in the message.
+We're not giving the assistant response.
+Of course there's some people that have taken the course and that at this point made a mistake with
+their test messages.
+They included the assistant's response, and when they then run the test, they get a perfect score,
+an absolute zero error, 100% of the results are spot on and they tell me they fine tuned the model.
+That is perfect and I have to break the news to them that that is an unlikely outcome, and it is more
+likely that they messed up their taste test dataset.
+So always be sure when you're running the tests that you don't tell it the answer you need it to respond
+with the assistant response.
+So let me show you what I mean by that.
+If I if I get the test messages for test zero, it says estimate the price of this product.
+Respond with a price.
+It's our favorite distortion guitar pedal, uh, from uh, from the old Blood Noise brand.
+And here it is.
+And we've just got that single user message.
+We don't have the assistant response.
+It's the assistant response that our fine tuned model is going to create for us.
+Okay, finally, the moment of truth.
+Here we have a function Gpt4 one nano fine tuned we call OpenAI create for the model name.
+We don't pass in gpt4 one nano.
+We pass in this very sophisticated name of a of a fine tuned model here FTE, GPT four one nano personal
+Pricer and then this funny idea at the end of it, that word pricer, by the way, is there because
+when we first set this batch up, we put suffix is pricer.
+That just gives us an opportunity to to have something in there that we'll recognize.
+So I can tell the difference between all my different models.
+Um, okay.
+So that's that's our model.
+That's what we're passing in right here.
+We pass in our test messages and we we only need, uh, seven tokens.
+Sounds fine.
+That's our response.
+We return it.
+This is our function.
+Okay, so let's print the actual price of test number zero.
+Uh, the the the old blood noise distortion pedal.
+And see what.
+Guess GPT four one nano has the real price is 219.
+Our fine tuned model guesses 199.
+Okay, it's fairly close.
+Uh, I don't know how that compares to to before, but it's time now, finally, for us to run our big
+test.
+Let's see.
+Okay, here we go.
+Kicking it off.
+It's running right now.
+It's doing the calculations pretty quickly.
+As GPT four one nano gets through our, uh, the fine tuned version of it gets through our 200 test
+data points.
+And here is the results.
+Okay.
+And yep, it's a disappointment.
+It's a bit of a clanger.
+It's, uh, $75.91.
+Write that down on the piece of paper.
+Uh, the good news is, it still it's superior to, uh, to the human level of performance and to many
+other models, but it's inferior to our frontier models.
+And in fact, strangely, it's inferior to GPT four one nano.
+Not fine tuned.
+The fine tuning has not helped.
+It has, in fact hindered the results.
+We've gone backwards a bit.
+And this is there's a there's a huge volatility variation in this number.
+Sometimes when I run this it predicts one of the numbers is like $10,000.
+It gets it way off.
+Uh and then sometimes it seems to do all right.
+And I ran this a few times with, with different types of training, uh, with um, with GPT four one
+mini, I was able to get, uh, error of with 200 data points.
+I got an error of 96, uh, with 2000, I got an error down at 79, which is kind of similar level to
+this with nano.
+With 2000 data points, I got 82 and with 20,000 data points the same as this, I got 67.75 when I ran
+it before, but this time I do a bit worse and sometimes when I run it, it generates like crazy high
+numbers.
+And this error is huge.
+You might see that yourself too.
+So what is going on?
+It's disappointing.
+We've done fine tuning.
+I've been winding you up all week about the power of fine tuning.
+We finally get to fine tuning and the results are slightly worse.
+Or at least what we can say, perhaps, is that there's a lot of variation.
+Perhaps we've not actually materially made a difference.
+Why would that be?
+What's going on?
+Why hasn't fine tuning worked for us?
+Let's talk about that back in the slides.
+--- Lecture 5 ---
+Okay, well, hopefully you're not feeling too let down at this point.
+You're like, ah, because I did.
+Sort of.
+I set your expectations that there was going to be something not so awesome ahead.
+So what happened?
+What's going on?
+How can we make sense of this?
+It's important to understand why one goes about fine tuning a frontier model.
+And when that's not the right tool for for what you're for, you're after the problem at hand.
+So the reason that you fine tune Frontier Model is, is these kinds of use cases.
+You want to set the style or tone of a model.
+You want to to improve how reliable it is at producing a certain type of output, like fine tuning is
+used to, to make sure that it produces Jason in a particular format before we had structured outputs.
+Um, you want to create for, for for failures, uh, when, when it's following a complex prompt and
+does something wrong and handling edge cases, a similar thing, and you maybe want to perform a skill
+or a task that you can't clearly explain in a prompt.
+So by giving it lots of examples, you want it to pick up what the task entails.
+And that's not exactly the situation we were in.
+We we were trying to to teach something very specific with lots of examples.
+And in a way, you know, we can already we had a task that could already be very clearly expressed
+in a prompt.
+We knew exactly what we wanted, and we can just directly ask that to GPT for one mini.
+And it has enormous world knowledge.
+It's been trained with like hundreds of millions of dollars worth of training, huge amounts of data
+to have all of this expertise.
+We could ask it the question, and that's indeed what we were doing yesterday.
+So fine tuning it based on like concrete examples like this, it doesn't naturally fit well with a frontier
+model that's had so much knowledge crammed into it, and we're trying to just tweak it, hone it slightly
+with a few very specific product prices.
+And so as a result, we didn't effectively we didn't we didn't materially change performance.
+I suspect we didn't we didn't measurably make it worse either.
+I suspect we just introduced a ton of noise into the process.
+And that's why we're getting sort of different looking numbers.
+Sometimes better, often worse.
+Um, but uh, yeah, it's all because that's not really why you fine tune a frontier model.
+But I have good news for you.
+That is exactly why you might fine tune an open source model.
+So this is this is whilst this is a temporary setback, it's something where maybe you were hoping that
+I was going to throw at you some amazing numbers of fine tuning, a frontier model.
+It's really been a learning point for us about where it makes sense to fine tune a frontier model.
+When you're doing this kind of crafting of its behavior, or trying to make it follow a particular style,
+it's not so much for teaching this kind of core expertise.
+Um, but but we're going to see how well that works next week.
+Uh, and, uh, yeah, I guess I make the sort of general point that, look, having experiments go
+wrong.
+That's part of the job.
+That's what a data scientist does.
+And so we should take take joy in the fact that we've had something that gave poor results, because
+that shows that we're iterating.
+We're we're doing R&amp;D.
+When you're when you're working as a software engineer, a problem is always bad.
+A bug is a bug.
+That's never a good thing.
+You know, maybe you learn how to not do it again, but it's not like, uh, that there's ever something
+positive to take from that that you wanted.
+It's like, oh, hooray!
+I have a bug.
+Uh, but in data science, that's not true.
+Like, the R&amp;D is about trying, exploring and and failure paths means you've eliminated one kind of
+technique for this problem at hand.
+That's an important learning point.
+So I know I'm a very upbeat, optimistic type.
+So maybe I would say something like this.
+But I'm trying to assure you that even though the numbers were.
+I guess they sucked.
+It's still something which is a an important point on our path to to really crushing this business problem.
+And so setting up experiments and some of them passing and some of them failing.
+That's part of the job.
+That's what it entails.
+And so yeah, we should we should be be be satisfied with that at least.
+But in the meantime the challenge for you for this, for this week, for week six is to go and recreate
+this, do do some fine tuning just with a very small data set.
+Don't do my 20,000, just do 20.
+Uh, I did actually think I was thinking that the 20,000 was going to slightly beat the previous number
+because it did for me when I ran it before, but it didn't this time for whatever reason.
+So there you go.
+Uh, sometimes it does seem to beat it, but with 20, just experiment with the hyperparameters.
+Try things like just try the number of epochs, try the different batch sizes.
+Use it as a way to understand what's going on.
+See if you can't do better than me.
+Maybe you can.
+It's, uh.
+It's pretty quick to run these fine tuning, uh, runs with just a small amount.
+It's good to get the practice.
+It's good to see the training loss, the validation loss, get a sense for what's happening.
+Um, and you could also perhaps explore using this for a use case that where it fits better.
+You could if one of these different use cases, uh, suits you and something that you are looking to
+do, then maybe explore trying out fine tuning for that purpose, doing something that actually is productive,
+fine tuning of a frontier model so that that would be the task at hand.
+Uh, so that's perhaps not the conclusion that you are expecting from a week that was all about fine
+tuning.
+And all I can tell you is that I do have redemption in store for you.
+Next week is going to be such a juicy week as we roll up our sleeves and dig in to to fine tuning an
+open source model, and there you're working with something that is a much smaller model, you have
+much more control over how you go about fine tuning, so you've really got the opportunity to put different
+models to the test and to to really explore how we can move the needle.
+Fine tuning a model, uh, to be able to, to try and compete with models that are much, much bigger
+than it.
+So that's all in store for you next week.
+But first, I did want to leave you only on a low point, so I wanted to have one.
+One nice outcome for this week.
+One more thing to do.
+So I have something different for you.
+I want to take you back to cursor for one little extra surprise.
+Something to have you smiling at the end of the week.
+What could that be?
+You're wondering.
+Let me show you.
+Let's go to cursor.
+Okay, so we're back in cursor.
+Let's go to the week six folder.
+And I want to show you that I've got another file that I've added.
+I've decided to try and build one new kind of model just to show something to you to, to end with some,
+some good results.
+And I'm going back to making a neural network.
+Again, remember, we made a vanilla neural network a couple of days ago, but I thought, why don't
+I leave you with an example which is not a vanilla neural network.
+It is actually a deep neural network, perhaps not as deep as like a transformer architecture, but
+certainly a step in that direction, something that's pretty sophisticated, that shows you the cutting
+edge of neural networks, what they can achieve.
+So if we go into the week six folder in the Pricer package in here, you'll find there is in fact a
+module called Deep Neural Network.
+And this is what it looks like to build like a professional neural network.
+Um, you can see there's this class deep neural network.
+This is like before it was a subclass of NN module.
+And it just had like before it had our layers.
+There's something a bit more now.
+It has a bunch of layers that are made up of this residual block.
+And this is in itself a number of different layers.
+The linear layer.
+You may remember we had that before.
+There's some other layers called layernorm.
+There's ReLU again that we had before.
+Dropout designed to make sure that it that it doesn't overfit.
+Another linear layer.
+Another layer norm.
+And yeah, this this is all put together into one block.
+Uh, the deep neural network itself, it contains, uh, ten layers or the specified number of layers
+where these layers are, each of these modules which themselves have multiple layers.
+So this is a pretty big neural network.
+The way that you count layers in a neural network is sometimes people do it differently, but depending
+on how exactly you count this, you could say this is anywhere from from a ten layer network to like
+a 40 or 50 layer neural network, depending on on how you're counting.
+Uh, but there's lots of layers basically all put together.
+Um, and this, this is the extent of the neural network.
+It's not exactly complicated.
+Uh, but then I've got something called the deep neural network Runner, which is more of a utility.
+And this has much of the same code that we had before, but it's just got a little bit more technicality.
+But it has this function train which has the four steps of training.
+It has the forward pass.
+Uh, there it is.
+The, uh, the forward pass, the loss calculation, the backward pass, and then the optimizer step.
+And there's lots of little bits and pieces around here.
+I'm doing something clever to to normalize the input data.
+I'm doing lots of sort of pro tricks to get the best out of a neural network.
+Um, and then I've got like an inference function at the end here that just runs inference for it.
+So this is just a sort of model of a more pro grade neural network.
+And what we're now going to do is see okay, so it's not an LLM.
+But this is again something we can train ourselves and we can see what kind of performance can we get
+from, uh, so this isn't traditional machine learning.
+This is now like deep learning deep learning in action.
+What can this give us?
+Let's find out.
+--- Lecture 6 ---
+Okay, so if you're in the week six directory, I've got a new notebook in here called redemption.
+Run!
+Open up.
+Redemption run.
+This is completely optional.
+You can just see what I've got here.
+You can run it yourself if you'd like to experience the magic of this.
+So I'm going to do some imports, including importing my neural deep neural network that we were just
+looking at.
+And we're going to use the full data set.
+You can also run training with just the small data set as well.
+So load in all of that just as before loading in items full because I'm going with a full data set.
+And when that's done, I'm going to then call our deep neural network runner, which sets everything
+up for our training data and the first 1000 data points in our validation data set.
+So it takes what about 30s to load in the training, all of our all of our data set.
+And then we will get to going okay.
+Everything is loaded in.
+So now we're going to run this.
+Now this this is setting up our neural network.
+You remember our previous vanilla neural network.
+It had quite a few parameters.
+I think it was 600,000.
+Is that right?
+About 600,000 parameters in vanilla neural network.
+This one.
+This one is it's a beefier neural network.
+We're going to have more parameters.
+Let's find out how many more.
+It's just about to print.
+Uh, and, uh, yeah.
+As I say, it's something which which you can choose to to train yourself, or you can just load in
+the one that I've already trained.
+So it has 289 million parameters.
+So, you know, I mean, it's still not like a frontier model with billions or trillions of parameters,
+but there's a lot there.
+It's a it's a hefty model for sure.
+And it's using my, my GPU or my Apple Silicon Mac.
+And it may say using Cuda for you if you're on a PC with an Nvidia card.
+Okay, now there's a choice for you.
+There's a there's there's three options.
+Number one, you could just do nothing and watch me and see the results I get.
+Number two you could choose to download the file.
+Uh you go to this Google Drive link?
+There's a file called deep Neural Networks PyTorch.
+You can take this file, put it in the week six directory.
+You can see I've got mine right there.
+It gets git ignored.
+I haven't put it in the repo because this is like seven gigabytes or something.
+Oh no that's that's the random forest.
+It's more like two gigabytes.
+It's not that big.
+It's two gigs.
+Still too big for the repo, but it's fine to be on Google Drive so you can download it if you wish.
+And then just, just it's just one line to load it in.
+Alternatively, should you wish you could actually train this yourself, it takes about 40 minutes per
+epoch.
+So running five epochs is about four hours or just under.
+Um, and I've run this already in redemption train.
+You can see that this is run, it ran.
+It took 40 minutes per epoch and it completed.
+And that's what the Redemption Train notebook is exactly the same as this, but it actually runs these
+two lines here to actually train the neural network.
+But we're not going to do that here.
+We're simply going to load it in.
+I've already got this file.
+I've saved it right here.
+There it is.
+Deep neural networks, PyTorch.
+And it loaded it in.
+It just takes a few seconds to load it in once it's been already trained.
+So that's a perfectly cool way of doing this.
+And it just remains for us now to run the test.
+And as usual with these things, we wrap it in a nice little function deep neural network.
+It's just going to call the runner dot inference, which is just exactly the same as how we did it before.
+Uh, let's run this and see how it does.
+It's very fast indeed.
+Bam!
+It's done.
+The visual looks good.
+The error 46.49 46.49.
+Let's take a look at that.
+That is pretty incredible.
+So our own homegrown neural network look we did it.
+We didn't beat GPT five one.
+That is still in pole position.
+But we got very very close.
+And we beat Claude 45 opus, which is like an enormous multi-Trillion parameter model.
+Uh, and, uh, we beat it pretty nicely.
+Uh, so this is, this is really cool to see.
+And this is a model that is totally homemade.
+This is coded from scratch.
+And PyTorch layer by layer.
+You can dig through it.
+You can look at the code yourself.
+This is something where we've really built this from the ground up.
+Now if you're saying to yourself, hang on, how can something with with only like two, whatever it
+is, 289 million parameters take on this monster model with trillions of parameters.
+The reason is because we have trained it.
+We've trained this model ourselves with our own cut of data, and we've trained it with 800,000 points.
+And we it hasn't been distracted by all of the other stuff it can do.
+It doesn't know how to write poetry about about the president.
+It doesn't know how to how to do, uh, how to to respond to your to your sales email or write a LinkedIn
+post or whatever people are using Llms for.
+But what it can do is predict the price of a product, and it can do it pretty well within $46.
+Uh, almost as good as GPT 5.1, the strongest model on the planet.
+So I think that's really awesome.
+It's a great point for us to get to.
+I realize it's slightly off, off, off track because we were fine tuning frontier models, but I wanted
+to end with a really great result.
+And I'd encourage you to experiment with this and play with it.
+And if you do want to, if you've become interested in looking at basic neural networks without even
+looking at transformers, this is an opportunity for you to come in and look at the code there.
+Ask an LLM to explain some of it.
+If you're unsure, look at some of the hyperparameters you could tweak there.
+You can change things like batch size and learning rates and other things.
+Experiment with it and see if you can't do even better with a home made deep neural network and enjoy
+that.
+Now let's have one look at all of our results side by side.
+And so here we have our latest results across the board.
+This is the prediction error.
+You remember our improvements with traditional ML.
+This was the disastrous Ed performance.
+Our original vanilla neural network.
+This is the frontier models.
+Improving.
+Improving.
+This is our disappointing results for sure.
+There's no way I can say it from fine tuning a model.
+I will say, as I say that that one time I did it, I got better than GPT four one, nano and fine tuned.
+But there's clearly a lot of variation in this fine tuning frontier model has not been fruitful for
+us.
+Um, but this here is a nice way to end it.
+The deep neural network that we trained with all of our data that's done really very well.
+It's almost, almost beaten GPT five one, but it's beaten other frontier models, including Gemini
+three Pro, uh, handily.
+So a nice a nice way to wrap the week, some great experiments, some great outcomes.
+We've we've had some setbacks, but we've learned through the process and we're we're absolutely ready
+for getting deeper into fine tuning open source models next week.
+Wow.
+Can you believe it?
+You're somehow 75% of the way through this journey.
+I haven't been giving you the percentages for a little while.
+And you've been maybe wondering, where am I now?
+75% I appreciate this week.
+Did feel like it was.
+It was quite a lot going on.
+It was a lot to take on.
+But but it was worth it.
+I hope we covered tons of ground.
+I'm hoping you've got some real practical sense of what it takes to do things like building these JSON
+files, running a model in batch mode, running fine tuning with a frontier model through the API.
+You've got a good sense of when to do that and perhaps when not to do that.
+And you've also, into the bargain, got a bit of a feel for what it takes to work with traditional
+ML.
+Uh, it's not super common, but it's still very much there.
+And it's a great basis.
+Always good to use for a baseline model.
+And you've even got some exposure to deep learning and to to building a neural network from scratch
+like that.
+Not again, not something that's that's common day to day.
+But it's great to have got that grounding and to see how it works should you need to do it.
+So this has been really important material.
+The other thing that's been so, so essential about this week is that we took on a commercial problem,
+figuring out prices from descriptions.
+And we built like a harness, a test harness for evaluating a metric.
+We really zoomed in on this on this absolute price difference.
+That's been the metric that is both a model metric and a business outcome metric.
+And we've been measuring that throughout, and we've been watching the progress of our experiments.
+Not all experiments have gone according to plan.
+Not not the most recent one and not the human experiment.
+Goodness.
+Uh, but many of them have been fantastic.
+And, you know, GPT five one has really shone.
+And that's what it's all about running the experiments, hyperparameter optimization aka trial and error
+doing this is this is where this is where you find results.
+This is where you're able to achieve great performance with your business problems.
+Okay.
+so massive congrats on being 75% of the way through.
+Uh, take a break, take, take a breather.
+Get a good night's sleep.
+Because when we start next week, we're really getting it gets super juicy.
+This is where I get if I'm not already overexcited.
+This is where I get extremely overexcited.
+As we get into fine tuning an open source model.
+And our objective for next week is to say, look, open source models are free.
+They are tiny, we're going to use a miniature one, and we're going to see, can we get to a point
+where we are getting close to a frontier model performance?
+Like, could we take on like GPT four one nano and its numbers and maybe get get close ish to GPT five
+and doing it using a tiny model with just just like a llama 3.2 a really small model.
+What can we do with that?
+If we use fine tuning, that is the mission.
+It's going to be really, really interesting.
+I can't wait to show you.
+I will see you for week seven.
+Coming right up.

@@ -1,0 +1,1051 @@
+--- Lecture 1 ---
+Week six was tremendous fun, but it's ancient history now.
+Welcome to week seven of the core track of LM engineering, a massive week.
+This is when things get professional.
+This is when we get advanced.
+But before we get advanced, let's remind ourselves what we can already do.
+Of course, you know, you can do lots of lots of generation of text and code.
+You can use front end models, open source models with tools.
+And you can also use you can create Rag solutions to business problems, giving expertise, looking
+in a knowledge base using long chain, long chain 1.0 no less.
+And do it without lang chain as well.
+And you know the importance of evals and you know how to evaluate both your retrieval and also your
+question answering.
+And then last week of course we we looked at a five step strategy.
+Given a business problem, how do you you get an AI solution starting by understanding the requirements
+and the evals.
+Evals.
+Super important.
+And then we embarked on solving a problem about predicting a number a price from some text.
+We solved that problem using traditional machine learning from simple basic like linear regression all
+the way through to some some really interesting XGBoost.
+And then we moved to deep neural networks.
+Well, first a shallow neural network.
+And then we went to LMS.
+And then we did fine tuning of a frontier model.
+That was disappointing.
+We learned when not to use fine tuning I guess.
+And then we did a deep neural network just to finish things off.
+And along the way we we looked at evaluating objectives using the sort of y hat y chart that we did
+and really digging into how you track the performance of your experiments.
+And so today, today we moved to what it takes to fine tune a model.
+And often when people talk about fine tuning an open source model, they use an expression like I built
+my own model from scratch.
+And if you hear that sometimes people actually mean that they went ahead and built something from the
+ground up.
+Usually that would be to make a sort of toy LLM that can do something very simplistic.
+Normally when people say and every day we built an LM like we have an LM.
+In my day job, what it means is that you took an open source model and you fine tuned it using a technique
+like Q Laura, which we'll use, which is, I think, the most popular technique, uh, using techniques
+like that to fine tune a model to get better at your business objective.
+That's what it means.
+There are, as I say, there, there are some cases where companies have fine tuned, have not fine
+tuned, or built their own model from scratch.
+Bloomberg famously did this with with Bloomberg GPT.
+But I think what becomes clear very, very quickly is that if you do that, then the Frontier Labs will
+come out with a better model very quickly and you'll be back.
+You'll be be saying to yourself, okay, do I do I retrain everything again, taking advantage of the
+latest technology?
+And that would be extremely expensive.
+So it turns out typically to be a better strategy commercially to be thinking about fine tuning an open
+source model that has been pre-trained by a lab like meta or deep seq, uh, rather than trying to to
+build one from scratch or Gemma from Google or five from Microsoft.
+Okay, so with that, let's dive in.
+Let's start, of course, as always at the beginning of the week by just reminding ourselves where we
+are in the journey.
+Here we are.
+You started out some six whole weeks ago over on the left.
+We spent the first week looking at the chat completions API.
+We were talking about things like tokens and stuff like that.
+By week two, we were looking across all of the frontier APIs.
+We were using tools for the first time.
+UIs Multi-modality.
+We had some fun with the with the airline thing in week three.
+We dug into hugging face.
+Of course, we'll be coming back to that today.
+We also looked at Google Colab.
+We'll be using a lot this week, almost exclusively with, with one exception, and we did open source
+work.
+So that's when you got your first exposure to hugging Face Transformers.
+And we actually looked at a model.
+If you remember, we looked at the layers of a model in week four that was all about selecting the right
+LM for the task at hand, and we used it to generate code with spectacular results.
+Week five was Rag.
+We used Lang chain one zero.
+We worked on on some question answering and we evaluated our success.
+And then we did it without long chain.
+Week six was about fine tuning a frontier model, although I say it, but that turned out to be the
+most disappointing part of the week.
+We did lots of other great stuff, including working with traditional ML.
+That was fun curating a data set that some people hate that, but I loved it and I always enjoyed digging
+into data.
+And then we had some successes.
+Fine tuning or not fine tuning, training a deeper neural network by the end of it.
+So it was a very interesting week indeed.
+This week.
+This week is fine tuning and open source model, which some people would say is like building a model.
+And then next week, the finale brings it all together with an AI project with the return of rag.
+Lots of stuff.
+And at the end of all of that, you'll be able to say for sure you can wear the LM engineer badge with
+pride.
+You will be an AI engineer.
+Just a couple of weeks left to go, and I've got some huge weeks in store for you.
+And one more time, don't kill me.
+But just to remind you, The Price Is Right is the name of our capstone project that we're working on.
+The idea is you're given a description of a product and predict its price.
+You're like, I know, I know what this project is about.
+And it's great because we've got the true value of products that we're that we've got to hand.
+Eventually we're going to incorporate this into an agentic AI solution that's going to hunt for bargains.
+That's going to be the prize at the end of this.
+And frontier models have done amazingly well.
+Of course, they've been trained with hundreds of millions of dollars pumped into them.
+The question is, can we fine tune an open source model that is thousands of times smaller and try and
+get something that can have comparable performance with the frontier, but at a fraction of the cost?
+It's basically a fraction of the size, and it's free for us to run it ourselves.
+So that's the challenge that we're laying out.
+That's what we're going to try to accomplish this week.
+And with that, let's go for the order of play for this week.
+So last week, you remember, of course we did the data curation eval frontier models.
+So this week it's all about fine tuning the open source model.
+Five.
+Five days, five steps.
+Today I'm going to introduce Q Laura, it's going to be a day with some theory stuff, but in the context
+of practice I'll show you the layers.
+We'll talk about dimensions.
+It's going to be interesting.
+Tomorrow we're going to do go back to data one more time.
+We're going to refine our data set.
+So it's perfect for fine tuning a bit of turning it into prompts.
+And then we're going to run it against a base model to evaluate our starting point.
+Days three and four is the meat of the week.
+This is when we do our training, and day five is when we bring it together.
+And we evaluate our performance and see if we've got close to a frontier model with a tiny open source
+variant.
+Okay.
+And then of course, next week is when we add in rag agentic, blah, blah, blah.
+It's going to be terrific.
+Okay.
+That's it for for for setting the stage.
+Let's get on the stage.
+I'm going to tell you what Q Laura is and how it allows us with a relatively small piece of hardware
+to fine tune models of this size and shape.
+Let's get to it.
+--- Lecture 2 ---
+So Q Laura is the name of the game.
+That's what we're going to be doing this week.
+And Q Laura is actually two different ideas, two different tricks, and one of them is called Laura,
+and the other is basically Q and so they're put together to make Q Laura, there are in fact two different
+tricks.
+Uh, so we're going to start by talking about Laura and make sure you're comfortable with that.
+And then throw the Q on the front of it.
+So here's the scoop.
+We are about to take a model.
+We are in fact going to choose llama 3.2 from meta, which is for whatever reason, I think because
+meta was first first to come up with these open source models.
+It's so common in industry that people start with llama that that's the model that they use.
+And so I think it's great prep for you to get really deeply into the llama model.
+If you wish to use any of the others, then for sure you can do so.
+They will all do great.
+They might beat the performance with llama, maybe not.
+You could give it a try, but llama is a fabulous model to start with.
+So we're going to be using llama 3.2 and that has 3 billion weights.
+It's a small model.
+3 billion weights is considered a small model, almost one that could fit on a on a device on a phone.
+But when it comes to training, 3 billion weights is still an enormous number of weights by by any normal
+size.
+Remember that that huge deep neural network from from last week was 200 million weights and that was
+maxing out my machine.
+3 billion is like off the charts.
+It's far too much for us to be training on a single GPU.
+You need to have some hardcore kit for that kind of thing.
+Um, so so there's a trick.
+There's a trick to allowing us to train something which is so enormous.
+And that trick is called Laura, which stands for Low Rank adapter.
+And I've already given some of the game away with what the trick is.
+But just in case you didn't get it, let's do the trick right now.
+So the architecture of llama 3.2 is something we briefly peaked at in week three, and you might remember
+it consists of 28 groups of modules that are stacked on top of each other that are known as the llama
+decoder layers, and each one It has different types of layers.
+It has these things called self-attention layers.
+You might have done some reading up on that when I showed you in week three.
+These are the layers that what they learn how to do through data is they learn which parts of the input
+sequence matter the most, which should they pay attention to in calculating the most likely next token.
+And then it has multi-layer perceptron layers MLP, which are these layers that are connected to the
+layer above and have weights.
+And then it has an activation function called Selu that I think I remember showing you briefly and then
+some Layernorm.
+So, so these are all all things which you could dig into.
+We'll look at them in a second and get a bit more perspective on them.
+But the the thing to keep in mind is that these all together form one module, and there are 28 of these
+modules stacked on top of each other.
+And this makes up the Lama architecture.
+And these parameters together take up 13GB of memory just before you even get to training.
+Just to have this in memory, it needs 13GB of GPU Ram.
+So as you remember, training involves these four steps.
+Training involves doing a forward pass through all of these 13GB of parameters and then calculating
+the loss.
+How wrong were we?
+And then the backward pass.
+If you were to twiddle all of these 3 billion parameters.
+13GB worth of data, would it make the loss better or worse?
+And then the step in the right direction to to reduce loss.
+Well, the first thing you do with Laura is you say, you know what?
+We're actually we're not going to change any of these parameters at all.
+None of these 3 billion parameters are going to get changed.
+We're going to freeze them, freeze all of these weights.
+They will not be subject to gradient based optimization.
+We won't be changing them at all.
+They're going to stay static.
+Okay.
+So we're not training them.
+Well so yes we are going to train.
+We are going to first select a few of these layers that we think are the ones that are most important,
+the ones that varying them is most likely to be able to shift the behavior of the llama model, and
+these are called the target modules.
+It sounds very sci fi.
+It sounds like something out of Star Trek, but they are modules.
+You remember I said that there are these these these stacks of modules, and the target modules are
+the ones that you are targeting.
+So that's what they are.
+So you're thinking, okay, I get you and we're going to shift the parameters of these target modules.
+No you don't change anything in llama 3.2 everything is frozen.
+But you've identified these target modules.
+You're like okay so so what do you do to these target modules.
+Well you come up with a separate matrix, a separate set of parameters of weights with less dimensions,
+way fewer dimensions than, than the llama architecture.
+And these things you have off to one side and because they have fewer dimensions and rank, is another
+word for dimensions, they are called low rank adapters.
+That's what you create these these little matrices of off to one side okay.
+And you're thinking, so what do we do with these matrices?
+Well, these matrices are used to adjust the target modules.
+They are applied to the target modules.
+And it's these smaller matrices that we train these we do the forward pass.
+We then do adjust these we calculate how much does changing these little things these little smaller
+parameters affect the loss.
+And then we shift these so they are used.
+We train these and we apply them to the target module.
+And what does it mean to apply them.
+It sounds very high tech.
+It is very high tech.
+They just get added together.
+So so basically it sounds Laura sounds like it's super fancy, super complex, and there's lots of lots
+of technical jargon that comes with it.
+But basically what we're saying is the llama model is too big to train, so we train something smaller
+instead that gets added to it.
+Uh, and uh, and that's how it works.
+And you train these smaller adapters, these Laura low rank adapters and, and as you train, every
+time that you do a forward pass through, you just add in the value of the low rank adapters.
+It sounds kind of simple right now.
+As always, there's a little bit of technicality.
+There's something that makes it slightly not not as simple as that.
+The problem comes to to matrix dimensions, and the fact that you can't just add a small set of matrices
+to big set of matrices.
+And so what actually happens in practice is that there aren't there isn't just one Lora set of parameters
+for each of the target modules.
+There are two.
+And they're known as lora A and lora B and lora A and lora B get multiplied together and that gets added
+to the target module.
+And the dimensions all worked out so that you can do that.
+And I'm not going to get deep into linear algebra.
+I'm going to show you the dimensionality.
+And if you wish you can look it up.
+Or you can just do it on a piece of paper and satisfy yourself that by combining multiplying together
+two smaller matrices which have a particular shape, you can get one larger matrix that can just get
+added in to the target module.
+It's not super important to know that.
+It's just that there is this trick that allows you to work with fewer parameters and have them added
+in and have them influence, affect, adapt the whole of the target module, allowing us to train a
+much smaller set of parameters.
+And whilst OpenAI isn't clear about how exactly fine tuning GPT works, all of us are sort of led to
+understand that this is they they almost certainly use this kind of technique.
+They also allow you to build to, to to fine tune a small matrix that then gets used to adapt larger
+layers in GPT.
+And it's what we're going to be doing this week.
+And as one final little extra when you do this, this multiplying and adding, you also scale up this
+matrix by a factor.
+And that factor is called alpha.
+That's how many how much you scale up the result of multiplying Laura a and or b.
+So in the end the target module has added to it alpha times A times Laura B.
+And that's that is everything about Laura.
+You now know Laura.
+--- Lecture 3 ---
+So one more time.
+Here you have it.
+Here's the picture.
+We have frozen the weights in llama 3.2.
+We've identified some target modules in there.
+And then for each of the target modules we're coming up with a pair of matrices called Laura A and Laura
+B.
+And it's worked out in such a way that the target module has a large number of dimensions.
+It's got lots of dimensions.
+Laura A and Laura B have much more fewer dimensions than it's designed, such that you can multiply
+together Laura A and Laura B, and you'll get a bigger matrix with with the right number of dimensions,
+you scale it up by alpha.
+You add that to the target module, and that allows you to train Laura A and Laura B, and have them
+influence the target module such that you can basically affect all of llama 3.2 by only fine tuning
+some small matrices.
+That's how it works.
+Okay.
+And now to introduce some essential hyperparameters that go along with that.
+Remember, hyperparameters is just a fancy name for any kind of settings that aren't the actual parameters
+themselves and the model.
+It's something else that affects the whole training and you can explore those.
+Try them.
+Setting them differently.
+Uh, before you train and the process of changing these hyperparameters and experimenting with different
+values is known as hyperparameter optimization.
+And it's really just just trial and error.
+And it's a big part of training, trying out different hyperparameters and seeing which ones work best.
+So what are the hyperparameters for the Lora process?
+What are some essential ones?
+Well, you may know them already.
+The first of them, of course, is r uh, which is uh, the the number of dimensions in these smaller
+dimensional matrices.
+Uh, the, uh, often you see people begin with an R of eight, have eight dimensional matrices, and
+then go up to 16 and then go up to 32.
+But eight, 16, 32 are very common values for R.
+Generally speaking, there's this thing in data science that hyperparameters are often powers of two.
+You'll often see we're going to do a lot of these things, and you'll often find that people use different
+powers of two for the hyperparameters.
+And I think it's like this sort of urban legend and myth that that some of these are necessary because
+they improve the the ability of a model to use memory efficiently.
+But a lot of this is more myth than, than substance.
+It's become almost a superstition that people tend to just always latch on to powers of two for hyperparameters.
+And this idea that it's more efficient for memory because of course, bytes are organized into into
+powers of two.
+Uh, I don't know if it's really true.
+Uh, so so it's just what everyone does.
+It's like.
+Like, uh, it's so common that it's almost second nature.
+I feel uncomfortable when I'm trying to come up with a batch size that's not a power of two, because
+it's so ingrained in me that it should be a power of two.
+But as we'll see, we may do some experimenting with this.
+You certainly don't have to feel like you're constrained to a power of two.
+You could have a value of R, which is 11 if you wanted.
+It would feel galling.
+Somehow.
+It would feel evil.
+But it's not.
+It's fine.
+Anyway, that is our.
+So what's another one?
+Another one is Alpha.
+You remember what alpha is.
+Alpha is simply the scaling factor.
+How much you're multiplying these two matrices by before you add it to the target module.
+And and the rule of thumb that everyone just does is you pick alpha to be double R.
+You don't have to.
+But I always do.
+I did once try having different values of alpha, and I can confirm when I did that that the different
+values of alpha performed worse than having just double, uh, but only very slightly.
+It didn't make a huge amount of difference, I've got to be honest.
+Uh, but yeah, the alpha you start at least with it being twice the value of R, and so if R is 32,
+alpha is 64.
+That's just what you do.
+But for sure you should explore a couple of other options to see if you do better.
+So that is R and alpha.
+And then the other one is which target modules do you pick.
+And this is something which is again it's just there's a sort of rule of thumb.
+You tend to pick the attention heads.
+You'll see that in a second when we go in and pick them.
+Those tend to be the layers that you target, at least initially.
+And then you can decide to also target the MLP layers as well.
+If you want to have more flexibility, you want to have more, even more ability to absorb your training
+data and change the model.
+Um, but but normally you'd start by just affecting the attention head.
+See how that does?
+Add in more if you need to.
+Uh, and yeah, that's that's usually what you see people doing most of the time.
+targeting the attention heads.
+I try, I've tried both with this project and I get.
+I think I get slightly better results when I have more than just the attention heads, but only slightly,
+and it takes a lot longer.
+So so generally, rule of thumb start with just the attention heads, which you'll see in just a second.
+Now I know what you're thinking.
+You're thinking okay, so you've explained Laura very nicely, but we're not here to learn about Laura.
+We're here to learn about Laura.
+So let's hear about the cue.
+So the cue of course stands for quantization.
+It's something we met in week three already.
+So you know a little bit about this.
+The idea is look even even at llama llama 3.2 has 3 billion weights.
+That's still a lot of data.
+Each of these parameters, each of these parameters is modeled as a 32 bit floating point number.
+And that adds up 32 bits, which is like four bytes.
+So 3 billion times for bites.
+You can do the math.
+That's going to be like 12GB.
+It's actually 13GB.
+Uh, rounding.
+Uh, so so it takes up 13GB of Ram and, uh, there's, there's this idea which which, uh, someone
+had which it sounds like one of those intern ideas.
+It's like like really, uh, of like.
+Okay, so so what if we we keep all of these weights, we keep the 3 billion weights, but rather than
+having them, each of them be be 32 bits.
+What if we reduce the precision of each one?
+Here's how to think of it.
+You can think of each of these weights like it's like it's a dial, a dimmer, a dimmer switch for your
+lights.
+You're turning this dial.
+It's turning your lights bright and dark and and what we're saying is, okay, we've got all of these
+different possible settings that the lights could be on.
+What if we made that more coarse grained?
+We made it so that there's only 256 possible settings here, or that would be eight bits only 256 possible
+settings.
+Click click click click 256 times.
+Or we can make it even more coarse grained.
+It could be just 16 possible positions.
+It's four bits.
+Just 16.
+Click click click.
+And the lights would get brighter brighter brighter.
+But keep all of your weights.
+What if we considered trying to do that changing lama to be to be using just four bit numbers?
+Well, I mean your first reaction would be okay, well sure fine.
+But but that's taking a lot of information out that was trained as part of pre-training.
+There was all this careful wiggling of the parameters to make a good model.
+If you if you turn everything down to just, just a 16 possible positions, you're losing a lot of info.
+And presumably that's not dissimilar to just taking out three quarters of the layers and just going
+all the way down to just a quarter of the layers with with full precision.
+Well.
+Well, it's kind of funny.
+This is one of those weird situations where you sort of have your cake and eat it for sure, going down
+to just four bits, just as very coarse grained click, click, click definitely reduces model performance.
+The results come down, the accuracy gets poorer.
+They do worse on all of their benchmarks, but not by as much as you might think, not by nearly as
+much as you might think.
+They just do a little bit worse.
+They don't do much worse.
+They're certainly not like four times worse.
+It's much, much better than taking out three quarters of the layers, which would be devastating to,
+to to a model.
+Uh, uh, so, uh, so it's, it's a strange kind of experimental result.
+It's very empirical.
+It's like we tried it and it's kind of okay.
+And we save like we get down to a quarter of the space, a huge memory saving without too much of an
+impact on performance.
+Just a slight impact on performance.
+And so it turns out that this is a really good trick.
+Just experimentally it works really well.
+The assumption is that when we do training, we sort of get more detail than we perhaps need, like
+there's more information baked in to the neural network than is necessary.
+And reducing the precision is a very efficient way of compressing a neural network.
+You're still getting a lot of the explanatory power, still getting a lot of the intelligence of the
+neural network, whilst massively reducing the amount of space it takes up.
+That's the that's the thinking.
+It's some kind of a of a clever trick to allow us to compress a neural network very efficiently, a
+bit like the way an MP3 still sort of sounds pretty good, even though it's massively smaller than a
+full WAV file.
+Same kind of idea, I guess.
+And so yes, it's very common to reduce from the 32 bits down to eight bits, It's or go even further
+and take it down to four bits, which is, uh, just 16 possible positions, really tiny.
+And that's what we will do.
+And that is what's super common color is going all the way down to four bits most of the time.
+And there's just a couple of technicalities to mention that that is a common point of confusion, even
+even for pros sometimes.
+Um, first of all, it's worth noting that when I said I said it comes down to like 16 possible positions.
+A four bit number is like typically between 0 and 15, the 16 possible settings.
+But it's not as if we we take these numbers to be integers, as a four bit number is usually interpreted,
+but no.
+Rather it's interpreted as a float that there are 16 possible positions, and these are mapped to to
+16 possible floating point values.
+And they use usually like like a, like a normal distribution to, to be able to very cleverly represent
+a possible range of floating point values with only 16 coarse positions.
+So you can think of these 16 settings as kind of clicking through the possible values of a floating
+point number might have in a way, that is, that is most likely to keep some of the knowledge of the
+neural network.
+So that's a key point.
+It's not it's not being converted to integers.
+And the other technicality that sometimes confuses people is that this business of quantizing this is
+being applied to the base model.
+The base model is being quantized down to four bits.
+We're not quantizing the Laura matrices.
+We'll talk about their precision another time, but we are quantizing the base model down to four bits.
+Um, and that's it's confusing because the name Laura sounds like it sounds like it's saying like quantized
+Laura or something.
+What you're quantizing is the base model.
+The Laura matrices are separate.
+So those are two important, uh, qualifiers to this.
+But now with that, you know all about quantization and you know all about Q Laura.
+--- Lecture 4 ---
+Well, this is a nice surprise.
+We're not in Cursa.
+We've gone to Google Colab.
+This week is mostly except for one lab.
+I'm going to be in Google Colab, and I'm here looking at Colab for week seven, day one.
+And you may be thinking to yourself, where do I find this link to the Colab?
+There are many places where you will find the link to the Skylab.
+One of them is just by going in cursor to the week seven, day one.
+In that day one lab in in the repo.
+I've got a link to here.
+I've also got a link in the readme, and anywhere else where I can think of putting the link.
+It should be quite easy to find a link, but you could always start by going to the week seven day one.
+Find a link to Colab.
+This Colab is the new week seven day one Q Laura.
+Intro.
+As we dig in to Q Laura matrices, models and all that good stuff.
+And here we are in Colab.
+And just first of all, a few things to remind you about.
+Now on the top right in Colab, you hopefully remember from week three we're looking at this, you can
+choose a runtime type and we want to be on a T4 change runtime type, make sure that T4 is selected.
+Doesn't need to be high Ram.
+This is the free box that you get for free with Google.
+As long as you have a Google account, that's all you need, which is also free.
+Uh, so you can use this for free, but you do need to be on a T4.
+And the other thing to remind you is that you may find while you're doing stuff that you get this strange
+runtime error Cuda is required, but not available for bits and bytes.
+And just remember, that's a common thing.
+It doesn't mean you need to do any Pip installs or imports, it means you need to disconnect and delete
+the runtime.
+Start again from the top, including this first line here that installs, uh, bits and bytes.
+But if you don't start with a new instance and do that from the top, then you won't be able to get
+around this problem.
+It happens when Google transparently swaps your hardware from under you and in a lower spec box because
+they ran out of capacity or something, and then you can't just keep going from where you are.
+You have to go back up to the top.
+Hopefully you remember that.
+Uh, and one other thing to remember.
+Uh, I'm sorry, uh, but just one more thing.
+And that is this business about your hugging face key that hopefully, again, you did this in week
+three, but over here is this little key symbol.
+When you press here, you should see that any keys you've ever set up in Colab should be here.
+You just have to enable this or it may already be enabled for you.
+Um, and make sure that that hugging face token is available for this lab or it will prompt you when
+you get there and you take that hugging face token from your hugging face account.
+There is actually a link later on in this lab, and with that you are set up.
+You are ready.
+You are hopefully now connected.
+You've you've maybe gone to runtime and said restart session or, or you just press the connect button
+up here so that you are on a T4 box.
+The way you check is you go here and you go to view resources and you can see that you, uh, have a
+nice T4 box with a GPU with 15GB.
+Look, I need to restart my session here so that we're starting from scratch.
+Restart session?
+Yes.
+So make sure that we've got a totally empty Ram.
+You can see I've got three active sessions, and I'm spending lots because I'm doing lots of things
+right now.
+But you hopefully only have the one active session which is this.
+Okay.
+Good to go.
+Let's get started.
+Okay.
+And the first thing to do always is to run this line here this pip install the first cell shift enter
+to run it of course.
+Um by the way minus Q means quiet.
+So it doesn't give you tons and tons of output.
+And minus minus upgrade means it gets the latest version of bits and bytes, which is the package that
+deals with quantization.
+A funny name, bits and bytes.
+Uh, and then we've got a whole ton of imports here, which, uh, and I don't know that all of these
+are necessary, but maybe I could trim this back a bit, but but anyway, a bunch of imports that includes
+importing transformers, the famous library from hugging face that we first explored in week three.
+And now there's lots of constants that we're going to be to be playing with here.
+Uh, the first constant is a constant called the base model, which is the model that we're going to
+be using as our, as the base model that we will be fine tuning this week.
+And we are choosing llama 3.2.
+The 3 billion variant of it.
+If you wish, you can choose any different base model that feels about the right size for you.
+Similar kind of size.
+Similar sizes of Gemma perhaps or Phi or deep seq.
+Um, and they should all do great.
+This one of course, needs you to be approved for access, which we did in week three.
+If you skip week three and you shouldn't skip week three, it's great.
+But if you did, then you'll now need to go and request approval for llama, and you might want to go
+back and watch the week three videos if you don't know how to do that.
+Alternatively, you could always use Kwan uh from Alibaba Cloud, which which has a much.
+I don't think they have any approval process at all.
+Or if they do, it's very quick and streamlined.
+Any of those models will do great as well.
+Llama is most common in industry.
+Meta really did a great job of bringing this to industry quickly.
+So I do focus on this here for you so that you can use the one that you're most likely to find in practice.
+Okay, so I forget if I ran the constants, but now I've run this.
+What else?
+Light mode.
+You remember, light mode is true.
+If you want to just just use the simple data set the short data set false if you want to go the whole
+massive great data set.
+Although we will, we will do a little bit of looking at both right now.
+So we're now going to and here this fine tuned model thing here, this is pointing to a model which
+I have already fine tuned.
+And so I'm sort of diving ahead.
+This is looking ahead into the future.
+The reason I do this I just want to show you the layers of it.
+But you don't need to.
+Obviously we're going to build we're going to do some fine tuning ourselves.
+So you don't need to worry that you won't have one of these just yet, but it's public, so you should
+be able to just use it as it is.
+Okay, so now I'm now logging into hugging face.
+This relies on me having given access.
+If you haven't done, you'll get a little pop up that says Grant access to your hugging face token and
+you say yes, and you'll now be logged in to hugging face.
+Okay, we are now going to just look at different versions of the llama 3.2 model at different levels
+of quantization.
+So this is the way we first load in llama.
+Um, we're passing in this base model and we're going to load it in.
+We did this before in week three.
+So this is somewhat familiar to you.
+It's now downloading onto this box the llama 3.2 model.
+And wham up goes our GPU memory.
+It's using up like 12GB of Ram right away.
+And uh, we are going to let this run.
+And when it's completed, we're going to print the memory footprint.
+And then we're going to look at the model itself, which we did before, once in week three, uh, just
+to remind ourselves about the different layers of the neural network.
+Um, okay.
+That seems to have run and run fast for me because, um, since I last, um, even though I restarted
+this kernel, it's running on a box that was already running, and I ran this once before.
+The first time you run it, it takes about two minutes.
+All right, now I'm going to print the memory footprint, and it takes up 12.9GB of memory.
+Uh, most of that is on the GPU right now.
+And so that that is the, uh, the size of it.
+And now we're going to dig into the base model itself.
+Okay.
+So let's print the base model.
+And here's what it looks like.
+When you print it you get to see all of the layers of the neural network.
+It is a it is PyTorch set object with a series of layers, just like the neural network that we built
+a few days ago.
+Well, just like it, but but uh, but more uh, so we looked at this briefly in week three.
+So some of this should be familiar to you.
+There is like an embedding layer.
+There are then 28 sets of these Lama decoder layers.
+And they each have self-attention followed by MLP, multi-layer perceptron, and that then goes into
+layernorm and then into smaller norm.
+And then, uh, that's, that's basically it.
+And then head at the very end of it.
+And you remember back in week three, I gave you some links for more reading, should you wish to dig
+in a bit deeper, you could look back on that.
+You could also simply paste this into ChatGPT and say, walk me through the architecture of llama.
+Explain each bit if you want to get a bit deeper.
+And generally I want to be gradually sort of getting you deeper into this as we go through the course.
+So the layers of a neural network like this, they are each sets of these things called neurons, these,
+these algorithms that are basically like they're doing a little linear regression calculation, just
+a weighted sum, and then they're putting it through some kind of function called the non-linearity,
+which in the case of llama is a selu function right there, which also I think I gave a link to before,
+uh, the, the way that this is implemented, because doing these linear regressions is basically doing
+a bunch of multiplies and adds, it essentially turns out to be just a matrix calculation.
+Each layer is basically just doing some matrix multiplies.
+And that's that's just the way to implement all of these linear regressions in parallel.
+It's it's again from my YouTube videos.
+It's like doing lots of of mixing of mixing boards all in parallel.
+And a matrix is a fast way of doing that.
+And that's why these things all run on on matrix calcs and why they're very fast on GPUs, because GPUs
+are designed to do lots of matrix calculations, very fast in parallel originally so they could show
+games, uh, build, build each of the screens of a refresh of a screen when you're projecting a 3D
+world into the 2D with polygons and stuff.
+Lots of matrix calcs.
+So each of these layers involves doing having a matrix of and there's some, some level, some number
+of dimensions that is the, the input to this layer and some number of dimensions.
+That's the output.
+And it contains matrices with parameters to be able to to to create those outputs from the inputs.
+And so this very first layer, the embedding matrix has this many input dimensions 128,000 input dimensions.
+And that's, that's that's 128,000 different numbers go in.
+And what goes out is just 3072 dimensions.
+And that's that's the main, that's the sort of inner dimensionality of the llama model.
+So so looking at that, you might be wondering, so what on earth is in this 128,000 dimensions?
+And the answer is very simple.
+So actually this is used to pass in the tokens, the tokens that are in the input sequence for the model
+and the tokens.
+You may remember for llama, there are in fact 128,256 different possible values of that token.
+Uh, that's that's the token index.
+And if you're if you're following all this and don't worry if you're not, but if you are, you might
+say, well, hang on, why isn't that just one dimension?
+It's one number which can take that many different values.
+Why isn't it just a one dimension that gets passed in and 3000 dimensions comes out of this embedding
+layer?
+And the answer is this ties back to something I just said when we were, I think it was just a couple
+of days ago that neural networks they like to have as their inputs things called one hot vectors, which
+are vectors with just zero and one, not with not with multiple numbers.
+And so the token is turned into a one hot matrix vector, which is zeros everywhere except the location
+that represents this token, where it is a one.
+So if your if token index number one is the word and then the vector would be 100000 and 128,000 zeros.
+If the first token is the word yes and that's and that's number two, then you'd get like 010000 for
+128,000 zeros.
+So the input tokens are turned into this one hot vector, which is 128,000 dimension vector with just
+a single one somewhere in there.
+And the embedding layer is responsible for taking this enormous one hot vector of lots of zeros and
+a single one, and then compressing it into something with 3000 dimensions, which is the embedding
+vector for that token.
+And that's what the embedding layer does, the first layer of the llama model.
+And that's perhaps more detail than you needed.
+But but I thought for those that are interested, I wanted to give that perspective again.
+Paste this into your favorite LLM if you want to go deeper on what this means, and you can then look
+through the other dimensionality and remember that this is how many dimensions come in and how many
+dimensions come out.
+And so you can see that there are four different kinds of layers in the attention layer.
+I remember again, we did speak this briefly in week three, but there's the Q, the K, the V and O
+for output.
+Uh, the the query, the key, the value and the outputs.
+And they have 3000 dimensions in.
+And then some of them have 1000 dimensions out.
+Um, and the final output ends up with 3000 dimensions.
+Um, and that that is the self-attention and the MLP you can see has, has a gate which is 3000 in 8000
+out and then up like breaks, takes, takes the 3000 dimensions and explodes it out to 8000 and down
+takes the 8000 and brings it back to 3000 again.
+And that's the the MLP set of layers.
+Um, and all of this together is done 28 times.
+Um, and then has an LLM head and that has the input features, the 3000 inner dimensions.
+The output features again is 128,000 dimensions.
+That's what's coming out of the very end.
+And what is that.
+Can you imagine?
+What do you think that might be?
+What?
+What goes in this 128,000 dimensions each.
+Each one of those dimensions is the representing the probability that that token number is going to
+be the next token to follow the input.
+That's what comes out of the output.
+So this may be more detail than you're expecting.
+It's more detail than you need.
+It's just important to get some intuition for what you're seeing here.
+Look through this get a sense of it, put it in ChatGPT or your favorite LLM.
+Get a feel for what it means to have these different layers and the different dimensionality.
+It's not like you need to know all of this to be an AI engineer, but it helps to have some intuition
+for what's going on.
+And once you've done that, and once you've you've experimented a bit, restart your session by going
+runtime restart session so that we clear everything out.
+We need to get this GPU Ram back down and then come back up to the top again.
+And I will see you for the next video to look at the same thing, but quantized.
+--- Lecture 5 ---
+
+Okay.
+And so you've restarted your session.
+Your GPU Ram has come down to zero.
+Come back to the top.
+You need to run this pip install at the top.
+Otherwise you'll get that funny, uh, error about bits and bytes.
+Rerun the imports, rerun the constants, and then scroll past what we did.
+Oh sorry.
+And login talking face.
+Uh, and then scroll down, uh, and, uh, come back down to here to this cell which says load the
+base model using eight bit.
+And this is where we set this quant config, which is a bits and bytes object, where we say load in
+eight bit is true.
+And then we have, other than that the same the same code to load in the base model.
+But we pass in that quant config.
+So we're doing that.
+So it's now going to load it in.
+And as it loads it in it converts it down from each of the parameters which, which generally have 16
+bits are coming down to eight bits.
+And let's have a look.
+The previous memory footprint was Point nine gigabytes.
+That's how large it was.
+So what we want to know is how large is it going to be after we have taken this down to just an eight
+bit version of it?
+And we're also going to print the base model again to see how that looks, to get a good handle on the
+base model.
+And I will see you in a second when this is loaded for me.
+Okay.
+So that's loaded.
+We have got our base model here.
+It's uh, now an eight bit version.
+The memory footprint is much smaller.
+It's 3.6GB.
+And if we look at it here, you will see that we've we've printed it out.
+It looks it looks very similar.
+Do you see any differences here.
+Same architecture.
+But you'll see that these layers have been replaced with a linear eight bit.
+Here it was linear and now it says linear eight bit.
+It's been reduced in precision.
+The base model is smaller.
+Um, but otherwise it is basically exactly the same, uh, same architecture, lower precision in the
+weights they click through 256 possible values instead.
+Okay.
+And with that, it's time to restart the session once more to free up the GPU.
+Restart the session.
+Uh, yes.
+And then come back up to the top again and uh, back up at the top again.
+Run the pip installs, run the imports, run the constants, log in to hugging face, and then come
+and join me.
+Go past the first thing we did.
+Go past the eight bit variant.
+Restart the session.
+Here we are.
+It's time to load the tokenizer and base model using four bit.
+And this is the bits and bytes config that we use.
+All right.
+So this quant config is where we we describe how we want to bring this model all the way down to four
+bits load.
+And four bit is true means we do four bits.
+Use double quant is like an extra trick it uses to do this.
+This pass of quantizing twice that shaves off a little bit more space, so it's even more efficient.
+And people like to do this.
+This is saying when you're running compute, there are a couple of different ways to do it.
+You can you can use a couple of different data types.
+And this one, the binary float16 is one that's particularly fast on this kind of GPU.
+Actually, we'll switch between them depending on which GPU you have.
+When we get our final version of the code, and this one here is saying okay, so we're going to reduce
+it down to just four bits to 16 possible values.
+But how do we decide how to map those 16 possible values to to to actual numbers.
+And Ncf4 is a particular methodology for doing that, which is by far the most popular one.
+And this is the one that works really well.
+And it sort of tries to associate 16 possible values with where it's likely that numbers might be in
+the whole floating point space.
+So this just basically gives you a configuration which can very efficiently change the precision of
+the entire Lama based model down to just four bits.
+And I really should have run this while I was talking.
+Uh, but there we go.
+We're now going to do this.
+We're going to load it in, and you're going to see that the GPU, Ram as well.
+You already saw last time it only blipped up by a little bit.
+We didn't need to restart the the kernel.
+Probably.
+If you didn't then you probably found that for yourself.
+We're now loading it in in four bits.
+And then we will print the memory footprint and the base model one more time.
+And here we have the memory footprint is all the way down at 2.2GB.
+It's really small.
+And here we've printed the the neural network architecture.
+Again it's the same architecture, the same setup of the layers.
+But you'll see that we've been we've replaced these layers with four bit linear layers inside here as
+we've reduced the precision all the way down.
+That's what quantization did.
+It turned it all the way down to this very small level of precision.
+Okay.
+And then the final thing we're going to do is load in the fine tuned model.
+This is like a peek into the future.
+We're going to build this fine tuned model in the next few days, but I've done it already, so I'm
+just going to load in the one that I made earlier.
+Uh, and uh, this is how you do it.
+This this, um, library model stands for parameter efficient fine tuning.
+And it's, uh, hugging face name for their library that implements Lora.
+So we are loading in a base model and some llama, some Lora matrices on top of that.
+So that is what I'm now loading in.
+So this is now it's the four bit model, this 2.2GB version of our model but with some extra parameters
+loaded in.
+So how big is this.
+The total size is 2.27GB.
+So it's this 2.2GB with like 70MB of extra stuff and that extra stuff.
+That's where the magic happens.
+The extra stuff are the Lora matrices.
+Okay.
+Let's see these Lora matrices.
+We can print the fine tuned model and take a breath, because there's quite a lot to it.
+Here it is.
+Let's take a look.
+Now it fits on more than one page.
+I might need to zoom out so you can see all of this.
+Zoom out again.
+Oh my goodness.
+Uh, well, hopefully you can see this on your screen.
+There's a there's a fair bit to take in here.
+Uh, and let's just, just spend a second to look through this.
+So at first blush, there's definitely some a lot of similarity.
+It's it's the same as what we were looking at before at a high level.
+But inside there's a lot more detail.
+So you can see that the, the, uh, the base model that's now called a Lora model, it's still it's
+still llama.
+It's still got the same embedding layer, same thing there.
+And then here comes the 28 llama decoder layers.
+All right.
+And here's the self-attention section right here.
+And now remember self-attention has the Q, the k, the V and the O.
+Each of those are quite a lot bigger.
+Now they've got the same linear four bit layer we had before.
+But they've now got a Laura A and a Laura B.
+These are the two Laura matrices that get multiplied together in order to be able to be added to the
+to the base layer, but multiplied by that alpha scaling factor if you're following.
+If you remember all this, and I would suggest that you dig in and look at the dimensionality.
+So in this case this is a very typical Laura setup I've got here.
+Where are the dimensions of the Laura matrix.
+R is 3232 dimensions.
+So what you'll see here is that Lama has 3000 dimensions in 3000 dimensions out in its Q proj.
+So if you dig into Laura A and Laura B, you'll see that the Laura A is 3000 dimensions in and 32 out,
+and Laura B is 32 in and 3000 dimensions out.
+And so you can you can do do all of the, the the maths if you remember your matrix maths.
+But if you've got a matrix which has that kind of shape and a matrix with this kind of shape, and you
+multiply them together.
+You have something with this kind of shape that you can just add it to it.
+That's how it works.
+That's why Laura is training two small matrices, one that's kind of looking like that, and one that's
+kind of looking like that.
+And when they get multiplied together, you get one big matrix that can get added after scaling up by
+alpha, just giving you the intuition for what's happening.
+This is the mathematical trick that allows us to to just train these small Laura and Laura B matrices
+and have them affect adapt the bigger Lama matrix.
+And we're doing that for each of these for for q, for k for V and for O.
+And we're not touching the MLP.
+And then that is the end of it.
+That is Q Laura, uh, the Laura part and the Q part in action in a fine tuned model.
+Again, get the intuition.
+And if you want to go deeper, put it into your favorite LM, get it to dig into it.
+You can also look at the actual hugging face code to get a sense for how this neural network is constructed.
+And as a final thing I want to do, I just want to do some quick matrix maths to show you something.
+So the the most common Q Laura setup, and the one that we'll use for our light training if you have
+light mode is true.
+That's the training you want to do, which is a pretty standard stuff.
+The training data size is 20,000.
+And as a rule of thumb, people often say that that's should be your sort of starting point for doing
+Laura fine tuning like this.
+Although there's no you should experiment.
+Sometimes way fewer data can do great.
+Um, so, ah, the inner dimension is 32.
+That's the common value.
+And you'll remember that 32 is indeed the inner dimensions you see right here.
+So with R is 32, how many parameters are there in our Q Laura setup?
+Well you can take a look at the different different matrices in that in that neural network you'll see
+that q, k, v and O the four attention layers.
+We've added these size matrices.
+So that's how many parameters in total are in those matrices.
+So that sums up.
+And it's the most standard default with Q that your target modules are the self-attention layers.
+That's very common.
+So it's very common to start with q v and o.
+And so if we add up the total number of parameters each Laura layer would have the sum of these four.
+There are 28 layers.
+So I have to multiply that by 28.
+Remember that with with with Q Laura, while you quantize the base model you don't quantize the Laura
+matrices.
+They are full 32 bit numbers.
+So we multiply that by four for four bytes and divide that by a million.
+Just so we get things in megabytes.
+This would be the total size of our Laura matrix of our setup.
+There will be a total of 18 million parameters and that will be 73MB worth of data.
+--- Lecture 6 ---
+Okay, so to recap, we've just been digging into how many parameters would be in this Lora matrix and
+this classic case of when we are looking at applying Lora to the attention layers, the V and O layers,
+and we have an R of 32, those inner dimensions.
+And we've added up that we'd have 18 million parameters and it would take up 73MB of space.
+And 18 million is a lot of parameters for sure.
+That's a big number.
+But but remember the llama model has 3 billion parameters.
+So this is dramatically smaller than Llama and Llama.
+Remember the original llama was like 12GB large.
+This is just 17MB.
+And that 17 number might be familiar to you.
+Because if you remember, we said that the memory footprint was 2.27GB of the whole thing, and the
+original non quantized model was 2.2GB.
+And the difference between those two numbers is 17MB.
+So it works.
+It really works.
+The difference there are these extra parameters that have come from this maths right here.
+Uh, and just to really prove it works.
+I have one more thing to show you.
+Check this out.
+I'm going to go into hugging face and I'm going to show you this is the the model that we were just
+looking at.
+This is a fine tuned model saved in hugging face.
+When you're looking at a model in hugging face, you can always flip to the files and versions tab.
+I'm just I'm just in the models right now.
+This is this is my model that we were just looking at there.
+And if I look at the files themselves, there is a file called adapter model tensors.
+And that's the file to look for.
+That is actually the Q Laura the Laura matrices saved in this directory.
+You don't need to do this.
+I do this just to prove to you that the actual size of this on disk is 73.4MB worth of data.
+That's what we're going to train later this week.
+You're going to have this number.
+And I just want to take this moment to show you that 73.4 remember that number 73.4.
+There it is 73.4.
+It is.
+It's really the case that it's these matrices that we're building.
+These are the parameters.
+And that's what gets saved in hugging face.
+Uh and so this is uh Hopefully making things more concrete for you.
+You could really see the reality behind it.
+But but this is if you wish to go the light route, I'm going to be going also the heavy route of training
+a big model with all 800,000 data points, and I can afford to splash out and have slightly beefier
+Cultura matrices, Lora matrices.
+And I'm going to go a bit crazy here.
+This is extreme.
+You don't normally find tune with such a big data set.
+Um, but we're gonna and so I'm going to try having R at 256.
+Again a power of two.
+You always have powers of two.
+Um, but, uh r of 256.
+That's definitely higher than people normally do, but 800,000 is more data than people usually use.
+So I feel like it's worth it.
+Um, and so if we work out what that does, that's going to mean that R is going to be a higher number.
+This is the same calculation as before for our attention layers.
+I'm also I'm not only going to target the attention layers, I'm also going to target the MLP layers.
+Uh and that's something which, which which is common for when you're doing more training.
+You've got more data, you target as much as you can.
+And so if we add all of that up, we times it by 28 for the number of these these stacked decoder layers.
+Um, and then times that by four for four bytes, um, in a, in a 32 bit number.
+And then let's print that out and see how much this will take.
+So this is then going to have 389 million parameters.
+So it's a lot more parameters.
+It's still ten times less than llama has.
+You know we're still just a 10% of the size of the big model.
+But it's definitely a bigger model.
+And it's going to be 1.1.55, six gigabytes worth of data that we're going to have on disk.
+So it is going to be a bigger model.
+And that's going to be the meatier one that I will train as well to show you the full one.
+And if you wish, you could do that too, if this sort of thing pleases you, but the light one will
+do just fine as well.
+And just to to show you this as well in the full format.
+This is a model that I've saved the full model.
+And you can see here that the total size of all of the adapter models safe tensors is 1.56GB.
+Remember that number 1.56GB.
+There it is.
+Same number.
+That's what it is.
+It's 1.5GB 1.56GB, which is all of this stuff right here that's being saved.
+And so that's giving you a real tangible sense of what does it mean to do?
+Q Laura, with a model, what does it actually look like under the hood?
+And how does this map to the actual parameters that we train and then get saved to disk, and how they
+actually get applied to to adapt your model?
+Great.
+Let's go back to the slides to wrap and to remind you.
+Then we we started out by saying that the original llama 3.2, uh, was at 13GB worth of data associated
+with that when we slammed it down to eight bits, uh, we went all the way down to 3.6GB worth of data
+that we had to load in there.
+When we reduced it down to four bits, it was 2.2GB of data.
+It's much, much smaller.
+But during Q Laura fine tuning, when we're only fine tuning the Laura matrices, we're not having to
+fine tune 2.2GB worth of data.
+It's just 73MB.
+That's all it is when R is 32, when we're not going crazy.
+Uh, and, uh, it's just worth noting that that they represent 32 bit numbers.
+There's just way fewer of them.
+And that's why in total, it comes to just 73MB worth of data to be trained.
+That's the sizes that we're looking at here.
+Hopefully this now all feels very real to you.
+As I say, it's not important that you fully understand about the layers of neural network and the matrices
+and so on.
+It's just good to have that intuition because it's going to mean things will start to click.
+And if you do know this stuff already, then hopefully some of this was interesting and you've dug in
+more and you could probably, uh, like, like, you know, I've oversimplified a few things, but but
+it's all basically in the spirit of what we're doing.
+And with that, well, this is this has been a real day of, of getting deeper, more, more advanced,
+more pro because now some of the stuff that you've already been able to do is like like solving, solving,
+uh, APIs and open source problems is easy for you now.
+Tools, assistants and even rag with with the lang chain one zero or not with lang chain.
+But you can also curate data, make a baseline model, fine tune a frontier model with disappointing
+results in our case.
+Um, but now you can also explain.
+Q Laura, you know about the Q part and the Laura part, you understand, hopefully got good intuition
+about how that translates to actual parameters and the size on disk.
+And you also know about the target modules R and Alpha three critical hyperparameters.
+And indeed, if you're thinking when I was talking earlier about about targeting the self-attention
+layers or targeting the MLP, the multi-layer perceptron layers as your target modules, and you might
+be thinking, okay, so so how do we know what's the formula for knowing when we use which?
+Uh, and of course, you know, the answer to that is the answer is the original formula.
+It's a hyperparameter, which means that you have to do some hyperparameter optimization, which basically
+means Yes.
+It's trial and error.
+You run some experiments, you try some target modules.
+You see what happens.
+Good rule of thumb.
+Start with the attention layers.
+Start with those four attention layers that I had there.
+That's where people almost always start.
+If you need more juice, more, more explanatory power, then you often add in the MLP layers.
+There are some situations when you want to add in the ML header.
+The LM ahead as well, but they're quite rare.
+That's when you want to perhaps output something that has a particular format, which is different,
+and you'd want to do some training there.
+Um, but but these are just rules of thumb.
+The most important way to get the right target modules is to experiment and find out what performs best
+with your eval metric.
+No shortcut to experimenting.
+And with that, experimenting is what we're going to do next time.
+We are going to do a little bit more data set stuff.
+We have to prepare our data set for fine tuning.
+We're going to look at the base model we'll be using, and we'll evaluate it against the business objective.
+And then we get to the juiciest moment of all.
+So so yeah this week is really, really exciting I can't wait.
+I'll see you tomorrow.

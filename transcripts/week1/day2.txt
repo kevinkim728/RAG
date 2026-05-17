@@ -1,0 +1,1013 @@
+--- Lecture 1 ---
+Oh, hello.
+It's you again.
+You've come back for more?
+I didn't manage to put you off with the horrors I put you through yesterday.
+You're back for more with day two of LM engineering.
+Welcome, welcome, welcome.
+I promise an easier day today than yesterday.
+I will always start each of these with a recap on what we did on the previous day, and what's to come
+so you can get used to this.
+It's a bit of repetition, but repetition is good sometimes.
+Already we have played with Olama and got used to different open source models.
+We've written code to call open AI.
+Maybe you didn't.
+If you're holding back on having that key and you're ready for something new today, which we will do.
+You've learned the difference between a system prompt and a user prompt.
+And we did a summarization use case, a core gen AI use case that we built on the very first day.
+And today we're going to go through the building blocks, the steps it takes to get from where you are
+now to where you will be in LM engineering master and recognizing frontier models, the different kinds
+of frontier models, what that means and how to use them.
+Let's get into it.
+So look, the first thing I want to say is that this is predominantly a practical course.
+This is about getting stuff done.
+I do teach some theory, but I like to do it in the context of the practice of putting things into action.
+I am here to to allow you to deliver commercial impact through LMS.
+Whether you work at a startup, whether you're an entrepreneur and you want to start a startup, or
+whether you work at a fortune 500 enterprise or anywhere in between, the goal of these sessions is
+to teach you how to use LMS in order to have commercial gain, so please always keep that perspective.
+I'm a practical person.
+I think that the best way to learn is by doing, and doing is what I have in store for you.
+And there are going to be these three different dimensions, these three different factors to LM engineering
+that we will build on.
+One of them is the models themselves, and I mentioned this yesterday, I mentioned that bottom layer,
+the models open source closed source.
+We'll look at multimodal models that generate images and audio.
+The architecture of models and importantly, how you select the right model for a particular task at
+hand.
+We're going to then build on top of models by looking at different tools, frameworks, libraries,
+things like the fabulous hugging face which which you will get to love.
+Long chain gradio.
+Weights and biases.
+Modal.
+And then on top of this are different techniques that you can apply.
+Taking advantage of these libraries and using these models techniques like calling APIs, which we've
+already done Multi-shot prompting is an easy one, is a very juicy one fine tuning a powerful one,
+and agent ization a genetic AI.
+You don't get bigger than that.
+That is the hottest topic of all right now.
+And so I've designed this course to appeal to many different levels of background.
+No matter what your expertise is you're coming to this with, there will be something here to appeal
+to you, but you might find some parts are too easy if you're experienced, in which case, hang in
+there.
+Speed me up.
+Put me on 2X2X right now and we'll quickly get to meaty projects very soon.
+you might find some parts are too hard for you, particularly if you're completely new to this field.
+And one thing to know is that all of us, every single person, one thing we all have in common is that
+at some point we've all been new.
+And so we know exactly how it feels.
+I've written a bunch of self-study guides in the guides folder.
+Please spend time with them.
+They really will help prep you.
+I do believe that you can learn everything from those self-study guides, and I've had people complete
+the whole LM engineering course who came at this with zero programming experience.
+It's not ideal.
+We do.
+I do aim this primarily for someone with some coding experience, but you can come in completely raw,
+learn from self-study guides and you'll be successful.
+Many people have looked at the guides, ask me for help and take things slowly, carefully, work through
+the practicals, add in print statements and above all, don't worry if you don't get it right away,
+it doesn't matter.
+Get some intuition.
+Keep moving on.
+You can always come back.
+You can, you can.
+Some people have actually watched all the videos and then come back a second time and gone through much
+more carefully.
+If that works for your style, then that's a great idea.
+But otherwise you can just work through it slowly the first time.
+But if it feels just right, if I've got it just right, wonderful, then keep going.
+So the ideal background to come into this course is someone who has intermediate level Python experience,
+and if you have that, then you're in really great shape.
+If you look at this line of code and you know what that does basically give or take, then fantastic.
+If not, don't worry.
+As I say, I've got great background material.
+You can either look at the beginner Python guide or the intermediate Python guide, or both, and get
+to a point where you feel pretty comfortable and you can pick stuff up as you go.
+And you know what?
+Llms are amazing at this cursor is great.
+It will fill in most things for you, and it can explain any line and what it does and it can help you
+with it.
+So with things like what I've got going on here, like a generator and a set comprehension, that kind
+of stuff, it can explain it all.
+It's fancy Python stuff.
+But I tell you, when you see how it works, it's all pretty easy.
+All right?
+And there's some tricks to get the very most out of the next eight weeks that you and I are going to
+spend together to get the most out of it.
+First of all, do follow along with the coding.
+It's often better to watch watch me do do a video, watch me talk through it, and then come back and
+do it yourself.
+Once you know what to expect.
+Now, I know some people dislike the way that I don't often just type out the code.
+Most of the time I have the code there and expect you to run it.
+It's a style.
+I find that it's very productive and it allows you to learn a lot quickly.
+Typing everything.
+In these days with AI tools, it's just not necessary.
+It's more important to understand what the code does and to be able to change it.
+Now, if you want, you can start a fresh notebook and type from scratch if you prefer that.
+And some people do learn best by by typing.
+And sometimes I do that myself.
+When I'm learning things, it can help, but most of the time I would urge you look at the code, understand
+it, change it, add in print statements, mess with it in some way, and see how you can experiment
+with it.
+That, I think is the best way to learn.
+And that's why I like to drive these labs and then do complete the exercises that I've got in the labs.
+And you should be making those changes and then pushing it to your own GitHub so that you've got examples
+of codes and solutions.
+And you can also make these changes and submit what's called a PR, a pull request, so that I can merge
+in your changes, as I mentioned yesterday.
+And there's instructions on that in the guides.
+If you're new to that, make sure that you apply the examples that I give to your business, or to some
+idea you've had about how you can apply it to something you work in.
+The best kinds of ways to apply these things is to something that feels personal to you.
+One person on the course that it just blew my mind.
+He had an elderly relative who was having problems renewing his his medications because he was losing
+track of the different refills, the different pharmacies.
+And the student wrote a tool, an LM based app that helped his relative to know when to schedule, which
+refills with which pharmacy and the dependencies between them, and so on.
+And it was so cool.
+And he posted it about it.
+And of course it got lots of attention because it was very personal and it was real and tangible, and
+it solved a concrete problem for the student and his relative.
+That's the kind of thing you want to look for, ways that you can take what I do and apply it either
+to your personal situation or to your work, your professional life, and make something that's specific
+to you.
+And then when you've done something like that, or when you've done any of the exercises or anything
+that feels like you've made progress on your journey or just discovered something or had some insight
+that you think is interesting or an experiment, post about it on LinkedIn.
+Make a post if you wish.
+If you're comfortable, and tag me in the post and make it relevant in some way so that I can then come
+in and weigh in and say, you know, this is great.
+This is this is why it's important, and so on.
+And in doing so, when I do that, of course, LinkedIn makes sure that that gets then shown to all
+the people that I'm connected with that are in large part other students on this course.
+And that helps amplify the work you're doing.
+Other people will weigh in.
+And similarly, if you're on LinkedIn and you see that I've posted about some other student doing something,
+then please do weigh in because it's so helpful.
+It helps build up the community.
+It gives attention to all, all of you and everyone's contributions.
+And it means that when people are looking, perhaps, perhaps it's a future client of yours, perhaps
+a future employer of yours, a future boss.
+They will see this kind of action.
+They will.
+They will be aware of your expertise and of the impact you're making, and it just helps to promote
+your visibility.
+So.
+So please do do that.
+And most importantly, stick at it.
+I, I really do say that that even if there's times when you feel like you're not following it, or
+there's times when you feel that's not as relevant to me, maybe speed me up, but just stay the course,
+get to the end.
+It's eight weeks we're going to spend together.
+By the end of it you will have mastered LM engineering.
+It's going to be worth it.
+Hang on in there.
+Let's get through it.
+Keep me posted on the journey.
+If you have any problems, reach out to me.
+I always reply and I'm always quick.
+All right, let's keep going.
+--- Lecture 2 ---
+So I already covered this yesterday.
+But one more time I want to tell you about the eight weeks I have in store for you because they're so
+great.
+The first week this week we're here on the left.
+The first week is about the foundations and the thing called the Chat Completions API, which you already
+experienced yesterday.
+OpenAI.
+That's this week.
+Next week is about looking at a ton of different frontier models, calling their APIs, getting super
+comfortable with APIs, and then hopefully I'll slip in there some things for the pros so that there'll
+be some new new information to to give give you some some extra juice.
+And we'll also look at things like multimodality.
+We're going to have such a cool project for you to see that week three is when we go deep on open source.
+So whilst we've used llama so far already to use open source models, we're going to use Hugging Face
+and I'll explain the differences and we'll be building some cool open source projects.
+Week four is when I cover this super important topic of how do you pick the right LLM?
+And we will also use Llms to generate code or to port code.
+And an interesting project.
+Week five is Rag.
+Now I know you're super interested in Rag.
+Everybody is.
+I do advise you not to skip ahead to week five because you'll miss out on lots of great stuff.
+Um, but but week five will be fun, and we're going to create a knowledge worker expert that is able
+to read through tons of documents and answer knowledgeably about them, which is a very important commercial
+use case.
+Week six is when we start to work on fine tuning.
+But week six is also a core data science week, when we will work with data and we will work with scrubbing
+data sets, data curation.
+It's stuff that I absolutely love, but I know a lot of people don't don't like it as much, but I really
+enjoy it.
+I hope you will too.
+It's going to be very interesting.
+Week seven is the shocking week, the shocking week with a ridiculous outcome that that, uh, hopefully
+you won't be expecting.
+I shouldn't give give the game away, but it's when we fine tune an open source model, uh, to, to
+achieve, to do a business task of our own.
+And week eight is when we bring everything together.
+It really pulls together many of the prior weeks.
+And we build in a genetic platform, and it solves a commercial problem, and we go out with a bang.
+And that at the end of those eight weeks, you will be able to say, I am an LM engineer.
+That's the plan.
+And in a cheap move to keep you engaged all the way through, I've definitely been sure to to sprinkle
+interesting content all the way through.
+There'll be tools and resources.
+There's going to be basically a code cookbook.
+I will leave you with sections of the code that you'll be able to use in your own projects.
+But most of all, I've left the best till the end, and there's no point in skipping ahead to it because
+it builds on everything that came before it.
+So I uses trickery to get you to stay engaged and see it through to the bitter end.
+--- Lecture 3 ---
+Now, you'll be pleased to hear that today isn't entirely admin and logistics.
+We're going to cover a topic and then we're going to do a lab.
+So the topic I want to talk to you about is models themselves LMS, the things that that generate content,
+the things that do generative AI and they are the best ones on the planet are sometimes known as Frontier
+models, frontier LMS.
+And they're created by companies that we call the Frontier Labs.
+And that's an informal word.
+There's not a strict definition of frontier.
+It just tends to mean the really big companies and their models.
+Now typically when you talk about frontier models, you're referring to the closed source models, the
+models which you have to pay to use because a company like OpenAI spent hundreds of millions of dollars
+training their models, and they need to get back that money, and it costs a lot of money to run them
+because they're enormous.
+So those models are sometimes called closed source models.
+And and frontier Models is another name for them or closed source frontier models.
+And then contrasting with that, there are open source models Models made by companies like like meta,
+Facebook that made a range of models called llama that are open source.
+And these are models that you can access and run yourself.
+The people who feel strongly about this stuff sometimes say that they're not really open source.
+They are open weight because meta has made available all of the weights of the model, but they haven't
+necessarily made available the training data and methodologies that was used to build the model.
+But still, we tend to call them open source models.
+And when you use the word frontier, it's most common to only be referring to the closed source ones.
+But sometimes people say frontier and they're also referring to open source.
+It can be used in either context.
+So just just stay aware of the context when someone uses a word like frontier model.
+But most of the time when I say frontier, I'm talking about the big closed source models.
+Hope that all makes sense.
+Let's talk about some closed source models, and the first one will not surprise you in the least.
+OpenAI, the most famous AI lab on the planet, made the most famous model on the planet GPT.
+And of course, it all hit everyone's radar when GPT when ChatGPT came out, uh, which was GPT 3.5.
+If you're keeping count in, what, November 2022 around then and ChatGPT, of course, uh, really
+moved the needle.
+That really changed our perception on what these models were able to do.
+And since then, OpenAI has released many more of these.
+GPT right now, for me, we're on GPT five.
+Maybe by the time you watch this, there's another version.
+But GPT five is the latest.
+And along the way, they also came out with a different range of models called the oh models.
+010304 mini.
+Um, but now the oh range and GPT range have converged.
+And GPT five is a kind of combination of both.
+And we'll cover more of that another time.
+But that is GPT from OpenAI, the most famous model and the most famous lab on the planet.
+And the next model to mention is, of course, OpenAI's mortal enemies, anthropic and their models,
+called Claude and anthropic is also a West Coast US start up.
+It was founded by people that used to work at OpenAI.
+The OpenAI turncoats that started the big rival, anthropic.
+And Claude is the model that a lot of people in the industry love to love.
+Claude is my favorite and many people's favorite.
+Claude, of course, comes in different varieties.
+The very small version is called haiku, the middle version is called sonnet and the bigger version
+is called opus.
+But sonnet also happens to be right now the most powerful one.
+Right now for me, we're on Claude 4.5 sonnet, and it is very, very powerful.
+And it's kind of neck and neck with GPT five, as we will see.
+But Claude, very powerful model.
+It's also, of course, the model behind Claude code, the coding agent platform.
+And Claude Claude is great fun to work with.
+And of course, we'll spend a lot of time with Claude on this course.
+And Gemini is Google's model.
+And Gemini, of course, is the big closed source version of Jama, the open source model that we played
+with yesterday.
+Gemini.
+It's it's fascinating that Google began this game very much at the back of the pack.
+They were late to the party.
+Do you remember Bard?
+Bard was Google's early model.
+That was something.
+They were a laughing stock for Bard.
+It was just awful, and a lot of people predicted that they'd left it too late, that they weren't going
+to be able to catch up with OpenAI and anthropic, but Google absolutely caught up.
+The Gemini, the latest one for me is Gemini 2.5 Pro, but Gemini three is poised to be released any
+day now.
+I'm kind of hoping it's going to be released while I record these videos.
+You're going to get like a live reaction moment.
+Uh, but Gemini three, a lot of excitement for that.
+If you've already got it, don't worry, I'll have updated the labs.
+You'll be able to use Gemini three instead of I'll be stuck on Gemini 2.5, but Gemini.
+Amazing set of models.
+Also, Google has made a lot of the smaller versions of it available for free for students, so you
+might in your region be able to get a deal to get a cheap or even free version of Gemini.
+So that also goes down well with lots of people.
+That is Gemini from Google.
+And is there a fourth one to mention?
+Is there?
+Of course there's a fourth one to mention.
+I know you know the fourth one.
+And you're like, oh, what about.
+Yes, yes, yes.
+There is of course grok.
+Grok with a K from Elon Musk from X.ai.
+A lot of people love grok for various reasons, and we will cover, uh, and grok is definitely the
+sort of the fourth of the big four.
+And of course, there are a bunch of other big frontier models.
+There's the model that sits behind perplexity that I know is popular, lots of people.
+There's the one that the Cohere Canadian company has, um, there's, I guess, uh, Mistral, the French
+AI company, has both a closed source and an open source model.
+So so that's another one.
+So there's lots of others in the kind of next tier.
+But these are the big four.
+These are the ones that grab the headlines.
+And we'll be using all four during the course.
+But but you don't need to have uh keys to all of them.
+You can watch me doing them.
+Uh, but we will get to use them all and compare them.
+And we will find out in week four how you pick the right one for your task.
+So that is the closed source.
+Let's talk about open source.
+--- Lecture 4 ---
+And now to talk about the open source side of the picture.
+Some people might still call these frontier models, but I tend to reserve that for closed source.
+So the open source guys, the first and foremost would be meta with their llama series of models.
+And really, meta was the first company to go out there and open source their models in In Anger.
+It's possible one might.
+If you're being uncharitable, you might say that meta felt like they had they had slipped.
+They hadn't been able to keep up with OpenAI and anthropic in terms of being in the headlines for having
+the strongest models on the planet.
+And so they were looking for a way to really set themselves apart, and they took their stance that
+AI models should be open source and they open source llama.
+And as a result, everyone talks about meta as being one of the the leaders in the field because they
+have promoted open source AI.
+So, you know, maybe it was an intentional ploy to keep the headlines, but for whatever, whatever
+it's worth, they've been very successful.
+Everyone uses Lama will use a lot on the course and it's a fabulous model.
+Lama for right now is the biggest, most powerful one that they have open sourced.
+But also Lama 3.2 is particularly notable.
+And you might have discovered this yourself because it comes in very small varieties.
+And as a result, it's easy to run it on your local computer.
+Lama 3.2 comes in a 1,000,000,003 billion size, both nice and convenient to run locally.
+And sometimes people call these things SL instead of LM, a small language model instead of an LM,
+but really with 3 billion parameters, it's still pretty large.
+So that's Lama 3.2, which is the small one, which is super popular, and Lama four is the bigger one,
+Lama from meta and then Mistral, the French company has come up with a bunch of open source models.
+One of them is called Mistral because it's a type of model called a mixture of experts, which means
+that it has lots of smaller models within it, and it directs traffic to different specialist models
+depending on the kind of question you're asking.
+So that's Mick's trial.
+Quinn is a model or a set of models from Chinese company Alibaba Cloud, the cloud division of Alibaba.
+And Quinn is a remarkably powerful model that I very much enjoy using.
+And it's not as well known and as popular as models like llama, but it's really great, and I recommend
+that everyone does give Quinn a shot because it's a super powerful and Gemma is the one that we already
+looked at.
+It is the cousin of Google's Gemini.
+It is the open source cousin, and it comes in a lot of different flavors.
+And it's most notable for having this absolutely minuscule model with, what was it, 270 million parameters,
+which is definitely a small language model.
+And it's still I mean, it's not particularly impressive to use it, but it's still able to, to interact
+and to, to generate language.
+So it's pretty impressive.
+And then Fei is Microsoft's range 54 is the latest at the moment as of recording this.
+And those are their powerful models, particularly good, I think, with tool calling and with with
+commercial work.
+And we'll see how to compare all of these, as I say, in week four.
+And then the one that everyone loves to talk about is, of course, deep seek from deep seek AI because
+it took the world by storm about six months ago and it came out.
+And it is important.
+I think I already said this.
+It's important to keep in mind what it was about deep seek that caused so much excitement.
+It wasn't necessarily that it's a super powerful model, because it's not as powerful as as GPT five
+and as Claude Sun at 4.5 or even close to it.
+What was impressive is that the Deep Seek AI team were able to make a model that is at the frontier
+level of capability, but at a fraction of the training cost than OpenAI spent.
+OpenAI spent north of $100 million training GPT and Deep Seek.
+I think it was about 4 million or something that they said they spent training deep sky.
+So it represented this, this huge, this step change in efficiency of being able to build a frontier
+level model very quickly and easily.
+And they open sourced it, which is amazing.
+The main version has 671 billion parameters, so it's way too big to run on your computer.
+But they also have made smaller variants of it that you can run locally, that you may have seen when
+you were looking at the models on llama.
+The way that those are actually built is kind of kind of funny.
+It's they're not actually deep seek themselves those smaller variations of deep seek.
+They are in fact versions of Llama and Quen, those two models you see earlier up on the list.
+They've taken small versions of Llama and Quen, and then they've trained it more with synthetic data
+that was generated by the big deep seek.
+So again, they used big deep seek to generate lots of fake data, synthetic data from deep seeks training.
+And then they've used that to educate these smaller Lama and Shen models.
+And that process is known as distillation.
+There's actually various different ways of doing distillation, but that's one of them.
+And that's what Deep Sea did, and that's how they made various small variants.
+And you can use those variants in Lama.
+And it's great fun.
+They're available for all for free.
+And wait, there's one more.
+There's just one more open source model to mention.
+And you know exactly what it is.
+It is, of course, OpenAI's GPT, the open source version of GPT that OpenAI released for me quite
+recently, like a month ago or so, six weeks ago.
+And it made a big splash.
+And people actually say that OpenAI might have done that because their hand was forced by deep sea,
+that open sourced this model that was almost at OpenAI's level.
+So that's one reason, perhaps, that motivated OpenAI to open sourcing GPT and GPT OS.
+It comes in two sizes, the one that we use, the smaller 120 billion.
+We used that yesterday.
+And then there's a much bigger 120 billion version that's far too big to fit on my computer.
+Maybe it fits on your computer, in which case, anytime you want to lend me your computer, that'll
+be great.
+But it's a very powerful model.
+It's very impressive indeed.
+And it's remarkable that OpenAI have open sourced it, which means it's also available for free for
+any of us.
+And one final point to make before we go to the lab, there are these three different ways that we can
+use models.
+And we'll be using all three of them at various points, but I just want to make sure that you feel
+comfortable that there are these three different things, and one of them is using packaged products,
+products that have a user interface and have functionality built in.
+And the most famous of them is ChatGPT.
+It's not you're not using a model, you're using a product.
+And it's important to have that distinction.
+ChatGPT comes with a user interface.
+It comes with features like memory and web search and stuff that's been built into ChatGPT GPT product.
+So when you're using it, think of it like it's a product.
+It's had some some people have worked on the model behind that, but also some people like you and me,
+some AI engineers have built the user interface, the functionality, the the glue that glues a user
+experience to a model that's ChatGPT anthropic has it's one two clawed through through the user interface,
+and there are a bunch of others.
+Then you can call large language models that are running on the cloud using APIs.
+So there are ways that you can make a call to an API.
+And you can call them directly.
+So you can call OpenAI like we did yesterday.
+And there are also frameworks that code you can run locally that will manage then calling OpenAI.
+And then finally you can also run managed.
+You can you can call a service like bedrock from Amazon or vertex from Google, vertex AI or Azure's
+ML from Microsoft.
+And these are our managed services, which themselves will run these models, and we can call them and
+they will call the models.
+And there are some other kinds of APIs as well that we'll find out.
+There's one super confusingly that's called grok spelt with a Q that is different to Elon Musk's grok
+spelt with a k.
+So we'll use both grok in due course.
+But but watch out for that one too.
+That's a different thing.
+That is it's basically an ability to run open source models super fast on the cloud using proprietary
+hardware.
+So we will we will look at that too.
+And then there's things like open Router which is very popular, which is a platform which you can connect
+to.
+And it will then route your requests to many different model providers.
+So all of these are different types of cloud APIs being able to call models in the cloud.
+And it's you can call closed source and open source models this way.
+But there's something else you can do as well.
+If you're working with open source models, then you can actually download the code and you can run
+the open source model yourself.
+Not on the cloud, not through some API, but that you are running it.
+And there are many different ways of doing that as well.
+But there's two in particular that we'll use on this course, and they're different and it's a bit confusing.
+And one of them is Olama and one of them is called the Hugging Face Transformers library.
+The hugging face Transformers library is actually the simplest one to explain, because with that you
+are just literally taking the code, Python code and C++ code that was used to to write these models.
+It's a it's a neural network.
+It's a kind of data science model, which is a large language model.
+And you run that code yourself in your Python interpreter and and you execute it and you get the outcome.
+It is just taking the open source code, taking all of the weights, the billions of weights, and running
+it yourself in code that is hugging face and it's hugging face is a is an open source vendor, and the
+Transformers library is the there a library that wraps a lot of this code that you can use very easily
+yourself?
+So that's that's that.
+So then what is Olama?
+Well, Olama is itself a product to make it very easy to run fixed open source models in a way that's
+been packaged and prepared so that in just a couple of steps, like we did yesterday, you can run an
+open source model yourself on your computer.
+So it's packaged.
+It only takes very specific versions of models.
+The code has been optimized into very efficient C++, and the weights have been compressed into a special
+file called a GIF file.
+And you download that onto your computer.
+And then you run this product called Olama on your computer.
+And that gives you an API locally on your computer.
+It's like an API, but you're not calling something out on the cloud, you're just connecting to your
+own computer and calling an API there.
+And then this Olama product is then running your model in a way that's a bit like hugging face.
+It's just more efficient, more packaged, and just focused on a smaller number of models.
+The models that you looked at yesterday in the Olama platform.
+So that's olama packaged, fast, efficient, uh, platform runs on your computer and provides an API
+on your local computer for you to connect to.
+And that's the difference between those two.
+I hope that makes complete sense.
+And that is the third category direct inference of an open source model.
+And if you're new to the word inference, inference is a fancy name for saying running a model.
+Inference is what you do when you got a model and you've got some new inputs and you want to get the
+output, that is called inference.
+And we'll be doing a lot of that in the next eight weeks.
+And on the subject of inference, I think we should go and do some right now.
+I'm going to take you back to cursor, and we're going to do a sort of repeat of yesterday, but we're
+going to be able to do it for Olama.
+And I'm going to talk a bit more about what's actually happening to give you some more insight into
+how this all works.
+Let's get to cursor back to the lab.
+Let's get building.
+--- Lecture 5 ---
+Okay, well, here we are, back in cursor, one of my very favorite places to be.
+And we're going into the week.
+One directory on the left.
+Check the LM Engineering's in block caps here.
+So you're in the right project.
+And then go to day two, which is where we find ourselves right now.
+And I need to remind you before you do anything, you have to go to the top right to where it says Select
+kernel for you.
+You click on that.
+You click in the Python Environments option.
+The first option you pick the dot VM.
+That's Python 3.12 that is matching this VM right here.
+And that means your kernel is set.
+Welcome to the day two lab.
+So I just wanted to mention here before we start that there is a page of resources on my home page and
+I've linked to it here.
+I'll try and keep adding useful resources.
+So do keep that bookmarked.
+You can go there and check it out right now if you wish.
+Okay okay so we're now going to go back again to doing what we did yesterday, but do it with a little
+bit more discipline.
+And I want to tell you about this thing called the Chat Completions API.
+And this is the name of it's the simplest way that you can call an LLM, particularly a frontier LLM.
+And it's called chat completions because it's a nod to what you're actually doing.
+When you call an LLM, you're giving it a chat a conversation so far, and you're asking it to predict
+the most likely message to come next.
+And you can think of that as as like completing a chat.
+That's what the LLM thinks it's doing.
+It's it's it's like predictive text.
+It's just trying to predict the most likely words to come next.
+And as a side effect of that, it happens to be really good at answering whatever questions it's asked.
+But all it's actually trying to do is to predict the most likely next few words, or as we'll shortly
+explain, the most likely next tokens.
+Okay, so it was actually this chat completions API.
+This this approach was invented by OpenAI first and foremost.
+But it was so popular the structure and style of this type of request became so popular that it's become
+ubiquitous.
+All of the providers offer the Chat Completions API.
+It is the kind of standard way to interact with an LLM.
+And we're going to start again with OpenAI.
+I know some of you are antsy to get off OpenAI and use free models.
+Your time is coming any second now.
+Just watch this if you don't want to use OpenAI, and we'll get to you in a second.
+All right.
+So first of all, I'm going to do a repeat of last time where we use this thing called load dot EMV,
+which is going to load in the secrets in our EMV file and check that we have OpenAI key set.
+So this load EMV function is something which which makes which loads in anything you've saved in your
+EMV.
+And then we'll just check that the key is good.
+It says API key found and it looks good so far.
+And if yours doesn't say that, then you know what to do.
+Check the EMV, check everything, and look in the look in the troubleshooting and ask me if you get
+stuck.
+Okay, let's talk about end points.
+Now, I imagine most of you know exactly what an end point is.
+It's one of those words people throw around all the time.
+But you might not.
+And for people that don't know about it, you should quickly find out.
+I explain it all in the Technical Foundations guide.
+There's nothing special at endpoint.
+It's an http url which you can call to, to to to make an API request by hitting some web address.
+And that web address would be known as an endpoint.
+It's a way that you have an API.
+But if things like API's and endpoints are new to you, then read that guide.
+Okay.
+There's an endpoint in particular which might interest you, which I want to show you right now.
+And it's an endpoint, an API endpoint offered by open AI.
+So in order to call this endpoint, which I will just do, we first have to set a couple of things which
+are very common for any HTTP request.
+There's HTTP headers, the headers that go down in that request.
+You normally you probably if you know anything about web requests.
+You specify what content type, what type of thing you want to come back.
+And that's a way of saying, I want Jason to come back, please.
+And then this is a fairly standard way of, of, of sending down a secret in an HTTP message that authorizes
+you, you put in a header called authorization and the value of that header, there's the word bearer
+and then a space and then some secret that identifies you to the third party.
+And in this case we are going to stuff the OpenAI API key.
+The thing that I got just here, we're going to stuff that into the header.
+And then I've got something here called payload.
+Payload is just a chunk of JSON.
+And it's going to be a dictionary a dictionary with two keys.
+One of them is model, which is going to be GPT five nano, the tiny version of GPT five.
+The latest model, the one of the strongest on the planet right now.
+And then the second field in this dictionary has a key of messages.
+The value is, you know, this is a list of dictionaries.
+It's a list you can see there.
+It is a list.
+Each dictionary, let's put that on another line, has a key role with value user a key content.
+And the value is tell me a fun fact okay.
+Nothing special here.
+Let's look at this.
+Uh, there is the payload JSON.
+It's is just what I said.
+Model GPT five nano messages, a list of dictionaries, role user content.
+Tell me a fun fact.
+Okay, that's a chunk of JSON.
+Uh, headers and payload.
+What we're now going to do is we're going to send that to an endpoint.
+This is the endpoint API.
+V1.
+It's chat completions.
+And sometimes when you make a Post request people think of that as like creating a new resource for
+people that are like rest, rest people.
+Uh, that's that's sometimes called creating a resource.
+So you could think of this as being like chat completions create some familiar.
+Uh, so chat completions create.
+We're passing in our headers with our API key.
+And the payload is this JSON blob right here.
+So let's run that.
+And what comes back is a bunch of JSON.
+We asked for JSON back.
+Let's see what we get back.
+Let's see what kind of JSON we get.
+Here it is.
+Uh so it's a chunk of JSON as like an ID object, various stuff.
+And then it has a field called choices and Choices.
+In this response, choices is a list.
+And the first item of that choices with index zero is something which has a field message.
+And that message is itself a JSON dictionary.
+And that has something called content, which is fun fact.
+There are possible unique games, more possible unique games of chess than there are atoms in the observable
+universe.
+About ten to the power of 120 There is a fun fact.
+And so that fun fact came back in the JSON response from our call to GPT five to that endpoint, that
+URL that I just gave you.
+And so there's obviously there's another way I could do this.
+Let me get a new code thing here.
+Let's say, uh, um, we said response JSON.
+That was the JSON that we just were just looking at right up here.
+Uh, I spelt response wrong.
+That's that's what you get if you make me type Response.json.
+So we could say, okay, let's look in the choices field.
+I guess it knows what I'm doing here.
+Look at the first element in there.
+Element index zero at the field message at the field content okay.
+You see that.
+That's you know what that's going to do.
+We're just going to choices the first one message content.
+And let's see what that prints.
+It prints that that very fun fact of course that we just looked at uh, the more possible unique games
+of chess than there are atoms in the observable universe.
+Okay, but you know what?
+Uh, so so this is a perfectly good way to call OpenAI in the cloud using an HTTP endpoint.
+And it's fine.
+We could do this.
+We could we could always type this.
+But it is kind of messy fussing around with JSON, looking in dictionaries at keys and things like that.
+It's kind of hokey, and it would be a real pain if every time we wanted to call GPT or any frontier
+model, we had to stitch together these HTTP requests, call that slash chat completions with a post
+or create and then be be sort of navigating our way through JSON objects like this.
+It would be a pain.
+It would be nice if there were a better way to do it.
+Yes, yes, I know you get the joke.
+You know what I'm gonna say?
+There is a better way to do it.
+And OpenAI created this better way.
+They made a package called OpenAI, and that package is what's known as a Python client library.
+Python client library is nothing fancy at all.
+A Python client library that you often use for APIs all over the place for you.
+Name it for APIs, for sending emails, for APIs to do so much.
+Um, and these things are typically very lightweight libraries that manufacture an HTTP request to an
+endpoint.
+And with what comes back, it turns it into Python objects so that you're not messing around with this
+kind of stuff with with these, uh, ploughing your way through JSON dictionaries.
+But you can just write some nice, elegant Python code, and that is all the OpenAI library is.
+It's a Python client library that wraps a call to an HTTP endpoint.
+It's very simple.
+It's completely open source.
+You can open it, look at it, look at all the code.
+It's perfectly simple.
+Some people, the first time they come across this, think that when you're dealing with OpenAI, the
+object and the code, that somehow we're sort of running GPT and we have some some fancy code from OpenAI.
+Not at all.
+It's vanilla code that just wraps making a web request.
+And we'll we'll quickly use that code now, but it's going to be much more familiar to you.
+--- Lecture 6 ---
+All right, so I'll do some more typing since since the haters will yell at me if I don't, so I'll
+do some typing.
+Let's do it the proper way.
+Let's create an OpenAI Python client.
+You just say OpenAI equals OpenAI.
+Oops, like so.
+And it by default looks in the uh, in the environment variable OpenAI API key by default if you don't
+specify one.
+So that's just just hard coded in there.
+And I have to say from OpenAI import OpenAI to be able to do that.
+Okay.
+And now what we're going to say is, uh, response equals I guess it just fills it in.
+What's the point in me typing OpenAI chat dot completions dot create.
+So that is basically saying I want to go to slash chat completions and I want to do a post request,
+which is like doing a create.
+And I'm going to pass in like I don't have to manufacture JSON.
+I can just say model equals GPT five nano five nano.
+Oh, I could just press tab.
+You know it.
+You know what I'm gonna say?
+messages is that list of dictionaries that I passed in right there.
+And then instead of this fussy JSON plowing, I can just say response dot choices.
+Zero choices, zero dot message content.
+And I'm just going through Python fields.
+It's actually pedantic object of course, for people that know this stuff.
+Uh, and uh, as a result, it's got all of the, all of the nice features of using proper Python methods
+and attributes like, like the ID can check, I've spelt it right and things like that.
+I'm not just guessing, uh, values to to look into the JSON.
+I know that I've got this right.
+And so I run this and we should get ourselves a new fun fact.
+And the thing to, to understand, uh, here we go.
+Bananas are berries, but strawberries aren't.
+Strawberries are not.
+And and there we go.
+We've got our explanation for that.
+A lovely, fun fact from GPT five nano.
+I hope you've been enjoying yours too.
+Of course, the point I'm trying to make to you is that this is exactly the same as doing it the boring
+way.
+It's just this looks a little bit more elegant and simple.
+And the reason I show you this is so that hopefully, and maybe this is all obvious to you, in which
+case, well, hang on in there.
+But if not, it just shows you that's all that this library is.
+At the end of the day, it's just a nice, simple wrapper around making an HTTP call to an API in the
+cloud.
+And it by default it looks for OpenAI API key.
+And that's what it puts in that bearer in that that authorization field in the headers of the HTTP request.
+And it's as simple as that.
+We have made our call to OpenAI on the cloud.
+It looks like we did it with code.
+In fact, it was an HTTP call over an endpoint.
+Over an endpoint.
+What I meant to say was it's an endpoint call over HTTP.
+All right.
+So I've already typed all this.
+We can get rid of that.
+Get rid of that.
+So so then something cool happened.
+So then OpenAI's chat completions API was so popular that all the other providers started to offer an
+identical end point.
+So you could use exactly the same web request and and just call a different model instead, because
+people sort of converged on OpenAI's approach as a way to do it.
+So everyone else offered them to Gemini.
+Google, for example, they had one endpoint that was very specific to Gemini, and they were like,
+oh, I know what, we'll just give a second one that's identical for anyone that wants it.
+And out of all of them, anthropic held out the longest.
+They they obviously their enemy OpenAI.
+They didn't want that to become the standard.
+So they held out.
+But in the end they relented.
+And they also created an OpenAI compatible endpoint.
+So now all of them have it.
+And for example, this is Google's one.
+It's Https generative.
+OpenAI.
+It's got OpenAI in its name.
+That is their endpoint for making OpenAI compatible request.
+And because everybody did this, OpenAI decided, oh, I guess we'll be good corporate citizens, good
+AI citizens.
+Reasons.
+And we'll say to people, look, you can use the same OpenAI library.
+The same client library will allow you to say, hey, I don't actually want to talk to OpenAI's endpoint.
+I want to switch to a different endpoint like this.
+You can say OpenAI base URL equals and switch to a different URL and pass in a different API key.
+And if you do that, then you can talk to Gemini using OpenAI's client library because it's just simple,
+lightweight code.
+That's it.
+And so yeah, just to be crystal clear, even though OpenAI is is in our code here, we're not actually
+using anything to do with OpenAI's models.
+We're just using their lightweight code to make an endpoint request.
+And you might know all this back to front.
+This might be super obvious to you, but you'd be amazed how many people are confused by this and that
+this can be really refreshing to understand exactly how this works.
+So if you're in that category, then then, then I'm pleased to hear it and it's going to hopefully
+make a lot of sense what we do next.
+Okay.
+So uh, we are going to look at Gemini's base URL.
+That's the one I just showed you.
+It's like a Google URL with OpenAI stuffed at the end of it.
+In my EMV file, I have a Google API key.
+Now you might not do it, in which case, don't worry, just just skip this next one.
+But if you do, if you've got a Gemini or a Gemini API key, then then hopefully you've added Google
+API key to your EMV file.
+Uh, then then you can run this cell and uh, I'm just going to run it and it's going to confirm that
+it found a Google API key in my EMV, and that it has the right format R and Z.
+And if you yeah, if you want to get yourself an API key, you can you can head over.
+The instructions are in guide nine.
+That will tell you exactly what you need to do.
+Okay.
+So now look at this line Gemini is OpenAI.
+Remember it's just the lightweight Python client library.
+We give it the Gemini base URL and we give it the Google API key.
+And that has now given me a, a basically like a class that's ready to connect to Gemini.
+Okay.
+So what we can basically do is take exactly the same code that we had before.
+Come back up here.
+I can just copy this.
+I can come down here and I can use the identical code.
+The only difference is I'm going to change the word OpenAI to be the word Gemini.
+And I'm obviously also going to change the model.
+If I try and talk to Gemini with GPT five, it'll say what it's not.
+That's not our stuff.
+So we have to make this something like Gemini 2.5 Pro.
+We'll get a fun fact from the top range model.
+Let's check.
+This looks right.
+It does.
+Let's give this a whirl.
+So we are now asking Google's strongest model on the planet.
+As of now, you might be a Gemini three user, in which case you will have great fun getting a hopefully
+a more profound fun fact than my one.
+Uh, and here is the answer a group of flamingos is called a flamboyance.
+Uh, there you go.
+Uh, if you knew that, then you're obviously very good at trivia.
+Um, but there is the short, uh, and punchy fun fact from Google's Gemini 2.5 Pro, and I hope you
+enjoyed it.
+--- Lecture 7 ---
+Okay.
+And now we also can use the same trick to connect to a llama running on our local box, because llama,
+the product also gives an endpoint locally that is compatible with OpenAI as well.
+So first of all, before we do anything, let's just make sure llama is actually running.
+If you if you installed it before yesterday like you were meant to, then it will be.
+And if you run this little test here, you should see a llama is running.
+If you don't see a llama is running, then make sure that you've installed llama.
+There are instructions in guide nine if you if you missed that one, or of course in the Readme for
+the project.
+And then you might need to run a llama.
+Serve in a terminal, open a terminal and type llama serve if you need to, or just double click on
+the llama application to launch it.
+Any of those things might be needed if you do llama serve, and you get an error that says that the
+port is already in use, it means it's already running.
+You're in great shape.
+Okay, so the next thing we're going to do is download the model called llama 3.2.
+And if you already tried this yesterday.
+Then you don't need to do it again.
+And if you've already done it, it will just run really, really fast.
+So if I run this now, it should run nice and quick for me because I already have it.
+But for you, it probably took a little minute.
+If it's too big for you, this this takes up a few gigabytes.
+Um, and it might be bigger for most machines.
+It should be fine.
+But if not, just add colon one b to get the really small version of llama.
+But assuming that this is good, then you've got that.
+Okay.
+And now we use the same trick and llamas base URL looks like this localhost 11434 slash v1.
+That v1 is like a call out to the fact that OpenAI had slash v1 chat completions create.
+Uh.
+So, uh, yeah, this is, this is V1 by analogy.
+And we can create OpenAI.
+The base URL is llama base URL, and the API key can be anything you want.
+It gets ignored.
+This is a local a local model.
+There's no your credit card isn't there?
+There's no no secret needed, of course, but I think it's a it's a mandatory field.
+So I think you have to pass in something you can pass in any, any, any word that you like.
+Um, and now we're going to just take the same code as before, the same ones we've used a couple of
+times now.
+Copy.
+And let's get a fun fact here.
+So we'll, we'll put it down here in this cell.
+I'll paste.
+And of course we're going to not do, um, I'll run that cell and then we're not going to do Gemini,
+we're going to do Olama.
+And for the model you need to put the name of the model that you just downloaded.
+So we'll use llama 3.2, uh, and uh, otherwise exactly the same.
+Now if you've got the smaller variant then you do colon one b there.
+But you need to have done a pull to have brought that model in or you'll get an error message.
+And so ready let's run this and see what happens.
+Let's run it, run it, run it.
+And here we go.
+Did you know there's a type of jellyfish that is immortal?
+The turret, the turritopsis, also known as the immortal jellyfish.
+There you go.
+If you didn't know it, you know it.
+Now, by the end of this, you're going to win at all trivia challenges.
+There is your your next fun fact.
+But the cool thing is that the last two fun facts we retrieved from Frontier models OpenAI in the cloud
+and from Gemini and Google's Cloud.
+This one was just created on your local machine by llama running there, even though it was pretty quick
+for me.
+Uh, that's that what was actually happening there.
+And that's very satisfying.
+There's something nice about that.
+And if you if you care a lot about data privacy and you want to be absolutely sure that that the data
+isn't leaving your computer, then this is the way to do it.
+You could unplug from the internet and I would stop talking to you.
+Uh, but but you would still be able to do this.
+Uh, so, uh, so so that's that's a great thing to know.
+And I just put here the obvious.
+I mean, we'll talk much more about this in due course, but obviously the big benefits, there's no
+API charges, it's running locally and data doesn't leave your box.
+The downside, of course, is that llama is something like a thousand times smaller than using most
+frontier models, and you'll see that that's reflected in in the.
+How intelligent it is and and how capable it is at solving difficult tasks.
+So obviously those are the trade offs that you have to make.
+And there are many more trade offs that we will talk about in time.
+Okay.
+So with that, it's time for you to experiment and start playing with with different models.
+And I want to show you one more open source model.
+I want to show you a variant of Deep Seek.
+You remember I told you that deep seek came in much smaller sizes.
+The main one would never run on my computer.
+The smaller sizes would.
+And in particular, I want to show you one that's called deep seek R1 colon 1.5 B it's very small 1.5
+billion parameters, a small version of deep seek.
+And as I explained before, this is in fact not deep seek.
+Originally, what they've done is they took Quene the model from Alibaba Cloud.
+They took the 1.5 billion size version of Quene, and they trained it more with extra data.
+And that extra data was data that was generated by deep seq.
+The big model.
+It generated tons and tons of data to sort of show its intelligence, and it trained the little quon
+to be able to try and replicate deep seq.
+That's how it worked.
+Known as distillation distilling.
+So we can we need to start by making sure that we pull this.
+So I do a lama pull.
+There we go.
+And kindly cursor fills in for me.
+Now I haven't downloaded that.
+So this is now going to run.
+So you can see how long it takes for me.
+Uh and it's downloading.
+Hopefully my computer isn't going to free freeze up, but but the trace is coming there.
+So once that's downloaded, we'll be able to then run some code.
+So let's let's get started on this.
+We're going to, to basically be able to take the same thing that we did before this exact code.
+We don't need to we'll still be using Lama locally.
+So we don't need to do anything new there.
+And we can just change this here.
+The model name to be the model name of deep seq R1 1.5 B.
+So I'm just going to be able to replace that in there like so.
+And as soon as this is finished pulling so that we have the model locally, I will now be it.
+There we go.
+It says success.
+I should now be able to call Deep seek R1 1.5 be deep seek distilled into Quen running on my local computer
+with the same message.
+Tell me a fun fact.
+Let's see what happens.
+Off it goes.
+Uh, here's a fun fact for you.
+Did you know that the sun looks like a golden crown during sunset, with its gold colored reflection
+on the horizon?
+The rest of it is pale yellow.
+This interesting correlation change coloration, not correlation coloration, changes as the weather
+changes.
+When the sun is high, it looks colder, and when it sets it appears hotter yellow.
+So.
+Aha!
+So fair enough.
+Not such a riveting fun fact, but not no surprise, this is twice as small as llama, and it's several
+thousand times smaller than the frontier models we worked at before.
+So to be honest, it's super impressive that it even answered the question and came up with something
+credible in the first place.
+But this gives you, first of all, a good sense of how you can run deep seq and any any open source
+model locally, and also some perspective on the different abilities of the different sizes of models.
+And now it's over to you to experiment with different models, pull them and run them.
+Keep experimenting.
+It's all about experimentation and have fun asking questions like fun facts or whatever question you
+want to open source models running locally courtesy of Olama using the OpenAI compatible endpoint.
+And now the assignment for you please a homework assignment for day two.
+And that homework assignment is look at what we did in day one, the summarization of a web page, and
+replicate that using Olama using any open source model of your choosing, using Olama, running it locally
+so that you have a web page Summarizer that gives you a summarized markdown version of a website using
+an open source model via a llama.
+That's what you should complete.
+Put that in the cell right here.
+Uh, there is a solution and the solution is folder.
+But don't look there.
+You can do it.
+Easy peasy.
+Copy and paste from day one.
+Make a change to the to the the open AI Python client library, just as we did above, and figure out
+how to make that work.
+And when you've done so, then by all means put it in community contributions.
+Put your change in this folder community contributions, and then look to make a PR so it can be included
+with the others.
+And particularly try to see if you can't do something fun with it.
+Maybe mess around with the system prompt, see if you could maybe change it to a different language,
+or use a different tone, or have some aspect of it that makes it unique to you.
+A different take, a different take on summarizing a web page using an open source model.
+That's your assignment.
+I can't wait to see what you come up with.
+And with that.
+With that, your 5%, your 5% along the journey.
+It's the end of day two.
+You've got got two days in and already hopefully you've got a good handle on what it's going to take
+to get you to being proficient on the steps along the path.
+You've got your first impression of the frontier models from our experience with OpenAI and Gemini,
+and you've also got an impression of the open source models, and you've used the OpenAI API, and you've
+used Olama to make web page summaries.
+You've done your task.
+I hope your assignment, you're feeling more confident with this.
+And for me, most important of all, if you didn't already have this clear in your mind about what a
+Python client library is, what a what an endpoint is, and how using OpenAI the chat completions API
+simply a web request then.
+Now hopefully that is crystal clear for you.
+What we're going to do next time we're going to be comparing frontier models.
+We're going to be to be playing with them through the products, through through the their websites.
+We're going to be getting a sense for what are they good at and what are they not so good at as an interesting
+way to get a deeper perspective on them?
+I can't wait to show it all to you.
+Lots to get done.
+See you on day three.

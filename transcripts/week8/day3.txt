@@ -1,0 +1,495 @@
+--- Lecture 1 ---
+Okay, a fine.
+Welcome to week eight.
+Day three.
+Today is about leveling up yet again with a new skill.
+Structured outputs.
+Such a such an important skill in the way that that LMS work and the way that particularly with with
+Agentic workflows already, of course you can use frontier and open source models, you can use tools
+and rag, you can fine tune both frontier models and open source models.
+Importantly, but also you can now deploy a fine tuned model with modal.
+You can use Rag with frontier models with a big setup with 800,000, uh, similar items and and add
+together an ensemble model that combines the best of multiple models.
+Okay.
+Today, today it's going to be about structured outputs.
+And and importantly, one of the applications of this, there are many, many, many applications of
+structured outputs.
+One of them that we will do today is using it as a way to parse unstructured data and turn unstructured
+data into a structured form, which is a business task, a commercial task that you come up against
+all the time.
+And llms are just great at it.
+Let's get into it.
+So structured outputs then.
+So there's there's a way that that it feels like structured outputs work.
+And then there's what they actually are.
+It's a bit like tool calling.
+When tool calling feels like the LLM is able to suddenly make calls to tools, but in practice it's
+something a little bit more pedestrian.
+So the way it feels with structured outputs is that you can define a Python class, and you have to
+make it like a subclass of this, this thing called base model, which is a pedantic object which,
+which we've touched on a couple of times.
+So.
+So you make a Python class, it's a subclass of something called base model.
+And when you're doing that, it means that you define each of the attributes of this class fairly carefully.
+So so you define a class that way.
+And you can tell OpenAI OpenAI invented this and now most of the other providers support it as well,
+but not all.
+But you can tell a provider, hey, when you when you do, do what I'm about to ask you to do in my
+prompting, when you respond, don't respond with natural language.
+Respond with an object, a populated object, a Python object with a fields filled in.
+That's weird right?
+It's like it's a natural language model.
+How is it suddenly able to not predict tokens, but instead craft an object, a Python object, and
+that's what you get back?
+Well, that's the magic of structured outputs.
+And that's how it feels.
+And that's that's really cool.
+And it allows you to do so much.
+It allows you to put structure around these, these somewhat very flexible calls to llms.
+It allows you to constrain what you get back.
+It allows you to then take actions based on it.
+So it allows you to to put so much, uh, organization and structure around how you orchestrate between
+multiple llms.
+Uh, but, um, yeah, this this is how it feels.
+But the reality, as is often the case, is a little bit more pedestrian.
+So here's the reality.
+The reason why you make a subclass of a pedantic base model is that what pedantic is all about is defining
+a JSON schema.
+If you if you have something that's a that's a subclass of base model, you can convert it to JSON and
+you can convert the JSON back to the object again.
+So the pedantic class that you set up is used to generate a JSON schema, something which says that
+the JSON must conform to the following spec and it lays it out.
+It needs to have these fields.
+And you put like a natural language description by your fields, and that gets included in the JSON
+schema.
+And OpenAI just shoves something extra in the system prompt that says, hey, when you're generating
+your response, you have to respond in JSON and it needs to conform to this schema, please.
+And so the model just generates tokens.
+All that generates tokens.
+And the tokens it generates are JSON.
+And models love generating JSON because they're trained on tons of it.
+And it conforms to the schema because it's in the system prompt.
+And then the OpenAI Python client library then goes and takes that JSON and converts it to an instance
+of the class that you want populated with those JSON fields.
+And lo and behold, you get back, apparently a Python object.
+That's that's how it actually works.
+It's not particularly magical, but it gives you this feeling that you can talk Python objects with
+models instead of just talking natural language.
+Except there is one thing about it that actually is quite magical.
+There's one thing about it that is like an invention that is like, wow, that's clever.
+One thing about structured outputs that you, even if you knew about everything so far, you may not
+have known this, this little, little feature.
+At least this is how it's implemented with OpenAI and with some other providers.
+And it's really, really clever.
+And to tell you about it, I need to remind you of the way that inference works.
+Remember, when a model generates the next token, it doesn't literally generate a token.
+That's not what comes out of the neural network.
+What comes out after you apply the softmax function thing is a set of probabilities, all the probabilities
+of all the possible next tokens.
+And then there is some code which says okay, I'll pick the most likely or okay, I will sample from
+these according to their probability distributions.
+Well there is a trick.
+And there's a trick that's called inference time constrained decoding.
+That's the technical name for it.
+And even from those words you probably already know what I'm going to say.
+Basically when when the model generates this probability distribution, OpenAI have written some Python
+code that says, hang on a second.
+This model needs to conform.
+This needs to generate something which conforms to a particular JSON spec.
+Let me look through all the possible next tokens and see if there are any tokens here that would break
+the spec a token.
+That would mean that what comes out wouldn't conform to the spec, and I would simply zero out the probability
+so that the model, whatever happens, it's not going to generate a token that will break the JSON spec.
+It's only going to be able to generate.
+I'm only going to keep probabilities for things which would stay in in line with the spec.
+And then and then we'll generate the.
+Then we'll select our next token and that trick.
+And isn't that clever.
+It's so simple.
+Once you've heard it you're like, I would have thought of that, but you didn't think of it.
+But once you heard it, it's like, of course, of course.
+And that means that actually the model is constrained, that it has to generate text that conforms to
+the spec.
+The worst case is that it doesn't generate it never generates a conclusion.
+It sort of keeps going or something.
+So there's still some failure scenarios.
+But but aside from that, when you're using OpenAI, it will always generate an output that is consistent
+with the Pydantic JSON schema.
+And so it is a way to guarantee that the response from the model will populate your Python object.
+And that's really clever.
+Okay.
+And with that we're going to go straight to the lab.
+We're going to get back to to coding.
+And we're going to focus on the scanner agent I will see you in cursor.
+--- Lecture 2 ---
+Okay.
+So we go into week eight.
+We go to day three.
+Welcome to the next part of The Price is Right.
+We've already built our specialist agent, our ensemble agent.
+Now we're going to build our scanner I run some imports.
+Now this is some code I wrote that scrapes RSS feeds and parses the results.
+Let me kick this off and then just show it to you.
+It's some basic stuff.
+There's nothing lm about it.
+It's in deals.
+Dot py right here.
+You start by specifying some some RSS feeds.
+I've got one for electronics, computers and smart home deals from deal Dealnews.com.
+And here's another couple for Automotive and Home Guard.
+And you can throw in if you wanted.
+And you could put in any RSS feeds you'd like.
+I use a library called Feedparser, which is an open source library that parses RSS feeds, very simply
+reads them in.
+I just take the first ten items from each one.
+You can put that number up if you if you'd rather have more, but it seems like seems like a decent
+thing to do.
+And uh, then I just read them in and I also go to the website where the deal is actually described,
+and I suck as much data as I can from that as well.
+So we end up with some some unstructured data that relates to this deal, and that's what we've got,
+uh, over here.
+Um, it's loaded in it's run those three RSS feeds.
+If I look at this, we've got 30 deals because it's three sets of ten deals.
+If I pick a random let's look at deal number ten.
+Here it is.
+It's a Dell Cyber Monday gaming deals, tons of stuff about it and a link to the deal itself.
+Uh, that that is what we have scraped in.
+Okay.
+Here is, is the where the meat happens.
+I have a system prompt.
+You identify and summarize the five most detailed deals from a list by selecting deals, blah, blah,
+blah, blah, blah.
+I tell it to be careful with products that are described as some amount off or reduced.
+This isn't the actual price you need to respond, blah blah blah and a very similar user prompt, I'm
+telling it, you're getting a list of items you need to respond with the five most promising deals.
+And don't be distracted by something that says it's $1,000 off.
+What matters is the actual price itself.
+And obviously I'm saying this because I've experimented, I've tried different prompts.
+It's fallen short in different ways.
+It's sometimes used to get confused with how much off a deal was.
+That's how I've got here.
+I sometimes present this as if as if this is the first thing I typed.
+It wasn't.
+It's so important with these kinds of projects that you're willing to roll up your sleeves and experiment
+with the prompts until you get the performance that you want.
+Okay, so that's the system prompt and the user prompt, uh, prefix.
+And now I'm going to make a user prompt.
+It's going to have this prefix here.
+And it's going to be then the contents of all the 30 things that we've scraped.
+So we're making a prompt which has this instruction.
+And then it has this instruction.
+And then it has 30 different things in there.
+And then at the bottom it's is going to say include exactly five deals, no more.
+So let's load that in.
+And now let's have this function, uh, use a prompt.
+So let me show you what that looks like.
+We'll just show the first the first 2000 characters of it.
+Uh, here's how it looks.
+Respond with the most promising five deals from the list, etc., etc. deals.
+And here are the deals.
+Each one spelt out okay so far.
+Makes total sense, right?
+We're just we're telling it.
+We want you to find the most promising five deals.
+Nothing about structured outputs yet.
+All right.
+But now comes the structured outputs.
+This is normally where I would have OpenAI create something that you know so well at this point OpenAI
+create but I don't I have OpenAI.
+Something different.
+And that is how you describe structured outputs.
+And it has in this parse function the usual parameters, the model name, the messages, the reasoning
+effort which you remember from way back with saying minimal.
+But there's something else.
+There's response format and we're passing this thing in deal selection.
+What is that?
+Well, that's actually something that I've imported that is also over in this deals dot pi.
+Let's find it deal selection.
+It's called uh and here it is.
+It's a subclass of base model.
+And it is it's a class which only has one field deals.
+And that field is a list of deal objects okay.
+So deals is deal selection has deals, which is a list of deal objects.
+And you'll see here in this this is pedantic I'm saying it's got one field called deal.
+And you can describe it in English.
+And so I describe your selection of the five deals that have the most detailed high quality description
+and the most clear price.
+You should be confident that the price reflects the deal.
+That's a good deal with a clear description.
+Okay.
+So what are each of these deal objects?
+Each of them has a product description, a price, and a URL.
+The product description it says clearly expressed summary of the product.
+The description is the actual price.
+Be sure to give the actual price.
+And then.
+And then you know, if the deal is $100 off 500, then you should give 400.
+And then the URL as provided.
+So this is how we've defined a pedantic structure a deal selection object that contains deals which
+are multiple of this object with a description, price, and URL.
+And the key thing to note here is that we've not only described this JSON schema, but we've got some
+language to explain how each field should be populated, and that that is what's allowing us now to
+be making this structured output call.
+And just to make this real for you, I just want to show you so deal selection this thing this is this
+is a class.
+It's I defined it in agent selection.
+We were just looking at it.
+It's because it's a pedantic class, a subclass of base model.
+It's got some some functions that it inherits.
+One of them is I can call model.
+Model.
+Um, uh, sorry.
+Model.
+Uh, schema this.
+And now when I run this, we get to see the, uh, the JSON description of the JSON schema associated
+with this object.
+And it's this kind of schema that gets provided in the system prompt to OpenAI to say to GPT, to say
+you must conform to this schema.
+And that is how when we make this call to OpenAI parse and we say response format is deal selection,
+it's going to return some JSON that will conform to that spec.
+And you're used to us seeing results is response dot choices, zero dot message content.
+And that's not what we've got here.
+It's response zero 20...
+And what that does is it takes the content and it takes the JSON, and it populates an object of type
+deal selection with that.
+So if I run this, it's turning that JSON thing into some schema.
+It's calling OpenAI with this prompt.
+Exactly.
+This prompt OpenAI GPT is generating JSON that conforms to this schema.
+And what comes back is a deal selection object populated with the JSON that came back.
+And so if you look at this thing, you can see that it is something which is a deal selection object.
+It has a field called deals, each one of which is a deal.
+So hang on.
+If I, if I add some code here and I say for deal in results dot deals, we'll do exactly what cursor
+is suggesting.
+And look at this.
+You can see that we've got a fitness tracker uh, which is going for some crazy cheap price, a Dell
+16 plus each of these things.
+So this is a Dell laptop going for for $550.
+Seems like a great bargain.
+And you might be thinking this, this fitness tracker for $15.
+That sounds too good to be true.
+Well, we can double check.
+Here's a link to dealnews.com.
+This is the URL that came back in our structured outputs.
+Let's click on it and see up it comes.
+Here it is indeed.
+This is the web page that was scraped by my janky code.
+And this in an unstructured format would have been sent to to GPT.
+And it's spotted that it hasn't given us the 159.
+It's given us the $15 insanely cheap price there.
+So it got that completely correct.
+Let's see this one here.
+$550 is indeed the price of the Dell computer.
+Lots of janky pop ups come up.
+So it has worked well.
+It has parsed in the unstructured data, scraped from the internet, turned it into pedantic objects.
+It responded in JSON that conformed to the schema.
+The OpenAI library turned that into a pedantic object, and it's been populated correctly.
+--- Lecture 3 ---
+Now there's another point I want to make here, which is a commercial point and an important one.
+What we've just done taking unstructured data from the internet and parsing it, and doing so in a,
+in a smart way in that something which is like $100 off $300 will have been interpreted as $200.
+That was pretty much an unsolved problem only a few years ago.
+There were there were plenty of parsers for different domains, but they tended to be very, very prickly,
+very inflexible, and such that if the content isn't doesn't conform well to what was expected, then
+they would break.
+So however well you tried to to work how it would interpret text if the text had had sufficient meaning,
+if it didn't say $100 off $300, if if instead it said something like it's usually $200 off, but this
+week only it's $250 off.
+That would be just completely not able to be handled by any passes on the planet, and there were lots
+of passes that tried to to to do this in different ways, very janky and very brittle.
+They would break when, when formats changed in different ways.
+And somehow in the space of a few years, this kind of parsing has become a solved problem that Llms
+are just able to do this, they are able to take unstructured data with human like complications, like
+different kinds of deals and different exceptions, and they can interpret it with this kind of, of
+intelligence.
+And this is something which is which is almost magical.
+If you've if you've tried to write parsers before yourself and the field.
+I've done a lot of work with parsing resumes.
+It's something which is pretty close to being a solved problem.
+There are a lot of resume parsers out there, but resumes come in so many different kinds of formats
+that resume parsers have grown over time to be very heavyweight.
+Things that have tons and tons of of ifs built into them.
+And they're pretty good, but they're they're a bit pricey.
+and now llms have an easy time parsing resumes.
+It is easy and nobody saw this coming.
+This ability for Llms to parse unstructured data and turn them into a structured form.
+It's something which is which is extraordinary.
+And of course it comes with its own negatives.
+There is a cost to it.
+There's a latency and there's the unpredictability you get with, with, with llms.
+But nonetheless, the, the intelligent parsing is something which is just a whole new set of solutions
+that weren't available before.
+And this is something which has many applications.
+I bet you can think of somewhere in your current job where you could apply this kind of parser to be
+able to to turn unstructured data into something structured.
+And the key to being able to do it is to use structured outputs, because it guarantees the output format.
+And now all that remains is for us to turn on logging, make something called the scanner agent.
+Let's just quickly check it out.
+It is really simple.
+It's exactly the same thing, the same system prompt, the same user prompt.
+There's a color, there's always a color.
+And then fetch deals.
+You can see I've added some comments and some type hints because it's a good thing to do.
+So this is sort of trying to take a step towards productionizing this code.
+Uh, after after being in a notebook, the make the user prompt the same thing and then the scan as
+before.
+This is where we pass in the response format.
+And this is where we call response .0. parsed, which is of course where we say we're using structured
+outputs.
+And so with that we can call the scanner agent and we can call agent scan.
+We see our log messages in cyan.
+And with any luck after a couple of minutes we will get back some scanned deals that have been been,
+uh, read in from the RSS feed and that then have been sent to to GPT five, which is doing two things.
+It's selecting the most promising deals, and it's also parsing them and turning them into this structured
+output, which which has things like the price and the URL identified explicitly.
+Okay.
+Well, I'll let that finish off while it's now.
+It's now doing it's already received the 30 deals and it's now calling OpenAI using structured outputs.
+The final step of this.
+And then we will look at the result.
+And then we're moving on to to the last part for today, which is one final little extra agent that
+I think will will will amuse you.
+Okay.
+I will let this finish and I'll come back in just a second.
+Okay.
+And here we have it.
+And we look at results.
+And we do of course have a deal selection object because of the trick.
+The inference trick we know that we were going to and it contains that, that fitness tracker at the
+front of it.
+All right.
+Next up, the the last agent for today is a very simple, quick one, and I want to introduce you to
+a new tool called pushover, which is a nifty little tool for sending push notifications to your phone.
+You may be familiar with platforms like Twilio that are able to send text messages.
+They're quite heavyweight, and they need you to fill in lots of paperwork to be allowed to send text
+messages to avoid you spamming people.
+A much simpler approach, if you're trying to message yourself, is to use an app that connects directly
+to you, and pushover is free, at least for the first month or so, so you might as well be the one
+to use it.
+Now look, this isn't super critical.
+This has got nothing to do with Llms being able to send a push notification, but it's fun to have that
+sense of an agent having having agency to have it, sending a push notification to your phone.
+So I do encourage you to go through this little setup, even though I do understand it's not exactly
+super relevant, but but I use it on my other courses to use it for all sorts of things, and I find
+pushover to be great.
+There's lots of others, by the way, if you if you'd rather use a different one.
+But but what we'll do is we're going to go to pushover dot net and get things set up.
+Okay.
+So you go to pushover net up it comes like this.
+You go to log in or sign up.
+And you will need to sign up for the first time.
+And I can't go to this right now because for some reason they show you your API key, your token, like
+on the dashboard screen, like in big letters.
+So just by going there, I will reveal my token to you.
+So when you do that you will get a you'll set it up and you will get a token.
+Now here's the thing.
+Uh, pushover has two tokens and you need both of them.
+And it's a little bit confusing.
+Once you've once you've signed up, you will see, um, a main token on the top right of that dashboard
+screen.
+It starts with the letter U.
+It's called the user token.
+And uh, so look out for that one beginning with a U.
+That's easy.
+But then you also on the home screen you need to click create an application slash API token.
+And then it asks you to come up with a name, uh, and you can give it anything you want.
+You could give it a name like agents or whatever you want, or MLM or whatever you want.
+Maybe LM engineering would be a better one.
+Or AI.
+AI engineer.
+That might be a nice a nice name for you.
+Um, and then click Create Application.
+This this doesn't matter just for your own queue.
+So you'll remember it in the future.
+And when you do that, you'll get another token, which is your application level token associated with
+this thing.
+Um, so you now have two tokens.
+One starts with a U and one starts with an A, and you need to add to your EMV file, push over user
+and then put the one that begins with the u push over token, and then put the one that begins with
+an A and then save.
+And then you will need.
+Once you've saved your EMV file, make sure you save it.
+I know you guys know this stuff by now.
+Uh, then we'll need to come in here and do a EMV override is true and do this again.
+And then, uh, you'll need to, uh, to, to, to print, uh, to, to load in your keys like this.
+and let's just print them out and make sure the pushover user is found and starts with a U, and the
+pushover token is found and starts with an A.
+And if you've got to this point, then you're great.
+Everything is working.
+You will also need to install the pushover app on your phone.
+Um, and uh, there are instructions for that on with a link to the app on the, on the landing page
+there.
+And I'm just going to have my phone here and turn it off silent and hope nobody calls me.
+And what I've now just written this function push again.
+This has got nothing to do with LMS at this point.
+But push just has takes a payload.
+That is the user token.
+The token, the one that begins with an A and then a message, and then it just calls the pushover URL.
+And that's, that's that's what it says.
+And if I say massive deal and run this then there we go.
+You heard that.
+I hope you heard that.
+That was my phone getting a push.
+Let's do it again.
+There it is.
+Three times.
+Very nice.
+And I have put this into an agent.
+Of course.
+Here it is.
+Messaging agent.
+Uh, now, the thing is that I feel like it would be a stretch.
+We couldn't call it an agent if it was literally just making a call to pushover, and that was it.
+And I wanted to call it an agent.
+And so I felt like there had to be an LLM involved.
+So I have it using Claude Sonnet 45 to write a hype message.
+So this is this is where it has the payload.
+I've also put the change the sound to be a cash register sound.
+And then I've got this thing alert which crafts a juicy message.
+And then it makes the call to pushover with the juicy hype message about a deal.
+So that's the only change I've made here.
+If you don't want to do that, you can just you can just delete it from from here and just have it responding
+with only the deal itself.
+But, uh, yeah, especially if you don't have a cloud API.
+This isn't strictly necessary, or you can make it, of course be OpenAI if you'd prefer, but I wanted
+to do it so that we would we would be able to have some, some reason for having another agent in the
+mix.
+Um, okay.
+So with that in mind, um, make sure my phone is unlocked.
+I can say such a massive deal.
+We should get a cash register.
+There it is.
+You have that ka ching, and we have our white printing.
+And now this is the one where we'll actually call a model, uh, with this information here, a special
+deal on Samsung.
+So it's calling anthropic.
+And there I got a cash register.
+Ka ching.
+And it says amazing deal alert.
+Get a Samsung 60 inch TV.
+Here we go.
+Uh, a lovely hyped message from Claude.
+So that just makes us really feel like we're using an agent.
+Claude is is turning this into something that's going to wake us up and make us excited about going
+to buy that that flat screen, 60 inch LED TV.
+Uh, and it's sending it through to pushover.
+So this is just something.
+Something a little extra to mean that our agents are able to notify us and do so with style.
+Wow.
+You're at 95%.
+We're almost done.
+Uh, so, uh, you know, everything that you can do.
+I'm having trouble cramming everything onto one slide I had to shove and use structured outputs at the
+end of that last bullet.
+A bit awkwardly, but.
+But you honestly, at this point, you really have got all the different bits and pieces, all the building
+blocks to be building AI solutions.
+It's just about bringing it together now.
+Perhaps the final piece of the puzzle is going to be about the orchestration part.
+We're going to bring back use of tools that we did all the way back in week two.
+We're going to come back with tools in anger, and we're going to use them to make an agent orchestration
+and a planner, an autonomous planning agent with an agent loop.
+We're going to do all of that tomorrow.
+I will see you then.

@@ -1,0 +1,928 @@
+--- Lecture 1 ---
+Well, I am overjoyed that you survived all of those APIs.
+You've made it to week two, day two, which is one of my favorite days.
+It's the day that I introduce you to the joy that is gradio.
+It's basically a way to build user interfaces.
+If you're terrible at building user interfaces like me, it's UIs for non frontend types and it's great
+fun.
+And it's particularly big in the data science world because it's oriented around building data science
+UIs.
+There's actually two very popular frameworks like this.
+There's Gradio and there's Streamlit.
+And I like both Gradio and Streamlit.
+And in fact, as I think I mentioned, the Outsmart app that I showed you before is a Streamlit app.
+And both of them, they're actually quite different.
+They have a lot of different styles to them, but I love them both.
+And gradio if I had to pick a favorite, I had to pick a favorite.
+It would be Gradio, but only by a hair.
+And that's what I'm going to be showing you this week.
+But what you can already do, you can already talk about transformers, at least the foundations, the
+leading frontier models, you can confidently use the chat completions API.
+You can use frontier APIs.
+I mean, goodness, you can use so many of them, uh, including stuff like prompt caching, including
+abstractions and routers and wow, you name it.
+All right.
+But today you'll be able to talk about Gradio.
+You'll be able to make a simple UI, and you'll be able to hook up Gradio to frontier Llms.
+What a lot I have in store for you.
+Okay, so what is Gradio?
+Gradio is an open source library Python library created by a company that's now owned by Hugging Face.
+So it's now part of Hugging Face.
+And it gives you this way to just write a bit of Python code that causes a UI to be generated.
+And I'm going to ask you to hold for one side.
+Like what?
+What what exactly is going on under the hood when you do this?
+Because there's going to be some magicky stuff and UI is going to appear.
+And you might be wondering, what is this UI like?
+Like, what is it?
+It's actually a react app.
+So so react is like written in JavaScript TypeScript.
+So where is that?
+I'm going to try and reveal all of that later once you've had a bit of a feel for it first.
+So first suspend your disbelief, go with it, see the UIs, and then I'll explain what's actually happening.
+How does it do it.
+Uh, so I said it was easy.
+It is really easy.
+This is one of the examples from their website that basically you import Gradio.
+There's this wonderful line import Gradio as GR that everyone does, for whatever reason, it was imported
+as GR.
+And then if you have a function like this one has a function greet, then you can create a user interface
+which allows you to have an input.
+You can press a submit button.
+The function, the Python function you've written will get called when you press the submit button,
+and you'll see the output in the output.
+So it lets you describe an interface just with inputs, outputs, buttons, and then you can put some
+Python functions in and it will build an interface and it will connect everything together.
+And it just works.
+Tim, as you will see.
+Okay.
+And so now we're going to head right into doing three things.
+We're going to create a UI for API calls to frontier models.
+We're going to create the company brochure from week one.
+And we're going to put it into a UI, which is going to be great.
+And we're going to have streaming and markdown all part of the user interface.
+And it's going to be really easy.
+All right.
+Are you ready for this?
+You're like okay.
+He keeps saying it's going to be easy.
+Is it really gonna be easy?
+Well, well you can judge for yourself.
+Let's give it a try.
+Let's go to cursor.
+All right.
+So here we are in Casa.
+We're going to go into the week two folder.
+And we're going to week two day two week two day two radio day.
+We're going to build a UI using the outrageously simple Gradio framework and prepare for joy.
+Okay.
+We start with just a few imports, some pretty simple imports there.
+And now we have import Gradio as guy.
+Oh yeah, there we go.
+It actually takes for some reason it takes time.
+It just took a second this time, but sometimes it can take like 10s to import this package.
+So if you're sitting there waiting then then don't don't worry.
+All right.
+So now I'm going to load in my dot EMV.
+And I'm just going to check that I've got my keys.
+Now again as always on this course you don't need to have any keys at all.
+You can use Olama locally.
+You can use open AI if you have it.
+You can use Anthropic and Google if you have it, you can use whichever ones you want.
+Guide nine gives you the exact instructions.
+But to be honest, after yesterday I imagine you know exactly what to do.
+You could use open Router.
+You could.
+You can go to town.
+It's all the same.
+We'll be using the open AI Python client library.
+So it's all exactly the same.
+And here in fact I will just set up the OpenAI Python client library and then Anthropic and Gemini.
+I will do the same thing.
+The usual trick, the same Python client library but switching up the base URL, different endpoints.
+We now have OpenAI Anthropic and Gemini.
+Should we wish to use them?
+Okay, let's do a very simple chat completions API.
+So I actually I just deleted that cell.
+So I can type it for the people that want to see me typing.
+Here we go.
+So I want to write a function which calls GPT 4.1 mini using the OpenAI Python client library.
+You know this so well right now you're probably of all the things to type.
+Surely not this again.
+And we're going to call it message GPT.
+And it's going to take a prompt this function.
+So it just takes a prompt.
+And then we're going to call OpenAI.
+So first we're going to put um the usual list of dictionaries the way that we call OpenAI.
+And here it is.
+I can just press tab.
+Okay.
+So it's going to have this system message that I've defined here.
+And then the prompt that's passed into the function.
+Okay.
+That seems good.
+And now I'm going to say response is OpenAI completions create.
+What are the different things we can pass in.
+You remember one of them is model will do GPT 4.1 mini and the other is messages.
+There it is.
+And then we return response zero message content.
+That is the simple way to call ChatGPT to call GPT.
+Sorry, ChatGPT is the product we're calling it GPT.
+I'm actually I'm going to take a minute for a quick sidebar.
+I've been saying a lot of times that this is something called the Chat Completions API, which was the
+first API that OpenAI came up with.
+It's the it's the one that people use most of the time.
+It's just the thing that completes the chat that's passed in.
+Now, OpenAI has some other APIs.
+Most importantly, it has one called the responses API.
+And if you go to OpenAI's website, they they will tell you in their docs that they encourage you to
+use the responses API instead of the chat completions API, because it has more functionality.
+It has functionality to to use things called managed tools and various other things.
+And so they tell you that that is the better, more powerful API to use.
+And this is sneaky of OpenAI.
+And so I want to tell you I want to caution you against taking its word for it.
+Yes, it's true.
+The responses API is more powerful, it has more functionality.
+But there's probably two things you should know about that.
+Number one, that extra functionality is mostly paid functionality.
+If you want to use the extra managed tools they let you use, you have to pay extra for them.
+They are things like running code remotely, running browsers remotely.
+A couple of them are free, but most of them are paid.
+So that's one thing to be aware of.
+And the second thing to be aware of is that responses API is something that is locked in to OpenAI's
+ecosystem.
+It's not something that's common and shared ubiquitously across all of the providers.
+So if you sign up for the responses API, then you're locking yourself in to the OpenAI ecosystem.
+And you don't want to do that because we're going to be using lots of different models, as people do
+in industry, and you typically don't want to have yourself be be locked in to one provider versus all
+of the others.
+So generally speaking, there are definitely times when it's good to use the responses API.
+But generally speaking, the chat completions API is the one to pick.
+The simple standard common API that's used across the different models.
+And there are a couple of exceptions to that, but that's a great rule of thumb.
+Well, I'm pleased I got to have that quick sidebar with you.
+I've been I've been wondering I've been wanting to bring that up for a while.
+There we go.
+Okay.
+So now we've written this function.
+We're now going to call the function with the question what is today's date.
+So it will then make this call to GPT and maybe wondering what this is going to say.
+And it's going to say today's date is June the 7th 2024.
+And you're like, what?
+What's going on?
+Well, the point is that that's like a year and a half away from me and even more for you.
+I imagine the point is that these models as, as we said last week when we were asking them to talk
+about their weaknesses, they are trained at some point in time, and there's a point at which the training
+data ends, where the date which the last day they were trained and that date is known as the training
+cut off.
+And they don't have any trained information beyond that training cut off.
+And in the case of this model, it was around June 2024.
+So that's the extent of its knowledge for GPT four one mini.
+Um, and and you may say, okay, but if I ask that question to ChatGPT, it gives me today's date.
+And yes, that's because ChatGPT is a product built on top of this model.
+And it's got people like you and me who've written in code in there to make sure that we update the
+system prompt with the current date, and we do stuff like that.
+So if you're using the product, you get more functionality baked in by people like you and me.
+If you're calling the model directly, then you get exposed to the mistakes, like the knowledge cut
+off that it's so well known for.
+Alright, so with that, we have we have completed some of the groundwork.
+We've, we've written something that calls an LLM.
+I want you to put Llms to one side.
+We're going to come back to Llms in a minute.
+We're now simply going to talk about UIs, data science UIs.
+--- Lecture 2 ---
+Okay.
+We're going to start with a very simple function.
+This will not be rocket science.
+Here we go.
+It's going to be called Def Shout.
+Shout will take some text as an input.
+It will then print.
+Shout has been called with that input.
+So we can print that.
+Um and then and I can see cursor is the worst.
+Cursor fills everything in for me.
+Stop.
+Uh, then what we're going to do is we're going to take that text that was passed in as an input, convert
+it to uppercase, and return the uppercase version.
+So return text dot upper like so.
+Um, so yes, highly complex stuff.
+If I call shout with the word hello, then what we would expect to see is that print statement and then
+hello.
+Coming back in capitals.
+There we go.
+Shout has been called with in but hello and then hello in capitals.
+All right.
+We're now going to have to do something pretty complex.
+We're going to try and build a user interface.
+We're going to want to build something that is going to launch a web server running locally.
+That will serve up a react UI to to bring this to the forefront, to allow a user to interact with this
+piece of Python code.
+Here to call shout.
+Okay.
+And this is how we do it.
+We type GR interface.
+GR interface is one of the simplest ways to work with Gradio.
+Create me a new interface.
+All right.
+The first thing we have to tell Gradio is what is the function?
+What Python code have we written that is at the heart of our application?
+And for us it is that function shout.
+That is the data science function that we are wanting to expose to a user interface.
+So you say function equals shout.
+You don't actually need that.
+It's a sort of convention, but you could just say shout.
+Uh, now notice I'm not doing something like this.
+I'm not I'm not calling shout and I'm not calling shout with hello.
+I'm just passing in the name of the function itself.
+And you may be very familiar with this if you've if you've done other programming, if not the first
+time you see this kind of thing, it can be a bit of a bit mind blowing.
+We're not calling the shout function, we're just passing it in as a variable.
+And that means that we're giving it to Gradio, so that Gradio can choose to call this function at any
+point in the future.
+It knows it as the function we want to be called in the future.
+And when you do that, it's known as as a callback.
+This thing shout is a callback that Gradio can call back to any times it wants.
+All right.
+Okay.
+Now this function, it has an input text and it has an output.
+It returns text.
+And so we've got to tell Gradio that it has an input and that it has an output.
+And gradient needs to do something with it.
+And how do we do that.
+It's very sophisticated.
+We say input inputs plural equals and we say text box, which means that we want there to be a text
+box.
+And whatever's in that text box we want to go into the input.
+All right.
+And outputs whatever comes out of this function.
+We want that to go into a text box.
+Okay.
+All right.
+And then there's one more thing which is that Gradio does can offer you a bunch of things out of the
+box, like, like comes comes for free in the mix.
+And we don't actually want that.
+It's called flagging mode.
+And if you say flagging mode equals never.
+Then it doesn't add in this functionality.
+It's a special tool that in data science you might want to flag results as not being right.
+But we don't need that special tool.
+All right.
+And then we've now got to do some very sophisticated stuff because we're going to want to basically
+spawn like an app server that can run this, generate a react front end and serve that react front end,
+anyone that hits the app server, a lot of technical stuff here.
+So it's like a couple of hundred lines of code to get this together.
+And no, it's not, it's it's this dot launch.
+That's it, that's it.
+And now we can run this and see what happens.
+Here we go.
+I'm gonna run it.
+Bam!
+A user interface comes up.
+Okay.
+Uh, and, uh, let's see what happens if we type the word hello in here.
+Nervously press that and we get back the word hello shouted back to us in the output.
+If I scroll down, we'll see that it's printed just below the user interface.
+Shout has been called with input.
+Hello?
+And, uh, yeah, I'm sure you're not surprised.
+Hi there.
+If I press this, we get high there and and caps.
+And if we scroll down we'll see.
+That chart has been called with input.
+Hi there.
+So this what you're seeing here in this output of the notebook is in fact a bit of a web page.
+What's happening is that Gradio is running an app server and serving up this web page to anyone that
+hits it.
+And you can go to this link that's appeared right here, and you'll see yourself when you click on that
+link.
+You'll have like a web page with this user interface in it, and you'll be able to type in hello and
+press submit and it will say hi there.
+It will say hello even.
+Uh, so um, yeah, this this is just worked so easily.
+And again, the thing to, to keep in your mind, which is a bit crazy the first time you hear it,
+but it's, it's old hat to people that have like done any, any JavaScript coding or anything.
+Is that what we're giving here, this, this, this thing we're telling Gradio.
+Hey, anytime that the user takes action on the website, I want you to call this callback that I've
+just given you shout.
+The input should be hooked up to your to your inputs.
+The output needs to go into the output, and that is what Gradio takes care of for you in this one line
+of code.
+And I'll just illustrate that if I click on this link and your one will probably have a different port
+number at the end, I click on this link.
+Up comes this user interface.
+We're now looking at a react app running on my local host, pointing at that port, and I can type in
+hello.
+And when I press submit out it comes and back behind the scenes.
+It did just call the callback again a third time.
+That is how it works.
+Cool, right?
+Okay, so next up I want to introduce you to an even crazier thing called share.
+And I do need to mention that if you're working in a corporate environment with with lockdown security,
+then this may not work for you.
+And in fact, if you're unsure about security, if you don't work for a data science team, if you're
+someone that's not necessarily part of the tech function, you might want to skip this step altogether,
+because it's possible that this would be something that would flag you to to corporate security, because
+it's quite, a quite a high tech thing that Gradio does.
+But Gradio has this incredibly cool way that you can pass share.
+Equals true.
+This is the same line as before, but I've added, if you look back up here, it doesn't say share equals
+true there.
+If you say share equals true then Gradio does something that's that's pretty high tech.
+Instead of instead of running it on your local box so that you have just a local host like a web server
+running, it sends that code to gradio to hugging face, and they run it for free in like a, like a
+playpen where apps can run.
+So you can share it with other people.
+But here's the thing that's just a little bit crazy.
+When someone interacts with your website that's running on a on a like a gradio place when they press
+that button.
+Gradio will still come back to your computer and call the the share the the shout callback right here
+on your machine, as we will see in just a second.
+And if you're wondering, like how on earth does that work?
+How does Gradio reach back into my machine.
+It's simply it uses an approach that technical people know as HTTP tunneling.
+If you've ever used something like Ngrok, it uses that kind of technology.
+It's very well known and understood by tech people.
+It's used a lot in data science communities to share apps, but if you're not part of that community,
+you should skip the share equals true.
+And there's another better a bigger way that's totally, completely above board to share apps that I
+will tell you about in due course.
+But for now, we'll give this a shot.
+We run it just simply with share equals true.
+We get back again the interface.
+And what you'll see here is that this time there's it's running locally.
+You can see there's a different port number because every time you run it Gradio just picks the next
+port.
+All of my previous Gradio apps are all running on the other ports, but it's also running on a public
+URL.
+This URL right now.
+Some long hexadecimal thing.
+Gradio live and this share link expires in one week and it tells you if you want the proper the proper
+way to do it.
+You run Gradio deploy.
+And that's a different thing that's well documented in docs then, is a proper deployment approach that
+we cover in some of my other courses.
+But but this gradio live.
+If I click on this, it's now opening this up on Gradio live website.
+And when I type uh, howdy, uh and press submit, we get howdy in block caps.
+If I go back here again, what you'll find is that shout has been called with input.
+Howdy.
+It's running the Python code on my computer.
+That's kind of crazy, right?
+Uh, but that's how it works.
+It's really great.
+This will run for free for a week.
+Uh, and, uh, you can always, at any point, just just stop your computer so that it's not going
+to be able to call back into your callback, should you wish.
+So only while you have this, this notebook running that it would be able to, uh, to, to use your
+callback.
+So I hope that you found that.
+Cool.
+If you're not sure what's going on or you're not happy with that, then then skip it for sure.
+But otherwise, if you're building Gradio apps and you want to share it with your team or with others
+in such an easy way, then you can simply add in that share equals true.
+--- Lecture 3 ---
+As another cute feature to know about Gradio forget, forget sharing.
+We won't come back to that.
+You can use that as you wish, but something just when you're running it locally is that you can call
+this thing in-browser equals true.
+And all that does is it means when you when you run this, it instantly pops up the browser window.
+It's just convenient if you're always going to be working in a browser window, not in your notebook.
+In browser equals true means it pops one up locally instantly so that you can, uh, um, immediately
+get your user interface running.
+And there we have it.
+Super easy.
+And Gradio also makes it very easy for you to add user ID password login to your app.
+Particularly perhaps if you're using share equals true, that might be a good thing to think about.
+Uh, this is how you do it in that in that call to launch, you just also add in auth equals and then
+you can put in a user ID and password in a tuple like this.
+And as the user ID and bananas as the password, say not my password anywhere else.
+In case you're wondering, uh, there we have it.
+Um, and you can also, instead of passing in just one user ID and password, you can pass in a list
+of user ID and password tuples.
+A whole list of them and all those people will be able to log in.
+What do I mean?
+Well, if I run this, up comes my Gradio app and now it has a login and password.
+And if I type add and I type in any old thing there and I do log in, it's going to say invalid credentials.
+Up comes my password manager.
+Try that again.
+Add bananas and in we go.
+We are logged in now to the app.
+I can say hi there and I can press submit.
+And it works.
+We have authentication.
+And obviously back in cursor we can see that it called the shout function.
+Now before you all email me at once, I know perfectly well you should not ever have passwords in plain
+text like that.
+At a very minimum, you could use your env file if you wanted to have some passwords there, but of
+course it would be recommended to use something proper, like a proper security database and maybe even
+some sort of hashing system.
+You can google any of that should you wish.
+But as a quick way to add in authentication, this shows you how easy it is.
+And if you have share equals true so that you're giving the outside world the ability to come in and
+run things you might well want to put in authentication.
+It couldn't be easier.
+Okay, let's move on.
+You can tell I like gradio.
+Uh, the one more thing is that I've been showing you all these screens.
+They've been coming up in dark mode for me because that's my default on my system.
+You might have been seeing a light mode version.
+Now, if you want, you can force Gradio to bring up the user interface in dark mode.
+Actually, Gradio advises against this, and they don't make it easy because they point out that it's
+important for accessibility reasons that you respect the user's choice for light mode or dark mode,
+but should you wish to, this is how you can do it.
+You can write some JavaScript, you can pass in that JavaScript, and then it will always be in dark
+mode.
+And here it is in dark mode every time.
+And in fact, I can show you that again by by actually making it light mode instead.
+Uh, let me just change this.
+I change that word dark to light.
+I believe now it should be in light mode.
+There we go.
+Bam!
+Ha ha!
+This is what it may have looked like already for you.
+The light mode version of it.
+I say hi there, submit.
+And there it is in capitals.
+So that is the light mode variation.
+I will put this back to dark.
+Uh.
+There we have it.
+And back to dark mode.
+So, uh, you can switch between dark mode and light mode.
+But as I say, Gradio recommends that you leave it be.
+Let the user decide.
+Respect the user's choice on that.
+Okay.
+Now we're just going to take this user interface a little bit further.
+And so there's a little bit of a block of code here.
+But it's all going to be super sensible I hope it's not going to surprise you at all.
+Uh, we can choose to specify explicitly the fields that will appear on our user interface.
+So let's say we want to have an input and an output.
+And instead of just going with all of those defaults, we're going to say I want it to be the input
+to be a text box.
+I want the label to be your message.
+Extra info.
+Enter a message to be shouted.
+Let it have seven lines and then message output will be another text box labeled response with eight
+lines.
+And now I can.
+I can say here that my view is a great interface.
+The function.
+The callback function I'm going to call will be the word shout.
+Let's say you don't need to put function there.
+You can just do it like that.
+But but we'll leave it in.
+Function is shout.
+The title of the window will be the word shout.
+The inputs will be this input we've just written right here.
+The outputs will be this output we've written right there.
+We can give some examples.
+Hello and howdy.
+And then again this flagging mode is never.
+You can take that out if you want and you'll see what it does.
+It's just an extra little tool that we don't need.
+And then view dot launch.
+So it's just like spelt out a little bit more.
+And when I open it up you can see this nice user interface.
+It's got a heading of shout just as we promised.
+Message.
+Enter a message to be shouted hi there.
+Press submit.
+Up comes hi there.
+There you can see it's printed.
+It called the callback down.
+Here are some examples I can click howdy and it populates with howdy.
+Press submit and there's howdy and there's the print.
+So it's just a bit tidier, more organized.
+We're using a little bit less out of the box with Gradio.
+And we're being a bit more explicit about what we want.
+And it shows you how you can have some control.
+Defining radio fields, passing them in in the inputs and outputs, giving some examples, a title,
+and so on.
+One other thing I will mention, and this might have already caught you off guard, is that when you're
+when you're moving your mouse, if your mouse is hovering over the Gradio interface, it appears that
+you suddenly can't scroll up and down if you use your mouse wheel to go up and down.
+And the reason is because it's trying to scroll up and down within within this user interface, you
+have to move your mouse off to one side, and then you can scroll up and down.
+I've had people be stuck with that be like, why can't my why is my mouse working?
+It's like a cursor thing.
+You just have to have your mouse outside the Gradio UI just worth mentioning.
+All right, so now, now is a big moment of truth for you and it's going to be crazy.
+I hope this is going to be like a whoa moment for you.
+Do you remember what seemed like an age ago, but was in fact just a few minutes ago?
+At the beginning of this lab, we wrote a function called message GPT.
+You remember that?
+Let's go back up and look at it, because I feel like you're like, did we?
+Yes we did.
+Let me show it to you.
+Blah blah blah all the way back up here.
+Goodness, it seems like it was a long time ago.
+Message GPT, you're a helpful assistant.
+It takes a message and it.
+And it returns the answer.
+It calls GPT on the cloud.
+Are you with me now?
+Okay, so back we go.
+Uh, so.
+So that was the one that we we we made.
+So let's just rewrite exactly the same thing as in the prior cell.
+But we're going to change shout to GP to message GPT a different function.
+But it's still a function that takes one input and gives one output just like Xiao did.
+Just like xiao was a function with an input and an output message, GPT took an input, the prompt and
+the output.
+The response.
+That was it.
+Nothing else.
+Okay, I'm going to change like the info.
+I'm going to change the, uh, example.
+I'm not going to change the examples.
+Hello and howdy will do just fine.
+Uh, I'm going to change the title.
+Otherwise no change at all.
+Okay.
+Are you with me?
+You see that?
+Nothing's changed.
+Just one callback function.
+Different function.
+Otherwise the same.
+Here we go.
+I'm going to run it.
+And okay, we get an interface that is headed GPT.
+Your message.
+Enter a message for GPT mini.
+We can type, but we can use the one we got right here.
+Hello.
+Press submit.
+And hello.
+How can I assist you today?
+It just called GPT.
+It called that function.
+It got back an answer.
+The answer went here.
+That's it.
+And so you know obviously the point I'm making is that hugging face a gradio has no idea that it just
+made a call to GPT.
+As far as it's concerned, it's just another callback function.
+It happens to be a callback function we've given it that's called GPT.
+It's not called shout.
+It doesn't doesn't care.
+It doesn't even know the name.
+That's just a variable.
+It just calls that function and it doesn't have anything.
+It doesn't know anything about llms.
+It's simply hooks up the input to the output through the submit button.
+That's all it is.
+That is what's happening here.
+So easy.
+We've just put an LLM on a user interface.
+And now you know how to use like share equals true.
+And you can use auth so that you can now have something that logs in.
+And then people are able to connect to GPT just like this.
+Wow.
+--- Lecture 4 ---
+You see, I told you today was fun.
+Okay, so next up, we're just going to make a tiny change, uh, to, uh, make, uh, make this reply
+in markdown instead of in normal text.
+And so I'm going to change the system message to you are a helpful assistant that responds in markdown
+without codeblocks.
+That's that little thing to make sure it doesn't put extra ticks around it, just worth knowing.
+So I do sometimes get questions on this.
+People are initially surprised because I write that system message, but I don't use system message
+in the rest of this code.
+And I tell you that it's going to change what happens.
+And people are like, okay, but you're not using it.
+Uh, do you know this?
+Do you know what's happening here?
+So the thing about about Jupyter notebooks, people sometimes get confused as this thing is called a
+Jupyter notebook.
+These these notebook interfaces, people get confused and think that you can think of it like it's a
+long line of code that's running there.
+And we're just editing further down the file.
+But no, the way it works is that every time you run a cell, you are executing that cell.
+And there's a there's Python running behind the scenes that it runs in.
+And this system message thing, we defined it like right up here somewhere.
+Uh, and the reason I belabor this, because it is a common confusion and source of bugs.
+So it's worth worth understanding what's happening here.
+This all the way back up here is where I define system message.
+And basically I'm defining a global variable because this this is just a global variable system message.
+And I'm using that global variable in there.
+And later when I redefine this I'm changing the global variable.
+And that new value is just going to be used whenever this function is called.
+So it's a way that in notebooks you typically if you do something like this, you're working with globals.
+And you can change them at any point.
+And they will affect everything that comes before.
+So it's worth understanding that because that can also create bugs.
+Now the engineers or software engineers amongst you will know that the use of globals like this is frowned
+upon in software engineering.
+And it's something that if you are building with Python Modules.
+You would want, for example, this to have an input of the system message and the prompt.
+You wouldn't want to rely on globals.
+And so I have some people saying to me you shouldn't use globals, blah blah, blah blah, but that
+in fact is in itself a slight misunderstanding.
+When you're operating in a notebook like this, you're doing so as a scientist, not as a software engineer.
+Take off the software engineering hat, put on the data scientist hat, and as a data scientist, you're
+encouraged to be experimenting, iterating, changing things, seeing what happens.
+It's a different mode of working.
+So in fact, in this mindset, I would argue it's totally above board and normal practice to have sort
+of globals in your notebook and to be changing them, seeing the effect, changing them again, that's
+the way it works.
+As long as you're totally clear on what's going on, then it's a perfectly safe and frankly, a recommended
+kind of practice.
+Alright, rant over.
+Let's keep going.
+Okay, so we're redefining the system message to say respond and markdown.
+We're also changing the second output the output the second field.
+Instead of being a text box, it's now a great markdown, and beautifully.
+That just means Gradio is going to figure out how to display markdown properly in there.
+And we're also going to change the questions from hello and hi to slightly more profound questions.
+So I've got two two examples for you here.
+You can type anything you want in here.
+But we're going to choose either explain the architecture the transformer architecture to a layperson.
+Let's start with that and press submit.
+And that is now going to call GPT 4.1.
+And with what comes back we'll get it back in nice markdown.
+You can see there's a few words in bold there.
+And there's some stuff.
+Sure.
+Here's a simple explanation of the transformer architecture.
+Imagine you want to read and understand a book, but the book is really long, and the meaning of a
+sentence often depends on words that appeared much earlier.
+Traditional methods read the book word by word.
+The transformer is like a super smart ebook reader that can look over a whole sentence or paragraph.
+Figure out which are important and then it goes on.
+Attention.
+That is the key idea how words relate to each other.
+Understand meaning through layers, the layers of the neural network.
+So it's a nice and and entry level kind of layperson description.
+Let's change this to explain the architecture transformer architecture to an aspiring AI engineer and
+press submit.
+Again it's going to go off to GPT.
+It's using the same callback.
+But now the response the system prompt asks for in markdown.
+And the response is now going to display it in markdown.
+And here you have something that's just a little bit more technical.
+It it refers to the paper.
+Attention is all you need that I mentioned from 2017.
+Uh, it talks about LSTMs.
+Remember I said that was what came before what we all used to use.
+And then it explains the components of the transformer that we will look at uh, along the way.
+But but most in week three next week, uh, the input embeddings, positional encoding, uh, then the
+encoder and decoder stacks.
+But typically these days you only have a decoder stack and then the output layer and how these layers
+come together.
+And then a little simple explanation of self-attention and the benefits down here.
+And so for the people that want to get a bit deeper on Transformers, now is your moment.
+You've got a Gradio UI.
+You can keep asking follow up questions, although there's no conversation here.
+It's not going to know what you said before.
+You can just add in more and more question in here.
+Press submit every time to learn about the transformer whilst playing with a nice Gradio user interface.
+Okay, but one thing we could potentially improve is that you may have noticed that it paused for a
+while, and then it suddenly appeared.
+And you're familiar now with this idea of streaming that we did back in week one, where we gather the
+results as they come back from GPT, and we can just simply rewrite that, that, that function that
+we had to call GPT, and we can make a new version of it called stream GPT, which is going to stream
+back results.
+Now, the way that it works is that you use something called a generator with gradio.
+If you provide a callback function, which is a generator, a special type of function, Gradio automatically
+says, I'm going to repeatedly iterate over this and display the results as they come.
+And it's as simple as that.
+You make a callback via a generator.
+Gradio will figure out how to constantly refresh with the latest it expects you to iterate with the
+bigger and bigger, not with the individual chunks, but with the whole amount that should be returned
+back.
+So if you're not confident with generators, if you're new to the yield keyword, then do look at the
+guides.
+I do explain it well there.
+You could also just sort of get intuition and just just figure it out.
+But it might be better to look through the guides and get tight on, on generators.
+Uh, but uh, but here we have a stream, GPT.
+We're also getting the system message and the prompt we call OpenAI create.
+But you may remember there's this extra argument stream equals true.
+And when we do that, what comes back isn't a response, it's a stream.
+And we can then say for chunk in stream.
+And this is do you remember this chunk .0. delta content.
+And yeah, we just add that into results.
+So that result is a kind of cumulative all of the text that's come so far.
+And that's what we yield at each point.
+So this is a generator that you can iterate over that will come up with all of the responses from GPT.
+And now this is our actual Gradio code.
+It's exactly the same as before.
+I think I don't think there's any change at all.
+Well of course there's this one tiny change.
+We just switched the callback from calling back, uh, just just the version that doesn't have streaming
+to the version that does have streaming.
+But Gradio figures everything out for itself.
+It figures out that that returns a generator or is a generator, and as a result, it iterates to display.
+Let's see how it looks.
+Okay, I've run it.
+Here we go.
+We've got our questions again.
+Uh, we've got the layperson and the the, uh, aspiring AI engineer.
+Let's go with the more complicated one, the aspiring AI engineer and press submit.
+And what we should find and we do indeed, is that streaming back comes the result streaming faster
+than I can scroll.
+Uh, but then we've got as before.
+We've got nicely formatted, nicely laid out explanation.
+It's, uh, talks about transformers that they are parallelizable uh, with, and they can handle long
+range dependencies and they're versatile.
+The again, it gives you the different layers, the, uh encoder and decoder stacks and then the self-attention,
+the attention mechanism that is at the heart of it.
+Uh, and you can read a little bit more about that.
+And I'm doing this.
+Of course, I have a dual purpose here.
+I want you to get a bit more insight each time into what a what a transformer architecture actually
+is.
+Uh, and look at all this.
+Lots of lots of stuff about it.
+Um, okay.
+And so that was streaming back from GPT.
+So easy.
+And now I have something called Stream Claude.
+Only for people that have anthropic key.
+If you have something else, then use that.
+You can make the stream a llama if you have a llama, of course, but you do have a llama.
+Uh, and I'm just using the same chat completions, the same OpenAI library as always.
+So it's anthropic completions.
+We will use Claude Sonnet 45 if you want a cheaper one, use haiku that we use yesterday.
+Stream equals true.
+It's exactly the same.
+And we have exactly the same code here.
+But we're calling Stream Claude instead.
+And we're giving the title Claude.
+And here it is.
+Answer a message for Claude 4.5.
+And, uh, we'll should we go with the layperson one.
+Let's see.
+Uh, hopefully it's gone out and back it comes streaming and we get a different answer.
+I think I prefer for the layperson one, I prefer the one from anthropic because it's not as sort of
+simplistic.
+It's got sort of like the attention mechanism.
+The star of the show.
+It's it's nice and well explained.
+So.
+So I quite like Claude's layperson version.
+Uh, so that is showing you the how easy it is to switch in a different callback and use anthropic instead
+of GPT for answering our questions.
+--- Lecture 5 ---
+Okay, now I'm gonna get a little bit.
+Fancy that again.
+You don't need to follow all of this if you don't wish to, but I just want to show you.
+Look at.
+Look at this.
+So I've made another callback, but this one is quite a sneaky one.
+It takes a prompt, but it also takes a model, which it's expecting to be either the word GPT or the
+word Claude.
+And obviously software engineers and you will say we should use enumerations for this, blah blah,
+blah.
+I know just keeping it nice and simple example.
+Uh, so, uh, if GPT is passed in, then we will call that we will we will get that stream GPT this
+this here is actually just just collecting that generator and putting it in results.
+If Claude is returning, we will get the generator called Stream Claude for that prompt and put it in
+results.
+Otherwise we'll throw an error.
+And then this command yield from this is the same.
+It's identical to saying for chunk in result yield chunk.
+Exactly the same thing as a shortcut to that is just to say yield from results.
+That's just a nice Python trick.
+Does the same thing.
+It iterates through results and yields each one of them.
+Uh, so that is stream model.
+It's something that can stream from either GPT or Claude.
+Why do I show you this?
+Because check out this next one.
+Uh, this time I have my message input exactly as before.
+Enter a message for the LM.
+And then I have another field here called model selector.
+And it has a it's a drop down.
+You can imagine what that is.
+It has two possible values GPT or Claude.
+And of course it has to match the text here, which is a bit why you should really use enumerations.
+Um, it's either GPT or Claude.
+The label is selector model the default.
+It will begin as GPT.
+And then there's a response here.
+And then, uh, for my, my, uh, actually creating my interface stream model is the callback that
+I'm giving Gradio that it can call back when it wants to.
+The title will be Llms.
+There'll be two inputs this time the message input and the model selector one output.
+When I give examples I'm going to give examples.
+Again you have to give list of lists like this.
+for each one with the with the two inputs that should be set.
+All right.
+There's a lot to take on there, but let me run it and let's see what we get.
+Okay.
+So now we have something which which this user interface has a message and it has this drop down.
+You see I can choose different models.
+Uh, and uh, down here I have some examples.
+So I can, I can go with uh, either the GPT giving the layperson.
+Let's see Claude with selecting Claude.
+And we want the transformer architecture explanation to an aspiring AI engineer.
+And I press submit.
+And of course, it's now going to select Claude.
+It's streaming back from Claude.
+Uh, wow.
+We've got some equations in here as well.
+Let's, uh, we've got the, uh, the softmax, uh, part.
+Um, so this is, uh, this is pretty cool.
+We've just written something that, like routes to different models based on your selection right here.
+Uh, and that's, that's quite a lot of functionality packed into this user interface.
+So you can imagine all the different directions.
+You can take this, and you should now come in and add different models in here.
+I mean, we covered so many yesterday, but you could of course have different different llama variants.
+You can have different models via llama.
+You can have deep sea, you can have Gemma, you can have Fei or Kwan and have them all in here and
+try them out and and take that opportunity.
+Why not to ask some of our favorite questions about the transformer architecture as a way to also build
+a little bit of foundational knowledge about Transformers?
+Okay, uh, it's now time for us to to revisit the brochure and put that into our UI.
+And I actually suggest here, perhaps before we do this together, you could always pause the video
+and do it yourself because it is quite easy.
+Um, but, uh, anyways, I will I will show you, uh, I'm just going to do a simple brochure, not
+the one we did last week where it goes and gets the links and gets everything deeply.
+Just one based on a quick fetch.
+More like a web summarizer.
+So, uh, I'm going to import that same thing.
+Fetch website contents from from scraper dot pi that I've got a duplicate in this folder and the other
+folder.
+Uh, and then um, I'm again, I'm being super hacky here.
+I'm just going to override this overwrite the same system message from before taking advantage of the
+fact that this is a global variable in this notebook.
+Not good software engineering practice, but excellent data science experimentation.
+You're an assistant that analyzes the contents of a company website landing page and creates a short
+brochure about the company.
+Respond in markdown without code blocks.
+We will have a stream brochure callback just like before, and we will build our prompt.
+And then we will stream back from Claude or GPT.
+And with that, as simple as that, we can now run.
+We can now create a company brochure generator.
+Uh, UI, here it is.
+You see how quick this was company name?
+I've put in some examples down here.
+We can again do Huggingface Huggingface model.
+Let's try GPT.
+Let's submit.
+We are now getting GPT to give us a example, uh, of um of a company brochure from Hugging Face.
+And again, it hasn't followed the links.
+This is just a simplistic version that's just taking the landing page, but it's still very robust.
+And we can also I've got another example which is imagining that I am a company.
+Look at my web page and we can ask this time we'll have Claude looking at my landing page.
+Submit that.
+And we should now get a nice an innovator at the intersection of AI and human potential.
+It sounds great, I love it.
+Uh, there we have it.
+From anthropic.
+We have just in a matter of minutes, maybe even a matter of seconds.
+Created a user interface to build a brochure on top of, uh, the code that we wrote before.
+And I hope that you I hope that you're wowed by this.
+It is so easy to use.
+And it's I find it so liberating as a data scientist, as someone that likes to work mostly in the back
+end, that I can quickly turn out great demos, great MVPs like this, just with a few lines of code.
+And of course, for some exercises you can do to this, you can beef this up to actually use the Lynx
+approach that we did in week one where it goes off.
+Gets the links, builds out a more robust brochure.
+That would be cool.
+You can use share equals true if you've got that ability in your environment to to go off and and and
+use that and share it.
+You can add in auth so easily.
+So it has a user ID and password.
+Uh and, and you can just take it in a different direction, give it different business functionality.
+You've discovered how easy it is to build a UI for a commercial purpose.
+I'd also suggest check out the Gradio resources.
+It's got super docs that are really well explained and it's so quick to get up and running.
+So so you should do that.
+Build some things.
+If you build something new with Gradio then put it in community contributions.
+Send me a PR, you'll see how many there are in here.
+Look, there's so much there's so many different things here.
+People have built great stuff.
+Add in yours.
+Show me what you got.
+Use a llama for some extra models.
+Whatever.
+Whatever interests you.
+Take this as an opportunity to experiment and build again.
+The best way to learn is by building.
+So do that, make some UIs and also post about it on LinkedIn so I can weigh in and I will see you back
+for the wrap up.
+So I said it before this.
+This journey is all about leveling up, leveling up, leveling up.
+As you build different skills and you've just leveled up, you've just built the ability to quickly
+hammer out UIs.
+And hopefully the idea of the callback is coming together for you.
+Or you might know all that stuff already, but anyway, at this point you can confidently use the OpenAI
+API streaming markdown, JSON, you can use a bunch of frontier models and you now know how to build
+UIs tomorrow.
+You probably noticed the limitation of this UI is that it doesn't have any conversation history.
+We just said a single message.
+Tomorrow we turn this into a chat UI where we can have an ongoing conversation.
+We'll be able to provide context.
+We're going to also look at Multi-shot, prompting a super common approach, and you're going to build
+your first customer support AI assistant.
+If the summarization we did in week one is one of the the major use cases, this is perhaps even bigger.
+This is the absolute primary use case.
+We're going to do it together tomorrow.
+See you then.

@@ -1,0 +1,542 @@
+--- Lecture 1 ---
+Well, it's about to get real.
+Everybody, welcome to week three.
+Day three.
+This is where we dig in.
+You're already confidently coding with frontier models, building AI assistants and using the pipelines
+in hugging face.
+Remember them, create a pipeline and then call it as often as you like with different inputs.
+But now we're going to actually run the code that runs anyway when you create a pipeline.
+But we're going to go and do it ourselves, and we're going to start by looking at these things called
+tokenizers.
+Tokenizers the things that translate between text and numbers for that a model.
+They are mathematical things.
+They deal with numbers, not words.
+And understanding the special tokens and the way that chat templates work, it's a big deal.
+And so to introduce the tokenizer.
+So the tokenizers are a bit of code that maps between natural language and numbers, that represents
+that natural language, and that's its job.
+And to be clear, there are actually two steps to this job.
+And this is something which causes some confusion.
+There's a bit of a terminology glitch here that a lot of people get slightly wrong, including myself,
+and it doesn't.
+It doesn't really matter.
+But people use these terms loosely sometimes.
+But to be to be strict, the stuff you begin with is natural language.
+It's words and letters that make up a sentence.
+That's your starting point.
+A tokenizer first turns this into a bunch of things called tokens, which are these little chunks of
+words?
+Very much like when we did this in week one in the user interface, we saw this colored in chunks.
+Each of those is a token.
+A token is a block of letters together that makes up a part of a word, or it can be a whole word,
+or sometimes it can be two words, but that is a token.
+And then a tokenizer turns that into a number.
+Every token, every possible token has a different number associated with it.
+So the word and I think we saw had a number 300, something I've forgotten with, with GPT.
+Uh, so, so uh, each, each of the possible tokens is mapped to a number which is sometimes called
+the token ID, and that is like its index in its list of all possible tokens.
+And so to be strict, there are these there are these two different terms token and token ID.
+The token is the fragment of word.
+The token ID is the number that represents that.
+People often say token when they mean token ID and it doesn't really matter.
+But but strictly speaking the token is the chunk, the ID is the number.
+And so the tokenizer has a dictionary.
+And I mean that both in the Python sense.
+But also just like in the normal sense, it's got like a lookup thing which has a list of all the possible
+tokens that it knows about, and an ID associated with each one that it will it will use to look up
+a chunk and replace it with its ID.
+And that dictionary contains that that vocab, all the possible things that it can that can break things
+down into all the possible tokens.
+And it also contains a few special tokens that don't map to any natural language word, special tokens
+that are going to be used to inform the model about something.
+An example special token.
+There is one that represents.
+This is the beginning of a prompt.
+This is the start of what I want to tell you.
+That's a special token.
+And so that that is something that has its own number.
+Like let's say it's the number ten.
+Then the number ten will be used in the numbers we pass into the LM anytime we want to represent.
+This is the start of a prompt.
+We're going to put in the number ten in there.
+And that's how it will know.
+This is the start of a prompt.
+And let me be super clear, just in case you've got any confusion on this point, when I say that the
+LM is going to know that ten is the start of a prompt or something, I'm not suggesting that there's
+something in the neural network where we've configured it so that the number ten means the start of
+the prompt, or that there's anything inherent in the transformer architecture that's expecting special
+tokens.
+All I'm telling you is that we reserved the number ten for this purpose.
+And in all the training data, the masses and masses of training data.
+We repeatedly use the number ten at the start of every single prompt, and because we always did that,
+the neural network learned over time from all the examples that that that that is an indication that
+what's coming next is the beginning.
+And it got better and better at predicting next tokens when it saw similar kinds of constructs.
+So it's the same as like the old fashioned models that predict someone's credit rating based on a few
+factors.
+You're giving it information, and by giving it enough examples, over time, it learns how to weigh
+up these different factors to to predict someone's credit rating.
+Well, obviously this is the same thing, but but many, many orders of magnitude bigger.
+And given enough examples, with the number ten always starting a new prompt, it has seen those patterns
+and it replicates those patterns.
+And so starting a prompt with the number ten with that token ID, uh, orients the statistics correctly
+so that it predicts patterns better.
+That's the point.
+I hope that made some sense to you because it's really important.
+We will come back to it a few times, but this idea that special tokens, they're only useful because
+we've done it that way in all the training data.
+That's the point of them now, different Llms don't need to use the same approach for tokenizing, for
+turning text into token IDs.
+In fact, they typically don't.
+Typically when when someone's building a model, they build the tokenizer that they think makes the
+most sense, that treats words, that turns them into IDs in the way that they like, and uses special
+tokens in the way that they want to for training.
+And so you have potentially a different tokenizer for every model that you work with.
+Um, meta led the way for open source llms with the llama model, and there's a llama tokenizer, Microsoft
+is fi.
+We'll look at its tokenizer.
+Deep seek has a tokenizer.
+We'll use its one deep seek is now on deep seek 3.2 for me.
+But that's still an experimental model.
+So we'll stick with Deep seek 3.1 And then we'll look at a coda tokenizer for Quinn 2.5 coda.
+And so we will play with these different tokenizers in a second.
+And the important thing to keep in mind is that a model has its own tokenizer.
+There's no reason why a particular model needs to use the same tokenizer as another model.
+It's just part of how they decided to map words to numbers for the purposes of that model, and to to
+just cover two typical questions people have.
+One of them is that, uh, people ask, okay, so does it matter?
+Is one model more efficient because it's able to use fewer tokens for the same sentence, so it's cheaper?
+It's honestly not worth worrying about anything like that.
+These decisions are very small, trivial decisions that people made to try and get a bit more juice
+out of their model.
+If one tokenizer makes fewer tokens, then maybe you're saving like a fraction of a cent in terms of
+your your input token use.
+But maybe the model gives slightly worse results or slightly better results.
+You know, that's a much more important factor is the quality of the results.
+Given the input you give it, rather than exactly how many tokens it maps to and how that works.
+That's something of a red herring, so you don't want to get too bogged down in why different tokenizers
+produce different numbers of tokens.
+It's more just important to understand that a tokenizer belongs to a model without getting hung up on
+on the kinds of tokens it creates.
+And then the final point that is a confusion to some people that have already heard about vectors.
+Vectors is an important property of llms and we will come back to vectors a lot.
+And tokens are not the same as vectors, and vectors come from deeper within the neural network after
+the tokens have been what's called embedded into a model.
+And so for those that know about these vectors, just just keep in mind that that all models, including
+models that that create vectors, take in tokens as their inputs.
+Because statistical models can only talk in numbers, they don't they don't know what it means to have
+a word.
+So that you have to input something in the form of numbers.
+And the numbers that we choose are the token IDs.
+That's how we first feed information into a model.
+What comes out might be a vector embedding.
+It might be the next token.
+It might be lots of different things we might get out of it.
+What comes in is token IDs for all models.
+And so tokenization is like a step before you get to things like vectors that we will cover later.
+So just in case that was confusing you just to clear that up okay.
+And with that we're going to go to Google Colab again.
+And this time I'm not going to get a cursor and say it's in the week three day three, because you know
+that now you know where to go.
+You know how to bring it up.
+You're not going to ask me.
+So we'll go straight to Colab.
+And remember, we're looking at the deeper, grittier way of interacting with hugging face.
+And the real power of it is about using models, which we're going to do tomorrow.
+What we're doing today is like a prequel.
+It is the the Tokenizers, which is setting the stage for what we do tomorrow.
+But let's go now and work with some tokenizers.
+--- Lecture 2 ---
+Okay, so here we are in Colab, the week three day three Colab.
+I want to start by saying that that by the way, today's lab is going to be basically something you
+could run on your own computer if you wish.
+We're not really going to use any colab features, and it doesn't need to run on a T4 GPU.
+You could run it on a CPU box in Colab if you want, but I'm just going to stick on the T4.
+Keep it consistent with the other days just so that we're not not changing things, but but bear that
+in mind.
+So you brought up this colab.
+You might as well connect to a T4.
+I'm going to remember to view resources.
+So you see what's going on.
+Let's make that a bit smaller.
+And also remember to go to the key button and turn allow notebook access for your hugging face token.
+If you don't, it will prompt you and say do you want to at the right point.
+Remember the pro tips.
+Don't worry about warnings.
+They come up all the time.
+And remember, if you get some kind of Cuda error that you won't get today because we're not going to
+do it.
+But remember that for the future, you just have to start again with everything.
+All right.
+So we're going to start with some imports.
+And we're going to do our logging in to hugging face and checking that we've got a Google Colab, uh,
+GPU.
+Uh, not that you need one, but but if you're doing things by the book, uh, and we do and it has
+15GB.
+Excellent.
+Okay.
+Next up is a little process to go through, which is like a super common thing that people go through
+as AI engineers.
+And it's called accepting terms of service with a model provider.
+And here's the scoop using llama 3.1 llama, which is Meta's open source model.
+A confusingly, O llama was named sort of an homage paying homage to llama, but that's why the names
+are confusing.
+But Llama is Mata's model.
+Llama 3.1 is what we're going to use, even though that's like more than a year old now, it's still
+for this particular size for like a 8 billion parameter model.
+This is a great one that a lot of people use.
+It's something of an industry standard, so I want to keep using it because you'll come across it a
+lot.
+But in order to use it, you need to agree to metas terms of service, which sort of says, look, I'm
+not going to use this for for nefarious purposes, things like that.
+And the way you do that is you have to visit their model page in Hugging Face.
+So you click this link up, it comes click on here.
+Here we have the model page.
+This is the Meta Llama Llama 3.1 page for meta.
+And if you look up here it says gated model, which means that you're not allowed access until meta
+approves you.
+You have been granted access because I have.
+You will not have been yet unless you've done this before, in which case what you will see here is
+instead a little form to agree to metas terms of service.
+And here's the thing, though there is a little tiny process to go through.
+It's going to ask you for your email address, which they want to have on record again, to make sure
+that you're not using it for bad purposes.
+And there's a trick, which is that when you give your email address, you need to make sure that it
+matches the email address associated with your hugging face account.
+Otherwise, I believe that that causes extra review, extra process.
+So if you want to make sure that there's that this is just going to be easy peasy, then try and use
+the same email address.
+The other thing is that it will ask you for your organization affiliation at some point.
+What what what what company associated with.
+And my recommendation, of course, you should do whatever, whatever you want to do for this, but
+I recommend that you think of what we're doing right here as being an educational endeavor, which it
+is.
+And I would suggest that you put down there something like, for me, I put down like Ed Donna, personal
+Education.
+And that was what I called my affiliation, because meta is using this as a way of checking that you
+don't actually work for a competitor of theirs, and you're not trying to build something which will
+then end up taking stuff away from them or something like that, using it again, maybe for nefarious
+purposes.
+And so giving them something that is a company that they have to research is something which could slow
+down the process.
+So I suggest making it clear that you're using this for personal education purposes.
+Include your role as like AI developer, AI researcher, AI experimenter, whatever you want.
+Something like that.
+Um, be sure that you're communicating to meta that you're using this for educational purposes and that's,
+you know, make make sure that you don't give them some information.
+That means they think, oh, goodness, we've got to do some some more review on this.
+So in my experience, when you do this, uh, one of three things happens.
+You either get approved within a matter of minutes or even seconds.
+The first time I did this, I refreshed my screen.
+It was late Saturday night.
+Uh, like in the middle of the night in England.
+The first time I did this.
+And it was approved almost immediately.
+And so I imagine it's somewhat algorithmic if you fall into various, uh, basic parameters.
+Uh, I've heard of people where it's taken a day or two before they get approved.
+And then I've heard of some people where it's taken several weeks, and I imagine the day or two is
+if it needs just a quick human eyeball.
+And the several weeks is if something that you answered doesn't map to their to what they're expecting.
+And so it needs a deeper review.
+So try and avoid being in that category.
+Do it the simple way if it happens to you.
+I've put together a troubleshooting sheet that walks you through the different, uh, different steps
+that you might have.
+And at the bottom of it, here are some other tools and tips for how you can make sure.
+And I say that thing about putting your name personal education right there.
+And at the end of the day, if you're not able to get approval by with Lama it really doesn't matter.
+The other models we'll look at, many of them don't need approvals at all.
+I don't think deep seek does.
+I don't think Quen does.
+Quen I know doesn't.
+And they are they are great.
+These are great models.
+You can use them instead of Lama throughout the entire course.
+You might even get better results.
+So I focus on Lama because it's so common in industry.
+I think it's good to give you the visibility to models you may well use on on the job, but you really
+don't need it.
+Um, and if you have have any problems at all, just use Quen instead.
+And so hopefully you got approved for Lama 3.1 immediately.
+If not, just watch me instead.
+Uh, and what we're going to do now is create our first tokenizer.
+We do that using a hugging face class called auto tokenizer, which has this one static class.
+This class method Frompretrained, which, uh, takes in a name of a model from hugging face.
+So the hugging face model names.
+It starts with the hugging face ID, which is the meta llama that is Meta's name of the Meta Llama account,
+and then the name of the model itself, meta llama 3.18 B.
+So you pass that in from pre-trained means.
+This is a pre-trained model.
+I want you hugging face to look this up.
+And auto tokenizer means please create the right kind of tokenizer for this model and return it into
+this variable tokenizer.
+So I will do that.
+You can see I already ran it, so it ran fast for you.
+It probably takes like 20s or something.
+All right.
+So now I'm going to take some text.
+I'm excited to show Tokenizers in action to my LLM engineers.
+And I call tokenizer of that text.
+And that encode is one of the, the main, uh, things, the methods you can call on a tokenizer turns
+the text into tokens, and then I will print them.
+Or to be pedantic, it is actually turning text into tokens.
+It's turning text into token IDs.
+But but again I'm being sloppy.
+And people often I say tokens when you're really, strictly speaking, mean token IDs.
+And here they are, because the tokens are just the word fragments.
+Uh, here are the token IDs.
+There they are.
+Uh, you can see there's a bunch of them.
+Uh, let's see how many there are.
+So in that sentence, there were 61 characters that consisted of 12 words, and there are 15 tokens.
+Seems roughly in line with that rule of thumb.
+You remember the rule of thumb.
+Rule of thumb is it's about about 0.75, uh, of a word to a token.
+On on on average.
+So there you have it.
+These are the tokens.
+These are the numbers.
+These numbers like this make sense to an LLM.
+It's expecting it's been trained off lots of numbers like that.
+It wouldn't you couldn't put that text into a statistical model.
+A weighted thing with lots of parameters that combines numbers.
+It needs numbers.
+You need numbers to combine numbers.
+And here are the numbers that it would expect to receive.
+And so I said encode is one of the key methods on a tokenizer.
+The other one is decode.
+So if we have a bunch of tokens or really token IDs, we can decode them.
+And what we will get back is this.
+Well that's interesting isn't it?
+It's not exactly the same as what we started with because it's got this funky thing at the beginning
+of it.
+What is that?
+Well, of course, as you probably guessed, that is a special token getting decoded.
+What happened is, when we turned this into token IDs, we got this massive great token ID at the beginning
+of it, which is not the I.
+I do believe that 40 is I.
+This huge number here, 128,000, which I think is actually the maximum, I think that is the number
+of tokens there.
+We'll check that in a second.
+Um, that is mapping to this special token begin of text.
+And it's like I told you, that is a special token which tells the LLM, hey, this is the start of
+some text to you.
+And it's not like like I say, nothing special in the in the neural network architecture.
+It's just that that's how we did all the training data.
+So the pattern matching that happens within it expects that kind of pattern.
+Okay.
+And then one final thing to show you is tokenizer batch decode.
+Batch decode is a bit different to decode.
+How is it different.
+Well because it just gives you instead of giving you the whole sentence like this, it turns it into
+the individual tokens.
+I am excited to show Tokenizers in action to my engineers are are.
+And that's showing you the individual token breakdown.
+And notice that space on the front.
+Do you remember that from week one that is showing you that some of these tokens have like a beginning
+of word meaning ascribed to them, whereas this LLM here did not.
+That was just a token showing a fragment of a word containing LLM.
+So that is encoding and decoding with Tokenizers.
+--- Lecture 3 ---
+And there's another method we can call get added vocab.
+And this gives you a list of all of these special tokens that are in its vocab.
+There's all of this, uh, there's like this begin of text that we saw.
+So so I was I it does go beyond one 28,000.
+It comes I think I think this is really the limit down here.
+Uh, it, uh, there we go.
+I think that might be the biggest number.
+The, uh.
+Um, so get, uh, we see there's a begin of text, special token, there's end of text, and then there's
+lots of reserved things.
+There's a header, uh, all this stuff that's a special vocab built into the vocab associated with the
+tokenizer.
+And in fact, the tokenizer has a field vocab which gives you its dictionary of everything, which is
+big.
+So I'm not gonna I'm not gonna print it, but I will get the length of it so we can see actually how
+many things does it have.
+And that's right, it has 128,256, because there are the 256 extra special ones shoved in at the end
+of the 128,000.
+That is the total size of llamas.
+Tokenizer.
+All right.
+Now taking this one step further, this this llama model we've been looking at is an example of something
+called a base model.
+You remember that I mentioned way, way back that there are like base models and chat models and reasoning
+models.
+And this is a base model, which means it's not been it doesn't expect things like system prompts and
+user prompts.
+It's not have that in its training data.
+It's there as like a fairly blank canvas.
+It's a lot of training data, so it's not very blank, but but blanker than some other canvases.
+It's ready for you to take it in a different direction if you wish.
+There's a there's a variant of these models that are known as the the chat variants.
+They're also sometimes called the instruct variants.
+And these are ones that have been specifically trained more with system prompts, user prompts, assistant
+responses, the kinds of backwards and forwards that we've have been playing with for the last couple
+of weeks, those are known as the chat or instruct models.
+And in fact, it is common in hugging face to refer to them with the word instruct rather than chat.
+Although you do see both.
+The instruct variants are the ones that have been specifically fine tuned to expect these series of
+of prompts, and the kind people at Hugging Face have written a special utility called Apply Chat Template
+and Apply chat template will take a an input in the form of the list of dictionaries that we know and
+love from using OpenAI's API, and it will convert that into a set of special tokens and texts that
+would be suitable for a prompt.
+Now, you might be wondering.
+You might be thinking, wait, wait wait, what?
+What is that doing?
+And I'm going to it's going to land for you in just a second when I show it to you.
+So first of all, let's get ourselves a tokenizer, but not the one we did before, which looked like
+that.
+But this time we're adding hyphen instruct to the end of it, which means we want the instruct variant,
+and that has a different tokenizer than the base model.
+Okay.
+So now we're getting this different tokenizer.
+It's loading.
+And it's different because it has more special tokens in there.
+And let's see them.
+So we're going to come up with a messages uh thing which is using the OpenAI format that we know a list
+of dictionaries, roles, system content.
+You're a helpful assistant role user content tell a lighthearted joke for a room of data scientists.
+There we go.
+A nice example set of prompts to a model, and I'm going to call tokenizer dot apply chat template,
+which is a way that you can say I'm going to pass in a list of dicts.
+And I want you to turn this into the right kind of thing that could be put into a model.
+Let me run that and let me show you what you see.
+We see this begin of text thing here.
+Start header ID system end header ID.
+It's actually inserted something in here knowledge cutoff date.
+And today's date which is a different but also a long time in the past.
+But it's for this particular chat template.
+You are a helpful assistant that came from here.
+And then this special token EOT and then start header user end header.
+Lots of stuff happening here and then assistant.
+Yeah and look at this ending here.
+Then start head ID assistant end header ID.
+What is going on here.
+So this is the moment for you to have like this eureka moment which you may you may already know this,
+but but if not, then you're going to have a eureka moment.
+Uh, I have been giving you this, this idea for the last couple of weeks that this OpenAI format is
+somehow like part of what an LLM expects, like the data science model is looking to have this, this
+kind of list of messages passed in as if like the deep neural network, the transformer architecture
+has like a sort of maybe a section for the system prompt and a section for the user prompt, and they
+get passed in in various ways.
+But that is of course not the way it works.
+And LLM is a data science model.
+It takes a sequence of numbers and it predicts the most likely next number.
+It just deals in a set of numbers.
+It doesn't take multiple sets of numbers.
+It certainly doesn't take JSON.
+It's not something that is like software.
+It's a data science model.
+Uh, and so there is this moment when you realize what's actually happening here.
+What's actually happening is that when you type in, when you create this list of dicts and all the
+rest of it, that gets converted into something which has a sequence, a series of words with special
+tokens slotted in to say like, this is the start of a system prompt.
+This is an end of a system prompt.
+This is the start of a user prompt.
+This is the end.
+This is the start of the assistance response.
+And that is what this thing is right at the end here.
+And what the model is going to do.
+It's going to predict whatever comes next.
+And it's just going to feel obliged to predict something that seems consistent with an assistance Students
+response to everything that came before it.
+And the reason it's obliged to do that, the reason that it knows what these special tokens mean, is
+not because of anything built into the neural network.
+But again, it's just because the training data looked that way.
+Tons and tons of training data was built with these special tokens in there with user message assistant
+response, user message assistant response.
+And so it's seen so many examples that statistically, it's likely to predict tokens that are consistent
+with an assistance response.
+That's all there is to it.
+And hopefully that is the final piece of the puzzle, which for you is like, right, I get it now.
+There's nothing special about user prompts and system prompts and all the rest of it.
+It's just that they're identified with special tokens.
+And there was tons of that in the training data.
+So the pattern matching that is an LLM is used to seeing those patterns.
+And so the tokens it generates are consistent with our objective of getting an assistant response.
+That is it.
+--- Lecture 4 ---
+And we will continue our exploration of Tokenizers by looking at a few others we're going to look at
+five for from Microsoft Deep SEQ, 3.1 from Chinese upstart deep Sky and encoder 2.5 from Alibaba Cloud.
+So I will load in those variables.
+As always, it's the hugging face username Microsoft followed by the name of their model five for mini
+instruct.
+So it's an Instruct variant and then we will take some text.
+I am curiously excited to show hugging Face Tokenizers in action to my LLM engineers.
+Let's turn that into tokens or really token IDs and then decode them.
+And we'll do it for Lama and then for five four.
+So for Lama you can see here there's like a beginner text token.
+And then I am curiously excited to show her hugging face.
+Tokenizers.
+And if you look down here, what you'll notice we're looking at the five four version.
+So the numbers are completely different.
+That's the first thing to notice, just different IDs.
+It's been trained with different numbers and that doesn't matter at all.
+So whatever numbers it's been trained with have to be consistent.
+And it doesn't start with a special token.
+So they've got a different approach, a different structure.
+They've experimented, they've decided this suits their model better.
+And you'll also notice that mostly the words matter the same way.
+Except look at that hugging face when it came to llamas.
+Tokenizer was hugging face, but when it came to Phi four it was hugging face.
+So different.
+Different tokenizers slightly different behavior.
+And it's just worth appreciating that they're different but not worrying about it.
+Uh, and uh, this is showing the apply chat template.
+Uh llama we get these beginner text start header.
+You'll notice llama has something that they also insert in there.
+Uh but then and then there's these these headers.
+The five for one is quite a lot simpler.
+It has system end user and assistant.
+And then the response.
+So that's the difference between them.
+The apply chat templates look completely different.
+And all that matters is that this was used consistently during training okay.
+And now we look at deep six tokenizer.
+Um and so what I've got here is just showing side by side llamas tokens.
+And this is five four tokens.
+And this is deep six tokens for the same sentence.
+Just to illustrate again the numbers are completely different.
+Different vocab different IDs.
+All that matters is the consistency with the training data.
+Again if you look at deep six chat template it looks totally different.
+It has a special token for beginning of sentence and then user and then assistant.
+And the assistant prompt is just comes at the front of the whole thing.
+That's how it's organized.
+For deep seek you can see these subtle differences between them.
+And then the final one I'm going to show you is a tokenizer for code.
+So this here is the tokenizer for for um Quinn coder.
+And so we bring in the tokenizer I've got some code as def hello world person print.
+Hello, person.
+Uh, a very complicated Python program there.
+And we are going to then tokenize it and then just print out separately the, uh, the results.
+Here you go.
+You see, what I've done here is I've put the name of a token and then what words it represents.
+And you can see that, uh, for example, underscore world is something that maps to some token.
+And yeah, you can see that there are some constructs like, uh, close brackets.
+Colon gets one token.
+So and that seems to be quite, quite an early up token.
+And I haven't done a deep analysis on this, but I rather imagine that there are much more common tokens
+in this tokenizer that are related to common coding constructs than there might be in a tokenizer that's
+not designed for a coding model.
+So they might have optimized their tokens to make sure that they can get the most meaning associated
+with the token in the way that they tokenize.
+So just worth understanding that the tokenizer is associated with the model.
+Different models might have a different strategy for how you convert natural language into these token
+IDs, because its token IDs that models understand the numbers.
+It's not like language or even lists of dicts get passed in to these models.
+So today was a bit of a gentle day.
+We just got through that pretty quickly, but I will make up for it tomorrow.
+Tomorrow will not be gentle, but what you can do now, you can code with frontier models.
+You can build a multi-modal AI assistant.
+But importantly, not only can you use hugging face pipelines, but you now know about Tokenizers and
+how they turn language into numbers, words into numbers, and fragments of words into numbers.
+Next time we then dig into hugging face.
+We use the models.
+We use hugging face models to generate some text, and it's basically doing the same thing as we did
+with the pipelines.
+But now we are actually driving the model inference ourselves, which is really fun.
+And there's other stuff for me to show you tomorrow.
+So, so prepare for a big day and I will see you on the other side.

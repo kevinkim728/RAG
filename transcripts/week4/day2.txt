@@ -1,0 +1,675 @@
+--- Lecture 1 ---
+It is week for day two and we're getting straight into it already.
+You know how to code with frontier models.
+You know how to build solutions with hugging face and you know how to compare different benchmarks.
+You know about the good parts and the bad parts.
+Today you're gonna know how to navigate different leaderboards.
+I am such a fan of leaderboards.
+In fact, when I was interviewed by my great friend John Crone on the Data Science podcast, he he described
+me as a leader boar because of how much I go on about leaderboards.
+And that is what we're gonna do today.
+Uh, and I'm going to give you real world use cases of LM solving commercial problems quickly as well.
+And then we'll go through how you choose the right LM for your project.
+Let's get started.
+So I'm going to start by walking you through five different leaderboards.
+I'll talk about what they all are.
+And then we're going to go and check them out and look at some of them.
+These change from time to time, but as of now and these pretty much for a while now, these are the
+frontrunners when it comes to understanding the different performance of different models out there,
+the first of them is called artificial analysis.
+It's a West Coast AI company that runs this leaderboard, and it is unbelievably good.
+It's unbelievably good.
+It has it's so clear and it has such, such great way of dimensioning how you think about what makes
+LMS good and bad across many things like intelligence and cost and speed, and you're going to be blown
+away if you haven't seen it before, it's great.
+You should bookmark it or commit it to memory.
+Whatever artificial analysis that is where it is, is a nice New York based AI company that has a nice
+leaderboard, that has a bunch of good features for comparing different LMS.
+But what's particularly useful is it has one place where you can see the API cost and context window
+side by side for all major providers, which is super useful.
+So I look at vellum all the time.
+I should probably mention about a month ago, the CEO of vellum contacted me on LinkedIn and said,
+I hear you talk about our leaderboard on your course, which was cool.
+Uh, so thank you.
+And yes, I do.
+It is a good leaderboard.
+And he also did say, by the way, you know, we're better known for having a whole product, uh, that
+runs AI and allows engineers to build it into production and have lots of good stuff there.
+So while looking at the leaderboard, check out their main product offering at vellum and then Scale
+Comm.
+Obviously, they're a very well known popular AI startup and now now company partly owned by meta,
+and they have a set of leaderboards called the seal leaderboards that are expert, very specialized
+leaderboards that we will enjoy looking at in a minute hugging face.
+Of course, they have their own set of leaderboards.
+They're all hugging face spaces.
+They used to be the go to leaderboard.
+The hugging face open leaderboard was where everyone used to go, but they've stopped updating it and
+for various reasons, possibly because people were gaming it too much.
+So no longer is that the one to go to, but they have lots of others.
+And so we'll take a quick, quick browse through some of them.
+And then the last one I'm going to mention is called Live Bench.
+It's a particular leaderboard that focuses on that question about about data set leakage, data set
+contamination.
+And they have a special approach for making sure that they are measuring true raw performance of models,
+and they are not susceptible to this contamination issue.
+So those are five great leaderboards.
+I think we should go and take a look at them now.
+It's generally never a good idea to pick favorites, but it's never stopped me before.
+My favorite leaderboard.
+My favorite leaderboard is Artificial Analysis II.
+Here it is.
+This is the leaderboard.
+And the first time I heard about this, when it only just created it was a student that reached out
+to me and said, have you seen this new leaderboard?
+Uh, and uh, yeah, it is absolutely phenomenal.
+I would say it's the most popular one out there.
+Uh, and, uh, this this is a company that independently analyzes LMS, and they have a number of charts
+that ranks them and places where you can dive in and learn about them.
+And there's some charts up at the top here, intelligence, speed and price, the sort of three big
+ones that you want to start with.
+Uh, and then each of them has a sort of breakdown with more detail.
+So we'll go for the more detailed ones, starting with the artificial Intelligence Index.
+It incorporates ten different evaluations.
+You remember we talked about MLU Pro, the difficult version of the uh, massive multitask language.
+Understanding a diamond is the particular one.
+This is the Google proof Q&amp;A Humanities last exam we talked about live code bench.
+Uh, and we talked about Aim, I think.
+And the others are a bunch of other ones that all combined together to this overall score.
+That is how powerful is a particular LM.
+And this is the results as of now.
+But you will have more up to date results.
+There'll be more models since then.
+And so you should go here and shouldn't listen to what I say.
+You should look at what you're seeing.
+But for me right now, the model that scores the highest in this sort of this assembly of different
+metrics, which is sort of weighted towards a genetic coding a bit.
+So it's not a huge surprise that the Codex version of GPT five, which is the one that's particularly
+optimized for a genetic coding, is the one with the highest intelligence score, um, almost equal
+with GPT five high and high.
+There means that it's been asked to to reason with the highest mode set.
+And then comes Mr. Musk's Grok four, which was at the top.
+It was in pole position before GPT five came along.
+And then the new Claude 4.5 sonnet.
+Well, it's new for me.
+Uh, that is a little bit it's I mean, it's still a very, very high score, but it is slightly behind
+the others.
+Then grok four and fast mode and then Gemini 2.5 Pro, which when it came out was in the top position.
+You see how they each get replaced over time.
+And then for one opus, the massive version of the next tier down of Claude, and then remarkably,
+absolutely remarkably, in the next place is the first open source model.
+All the ones that I've mentioned up to now have been have been paid frontier closed source models.
+The first open source model is GPT, opus one R20b, the big version of GPT OSS that I think we just
+saw winning a game of Connect Four, but but only just, uh, and, uh, it it comes in this place and
+it is of course, super fast as well and very cheap.
+And then Quinn three from Alibaba Cloud comes next and then comes uh, upstart Deep Seek.
+Uh V3 point two experimental is the latest version of it.
+Still an experimental prerelease Pre-release.
+For me, it's probably out there for you.
+Or maybe it's already a deep sea V4.
+Who knows?
+Uh, so that is that comes next.
+All right.
+And so those those are the top most intelligent models that perform best across this range of different
+benchmarks.
+And you can keep digging in and look at these to get a really good sense of what are the strongest models
+on the planet.
+And then the next one is a kind of scary thing to look at.
+This is showing you a timeline of how models have performed against these scores, looking back over
+time, looking, uh, looking from from just a back over time.
+I make it sound like it was like decades ago, all the way back to November 2022.
+Uh, and this is based on the same the same intelligence index.
+And you can see how the models have, have grown over time against this index.
+And, you know, like people talk about model performance saturating and coming, coming, slowing down.
+But you look at a diagram like that and I ask you if it looks like there's any signs of things slowing
+down.
+It's quite terrifying.
+It's also very interesting to keep in mind that that a lot of the early gains were due to training time
+techniques.
+A lot of the more recent gains are due to inference time techniques that we've started to see diminishing
+returns from training time.
+And that's why people, people often like, like to sort of talk down the GPT five release because it
+didn't feel from chatting with it like there was a marked change from GPT 4.1.
+And really the difference, the reason why these models are doing so much better comes down a lot to
+the inference time techniques that the reasoning, the tweaking, the prompts, the added tools.
+It's this stuff that's really moving the needle recently and why this line is kept going with this steep
+trajectory.
+If we took out the inference time techniques, I think you'd absolutely see this kind of leveling off.
+--- Lecture 2 ---
+And continuing our exploration of the amazing artificial analysis, we come down to more more detail
+on the intelligence evaluations, and you can see how it performed against each of the metrics individually.
+You can see the terminal bench is like like a hard genetic coding using a terminal.
+There's a bunch of others here.
+Humanity's last exam we will be talking about later.
+You know, that's an amazing one.
+Uh, but already you remember I challenged you to think about what you thought the top models would
+score on.
+Really?
+It started out as being about 2%.
+3%, I think late last year.
+And now the top model GPT five on high is scoring 26.5% on humanity's last exam.
+It's made huge inroads just in the space of a few months, which is terrifying.
+So there we go.
+With HL, you can see Mglu Pro, which was designed to be this much higher.
+Bar models were in the 90% on ML and so they came up with Lou Pro, but already models are at 88%.
+Gee, this is the Google proof Q&amp;A.
+Remember that?
+Remember what I said was human level performance.
+It was 65%.
+65% was PhD level performance.
+I think 34% was was none was was was mere mortals like me.
+Uh, and let's have a look at what it's scoring with the top models.
+It is on 88% superior, significantly superior to that 65% level.
+And now you know the people.
+Uh, well, the skeptics will say to you that, okay, but it's gpca it's PhD level very specifically
+on these physics, chemistry and biology questions.
+But we can ask it dumb questions about about setting a chess board with a move before the end of the
+game.
+And it can't do it.
+So there's obviously deficiencies.
+It is not generally PhD level, but there are fields in which it is in scientific reasoning.
+Live Code Bench is one of the particular coding metrics that we'll look at later, when again, GPT
+five is the the highest, strangely, slightly better than Codex.
+Um, and then there's some more coding ones, uh, that where grok four comes best following instructions,
+GPT five Codex comes strongest.
+And then the competition math, the AI, the aim competition that we talked about.
+Uh, GPT five Codex again comes top.
+Uh, and then GPT five high comes right after that.
+So there there are the sets of models and results from the detailed intelligence drill down.
+Um, and now we'll look at some of the other bits of information that you get on the amazing, uh,
+artificial analysis-i.
+And I should point out, these are 23 models, but you can pick different models.
+You can come in here and pick the different models that you would like to see and compare them.
+You're not you're not limited to these models.
+This site is really incredible.
+Uh, so you can go through a whole ton of stuff to see how the different models perform.
+Uh, the this is sort of interesting point.
+It makes that different models will produce different volumes of output tokens, particularly when you're
+thinking about reasoning models.
+It's not enough just to say, does it give the right answer?
+You.
+You also want to understand how much thinking was required to get there, because that will affect time
+and cost.
+And so there is some some stuff here.
+It's interesting that that grok for uh, you can see the different color reasoning tokens is the lighter
+color.
+And the answer is at the top.
+And it gives you that real sense that grok for shows this very strong performance.
+But that is partly because it does a lot of thinking, a lot of inference.
+And that leads to this, this incredibly useful chart, which is a cost.
+So comparing costs of models is difficult because just comparing the cost of the input and output tokens,
+I think you know that they have a different price point, but that's not good enough because the same
+a different model might do more reasoning as we've just seen.
+And so it might cost more to do the same thing.
+So the way that artificial analysis cracked that particular problem is they said, okay, so we'll take
+our index, our combination of lots of tasks, and we'll treat that as like the standard thing to try.
+And we'll see how much does it cost to to to create this index, including all of the tokens that need
+to be generated in order to answer all these questions.
+And that gave this, this, this really, uh, nice, simple, rich way to compare the actual bottom
+line cost of these models.
+Better than just looking at the price of the input and output tokens.
+And with that in mind, you'll see that Claude 4.1 opus from a cost point of view is terrible.
+That because it does a lot of this thinking, uh, and you can see it's the input output and reasoning
+costs It's showing here and obviously it's the reasoning cost is the $1,754 there.
+It's very expensive.
+Roquefort is pretty expensive.
+Gemini two five Pro does a lot of thinking.
+That's been my experience too.
+Um, and then amazingly, GPT five is is quite far down this list compared to the fact that it's that
+it's top of the leaderboard in intelligence for me.
+Um, and then four five sonnet also doing really well here from that point of view.
+Uh, and then so on.
+Mistral's magistrale uh, deep seek.
+Uh, so this is, um, this is, this is quite an interesting list, but the next, the next chart is
+where it all comes together.
+Okay.
+So this this is the chart.
+This is everything.
+You should bring this up now to see what it's at right now.
+So this is a chart that is mapping the intelligence on the, on the y axis the height and with the cost
+on the x axis.
+So things in this quadrant here are models that are smart and expensive.
+These are ones that are that are not smart, but still expensive.
+These are ones here that are cheap but not smart.
+And this quadrant, the one that's highlighted in green.
+These are models that are cheap but smart.
+Which is which is great.
+Uh, so this is this is the really this is the sweet spot for most people.
+Um, and and, you know, there's certainly a school of thought that would be to say that if you identify
+any model like this one right here, that happens to be, uh, GPT oss, that's that's quite far along
+over here.
+You would then say you could imagine drawing, like, a box this way and this way.
+Anything that appears to the right and below represents something that is that is, uh, more expensive
+and not as smart.
+So there's one school of thought that would be to say you should never pick a model that is bottom right
+of any other model on this chart.
+And in fact, even GPT is ruled out because grok four on fast is just slightly above and quite a lot
+to the left.
+It is cheaper and smarter.
+And so you could argue, look at that.
+Any model above this line here, you should always pick grok four fast instead.
+Now there is of course a slight problem with that, which is that it's hugely oversimplified because
+the Artificial Intelligence Analysis Index doesn't necessarily tie directly to your task.
+It's a it's a hybrid of all these tasks.
+And because there are other factors as well, like latency and and other reasons why you might lean
+towards a different model.
+But as a quick rule of thumb, it's not a bad rule to say, hey, never pick a model that's that's to
+the lower and to the right of anything on this amazing chart.
+Uh, so pick things in this quadrant, like, like Deep Sea 3.2 and grok Full Fast and GPT OS.
+These are going to be models that are cheap and smart.
+And let's look at the the the cluster up here of the expensive powerful ones.
+So you can see that that for a start Claude 4.1 opus is very expensive and not as smart even as Claude
+4.5 sonnet.
+So except for very specific benchmarks, it is hard to imagine why anyone would use Claude 4.1 opus
+these days when 4 or 5 sonnet is better and cheaper.
+And looking around here, you can see how GPT five and grok four line up that that GPT five does seem
+to be cheaper and smarter, at least on this aggregate benchmark.
+And yeah, you can you can see that when open source model is right up here in the the really, uh,
+well, it's pretty expensive because it's so big, but it is also pretty smart.
+So look around this cluster here and enjoy really learning about the power versus cost of the different
+models.
+And you'll see something different to me.
+And so you'll be able to draw new conclusions and by all means post about them, share it with other
+students on on on Udemy or on LinkedIn or share this diagram.
+It's a fascinating diagram.
+More people should know about it.
+Okay, just a couple more to show you on artificial analysis the speed and latency section.
+So this is showing you how fast models run.
+How many output tokens per second will they spew at you with OSS 120 in the top place.
+And we saw that ourselves when we played connect four and it was just on fire.
+Latency I mentioned before is a different metric.
+This is how long does it take before you get your first token, but not not including thinking tokens.
+They don't count.
+It's not until you get your first answer token that counts and you'll see Lama4 Maverick does does pretty
+well.
+Kimmy K-2 a model from the Chinese start up moonshot, GPT five, Quinn three from Alibaba Cloud.
+They all do well in terms of of speed, end to end response time, the total time it takes to respond.
+Llama four in good place there as well.
+And then this nice little chart showing intelligence against output speed and the total price comparing
+input and output prices per million tokens, no longer pegging it to their their analysis index.
+And another scale.
+This time it's intelligence versus price with price per million tokens on a log scale.
+Another useful one, but I prefer the one before.
+Uh, and then there's a bunch of other specific tables.
+There's some stuff on OS 120.
+There's lots of things to to look at here.
+You should lose yourself in artificial Analysis-i spend ten minutes here and you will know how to pick
+a good subset of models that might be right for your task.
+This is where to go.
+This website is gold.
+--- Lecture 3 ---
+And next is the vellum leaderboard.
+You'll find a link in the resources vellum.
+Again, the company where the CEO messaged me on LinkedIn, uh, after I mentioned it.
+It's got a number of good comparison tables.
+It's got, uh, the, um, uh, comparisons of models side by side with another model that you can pick
+from the dropdowns and see them ranked.
+But the thing I wanted to mention, the thing that I find most helpful, is right here, the context
+window cost.
+And now speed didn't used to be there.
+Also speed comparison this table.
+But I really like it because it's such a one place to go to get the the input and output cost per tokens
+for a context window.
+And as as you now know from from week one, there is another dimension here which is the cached cost.
+If you send the same input tokens twice, usually significantly less.
+But to get that you have to go to the the models website.
+But anyway that's vellum very useful okay.
+So this is now looking at the seal leaderboards, a set of leaderboards published by AI company Mail.com.
+And they are intended to be leaderboards that quite specifically test for different areas of expertise.
+So if you have a very specialized task, you might want to see if there's a Seal leaderboard that applies
+to you.
+Now, one of the leaderboards they're most famous for producing is the Humanity's Last Exam leaderboard
+that I promised you.
+And if we drill into that, we can see more about humanity's last exam.
+It explains that it's 2500 questions.
+It gives a sort of background to it about frontier benchmarks just all having diminishing returns.
+And then in partnership with the center for AI safety, they came up with this idea.
+They had user submitted questions and they selected this final set.
+And you'll see that when they started out, which was November of last year, uh, the top model was
+GPT four and it was scoring 2.72.
+I told you I thought it was between 2 and 3.
+Uh, there it is.
+And over time, look at how these numbers have changed.
+And now GPT five scoring 25.3.
+I think we saw a slightly different number on artificial analysis II, which is because there's a variant
+of this exam which is just text only, whereas this one is the multi-modal version.
+And you can see how this has changed.
+And, you know, for people that feel like progress is slowing down, that's not what we see in terms
+of this ability.
+Uh, and uh, yeah.
+The way if you're wondering how are the questions evaluated because they're so hard.
+Well, let's just start by looking at what are the questions like.
+This is on their website, humanities exam website.
+Here's an example of a question.
+Uh, it's given that image.
+The question is here is a representation of a Roman inscription originally found on a tombstone.
+Provide a translation for the Palmyrene script.
+A transliteration of the text is provided.
+Ah, so goodness, it's some sort of combination of like having amazing subject matter knowledge of
+something super obscure, but also presumably being able to puzzle your way through something.
+Because I imagine this is something that requires some decoding and some problem solving to figure out
+how you could possibly read that.
+Uh, then here's a question on ecology.
+I'm not even going to try and read this through because I'll embarrass myself.
+But you can you can see that there and get a sense of how hard these are.
+There's a maths question.
+There's a computer science question.
+There's a chemistry and linguistics.
+And providing the standardised biblical Hebrew source text, your task is to distinguish between closed
+and open syllables.
+Uh, chemistry.
+Trivia.
+Physics.
+I'll take a look at that later.
+Rod.
+Tension.
+What is the value?
+Okay, so some sort of super hard, uh, physics level question that certainly looks like it might be.
+Uh, it's from UC Berkeley.
+It's probably very difficult question.
+Uh, so those are the samples.
+It's fun to see them.
+It's fun to understand how challenging these are.
+They are definitely above PhD level in complexity.
+The way that it's judged is that the model comes up with the answer.
+And that is provided to oh three.
+One of the larger reasoning models from open AI.
+And oh three is given the answer from the model and the reference.
+Gold truth.
+Uh, answer the actual ground truth.
+The golden answer makes my my words.
+It's given that, and it has to compare them and confirm that they are consistent.
+And so it is a kind of LM as a judge.
+But it's not just the LM grading it, it's the LM using a reference answer.
+So which is which is an excellent technique.
+So that is humanity's last exam.
+It's great fun.
+Take a look at it.
+And whatever you're looking at now no doubt the world has moved on from here.
+And so you'll see where we are.
+And yeah, if it's in the 80s or 90s, then maybe, uh, the overlords have already taken over.
+Uh, that is humanity's last exam.
+And just to walk you through some of the other leaderboards on the seal leaderboards, there's one that
+specifically tests models ability to use MCP to call tools.
+There's some software engineering metrics.
+There is one that's about being able to reason in foreign languages, or to solve foreign language puzzles
+with reasoning, because reasoning tends to be quite, quite focused on, on English language.
+Uh, there's a bunch of interdisciplinary challenges.
+There is a particular evaluation around security and safety.
+That's something that Cellcom has focused hard on and a similar one about alignment.
+The mask is evaluating models honesty when pressured to lie.
+And you remember the point I made about the potential concern that models know when they're being evaluated.
+Obviously that comes strongly with with a metric like this.
+But as of now, sonnet does well on on, uh, on sonnet 4.5 seems to do seems to do pretty well on this.
+Their consistency with their beliefs when pressured to lie.
+Super interesting, uh, complex, multi-step reasoning, vision, understanding.
+And then a tutor bench.
+Something very specific for teaching skills.
+And so, yeah, if you're looking to build something that's going to be in the education space, then
+the tutor bench might be a useful leaderboard for you.
+So that wraps up the seal leaderboards.
+Let me flip to hugging.
+Face this.
+There's a hugging face spaces.
+There is a mass of useful leaderboards that you can look at for different comparing open source models
+against different characteristics.
+The one that used to be the go to is called the open Leaderboard, but it's been archived for a few
+months now.
+It seems that Huggingface has decided that they don't want to be in the game of building these leaderboards
+anymore, possibly because people were starting to game it and there was so many different models being
+put up here that it became noisy.
+So I think they have backed off from being in this space.
+But if you're if you're interested, it is.
+It's a few months old, but it is still a nice place to see about the performance of different open
+source models.
+But there are a lot of other leaderboards here that are kept updated.
+There's a big code, uh, leaderboard that gives you the performance of different coders, um, against
+different programming languages like C++, JavaScript, Java.
+And you can see that it's, it's got 2.5 coder.
+So this has some of the latest models.
+And you'll find a bunch of other leaderboards here.
+There's a performance one that's very good for seeing the speed and power of different, uh, open source
+models on different hardware spec.
+There's a medical leaderboard that has very specific criteria from the medical industry.
+Uh, Q&amp;A, anatomy, clinical knowledge and ranking different models against those specific benchmarks
+agent leaderboards, deep research, hallucination, image leaderboards.
+So much to explore on hugging face.
+Always double check how how recently it's been updated and and check the sources and make sure that
+this is something that is a credible leaderboard, but otherwise tons of information freely accessible
+on hugging face.
+And I mentioned the last one I was going to tell you about is Live Bench, which is a hard and contamination
+free benchmark that involves completely refreshing all their questions every six months and then going
+through and testing against these different factors like reasoning, coding and genetic coding, maths
+and data analysis.
+And you can see how the models rank compared to these different scores, GPT five high is currently
+in pole position.
+Claude 4.5.
+Thinking comes soon after GPT five.
+Uh and uh does does pretty close pretty well, but is uh.
+Yeah.
+Also doing very well on reasoning but winning in coding.
+Look at that first place on coding or tied uh, for for uh, agentic coding.
+Strangely, GPT five high does slightly worse than GPT five medium on agentic coding.
+Maybe it overthinks things through, uh, but this is a great resource because these metrics are so
+carefully, um, prepared to not not suffer from data set leakage problems.
+And so this is very credible source.
+And it again, it combines like most of these leaderboards closed source and open source models a bunch
+of ones here GLM I think we saw that did pretty well on artificial analysis as well.
+Uh, is from Chinese startup Xie AI.
+So lots of great models to look at here.
+Do check out and bookmark Live Bench as well.
+--- Lecture 4 ---
+So I've shown you a couple of arenas as we've gone through this adventure together.
+The ones that I've made, The Outsmart and the Connect Four.
+But there are in fact, proper arenas.
+Or at least there's one really proper arena, very well known.
+It used to be called Lambesis.
+These days it is called LM arena.
+The LM arena language model arena.
+Incredible place to go.
+It's a place where you can chat with two different models anonymously.
+It could be frontier.
+They could be open source.
+You compare them, you don't know which one is which.
+You vote.
+So this is a like blind human evaluations.
+And then the results are shown with what's called an ELO style rating, which for people that play chess,
+you know it well, but it's a kind of rating that is that works when you have a head to head competition
+and you can show the performance of different, different models compared to the ones that came before
+it.
+And there's it's a it's great fun to participate in this arena to to go through the process yourself
+of weighing up models and voting.
+And as a benefit, you are adding to the community because you are helping everyone to know which which
+is the best model in this, in this very, you know, forget all the benchmarks.
+This is just at the end of the day, the people's decision on which model is stronger.
+And so there's something about it that is the sort of the final say in all leaderboards.
+So I've explained it.
+It might sound a bit abstract to you.
+There's one way to make it be less abstract that's to go and try it out.
+Let's go and do that.
+Okay, so here we are at la Marina, the place of the famous chatbot arena.
+And we're going to ask a question not to one model but to two models.
+We're going to say tell a joke for a room full of AI engineers.
+That would be you.
+All right, let's see.
+So it goes to two different assistants assistant A and assistant B.
+Assistant A says why do the neural network go to therapy.
+Because it had too many unresolved layers.
+Well it's not bad.
+All right.
+An assistant be sure.
+Here's one tailored for AI engineers.
+Why did the neural network break up with the decision tree?
+because it couldn't handle the branching commitment.
+Yeah.
+Um.
+Ha.
+Um, I, uh, I think, um, uh, between the two of them, I think a is shorter and sweeter, but I'm
+torn a bit.
+But I'm gonna go with assistant A, you might feel differently, but that's too bad, because it's not
+your choice.
+It's my choice.
+It's the great thing about this site.
+I get to choose.
+If you hover over these, you can see it highlights which one I'm going to go left is better.
+So that is my vote.
+The vote is in.
+And now we can go and look at the results.
+And so we click here on the leaderboard section.
+You can see there's actually a bunch of different leaderboards depending on what kind of question you'd
+asked.
+And we'll stick with the text one because that's where it all began.
+And that's probably the most popular one.
+You can see.
+It said 50,000 votes here and in pole position is Gemini two five Pro as the model that people most
+like to chat with.
+And, uh, so that that comes first.
+But sorry, no equal equal.
+The score is slightly below, but it's considered I guess a tie is Claude opus 41 and Claude Sonnet
+45.
+So really they are all tied.
+And then GPT strangely ChatGPT for zero, which was a version GPT four are particularly optimized for
+chat.
+Maybe not strangely.
+Maybe that's what you'd expect.
+That comes in second place.
+And it's considered a tie with these other models, which includes GPT four five preview, which was
+only released for for a short period of time.
+Um, which is tied one point higher than GPT five high itself.
+Um, so it's interesting and it's good to see Gemini two five Pro and in first place like that.
+And you can see the other leaderboards here.
+And again, the thing that makes this most satisfying is that there's no this isn't based on some as
+a judge or some other criteria or a multi multiple choice selection.
+This is based on actual people like you and me voting for the model we prefer with without knowing which
+one is which, which means it's super legit.
+So go on in there, make your vote.
+Contribute uh to to to the votes and see what what what can happen.
+See how you can change the leaderboard and bring your favorite model to the front.
+And learn a little bit about the different capabilities of models while you are at it.
+--- Lecture 5 ---
+So as a quick extra topic, I know everyone wants to get to coding.
+Fed up with all of these, uh, commercial type topics.
+But just to wrap up, I want to talk about the different use cases commercially of applying LMS to solve
+business problems.
+And I often describe it as, as you can think of using LMS and generally applying AI, uh, along this,
+this continuum of the amount of business value that you're offering.
+Initially, everyone was thinking about automation.
+You were using AI to automate tasks that were intensely manual and error prone and were easy to automate.
+Automating repetitive tasks was the domain of of AI originally.
+Then it moved from automation to augmentation, which is about being a co-pilot, to a human working
+alongside a human, allowing someone to do more because they can they can, uh, delegate some tasks
+to an AI, and it allows them to achieve more through partnership with an LLM.
+And then the sort of the final tier.
+The next step up is differentiation, which is where you or your business are actually able to achieve
+something completely different because AI is enabling a new activity that was previously impossible.
+And as you go down that continuum, of course things get more and more exciting from automation to augmentation
+to differentiation.
+And it's also helpful to think about the types of AI solution that you build in three dimensions.
+There are things that people often describe as ChatGPT wrappers, and that's usually used in a slightly
+dismissive way.
+And these are cases where a commercial app has integrated with an with an LLM like GPT.
+Uh, often people just say ChatGPT because it's the most obvious one that is most dismissive of someone,
+and they're using that behind the scenes in order to add value to their app.
+And I mean, there are so many examples of this that like you pick up your, your, your phone and look
+at the apps there and you'll see that many of them will be using an LLM in some way.
+They'll be integrating JNI into the app.
+The one that came straight to mind is Duolingo because we talked about it earlier.
+And yes, it actually uses GPT.
+Uh, and so it's such a clear example of just putting a wrapper on top and being able to charge a premium
+for it.
+Although of course they do a bit more than that.
+That's probably unfair, but you get the idea.
+And then copilot is often very similar.
+The the wave of copilot, which are essentially just making calls to a frontier model but surfacing
+that baked into the tool.
+So those are GPT wrappers.
+And then next up is a specialized, bespoke proprietary AI platform that your business has built in
+order to be able to add value because it has direct domain expertise in some area.
+And this is of course, the more juicy, the more meaningful area.
+And arguably Duolingo is more in this territory too.
+There's of course, some sort of, again, a continuum between these things.
+But this is where you've built models that that have expertise that you won't find if you go to ChatGPT.
+And maybe originally you did that through training, through fine tuning, you built models that you
+trained it on proprietary data, and you used that to, to be able to, to achieve something different.
+ChatGPT.
+But increasingly it's inference time techniques, it's Rag and other kinds and adding tools, other
+capabilities that allows you to do more.
+And so there are smaller companies, there are startups, there's companies like Harvey which is applying
+llms to law.
+There's the company that I work at Nebula, which is applying it to to the talent and careers and jobs
+and, and people matching people with roles where they'll be successful.
+There's Kahneman go from the Khan Academy, which is applying it to education, and then just to talk
+to some of the big people out there, of course, Salesforce is in this game all over the place, but
+they have a healthcare offering that's particularly impressive that does things like automate taking
+doctor's notes and clinical, uh, meetings and being able to to take away a lot of the administrative
+work, but with knowledge, with with bespoke information and hooked up to all of the Salesforce tooling
+and Palantir, of course, the data platform that has a lot of AI weaved through it, taking advantage
+of their data.
+And that is a it's generally a common theme of this, that a way that an AI company, perhaps like one
+that you work for, is able to to distinguish itself from the others is often through the data.
+It comes down to data.
+There's famously Andrew Ng once said that the AI is the new electricity, and I think that's that's
+obviously proven to be true.
+But in addition to that, I would say that data is the electricity.
+Having your own proprietary data set that other people don't have means that you'll be able to build
+a business specialized application which can do things that others can't.
+And these things always come in threes.
+So there had to be a third one.
+And it is of course a genetic AI.
+That is the that is the new frontier.
+That is the the place where we can build software that is autonomous, able to make decisions, able
+to go out and do things.
+And this really feels like the place where more than any other, we will be able to build things that
+let businesses differentiate and do things that just weren't possible before.
+And it's interesting to me that many of the most common use cases around using Agentic AI are more technical
+and coming from technical companies.
+So obviously Claude Code, OpenAI, Codex, these are ones we all know, and also the OpenAI agent mode
+that we used within ChatGPT.
+But and that was less technical.
+But but still, it's coming from a tech company.
+I think that the space to watch is going to be how businesses bring a genetic AI into their products
+in a big way.
+And that hasn't yet happened.
+And I think that's going to be the next frontier.
+And if this is interesting to you or you wanted to hear more about this, then I do have separately
+a companion briefing on LMS for leaders.
+I know I expect most of you want me to move on and get to the coding, which we're going to do in just
+a second.
+But but yes, if you if you are interested, there is the companion briefing.
+And the one thing I'll say about this whole topic is that, look, I do believe that it is a superpower.
+If you are an AI engineer and you also have knowledge of the commercial side of this, you have savvy,
+you know, about what are some of the traps and some of the, the, the, the areas for success for
+applying a genetic AI or generative AI for commercial benefit.
+So I would urge you to take time to look at the commercial side too.
+It really sets you apart, and maybe some of your business people who are taking this course to get
+some technical skills, which gives you superpowers.
+And you probably agree with me that that's where it's at.
+Knowing both, having at least a good awareness.
+Some know how some savvy about the commercial side of it will really set you apart.
+Okay, but I promise you that we were going to get technical and we're going to do starting tomorrow.
+We're going to go back to labs.
+It's been like two days without any real coding labs.
+We are going to build a little commercial challenge, which is going to be fun and tangible.
+Let's suppose we're trying to build a product that converts from one technology to another.
+In particular, we're going to try and do something that converts Python code to C++ to be high performance
+C++ code.
+Uh, which is an interesting one.
+So C++, most of you probably know, is like a compiled language that's very platform specific, that
+compiles down to machine code that runs natively on your platform, where Python is an interpreted language.
+And so converting Python code in C++ is a really cool thing to do because it allows you to build this
+kind of super blazingly fast solution.
+And we're going to try it with a bunch of different models.
+We're going to pick the right model to do so.
+We're going to use this as our exercise for how do you select the right model for the task at hand,
+which is going to be great fun.
+And we're going to do that tomorrow.
+And so with that now, at this point, in addition to coding with frontier models, open source Llms
+and Transformers, and you can now confidently choose the right model for your project backed by metrics.
+Or if you want to be pedantic, you can choose the right models.
+You can choose the right Llms the subset.
+There's still another step to go to actually prototype and select the final model.
+And that's what we're going to be working on for the next few days.
+Next time you're going to be able to assess models, particularly for the ability to generate code.
+And we'll be able to build a solution that uses models to generate code.
+And as a side effect of doing this, we'll have walked through the practice of picking the right model,
+which is what this week is all about.
+See you tomorrow.

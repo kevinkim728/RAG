@@ -1,0 +1,490 @@
+--- Lecture 1 ---
+Okay, so now you scroll to this first box right here which says imports.
+And the way that you run this bit of code known as a cell is you hold down the shift button and you
+press return.
+While you've clicked anywhere in this box, I press this and it runs.
+Now, if you have any errors running this, if you get an import error or something like that, or if
+it just doesn't seem to run, it just sits there.
+It means your kernel isn't set right.
+Look on the top right there.
+Look at what mine says.
+It needs to look a bit like that 3.12. something.
+It needs to be referring to your local venv right there.
+That is what you have to see.
+And then it should run just fine.
+There's no output yet.
+Nothing's happened.
+It should run.
+It should show a tick mark, meaning that it's run.
+You've just done some imports.
+We'll talk more about what all of this does later, but for now, just run that code.
+Okay.
+The next thing we're going to do.
+So come down to this next block of code right here is we are going to load in that dot EMV file, that
+secret file with our environment variables, our secrets.
+We're going to load it in.
+And we're then going to collect this thing called OpenAI underscore API underscore key.
+And as long as you set it right then it's going to find a key and it's going to be happy.
+Let me see I hold down shift I hit enter and it says API key found and looks good so far.
+Now if yours doesn't say that then something's wrong with your EMV file and it's going to give some
+explanation.
+Hopefully.
+Maybe it doesn't start with the right thing.
+Maybe you forgot to save your env file.
+Something went wrong.
+You can go to the troubleshooting lab to dig into it, or you can have a look yourself and try and figure
+out why it wasn't able to read in your EMV file, but I'm hoping it did.
+You're in great shape.
+You found an API key.
+All is good.
+Let's make our first call to OpenAI running in the cloud.
+Now we're going to call OpenAI in the cloud.
+And if you don't want to, if you want to use Olama, then wait for tomorrow in day two.
+We're going to redo this using Olama running locally, so that will be your day.
+So never fear, it will happen.
+But for now, what we're going to do here is we are going to, uh, to send this message to OpenAI to
+GPT two.
+We're actually going to use GPT five, the new version of GPT.
+And what are we going to do?
+We're going to say, hello, GPT.
+This is my first ever message to you.
+Hi.
+Uh, so I've put that in this variable message.
+Now, the first thing I have to do is I have to put that into another variable called messages, which
+is in a special format that OpenAI expects.
+And you'll see that cursor already fills in what it knows I'm going to do, but I'm going to ignore
+cursor.
+I'm going to type it because I know some people like me to type, so I'm going to type.
+So what you send to OpenAI, the format is a particular format that OpenAI came up with, and we're
+going to talk so much more about this format.
+So I don't want you to worry about it right now.
+I'm just going to tell you that it is a Python list and the Python list contains a number of dictionaries.
+Python dictionaries.
+In this case, we're only going to have one dictionary.
+There it is.
+So it's a list with one dictionary in it.
+And that dictionary is going to have two keys.
+One key is called role.
+And the other key is going to be called content.
+And that role we're going to put in that in for the key role.
+We're going to have the value being the word user.
+And we'll find out why later.
+And there's going to be another field, another field with key content.
+And what we're going to put in there is going to be that message.
+Hello GPT, this is my first ever message to you.
+Okay, that's all clear.
+Let's just print what that see what that looks like.
+It looks like uh, list with one dictionary in it with role user content.
+Hello, GPT, this is my first ever message to you.
+Hi.
+Okay.
+That's easy.
+Next up, I'm going to hover down here like this.
+And I'm going to add in.
+So I just hit another code block by pressing code right there okay.
+Now I'm going to type in, um, OpenAI equals open a equals open AI like that.
+I'm creating a new instance of an object, OpenAI.
+And again we will cover exactly what that's doing another time.
+And now I'm going to make my first API call to GPT running on the cloud.
+And this is how I do it I type response equals OpenAI dot chat dot completions dot create.
+And that might sound like it's nonsense to you.
+You will get so used to that that you're going to dream it eventually.
+But for now, just believe me, that's what we type.
+It's known as the Chat Completions API.
+And you say OpenAI completions create.
+We pass in the name of a model.
+And the name we're going to go with is GPT five Dash nano, a very cheap version of the latest model,
+GPT five.
+At least the latest for me right now.
+And then the messages I'm going to pass in is going to be this variable messages that we just created.
+And that is it that is going to call GPT.
+And with what comes back, what we want to take is we want to take this response and we want to take
+the choices variable there.
+We want to take the first choice message content.
+There it is.
+That's what we're going to do.
+I'm going to now press shift and enter.
+And when I do that it's actually going to call out to to GPT running in the cloud.
+Let's do it.
+Let's see what happens.
+It takes a little bit of time for for that.
+And it says, hi there.
+Nice to meet you and welcome.
+Thanks for saying hi.
+I'm here to help with questions, explanations, writing, brainstorming, planning, learning and more.
+Encoding.
+What would you like to do today?
+If you're not sure, here are a few quick ideas.
+And on it goes.
+So, a very verbose answer for our very first call to GPT running in the cloud.
+And it was all pretty easy.
+And we were running it from code.
+And if you know all this already, then good for you.
+Zoom through it.
+If this is completely new to you, then we're going to talk a lot more about this.
+It's going to all make absolute sense very soon.
+But I want you to enjoy your first call to an LLM.
+Okay.
+So I have written a little function that is called fetch website contents.
+And that little function is right here in scraper pi.
+Now this is what it looks like.
+This is not a course about web scraping.
+So I don't plan to tell you about what I've done here.
+I'm using a lovely package called Beautifulsoup that's very popular.
+You can look at this function if you wish and use it yourself.
+But it's very, very simple.
+And it's doing just what's known as a server side scrape that it just collects that web page.
+It's not actually rendering this web page.
+So it's not a very sophisticated web scrape, but it fetches the contents of this URL.
+So that's what we're using here.
+And for example, I could pass in my own personal web page https.
+Com and I could use fetch website contents and see what I get there and what I get if I run.
+This is a whole lot of stuff from my website.
+And if I actually if I say like print ad, then we'll get something a little bit more than that.
+And here it is.
+This is the contents of my web page with lots of stuff.
+And it's worth noting that nothing to do with AI at this point.
+This web scrape is just a simple fetch of a web page.
+That's it.
+But now we're going to start to involve AI in this.
+So I imagine most of you know this already, but some of you might not that there are these two different
+kinds of message that you send to an AI, to an LLM, two different kinds of prompt.
+One is called the system prompt and one is called the user prompt.
+And the system prompt is where you specify the frame, the overall task they're carrying out.
+You tell them what tone they should take.
+You give them context.
+We'll find out later.
+When we talk about things like Rag that you can supply information in the system prompt, it's your
+way of setting the scene.
+The user prompt is the actual message coming from an end user to the LM that it should respond to in
+the context of whatever you told it in the system prompt.
+So that's the difference between the system prompt and the user prompt.
+And people that are very familiar with this can can add all sorts of stuff to that.
+But but we will get there in good time.
+So for example, we could have a system prompt that says you are an assistant that analyzes the contents
+of a website and provides a short summary, ignoring texts that might be navigation related respond
+in markdown.
+It's framing the situation, it's setting the task.
+It's giving the format, the style of how response should come.
+That is our system prompt.
+And we're going to to also define the start of our user prompt, which is.
+Here are the contents of a website.
+Provide a short summary in markdown if it includes news or announcements, then summarize these two.
+That is our user prompt prefix.
+So far so good okay, so we saw a second ago that when we're sending a message to OpenAI, we do it
+using this list of dictionaries.
+And I showed you one in particular which had role user content.
+And then we had something like hi GPT.
+So there's another type of dictionary where you say role not user but system.
+And in fact this is how you specify the system prompt and the user prompt.
+Uh, you have a list of dictionaries and we'll have two dictionaries in one dictionary the role is system.
+And the content will then be the system message.
+In the second dictionary, the role is user and the content is the user message, the user prompt.
+And so just just to give you a silly example, here's one.
+Here's messages role is system content.
+Let's say not.
+You're a snarky assistant.
+Let's say you're a helpful assistant.
+And then what is two plus two.
+So this would be messages.
+And what we can do is then we can say here response is open AI.
+Look at how cursor fills it in for me.
+Look at that response is open chat completions dot create model will go with GPT 4.1.
+Mini know we'll make it 4.1 nano make it a really cheap, simple model.
+GPT 4.1 is faster than GPT five.
+It'll be very, very quick.
+And we pass in this these messages, this this list of two.
+So let's see what a helpful assistant has to say about this.
+The helpful assistant.
+When given this question uh, we need to print the results.
+Cursor didn't fill that in response.
+Dot choices zero dot message content.
+Try it again.
+Two plus two equals four.
+So now we're going to change the system message.
+So it doesn't say you're a helpful assistant.
+It says you are a snarky assistant.
+And otherwise exactly the same user message.
+What is two plus two.
+We run this.
+And oh finally a math question.
+Two plus two equals four.
+Groundbreaking.
+I know that's just the effect of putting in snarky there.
+And now a quick challenge for you in the spirit of of changing things and tweaking the code.
+Make a different system prompt here.
+Not a snarky assistant, but something else.
+Maybe an assistant that speaks like a cowboy, or like a pirate, or an assistant that speaks in pig
+Latin or in another language.
+Whatever you want, put it in there.
+Experiment.
+Try changing the system prompt several times and get to see how different system prompts with the same
+user prompt will change the tone, character, and mission assigned to the LM.
+--- Lecture 2 ---
+Okay, it's finally time to put this all together.
+So before we created our messages, just by setting a variable messages and building that list of dictionaries,
+what we can also do is write ourselves a little function.
+This is a function called messages for, and it takes in the contents of a website and it will return
+our list of dictionaries.
+It's going to return two dictionaries.
+The first of them is role system content.
+Is the system prompt that we defined up there somewhere.
+The second one is role user and the content is the user prompt prefix, followed by this website that's
+passed in.
+Okay, that sounds good.
+Remember the prefix looks up there.
+Maybe we should put in an extra empty line there.
+That's probably a good idea.
+Uh, so that that website will then get get shoved in underneath.
+All right, let's run this.
+We've just defined a function that will return this list of dictionaries when we pass in a website.
+So we have a website.
+We have one in the variable AD.
+It contains all of my personal web page.
+So if I run this cell, we'll see what we get.
+We get something which is indeed a list of dictionaries.
+There's one dictionary that's that's got role system content, and it's your assistant analyzes contents
+of a website and then role user.
+Here are the contents of a website.
+And if I scroll you will see that it's got the full contents of my website.
+So hopefully this is super simple.
+We've we've written a function.
+It can manufacture this list of dictionaries.
+The list of dictionaries contains a system prompt and a user prompt.
+The system prompt is telling it.
+You summarize websites.
+The user prompt says, hey, here's a website to summarize, and then it has the contents of the website.
+Okay?
+And now it's time to bring it together in this lovely function right here.
+Okay.
+And just before we run this summarize function, I want to mention I did just make a little tweak to
+the system prompt I added in this sentence do not wrap the markdown in a code block.
+And this is a little trick that you sometimes see that prevents it from putting extra stuff around the
+response.
+Not super important, but makes the results a bit better.
+Okay, so this here this summarize.
+This is the function that brings it all together.
+We start it takes a URL, a URL like madonna.com.
+It starts by calling fetch.
+Website contents that you'll remember is my utility that goes off and pulls a website's contents.
+We put that in a variable website.
+We then call OpenAI.
+Create.
+That is the chat completions API.
+That is new to you now, but you will soon know that off by heart you will.
+You will dream it.
+You will know it so well.
+It takes two things.
+It takes a model.
+And we'll be using GPT 4.1 mini.
+And it takes messages, which needs to be the list of dictionaries.
+Well, we can get that by calling our function messages for for our website that function just here.
+It returns the list of dictionaries exactly what we want, and with whatever comes back, we call choices
+zero content.
+Let's run that function.
+It's now been defined and let's give it a try.
+Let's call it for my website and see what comes back.
+This is now making the system and user message, putting in a dictionary and dictionaries in a list,
+sending it to GPT.
+And before I can finish explaining it, it's come back.
+We've got an answer.
+Here is a summary of my website.
+Our little snapshot of my website about me.
+It's a bit hard to see because it's all on one line and it's not so formatted, and we can fix that
+quickly by making another function called Display Summary.
+It will call that that function.
+Here it will call summarize with the given URL.
+And then it will use this utility display markdown which is a nice way to show markdown elegantly inside
+one of these labs.
+So if I run this, then once again it's building the system message, the user message, packaging them
+up, calling the chat completions API.
+And with what comes back, I have to actually run display summary for my website.
+Now it's actually doing that, making a system prompt and user message, sending it off.
+And what comes back bam is this website summary.
+Uh, this website is the personal and professional homepage of Edward Donner, a coder and AI enthusiast
+who enjoys experimenting with large language models.
+That sounds like me.
+Uh, and, uh, it says Nebula, and it's got some projects.
+It's about my interests and some posts and announcements summarized and how to reach me.
+Uh, so we've just done it.
+We've just built something that's able to take a website, scrape it and summarize it, using a call
+to OpenAI running in the cloud, connected to the API key in your EMV file.
+Congratulations.
+Try it with some different websites, experiment with it and hey, you can go to the system prompt and
+mess with that.
+How about we get a snarky version of the website instead of the normal version?
+Any of these things are possible.
+Go and experiment and explore and have fun.
+Calling the OpenAI API.
+Well, let's have some fun!
+Since I mentioned we can change the system prompt, let's go and do that.
+Let's go back up to the system prompt here instead of your your helpful assistant.
+Let's make this.
+You are a snarky assistant that analyzes the contents of a website and provides a short, snarky, humorous
+summary.
+And then run that.
+Let's redefine the system prompt.
+Let's just go straight back down and rerun this line here.
+To summarize.
+Edward Donald, let's do the display version, make it the pretty version of it, run that and run display
+summary and see what we get.
+Edward Donner's nerdy Playground editor is your friendly neighborhood code monkey who's obsessed with
+playing DJ badly.
+Stalking Hacker News like it's the only social interaction he needs.
+Latest news like you're dying to know so wonderfully.
+Just with that tiny change, we've been able to get a snarky version.
+Not just a Reader's Digest version, but a snarky version.
+And we can also use this to do different kinds of tones and styles and try it with other websites,
+too.
+And so I'll keep it on snarky mode.
+And let's look at what CNN's news of the day is.
+Uh, it's now collecting all of CNN's website, the news site, and it's coming, uh, the CNN, the
+glorious smorgasbord of everything news.
+Welcome to CNN, where you can get your daily dose of global chaos, celebrity heartache breaks and
+government shenanigans in one place, trying to escape world wars, hurricanes and political drama.
+Too bad it's all here, front and center.
+Ha!
+So, uh, yeah, because nothing says fun like a political stalemate so wonderfully.
+This has given us a summary of the news, but also a snarky version of it as well.
+And you can try some different websites here too.
+What you'll discover is that this is a pretty simplistic solution.
+The way that I'm scraping web pages will only work for web pages that don't get rendered in the client
+web web pages, that you can just fetch them remotely and you'll get the full content.
+And that doesn't work for too many websites.
+But luckily, there's an easy way to build this out yourself if you know about this.
+If you know about tools like Selenium or Playwright, then you can build this yourself.
+And many students have.
+And that brings me to the topic of the community contributions.
+So over here in week one is a folder called Community Contributions.
+And it's a place where you can put your own projects.
+And if I open this up, you'll see that a lot of people have come and done this, which is such a joy.
+You can come in here and add in your own exercises and your own examples.
+It could be as simple as changing the system prompt to translate a web page to French or Spanish.
+Uh, hopefully better than any of my Spanish.
+Uh, and you can do anything that you want.
+But use this as an opportunity to make changes and to share them with other students.
+And there are instructions on how you do that.
+In the guides.
+There's a guide on the git and GitHub guide includes instructions for how you submit what's called a
+PR, a pull request, which lets me merge in your changes into the repo.
+And I would love that.
+And I'd love it if you shared it.
+And it's a great way to add value to the whole community and to get your work seen and get get me to
+see it and look at it and comment on it as well.
+So, uh, I want to mention that that there are so many business applications of what we've built,
+uh, the fact that we've, we've just experienced calling a frontier model in the cloud, and we've
+then given it some instructions to summarize it, to change the tone, we could translate it.
+There are so many different ways that you could extend this and use it, and you will see many of them
+in community contributions.
+So many things.
+Someone added it to to to call the Yahoo Finance API to summarize stock movements.
+There's lots of other stuff in here and you should be inspired by this, but try and take it in your
+own direction.
+Apply it to your business or to some some personal thing that's been on your mind.
+A pain point that you think you can fix.
+A simple way that you can make a call that involves collecting a web page and doing something with that
+web page.
+That's it's such an open canvas.
+There's so many different commercial directions that you can take this, this idea of summarization
+or translation.
+This is one of the most essential and simple gen AI use cases, and you now know how to do it.
+And you can apply this to any problem you want.
+So please do that, apply it to a different business and try it out for yourself.
+Uh, try making something and and have fun with it above all.
+--- Lecture 3 ---
+And now an exercise for you.
+You've just hopefully gone in and run this for other web pages, and you've maybe tried tweaking it
+for a different business purpose.
+The exercise is now to come in here and see if you can make your own message to GPT from scratch.
+So first of all, write a simple system prompt.
+Now you should think about something completely different to do here, perhaps still related to to summarizing
+information.
+So as an example, you might want to summarize the contents of an email.
+Or perhaps you might want to take an email and come up with a nice subject, a possible subject for
+that email that might be an example of a business task.
+So in the system prompt here, describe the task that you want it to do in the user prompt.
+You'll want to put in here the contents of the email or the thing to be translated or whatever the is
+going to be the prompt with the instruction.
+Then you now have to do some typing, just like I did some typing.
+It's your turn to do some typing.
+Replace this messages equals you're going to want to put in here something which will describe your
+messages to OpenAI.
+So this is going to be a place where you're going to put in a list of dictionaries, two dictionaries.
+And it's going to have some things in it like role and content, and cursor is determined to fill it
+in for me.
+But don't cheat.
+Uh, try and see if you can't do it yourself and then cheat if you can't.
+Of course, it's always good to use AI tools.
+It's not cheating in the least.
+And then you have to uncomment this line and have response equals and type in the the the command that
+you're going to give, which I'll tell you very quickly, is OpenAI create.
+And you pass in the model name and the messages, and then you're going to print the result.
+And the result will be this word response .0. content.
+And always look back up in this code and copy and paste to get that example.
+And when you've done that you should find that that works.
+And if you've built something like something that can give you the subject of an email or something
+else, then please consider doing a PR.
+The instructions are in the in the guide so that I can get to see it myself.
+And I can share in your joy of your first commercial call to an LLM.
+And then finally, there's this extra exercise I mentioned for people that are pros, people that already
+know this stuff.
+You'll be aware that, as I say, my my way of web scraping is super simplistic, but you could use
+selenium or playwright or something similar to do proper web scraping with a web page that gets rendered
+in the browser, and you'll see that other people have done that.
+There's a playwright version there.
+I know that there's several selenium versions.
+You could look at how other students have done it.
+But first, if you know this stuff, if you've used selenium or playwright before, have a shot at doing
+it yourself as well to build a more industrial strength.
+Web page summarizer.
+And then afterwards, as I say one more time, please do consider sharing your code.
+The guide will tell you how to do it.
+Submit a PR.
+I will gladly review it and I'd love to include it in the community contributions with 1 or 2 other
+people that have done this too.
+Okay, so with that, that's your mission.
+Enjoy it.
+Fill this in.
+If if you if you find that you're struggling with it, please don't worry.
+We're going to be doing this so many times over the next eight weeks that's going to become second nature.
+Give it a shot.
+Give it your best crack.
+And if you can't get it this time, don't worry.
+We'll be coming back to this tomorrow.
+Wow.
+You're probably thinking, whoa, this if this is if this day is what every day is like, this course
+is going to go on forever.
+No, today was a big, big day.
+And it's longer than most of our days will be.
+You've got through a ton of material.
+You've made your first request to an LLM, and I'm hoping that you've also adapted it for a different
+commercial task.
+And maybe you've even submitted a PR.
+So much has got done and and it's just just a great start.
+Your environment is built and ready for prime time.
+And tomorrow we're going to start getting a little bit deeper.
+But already, even though your journey just started, your 2.5% of the way along your journey to the
+to the path of being 100% a master of LM engineering.
+You've already used a llama to run a model locally on your box.
+Perhaps several models.
+Seems like an age ago that we did that.
+But we did that.
+You've written code that calls OpenAI's frontier models.
+You know the difference between a system prompt and a user prompt.
+And you've built summarization.
+You know how to apply to commercial problems.
+Maybe you've built a couple yourself.
+Tomorrow is going to be a little bit of a breather.
+It's going to be an easier day, I promise.
+We're going to talk about the steps it takes between now and being a master of LM engineering.
+I'm going to set you up for success.
+We're going to talk through some of the top frontier models out there, and we'll also do a little bit
+of a dig into Olama and using Olama locally.
+I kind of repeat of that lab, but using Olama locally on on our own computers, people that didn't
+want to to get OpenAI.
+That's your chance to use Olama instead.
+So I'm super excited to see you on day two.
+You survived all of day one that by far the biggest day of the whole course.
+So tomorrow much gentler.
+Can't wait.
+See you then.

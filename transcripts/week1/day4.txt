@@ -1,0 +1,1041 @@
+--- Lecture 1 ---
+And welcome to day four of week one.
+Somehow we are already on day four and I have lots of great stuff in store for you today.
+But what you can already do, you can already write code to call OpenAI on the cloud and locally, you
+can compare the strengths and limitations of frontier models and contrast them.
+And by the end of this lecture, you'll be able to talk about how incredible the way that Transformers
+have overtaken what we do in this.
+In the field of data science, you'll be able to talk about things like Agentic, AI, context engineering,
+agent loops, the latest hot topics, and most importantly, you're going to understand the basics like
+tokens, context, windows parameters, API costs.
+And you may be very much familiar with this already.
+This might be old hat to you, but I always hope to sprinkle in something different to to give you something
+new to think about.
+So even the people that know this stuff, well, hang on in there.
+I still hope to give you something useful today.
+But first, before anything else, I know you're wanting to know what happened from this.
+This big competition that we ran.
+What?
+What came of out smart?
+Who managed to outsmart the others?
+Let's go take a look.
+And I have it running on this tab.
+Here.
+I'll give you a drum roll.
+Prepare to see who wins.
+And the winner.
+The winner of this particular run was Charlie.
+Which Charlie was being played by Grock for Grock for known for being perhaps one of the more devious
+of the models did in this occasion managed to triumph.
+Um and uh, with 14 you'll see that it was actually pretty close.
+The one that did, uh, did worse down here was was drew at the bottom.
+Claude Sonnet, coming in last place did not do very well.
+Uh, and but it's quite wordy about it.
+All this stuff.
+Um, but you'll see that Charlie was, was ultimately, uh, the most Successful uh, Charlie, followed
+by OSS, uh, followed by GPT five in third place and then finally drew.
+And there you see the, uh, the chart of how it went.
+And for a while there, actually drew was the winner.
+But then the others ganged up on.
+Drew.
+Fascinating.
+I hope you enjoy running this yourself.
+Get some insight into it.
+That's what it's all about.
+Very enjoyable.
+And when you're doing it, you can also go to the swizzle over here on the left.
+This is also on the main site.
+If you open it up and press Calculate Rankings, it takes a second.
+There's been more than 2000 games of this played, and you'll see that right now grog is at the top,
+but only I've only played three games with grog and it's won all three of them.
+So it comes up very strong and you can see how some of the others did.
+But because I haven't played enough games with different ones, it's not.
+You have to look for the ones which have the most games.
+Claude 3.5 sonnet uh, did the most games is the one that really rose to the surface, uh, from playing
+lots and lots of games.
+So it is actually the one that came out strongest from my my public website where you can you can play
+all of them and but the rankings is kind of fun to see.
+You should give that a try.
+You can also see the repo.
+See the code to learn more about what I did, and also read a blog post I made about how I wrote it
+and some of the the tactics that you can work on and should you wish to make your own variant of the
+game.
+There's there's some ways to do that.
+You can also run it locally to try out any models that you wish.
+Uh, anyways, use this as a chance to learn about models, but meanwhile we've got to press on with
+the course with week one, day four.
+So we spent some time now with GPT, and I'm sure you spent lots of time with ChatGPT, and you're probably
+familiar with the fact that GPT stands for generative is the G, which means that it's a model which
+is responsible for generating tokens or predicting what should come next after a sequence of inputs.
+It's P stands for pre-trained, in that it's been trained off tons and tons of data scraped from the
+internet and from all sorts of sources.
+Controversially, that is the P in GPT.
+And of course the T is transformer.
+GPT, the generative pre-trained transformer.
+So what exactly is this transformer thing?
+So I'm not a big fan of teaching tons of theory before you get stuck into stuff.
+So what I'm not planning to do now is tell you about the innards of a transformer.
+And I know some of you will be disappointed because like, I wonder about decoders and self-attention
+layers and blah blah blah.
+The way that we're going to do it is that over the course of the next eight weeks, I'm going to be
+showing you deeper and deeper glances into the insides of a transformer so that you get a better sense
+of how it all holds together.
+Because the way that I like to teach theory is through practice, through putting things into action,
+looking at the code, seeing what this transformer actually looks like as Python code.
+But for now, what I want to do more is tell you the story of the transformer.
+Give you some intuition for what it is and how it fits together, so that the rest of the next few weeks
+all fits into place.
+And it all starts a long, long time ago, in 2017.
+Not that long ago at all.
+In 2017, a bunch of scientists at Google put out a paper that's called Attention is All You Need,
+which I've linked in the resources.
+And the naming was because there's a sort of series of papers that are named in in the style.
+Something is all you need.
+And at the time they it's clear.
+If you look at the paper and I do recommend you do look at the paper, even though it might not make
+sense initially.
+Uh, but but as I say, linked in the resources.
+Look at the paper.
+The thing to keep in mind is that it's very evident that the scientists that wrote this paper did not
+realize what an extraordinary discovery they were making, or how it was going to change the years ahead.
+They didn't realize it.
+They thought it was a bit of an optimization.
+There's something good that we realized here.
+Uh, and that's at the core of the paper.
+Attention is all you need.
+So?
+So what was the paper about?
+Well, the paper was about describing a particular structure of a kind of data science model called
+a neural network or a deep neural network.
+And I know this is old hat to some of you, but but just give me give me a couple of minutes on this.
+So prior like some some time ago, we used to work with with traditional data science and these are
+models.
+They are statistical models mostly, uh, that try to predict some outcome based on some parameters,
+some controls.
+And it learns how to set those parameters by looking at lots of examples of data that's, you know,
+very broad brush strokes.
+So if you're trying to figure out how, how what kind of credit score someone should have that's going
+to take out a loan.
+You might look at various factors about that person, and then you might look at a lot of data about
+different people with those different factors and what their credit scores are.
+And by comparing your actual data of real world examples of people and credit scores.
+With this new person, you can estimate what the credit score should be based on all of this training
+data, as it's called.
+And that is a sort of traditional data science model.
+And uh, sometime actually in the 1950s, like a long time ago, someone had the idea of building a
+special kind of data science model that was loosely inspired by the human mind.
+Only loosely, it was called a neural network.
+The idea was that it was, rather than one statistical program.
+It was lots of statistical programs that were all kind of connected together in some way, sort of a
+nod to the way that the human mind has lots of real neurons, human neurons that are connected together.
+Similarly, the neural network had lots of little algorithms called artificial neurons, that were all
+connected together.
+And it turned out to be a very effective way to learn different patterns in data and be able to make
+good predictions about things like credit scores.
+And the neural network has something of a storied history, a checkered history of times when it seemed
+to be very much in vogue, and people saw tons of promise and times when it seemed to not show so much
+promise and fall behind a bit.
+And there were various breakthroughs along the way, and most of the breakthroughs were around ways
+to work with larger neural networks that could take more training data and be able to detect patterns
+even more deeply, and hence the expression deep neural network, or deep learning, which was about
+building these very, very deep sets of of these neurons connected together, they're actually sort
+of stacked on top of each other, connected together.
+And the more of them there are, the deeper this became, the more stacks on top of stacks and the sort
+of more intelligent these neural networks turned out to be.
+But I'm getting somewhere with this, I promise.
+In 2017, Google scientists came up with a new way to organize these these neurons, this neural network.
+It's called an architecture.
+The architecture is just the approach you use to connect these things together.
+And the new architecture was especially good at handling sequences of inputs and being able to look
+back on those sequences and figure out what parts of those sequences really matter, which was a type
+of, of of, uh, of, of layer in this network called a self-attention, an attention layer.
+And this, this idea, a layer that was able to figure out what should I pay attention to in the input
+sequence turned out to be to be a huge step forwards.
+It allowed.
+It allowed them to work with much bigger neural networks and much bigger data sets in less time and
+scale more effectively.
+And as I say, I know I'm being very hand-wavy on this.
+We will get more detailed later, but that's the intuition.
+And in 2018, where Google had really led the field of inventing this transformer architecture, OpenAI
+at the time of small, almost unheard of company, came out with their transformer called GPT one,
+the generative pre-trained transformer one.
+And it was okay.
+It was it was quite basic.
+Uh, and then a year later, they came out with GPT two, and I think I first really noticed GPT two.
+I remember 2020, GPT three, I sent this, I had this, this long argument with my dad about GPT three
+when I was saying, this is something huge.
+You got to look at this.
+This is big.
+Uh, and uh, yeah, he was like, ah, it's just statistics.
+Uh, and I'm not surprised.
+I also partly felt that way, too.
+We were all caught off guard.
+Even practitioners in the industry when ChatGPT came out in 2022, which was using a version called
+GPT 3.5.
+But importantly, it was also using something called ref that I alluded to, I think yesterday, which
+is about an even better way to make it not just think about extending a sequence, but also work in
+a chat mode with a user.
+User prompt a system prompt, a user prompt and its response and be trained in that way.
+And that was ChatGPT.
+And then of course, GPT four came out in 2023 and was like, whoa.
+And then 4.0 was last year, the multimodal version.
+And now, of course, for GPT five, maybe you're on GPT six, but the rest is history.
+That is the extraordinary, astonishing rise of the transformer.
+And we will cover more aspects of the architecture itself in the coming weeks.
+But that's enough for now.
+One step at a time.
+The one point I want to make, though, is that we don't believe that there's anything super fundamental
+about the transformer architecture.
+That means that it had to be discovered and that we wouldn't have things like GPT five or Claude 4.5
+sonnet if we hadn't discovered the transformer.
+The transformer, it's it's an optimization.
+It's a really clever approach that allows us to scale, train with more data, with more parameters
+in a in a more efficient way.
+Without it, it might have taken us longer to get to the point we're at.
+It might have cost more.
+The API costs that everyone complains about might have been 10 or 100 times more.
+The transformer allowed us to to do this faster and cheaper, but it's not like there's anything about
+it that somehow fundamental to what it takes to predict tokens.
+It's more of an efficiency play.
+That's a way to think about it anyway.
+And there are alternatives to the transformer architecture.
+There are state space architectures if you're familiar with them, and there are hybrid architectures.
+There's all sorts of stuff going on as yet.
+Many of them are sort of on lockstep with the transformer, but none of them have yet proven definitively
+that they are superior to the transformer architecture.
+So it still remains today the predominant architecture that people use for Llms.
+But but there are others, and as I say, important to keep in mind.
+We don't believe there's anything fundamental about this, this attention thing.
+It just happened to be really efficient.
+--- Lecture 2 ---
+And some of you may know that before the transformer, the model that we used the most was one called
+the LSTM, the long short term memory, which was a type of recurrent neural network NN.
+And and actually many people think that it is in fact more powerful than the transformer.
+It has a lot more ability to to take a sort of deeper understanding of the relationship between a sequence.
+The problem it had was that it was very hard to parallelize.
+It needed to learn things step by step.
+The outputs from one part of the of the input got fed to the next in a way that meant that you couldn't
+run all of your calculations in parallel, and that made it very time consuming and complicated to try
+and train these things.
+The transformer in some ways was a simplification.
+It was it was not not doing all this clever stuff.
+And it turned out that the simplification that you got so much benefit from being able to parallelize
+and do things together concurrently, a lot of the time that it far overtook the fact that it was a
+bit of a simplification.
+But the reason, since it was a simplification, the reason for the title of the paper attention is
+all you need.
+Well, the authors were trying to say is, you know what?
+It turns out we don't need all this clever stuff.
+If you just have this much simpler construct called attention, it's actually good enough.
+And because we can scale it so much more and, and operate in parallel so much more, we can actually
+get much further along.
+And that was that was the purpose of attention is all you need.
+And the results speak for themselves.
+And the world's reaction you'll probably remember in 2023.
+First of all, people were astonished, amazed, shocked.
+It was everywhere in all the papers, people that friends of mine would ask me, so, so, so what's
+a transformer?
+Which was kind of crazy.
+It's my day job, and I wasn't used to people around me knowing the word transformer.
+It was.
+It was everywhere.
+Uh, and that was followed by a backlash that was followed, uh, famously by by a paper on the dangers
+of stochastic parrots, uh, written by some prominent scientists who were concerned that people were
+looking at these these simple statistical models that were just predicting likely next words and interpreting
+them as being truth when they weren't necessarily they were just the most likely next, next word.
+It was just statistical.
+It was predictive text on steroids.
+And so people were very concerned about the implications and what could happen as a result.
+But their concerns, it's worth reading that paper just just to get a sense of of what people were thinking
+at the time.
+And of course, it didn't age well.
+We now see this remarkable characteristic that that still surprises even the experts today.
+Even the people in the frontier labs in OpenAI are perplexed by the fact that it's not a surprise that
+we're able to get so good at predicting likely tokens.
+Tokens we'll talk about.
+Of course, they're fragments of words.
+It's it's not a surprise that we can take an input sequence and predict words that look very realistic,
+really good predictive text.
+That's not surprising.
+The thing that's surprising is that as a byproduct of doing that, so often, what gets predicted happens
+to be the truth.
+It happens to be accurate.
+And if we give like a maths problem, a math problem in that input sequence, you'd expect some sort
+of plausible words that sound like an answer to a math problem.
+What you might not expect is that it actually is the answer to that math problem.
+That's the part that's caught everyone off guard, and we don't fully understand it.
+We understand how it works.
+We understand the statistics and the numbers.
+We're sort of still surprised about why it works and why it works so well.
+So that that phenomenon, the fact that with a big enough neural network, with enough of these kinds
+of these, these neurons, these little algorithms hooked up together that you get a not only likely
+tokens, but accurate tokens, intelligent tokens or tokens that that represent an intelligent response.
+It simulates its.
+It imitates an intelligent response very accurately.
+That still a bit of a mystery.
+And it's what people call the property of emergent intelligence.
+With enough scale, you start to not only create plausible tokens, but actually ones that imitate intelligence
+very accurately.
+And some of the innovations that we've we've hit in the last few years.
+There was a time when prompt engineering, a prompt engineer, was actually a job out there that commanded
+a high six figure salary for a while.
+And I feel like prompt engineering is like a profession.
+And a thing came and went.
+Now all of us are prompt engineers.
+We all know the different tricks and the ways to explain the context.
+Give some background, say the style of what you want.
+We've all got so good at this that it's no longer a job title.
+I'm sorry for prompt engineers out there, but it was for a bit.
+The Copilots have come and they have stayed for sure.
+Microsoft Copilot, GitHub Copilot that I think deep research showed us earlier.
+These copilots are definitely, uh, what was it was a big moment when we realized that that humans
+and llms could sort of operate collaboratively to work together on things like documents in order to,
+to, to get more and in order to, to both, uh, automate some of the manual tasks, but also enrich
+the work that we're doing by working hand in hand with an AI with an LLM.
+Next was the evolution of prompt engineering.
+And this is more in recent time.
+And this new word context engineering.
+Context engineering.
+The new prompt engineering is about thinking broadly about all of the information that you can give
+to an LLM to best set it up for success.
+And that can be business specific commercial information that you're giving it in the prompt, and you're
+maybe stitching it together in a really compelling way.
+And in addition to that, you're also equipping your MLM with things called tools that will do next
+week.
+Uh, and it sounds very fancy, and it's actually not that fancy at all.
+It all comes down to.
+Just better ways to inform the LM, to give it better input sequences so that when it's coming up with
+the output sequence, it's more aligned with the task you're trying to solve.
+If you're trying to find out about you're trying to inform your customers about the ticket prices to
+travel to different locations, then you need to make sure that those ticket prices are included in
+that input sequence, so that when the LM is predicting tokens, it's including the right ticket prices.
+And that is fundamentally what context engineering is all about.
+And last, but very much not least, is a genetic AI surely the hottest topic in AI right now?
+And of course, I have a whole companion course on just that.
+There are many different ways to define agents, but two of the most common, uh, one of them is it's
+it's a system where an LM controls the workflow, a system where you have an LM which is responsible
+for figuring out what happens next, including potentially calling other LMS, making use of tools or
+functionality that you're running.
+That is one common definition of a genetic AI, and another one which is becoming, uh, probably more
+common these days is that a genetic AI is when you have an LM in a loop and that loop, in other words,
+it's repeatedly being called, it's calling itself repeatedly, and its inner loop, and it has access
+to tools which allows it to take various actions.
+And that idea of an LM and a loop with tools, that's something that if you've ever used Claude code,
+you're very familiar with, because it really is front and center, you see the to do list that it's
+working on, you see it planning out what it's going to do and then ticking them off one by one.
+And it is just a series of LM calls carrying out each of these actions.
+Another word people love to throw around with their genetic AI is the word autonomy.
+Autonomous.
+this idea that you're you're allowing an LLM to sort of be master of its own destiny, choosing what
+it wants to do next.
+Of course it sounds.
+It sounds like voodoo, but it's all again, it all just comes down to it taking in an input sequence,
+generating an output sequence.
+But when it generates that output sequence, that can include some instructions about what activities
+it wants to do next.
+And when you do that, when you have an LLM predicting tokens, which says, this is what I want to
+do next, then that is in a way autonomous.
+It's choosing its own destiny.
+And that is a sign that you're working with a genetic AI.
+And so so there you have it.
+We'll, we'll we'll talk more about it later.
+We'll build some in the final week of this course.
+It's going to be great.
+And a genetic AI all the rage.
+And if you haven't well, we just saw Claude code, so you already probably have a pretty decent feeling
+of what it feels like to be working with a genetic AI.
+And also, of course, the GPT agent that we did that found that, that that a reservation for for banoffee
+pie in the evening.
+--- Lecture 3 ---
+When I was describing Transformers, I mentioned this word parameter and it's a word you hear a lot.
+In fact, we talked about like the 8 billion parameters in llama 3.2 and the what was it, 270 million
+in the smallest version of Gemma.
+So what are these parameters?
+Well, you may already know what parameters are.
+You may have a very good sense of it.
+And if you don't, I've put some short videos in the resources of times when I feel like I did a great
+explanation of parameters, and so to avoid boring the people that already know it, I'll just suggest
+if you don't know what these parameters are then, then check out the videos that I've attached in the
+course resources and you'll get a really great briefing on them.
+Um, but the, the, these these parameters, back in the traditional machine learning days, we used
+to have somewhere between 20 and 200 parameters that were control and model choose the creditworthiness
+of someone based on on maybe 20 factors, 30 factors, that kind of thing.
+And the first time that that neural networks, that deep neural networks came out.
+I was just so shocked by just the number of these different parameters that we were talking about.
+And when GPT one came out and it had 117 million parameters, just an extraordinary number.
+I remember thinking, I can't imagine what all of these parameters are being used for, and I can't
+imagine we're ever going to need a model bigger than this.
+And I was a bit wrong there.
+Well, this is what happened next.
+GPT two had 1.5 billion parameters GPT three.
+175 billion.
+GPT four had 1.76 trillion parameters.
+It's it's an extraordinary number.
+And the latest frontier models.
+We don't actually know how many parameters they have.
+They haven't revealed them.
+There is a sense, actually that that we've been able to reduce parameters a bit generally.
+I'm sure there's still they're probably still in the tens of trillions, but they have come down a bit
+because we've got much more efficient at sort of packing information into a smaller number of parameters,
+as evidenced by the fact that that smallest Gemma is only 270 million parameters.
+It's smaller than GPT two, and yet it's way more powerful than GPT two.
+So we've definitely been able to do more with less when it comes to parameters.
+Nonetheless, as a general rule, more parameters means more intelligent, more training information
+has been absorbed into the neural network.
+And generally speaking, when you see that there are models that come in different flavors, like GPT
+five has a nano, a mini, and GPT five the whole one that represents three different sizes of the model,
+with three different sets of three increasing numbers of parameters.
+Now, the Frontier Labs typically haven't been explicit about that, so we don't know for sure and we
+don't know how many, but that's certainly everybody's understanding.
+Similarly with Claude, you've got haiku is the smallest sonnet in the middle and opus the largest one.
+And we understand that they are three different sizes of model.
+And that's certainly reflected in the cost, which we understand, of course, is the actual compute
+cost.
+Basically how much it costs to calculate all of these parameters, these trillions of parameters.
+So so that's why there are these different variations of model.
+And they represent different sizes, different, different uh, different amounts of parameters in the
+model.
+And we sometimes call that training time scaling.
+It's saying a bigger model, more parameters.
+It needed more.
+It was more expensive to train it.
+And it can typically absorb more training data.
+There's something from from a few years ago called the Chinchilla scaling laws, which you may have
+heard of.
+It's not talked about so much anymore, but it says that generally speaking, the number of parameters
+you have in a model is roughly proportional to how much training data it can successfully be trained
+on, and still absorb that training data.
+So generally speaking, more parameters means we could do more training.
+We've got a beefier model.
+And so as I say, this idea of having more parameters is sometimes called training time scaling.
+That can be contrasted with another way to get more out of a model, which is sometimes called inference
+time scaling.
+You remember I said inference is just the word for when you run a model.
+When you've trained it, it's done.
+You've got the model, and now you actually use it.
+Well, when you use it, there are tricks you can do that will make it perform better, be smarter.
+And one of those tricks is the reasoning trick that we've already looked at.
+It's telling it.
+Hey, don't just answer this question.
+I want you to first generate tokens that describe how you will answer the question.
+And maybe I'll do that janky thing of shoving the word wait in there a few times just to make you do
+even more of this.
+And it turns out you get a better outcome by doing it.
+Another type of inference time scaling, is about putting more information in the input sequence, like
+ticket prices around the world, which means that when it's generating outputs, it can it can draw
+on the input sequence and be influenced by it.
+And, you know, that's very consistent with techniques like Rag that we will come to.
+Uh, and so those two techniques I just mentioned are both examples of inference time scaling ways to
+make your model perform better at inference time not when you trained it, but when you're actually
+running it.
+And this idea that there are these two different parallel ways that you can get more out of a model,
+training time scaling and inference time scaling is something that has really come to the to the forefront
+in the last year or so, because previously it was all about training time.
+Everything was about a bigger model.
+Bigger is better, more parameters, bigger, more training.
+And in the last year, inference time scaling has really taken off.
+And you know, two years ago it was Rag, which is inference time.
+And and then in the last year it's been a lot about different reasoning techniques.
+And basically these are two different orthogonal tracks to getting more out of your model.
+And you can do both.
+You can scale at training time and scale at inference time.
+And we'll talk a lot more about this over the course of the next eight weeks.
+And you'll see some real examples of both in action.
+Okay.
+But I just want to superimpose on this line the size of some of the open source models that we've,
+some of them we've already come across, and some of them we will.
+On the left, I've put the llama 3.2 with 3 billion parameters as a yellow dot.
+There you can see it's just slightly more than than GPT two.
+Uh, I should point out, of course, if you didn't already realize this, that this is a logarithmic
+scale, so that every one of these tick marks represents an order of magnitude ten times bigger.
+It's not like a linear scale with one, two, three, four, five.
+It's 1 billion, 10 billion, 100 billion.
+Uh, so so llama 3.23 billion is give or take close ish to GPT two, but way more powerful.
+Llama 3.1.
+It has a smaller number, but it's a bigger model with more parameters and outperforms llama 3.2.
+It's 8 billion.
+Uh, llama 3.3 is 3.3 billion.
+There is also a llama four comes in a bunch of different varieties.
+There's a multi modal one that I think 2.45 billion is uh is the more common one GPT os the open source
+version GPT.
+We've already played with the 20 billion version that I'm not showing here, but we also played with
+the 120 billion version, which is the heftier one.
+We didn't play with it.
+We had it playing the Outsmart game a moment ago.
+And then the biggest one I've got on this diagram, Deep seek has 671 billion parameters.
+And most of these big models are what's known as a mixture of experts model, which means that within
+them they contain a lot of smaller models that get activated, get used based on the question that's
+asked.
+Take a moment to absorb this scale, this logarithmic scale of parameters, and and marvel at the enormity
+of the latest frontier models in the probably tens of trillions of parameters.
+Absolutely extraordinary.
+If you haven't seen my videos and the resources about parameters, then then if you're interested,
+check them out and and keep all of this in mind as we go forwards and think more about how these models
+actually function.
+--- Lecture 4 ---
+Let's take a couple of minutes on what tokens are.
+Most of you know, but hopefully there'll be some interesting stuff here.
+In the early days of neural networks, we used to build neural networks that were trained to take in
+character by character, letter by letter, and they would output the most likely next letter.
+And there were some nice properties of this.
+There were only perhaps 100 possible characters for uppercase, lowercase, and punctuation.
+And so there's a nice and simple, uh, vocab, different possible inputs.
+Uh, and, uh, that meant that it could take up little memory and it could be quite efficient, but
+it required the, the neural network to understand too much like it was.
+It was too hard to train it to both understand how to make up different words out of their characters,
+and also associate them with some kind of meaning.
+There was too much being left to the network, and the next thing we tried was really having one word
+each.
+Each input.
+Being a word is the kind of obvious thing to do.
+And so you'd build up like a, like a vocab of possible words that could be passed in.
+But then we had the opposite problem that there's so many possible input words because, you know,
+language, but also because of all the proper nouns, the names of places and things.
+So this exploded and and we'd have to leave out rare words from the vocab that meant that they didn't
+understand some things.
+But this is what we put up with for a long time.
+And then, uh, the, the, the breakthrough, the idea was to have some sort of a middle ground where
+you have a chunk of text.
+It might be a word, or it might be a fragment of a word, or it might even be two words.
+If you have two words that are really common, uh, and you build up a vocab, that is these fragments
+of words, these chunks of characters.
+And as a result, you can have a limited set.
+You can constrain it to some set because you could go all the way down to the character level if you
+needed to.
+And you can allow the model to recognize various fragments of words as having some meaning associated
+with them.
+And basically this approach just ended up working really well.
+It's a bit like the transformer architecture.
+We don't think that there's something fundamental about tokens that we needed to do it this way.
+We could have done it with characters, we could have done it with words, with massive dictionaries.
+It turned out that this compromise with tokens is efficient.
+It works fast.
+It learns about about the concepts really quickly.
+And it has this nice little extra property about word stems that I'll explain in just a second.
+But but it allowed, very simply, a neural network to recognize that often you have a case where there's
+one chunk of characters and then different chunks come after it, and that that is just moderating the
+main, the main chunk.
+And that sort of fits nicely with the way that we happen to to spell things, to write things to, to
+our language.
+And so that property again meant that it could be very efficient.
+And so that's the background to tokens.
+And now I do want to explain.
+So these tokens are the input.
+They are passed in as is the very first input into one of these language models, these LMS or any deep
+neural network.
+In fact, it's the number associated with like the token ID, which one of the tokens it is.
+Uh, it's different from things called vectors.
+And if you're a pro and you already know about vectors, then some people do get confused about, oh,
+hang on, what is a token of vector?
+No, we'll come to vectors later.
+They're different.
+They come further down in the neural network.
+The very first input, whether you're making a vector or whether you're generating next tokens, the
+very first input is just the token id.
+So so put vectors to one side.
+We will come back to them.
+They are different okay.
+Let's look for a moment at the tokenizer that's used for GPT.
+And you can get to this yourself by going to platform.
+Tokenizer and have a play.
+And this is a lovely way to get a hands on view of what is it like turning text into tokens?
+--- Lecture 5 ---
+
+And so you can see on this user interface, I've typed in the sentence an important sentence for my
+class of AI engineers.
+And below it, the user interface has shown how that would be converted into tokens with those colors.
+And you'll see that in this case, because these are very common words, each word is mapped to a token
+in its own.
+So Ann has a token important sentence for my class of AI engineers.
+They each get a token.
+You may also notice you can pick the different model in the user interface, because different models
+may have slightly different strategies for how they turn things into tokens.
+That's not super important.
+Some people get worried about does this mean I have to pick a model that will be more efficient?
+It's just some different decisions they made during training doesn't make a huge amount of difference.
+But if you're if you're investigating tokens, then pick the one that is the one that interests you.
+So I wanted to make the two points.
+One is that that each word has gone into a token.
+The other point I wanted to make is that you'll notice that in the way that it's colored things in,
+it's its coloured the space before the word as well, and that reflects the fact that the token isn't
+just the word important, it's also something called a beginning of word.
+Part of that it's telling the model that's fed to that.
+What comes next is a new word, and it's the word important.
+And those both those bits of information are a part of what what that token represents.
+And if you had a word like unimportant it wouldn't contain that token.
+It would be a different it might be un and then another version of the important token, but without
+the space in front of it.
+Subtle point is worth understanding.
+There is this difference between tokens that represent the start of a word and tokens that represent
+a fragment, the middle of a word.
+And I'll bring that to life in the next one.
+Okay, so here's another one.
+I've now got, uh, an exquisitely handcrafted quip for my master's of LLM witchcraft.
+Okay, uh, steady on, uh, the flowery language for you.
+But the reason I do it is because there are some less common words here, and even in an invented word
+in mastera.
+And I wanted to show you how those more, those less frequent words get broken into multiple tokens
+so that they can still be understood by the model.
+Check out the colors exquisitely is obviously not a common word, because look, it got X as part of
+it and then quiz it li.
+Lots of different fragments there.
+Handcrafted was split into two hand and crafted.
+And so it does have it will be mapped to something which which has some understanding of of hand and
+then something which ends crafted.
+Notice that that token crafted doesn't have that space before it.
+It represents a word ending crafted.
+And so it's mapped to something that the neural network will recognize wherever it's had something crafted.
+The next one is quip, which has been broken into and and then for and my get get separate ones Masters
+gets master, which is the, you know, represents the verb to master and then errs as you know, someone
+that does something.
+And so it kind of works.
+Again, it's not super important.
+It's not like the neural network needs it to be done this way.
+It's just more likely to train faster and to be able to capture, reflect the meaning of these words
+quicker.
+If the way that they're fed into it already is kind of similar to the way that these words are constructed.
+And then of and then LM wasn't as common.
+Now LM, of course, is like insanely common expression.
+But at the time that this tokenizer was built, LM wasn't such a big term.
+And so LM got broken into two tokens and witchcraft gets witch and then again craft as the as the ending.
+Um, and so that it again, it's similar to the meaning of these, these compound words.
+Uh, so so that gives you a sense.
+It's not it's not actually a compound word, but but like a word that's composed of multiple pieces,
+so it gives you a sense of how it works.
+You can see that there were 66 characters here, and it got mapped down to 18 tokens.
+If we go back to the previous slide, we'll see there there were 50 characters that got mapped down
+to nine tokens.
+So it gives you that that kind of sense for for the ratios that are involved here.
+And it's also interesting to see this next example.
+This is Edna's fave number is 3.141592653589793.
+Uh, you can see that, uh, the way that's been broken down is that that number has been split into
+fragments of three digits at a time.
+And it's kind of interesting.
+Basically, they've got a separate token for every possible three digit number.
+So a thousand of the tokens in, in, in Gbt's vocabulary, uh, consist of just different three digit
+numbers.
+And any three digit number will get mapped to one token.
+And it was it's interesting the way that it that it does this And it might.
+It was in the early versions of GPT before it got as as as smart as it did.
+You'd find people used to joke that if you gave it a three digit math problem, it would get it right.
+But if you gave it a four digit math problem, then it would flounder and give like a random answer.
+So people would say that, you know, when the overlords take over and they're coming for us, we'll
+just just set them a four digit arithmetic problem and they'll be stumped.
+But unfortunately for us, they are now easily able to handle four digit numbers.
+But but the understanding at the time for for why it was difficult for them was because it was then
+split across multiple tokens, rather than it just simply being something that it could always have
+in its training data, because it was one token combined with another one token has an answer.
+So anyways, it's it's interesting to look at this kind of effect.
+You should take the time, even if you're a pro, take the time to go to platform tokenizer.
+Mess around yourself because it's always good to get that sense of of how it's working under the hood.
+The rule of thumb people tend to use is that typically, typically a token ends up being about four
+characters.
+If you're if you've got a character count, you're trying to turn it into the number of tokens.
+Or the most common rule of thumb people use is that, roughly speaking, a token is like three quarters
+of a word, so a thousand tokens would be about 750 words.
+That's a way to think of it.
+1000 tokens, about 750 words.
+And give another example here, the complete works of Shakespeare.
+People tend to have a sort of a sense of how much content that is.
+You can picture the volumes up on a bookshelf, the Complete Works of Shakespeare, that's about 900,000
+words.
+So it's about 1.2 million tokens.
+So give or take, people often talk about the cost per million tokens.
+That's something we'll talk about in just a second.
+You see that quoted on in lots of places roughly.
+You can think of that as being like, uh, the, the cost of the complete Works of Shakespeare, the
+complete works of Shakespeare a little bit more than a million tokens, but roughly.
+So that's giving you a good sense of how to map between tokens and words.
+And it's worth pointing out that that's true for language and particularly for like common English language.
+But if you start to move to things like math or scientific terms or code, then it typically uses up
+much more tokens, because these words are things like variable names that can be obscure, uh, and
+code can be can be quite, quite complex and dense.
+And as a result, it can be more closer to a token per character.
+Uh, but, but but always a bit more efficient than that.
+So you can you can do some experimenting.
+You can also try putting some code in to GPT tokenizer and get a good sense for that mapping.
+It's useful to have a good gut feel for how many tokens different amounts of text take up.
+And now I know what you're thinking.
+You're thinking editor, you told us this was going to be a practical session and you've just been yabbering
+away for ages.
+Okay, I hear you.
+Let's go to the code.
+Let's go to cursor.
+--- Lecture 6 ---
+And so here we are back in my favorite place to be.
+And we're going to go into week one.
+And we're going to go to day four.
+And here we have day four.
+Tokenizing with code.
+Start by picking a kernel on the top right.
+Click there.
+Select kernel Python environments Vmv.
+All right.
+So I'm going to begin by importing a package called tick token.
+And then I'm going to say I would like to get the tokenizer the thing that encodes text into tokens
+for the model GPT 4.1 GPT 4.1 mini is often my favorite model for chatting.
+It's a chat variant.
+It doesn't do all the reasoning thinking, so it's nice and simple.
+And let's see what happens if we encode.
+Hi, my name is Ed.
+Now this isn't making an API call.
+This isn't going to the cloud.
+This is just doing a lookup of a mapping.
+Let's see what those tokens are.
+Oh and here we go.
+They are token number 121949221308 and so on.
+And you're like, oh yeah that makes complete sense.
+So so it turns, it looks up, it breaks this.
+Hi my name is Ed into different chunks and then it looks up the number, the ID associated with each
+one in its vocab.
+And that's the numbers you see there.
+So what we can now do is just loop through that and decode, turn each of these numbers back into the
+fragment that it represents.
+And if I run this you can see that's literally just what I'm doing.
+I'm calling this decode function.
+And so we discover that this token 12194 is in fact the word hi.
+My name is Ed, and I'm pleased to see that Ed gets its own token.
+How about that?
+Uh, number 6117, no less.
+I think there's some idea that a smaller number represents like, like higher up in its index means
+it's one of the the more kind of more primary, uh, first few words in its dictionary.
+Uh, I don't know if it actually means very much, but but, uh, it's quite fun to try and guess to
+see if you can get, uh, words which, which are very high up in its vocab.
+Anyway, so that is.
+Hi, my name is Ed and we could do more.
+We could say hi, my name is Ed aired.
+And I like banoffee pie because it knows what to put there.
+Ah, there we go.
+So we will run this, uh, and run this.
+And here you see the same tokens began, and then a bunch more tokens came afterwards.
+And what do we get?
+Hi, my name is Ed, and I like Ban Offee pie.
+Um, and, uh, so interestingly, not that surprising.
+Banoffee does not get its own token, and, uh, it, uh, does break banoffee into, uh, these into
+ban and Offee.
+Um, and, uh, that's that's why we see our first fragment there.
+And offee is token number 26,458.
+I guess it's more fun to try and pick a word that is this far out in the vocab.
+Um, but you can see you can you can, uh, look here and you can see that token ID three, two, six
+is the word.
+And and sure enough, if we look to decode three, two, six, we'll see that that is in fact the word.
+And so that's how you can use tick token as a way to translate text to tokens and tokens.
+Back to text.
+And you can count up the number of tokens and use it to experiment.
+It's very similar to using the UI that we did before, but I would suggest come on in here, mess around,
+find a little challenge, find a word which has a really small token number and a really big token number
+doesn't.
+It's not not relevant to anything, just just something fun to do and get a sense of how words get broken
+into individual fragments.
+And I have one more topic before we go back to the slides.
+And it's a really interesting one.
+It's something which is probably obvious to many of you, but for some of you it's not.
+And for you it will be a real help.
+It's a real aha moment when, when when I connect the dots for you here, there is this thing that I
+call the illusion of memory, which it's so important that is like super, super clear to you.
+So look, here's the thing.
+Let's start by just doing the same as we did before.
+Let's Load the dot env.
+This is loading the dot env file.
+Bringing in the secrets.
+Making sure that the OpenAI API key is set.
+It looks good so far.
+If you're not using OpenAI, hopefully by now you know exactly how to switch this to a llama.
+Okay, so the next thing I'm going to do is run these two lines.
+And by this point, you should be super comfortable with what this is doing.
+It's not bringing up some LLM.
+What it's doing is it's creating a new instance of OpenAI Python client library, which is a wrapper
+around making HTTP calls to an endpoint with a model.
+By default it's it's OpenAI.
+You can switch it for another.
+There we go.
+We know it.
+Well okay.
+And this is the other thing, you know.
+Well, the way that you make an API call is you pass in a list of dictionaries.
+Each dictionary has, uh, two, two things in it.
+One thing has a key of role.
+And the value can be system for the system prompt or user for the user prompt.
+So here I'm going to say you are a helpful assistant.
+And my user prompt will be hi, I'm editor.
+All right.
+There we go.
+That is the message.
+So we now are going to call OpenAI.
+And I'm not typing it in but but you know it it's response is OpenAI create.
+You pass in the model.
+You pass in the messages.
+The same message we've got right here, this list of dictionaries and what comes back.
+We take choices, zero message content.
+And, you know, from from the prior day that this is basically just making an HTTP call and then unpacking
+the results.
+And let's do that.
+And back comes the response.
+Hi Ed.
+Nice to meet you.
+How can I help you today.
+Oh that's nice.
+All right.
+Okay.
+So now we're going to ask a follow up question.
+And my follow up question will be, uh, what's my name?
+So I'm saying, uh, you know, system message.
+You're a helpful assistant user message.
+What's my name?
+Okay, I know half of you know exactly what's going on here, but hang on.
+So I call again Open air completions create.
+I pass in the model, I pass in the messages and I get back response message content.
+Yes, yes, get on with it.
+Here we go.
+I don't have access to your personal information.
+How can I assist you today?
+What?
+So what's happened here?
+We just said my name is Ed.
+It's said.
+Hello, Ed.
+Nice to meet you.
+What's going on?
+All right, well, for those that, uh, that don't know what's happening is that every time you call
+an LLM, every one of our calls to the LLM over this API is completely stateless.
+Every time we call it, we're giving it this input sequence that gets fed in as the input sequence to
+the GPT model, this transformer that predicts most likely next tokens and it predicts the tokens.
+I can now say tokens without saying I'll get on to that.
+It predicts the tokens that are most likely to come next fresh every time.
+It doesn't have any background.
+It doesn't know that you called it 20s ago with your name.
+It just has this input sequence and it's predicting the next tokens and you'll say, but that's not
+my experience of using ChatGPT.
+I know perfectly well that it can hold a conversation.
+Aha!
+And that is because we use a trick.
+It is the job of you and me to to fool the user into thinking that an LLM has things like memory and
+that it remembers what you were saying, and that it keeps context.
+All of that is trickery that we apply to calling the LLM, and we do it in a super simple way.
+And this is what it is when we build our messages, list the input sequence that gets put into GPT.
+We don't just give it the most recent message, we give it the whole conversation.
+So far we say, you are a helpful assistant.
+Hi, I'm Ed, and then there's this other thing.
+I hadn't told you about this yet.
+There's another row I've got in here where the role isn't system or user.
+It is Assistant, which is its response back, and it's recording that it said, hi Ed, how can I assist
+you today?
+And then I'm saying, what's my name?
+And so that that is my my final message here.
+So it has all of this in the input sequence.
+And of course when we run this we will get a different answer.
+Your name is Ed.
+How can I help you today Ed.
+And so again apologies if you know all this already, but I do want to reinforce it.
+These five points I've got here you need it needs to be second nature to you.
+It's so obvious.
+Every call to an LLM completely stateless number two we pass in the whole conversation so far with every
+input prompt every time.
+And number three, it gives the illusion that the LLM remembers what you said 30s ago, because you're
+passing it in every time.
+It can keep the context of the conversation.
+The whole thing is a trick.
+It's a trick that it's it's it's producing the next token.
+And in doing so, it's producing the token consistent with this full input so far.
+And that gives the illusion that it has a memory of what you said before.
+That memory is just what we call the input sequence, including the past.
+And so the LLM just predicts the next tokens in the sequence.
+If the sequence says my name is Ed, what's my name, then likely next token would be your name is Ed
+not your name is Joshua or something.
+That would not be a likely next token.
+And and that's all that it's doing.
+And if you didn't say my name is Ed, what's my name?
+If you just said what's my name, then the next token is like, I don't know your name.
+So that's that's all there is to it, even if you already knew that back to front, it can't hurt to
+have had that reinforced again and to see it viscerally in the code like that.
+Uh, and uh, the, um, the.
+Yeah, it's, it's such a core understanding.
+And the first time someone hears this, I sometimes get people saying, well, that's unfair.
+Does that mean that we have to pay every time for for all of the past, and it sort of accumulates.
+And you have to pay more and more with every message.
+And the answer is yes, you have to pay.
+And there's a reason you have to pay because you're asking the model to calculate more.
+You don't just want it to answer what is your name?
+You want it to answer.
+My name is Ed.
+What is my name?
+You want it to take all of that into account, and doing so requires more computation and you need to
+pay for it.
+You need to pay the electricity bills for doing this computation, and it's trillions of calculations.
+Now, you probably will talk about costs in a second, but you probably know that the costs per input
+tokens are very, very cheap.
+Each extra token is a fraction of a fraction of a cent for most, most models.
+And so it's really very, very small.
+But nonetheless the cost is there.
+You do need to do more compute for the prediction of what's to come next in the sequence, to be able
+to look back and understand the full context of what's happened before.
+So a critical learning point, even if it was obvious, it's always worth reinforcing.
+--- Lecture 7 ---
+Now there's a constraint.
+When working with LMS, you need to be aware of, which is known as the context window.
+And the context window is the maximum number of tokens that any particular model can fit that it can
+it can look back on.
+It can consider for when it's generating the next token.
+It's the maximum length of the input that it can that it can handle.
+And if you try and pass in more input than that, then it will fail.
+It will say bigger than my context window.
+Can't do it.
+Now here's something to keep in mind that that thing that gets that needs to fit within the context
+window isn't just your message you've just given to the LM.
+But as you now understand, it's what the actual input sequence isn't just the most recent message,
+it's the whole conversation.
+So far.
+It's the first thing you said.
+Hi, my name is Ed and then nice to meet you, Ed.
+And then what's my name?
+All of that has to fit in the context window.
+And actually it's a little bit more than that too, because you have to pass in all of that.
+And then GPT generates the most likely next token, which is perhaps the word your is going to say.
+Your name is ed your, it produces your.
+And then the whole of that input sequence is fed back in again to GPT with the word your at the end
+of it, and it generates the next token of name.
+And then in goes all the input with your name and it generates is and then your name is Ed.
+It generates tokens one at a time and the whole input is passed back in.
+And that means that what you need to be able to fit in the context window is the original input, the
+replies, the next input, the final message you're giving it, and then all of the generated tokens
+that it comes up with up until and not including the very last token that it generates.
+All of that has got to fit in the context window.
+And so obviously the context window governs how much the background the model can remember about references
+and content and context.
+And as I gave the example before.
+If you're shoving all of the ticket prices to different cities in the prompt, then it allows it to
+be able to remember a certain number of those references.
+And it's particularly important for a technique called multi-shot prompting, which is a technique where
+in the input you give a series of examples of example questions and answers for it to kind of draw from,
+as it's trying to figure out what sequence to generate.
+And it's also important for techniques like Rag that of course we will get to.
+But many of these inference time techniques we talked about about training time and inference time scaling,
+many of these inference time techniques make hefty use of the context window, and that's why it's important
+to keep it in mind.
+And people that have used Claude code say, are very aware of what happens as you start to fill up that
+context window.
+And if you happen to have a question on the complete works of Shakespeare, well, you would need a
+context window of like a million tokens to be able to handle that.
+And as we'll see at the moment, it's only models like Gemini that are able to handle that much of a
+context window.
+And that brings me to everybody's favorite topic API costs.
+So look, the chat products like ChatGPT typically have a free tier and a paid tier or many paid tiers.
+They range from $20 a month to $200 a month.
+And that gives you a monthly subscription.
+It means that you can use it with no charge per use, but some kind of rate limiting that is completely
+unrelated to using the API.
+If you use the API, it doesn't matter whether or not you have a subscription, you pay per use of that
+API, and the idea is that you could use that to to build your own product, your own ChatGPT to rival
+ChatGPT, and you'd be monetizing it, but you'd also be paying per API call because you have to pay
+the compute bills.
+These these API costs go into paying for the inference compute.
+There's trillions of calculations happening.
+And presumably a little bit goes towards paying OpenAI back for the $100 million plus that they spent
+on training this model.
+So that's why there are costs.
+Typically, the cost depends on how many input tokens you passed in and the output tokens that you generate.
+And there's two little catches in there.
+One of them, of course, is that the input tokens needs to include the full sequence so far, including
+all of the fake memory that you've inserted in there and anything else you put in there like rag.
+And some people think that that sounds unfair because costs will start to accumulate.
+But again, remember you need it to do this compute.
+You need the transformer to look back on all of this in order to predict the most likely tokens.
+So you should be happy to pay the bill because you want the result.
+If you wish, you could just pass in the most recent message.
+Forget the history.
+Don't pay for that compute.
+But then your your results are not going to be good.
+So that's why.
+And it does make sense.
+The other catch is that when you pay for these output tokens that Includes any reasoning that the model
+is doing for these reasoning models that generate output that describes their thought process.
+Those are output tokens that you need to pay for, and in the case of gpts models, you actually don't
+even get to see these outputs.
+It's all it's all happening behind the scenes, but you still pay for them.
+And again, people sometimes think that that sounds a bit mean.
+But at the bottom line is that compute needs to happen, that processing needs to happen.
+Those those calculations need to happen.
+And so it's only fair that we do need to pay the compute cost for calculating that reasoning trace.
+But it can lead to a little bit of unpredictability associated with costs when you don't always get
+to see the reasoning that's happening.
+So those are the two catches to watch out for as well with API costs.
+One of the things that I'm going to cover a lot are things called leaderboards, which is where you
+get to see ranked comparisons of different llms, particularly in week four.
+We do that, but one that I'll show you right away is a leaderboard called vellum which is at vellum
+leaderboard.
+You should go check it out.
+And this is a really convenient it's got lots of leaderboards there.
+Lots of great things to look at.
+We'll look at many of them later, but in particular there's a very handy one right in the middle which
+shows you the context window and the API costs of many major models.
+And you'll see there that I'm showing that GPT five, it has a context window of 400,000 tokens.
+That's big.
+That's a lot that you can cram in there.
+The input cost is one point is $1.25, and the output cost is $10.
+And you might think, okay, that's quite a lot $10.
+But do keep in mind that that is $10 per million output tokens.
+So there's a there's a lot there, uh, that you can fit in a million output tokens basically give or
+take.
+You generate the complete works of Shakespeare and you've spent $10.
+Uh, and that would be a lot of content to generate.
+And so, you know, it's definitely worth understanding that these things are they come at a cost.
+And if you're looking to operate this at scale, where you have lots of concurrent conversations happening,
+then you need to take a lot of care to understand what are going to be your unit costs for each of your
+users, and how do you factor that in.
+But when it comes to individuals using if you're just experimenting, prompting yourself some of these
+models with just hi, my name is Ed, then divide those numbers by like like almost a million by like
+100,000 for ten tokens.
+You can see that the costs involved in individual small API calls are really very small indeed.
+And so whilst people I understand it's frustrating to have to put in the $5 up front to OpenAI, that's
+annoying.
+But recognize that the actual costs that you make for everyday API calls if you if you're not building
+a bigger, scalable system or an agent loop which can eat through the tokens, then the costs involved
+are relatively small, so it's important to get a handle on that and feel comfortable with what are
+these API costs.
+And I also want to mention that when you see GPT five there, that is the big version.
+If you scale all the way down to the tiny version, GPT five nano, if you work with that, then the
+input cost per million tokens is $0.05 $0.05 per million tokens.
+So for each token is a millionth of that.
+It's a number too small for me to say, and the output cost is 0.4 of a dollar per million.
+It's $0.40 per million output tokens.
+So if you got GPT five nano to generate the complete works of Shakespeare, you'll be spending less
+than a dollar.
+A couple of other things to mention.
+There's also this this idea called caching, which is that if you send in the same input twice within
+a few minutes, then you pay less.
+It's cheaper because some of that information is cached with GPT.
+That's automatic.
+With Claude, it depends.
+It can be.
+It's more of a story.
+But basically in many cases, there's a way if you're sending the same inputs frequently to models,
+there's some ways to get those costs even smaller for the input costs.
+But there are some some tricks to be aware of.
+And we'll talk about that another day.
+Another thing to point out is just take a look at some of those context windows.
+You'll see GPT five again 400,000.
+The Claude range has got a 200,000 context window.
+You'll see that GPT OS, the open source model, is around the 130,000 and famously Gemini.
+Gemini 2.5 flash has a 1 million token context window, which means, again, that you could almost
+fit the complete works of Shakespeare in in one prompt to Gemini and say, tell me, give me a give
+me a quote about from this play and it will be able to look back and do that, which is just insane.
+So it's good to get that perspective and have that kind of sense of what is the range of context windows
+offered by these different LMS?
+Goodness gracious, somehow you're already 10% of the way through.
+How about that?
+Wow.
+So what you could already do, you can already write code to call OpenAI and a llama.
+Make a summary.
+You can contrast the leading frontier models.
+And now at this point, you've had this introduction to transformers, to tokens to context, windows
+to API costs, and you've just got this good grounding, this good foundations to everything that will
+be working on, including the illusion of memory by the end of the next time.
+At the end of this week, you'll be confident with the OpenAI API, the chat completions, API, chat
+completions.
+You'll you'll know about this thing called one shot prompting.
+You'll know about streaming markdown JSON results.
+You'll have implemented a business solution in a matter of a few minutes.
+It's going to be all practical.
+It's going to be sleeves rolled up.
+We're going to be building.
+I will see you then.

@@ -1,0 +1,593 @@
+--- Lecture 1 ---
+Well, here we are.
+It is week seven.
+Day five.
+Somehow it's the big reveal.
+The results day.
+Uh, but first, a reminder.
+You can already work with open source, closed source models, with calling tools, with with assistance
+with Rag five step strategy to solving a business problem, including curating data, fine tuning a
+frontier model, and now running Q Laura for an open source model including hyperparameter optimization,
+monitoring the training, and the fabulous weights and biases.
+Hopefully, hopefully you didn't get as overexcited as me, but at least you enjoyed the process of
+doing it.
+And today, of course, it's results day.
+We're going to to run inference on a model which has been fine tuned.
+So with Laura matrices and stuff.
+So there's some some things to cover there and wrap up with, you know, so you're in a position that
+you could confidently do all of this yourself.
+That's the big part of it.
+Um, and I'm, I'm excited to show you the results.
+Of course, what we're trying to, to get towards is get something that is close to the performance
+of a frontier model.
+Recognizing we're working with llama 3.2, a 3 billion parameter model, a tiny model by by comparison
+to multi-trillion dollar frontier models, recognizing that we've quantized it down to four bits so
+it could run on a mobile phone pretty much for sure.
+And so it's very small.
+The question is, can we get close to frontier performance at least?
+Can it beat Ed?
+It should at least be able to beat my my abilities.
+Maybe it could get close to GPT four one nano or something like that.
+That that's that's what we're striving for when you're trying to fine tune an open source model because
+it's free and it's something that that you could use.
+Okay.
+But first, before we we do that before we run inference, I do want to to close the loop on something
+that I've had hanging out there for a while, which is explaining what exactly is this loss calculation
+that we we keep covering.
+What is the loss?
+How is it calculated.
+Just a bit more detail on training.
+So a few theory slides before we get into action okay.
+Here we go.
+You remember the four steps of training.
+You know them well now.
+We coded them one by one.
+Uh, a week ago.
+But now we know that you first do a forward pass.
+It's when you have some input data and you predict what will be the next token by going through that
+input data, the loss calculation, some calculation that says how wrong were we.
+You do the backward pass, which is when we say okay, if we tweak each of these parameters, does it
+make the loss better or worse?
+And then we take a tiny step in the direction that reduces loss.
+It's called the optimizer.
+You remember we used an optimizer called Adam Adam w I think we used which is very popular.
+The, the original one is called SGD stochastic gradient descent.
+That's the one which is basically just saying take the learning rate times the gradients and going the
+other way and negative learning rate gradients take a step.
+That's it.
+So those are the four steps in training.
+Uh, you've experienced this a few times now.
+And what we're going to dig into is this loss calculation.
+And just a bit more perspective on this, this this whole idea.
+So again the first step is the forward pass.
+So there's an input prompt input sequence like price is dollars.
+And then that's the next token.
+It's got to predict that is an input sequence.
+It's turned into token IDs.
+Those token IDs are fed in to a a neural network which consists of a base llama 3.2 and then some Lora
+adapters which have some some things which will able to adapt, able to slightly tune llama that get
+applied.
+What comes spitting out at the end is the predicted next token.
+Let's say it says the price is $99.
+It predicts 99 is the most likely next token.
+That's the forward pass.
+The loss calculation comes next.
+The loss calculation take the predicted next token is 99.
+Let's say this thing actually cost $89.
+We're off by $10.
+So we need to calculate some loss.
+And that loss has got to be related to how wrong were we if we were exactly right.
+If it was a perfect prediction, then the loss should be zero representing no error.
+It was perfect.
+If if the if it's a if we're more wrong, the worse we are, the higher the loss should be.
+Okay.
+A bigger number means worse result.
+Sure.
+You're thinking so you might be thinking, okay, why not?
+How about we take the difference between them?
+The absolute error.
+That's what we've been using all this time.
+Or maybe the mean squared error that linear regression uses.
+But there's a problem with that that we will come to.
+But you get the general idea.
+That's what loss is all about.
+Then we do something called the backward pass, which again is saying, okay, let's go to every single
+parameter and say if we were to twiddle it a bit, would that make loss bigger or smaller.
+And that of course is called calculating the gradients because it's like a calculus thing and that we
+only have to do that for the Laura adapters because we've frozen all of the base model.
+So we're only doing this, this tweaking for these, these smaller Laura adapters, they are being subjected
+to gradient based optimization.
+It's how you'd explain it.
+And doing this is something that would be very laborious and complex calculation involving tons and
+tons of maths.
+But there is a clever trick.
+A trick that's known as back prop or back propagation, which is a way to calculate the gradients,
+calculate how sensitive everything is to being just changed slightly by working from from the the the
+bottom of the neural network, working all the way back up to the inputs again, and calculating all
+the gradients as a function of the gradients that came before.
+And it's because it uses a mathematical trick called the chain rule, which is something that you might
+remember from high school, like a calculus thing, which is how you're able to calculate gradients
+in terms of other gradients.
+And so it uses this approach of repeatedly applying the chain rule working backwards.
+And this was something that was it was invented some time ago.
+But this this trick is one of the sort of secrets that has made, uh, made training neural networks
+so effective.
+It's such an efficient way to do it that an operation that would have been very, very time consuming
+can happen rapidly.
+And particularly it can happen very efficiently, in parallel rapidly.
+And so we're able to calculate the gradients in this thing called back propagation or back prop.
+And all of that is known as the backward pass.
+Okay.
+So that's backprop.
+And you've probably heard that expression.
+If you want to know more about backprop then then it's easy to look it up and get more detail.
+But I don't want to get too into the gory detail here.
+It's actually the the algorithm itself is very old.
+I think it's from the 1970s or so, but it was in the 1980s, I think 1986 that that it was there was
+the very famous paper.
+One of the authors was Geoff Hinton, who is like a, you know, considered one of the godfathers of
+modern AI, uh, and that that really sort of brought it to the forefront of using it for neural networks
+in AI.
+Um, so backprop super essential.
+All right.
+And then optimization is the fourth step.
+And this is where we take all of the adapters and we slightly step them in the direction.
+That's going to mean that next time the loss will be less okay.
+You get it.
+You know about these four steps.
+So now let me go one level deeper deeper so that I can explain what exactly is the loss calculation
+itself.
+--- Lecture 2 ---
+Okay, back to this diagram again.
+Remember this.
+We just saw this.
+The forward pass.
+I told you that the forward pass is about taking an input prompt, going through and predicting the
+next token.
+But that's not exactly true.
+I didn't lie, but I oversimplified in a way that is is necessary for us to go go deeper.
+Now, that's not what a forward pass actually does as actually, you know, from from when we did this
+like week three, I think what the forward pass does, it doesn't it doesn't predict the next token.
+It outputs a probability distribution for every possible token in the vocab, every single one of the
+128,000 possible next tokens.
+Each one is given a probability.
+And and that's why if you remember the the output of the LM head, the last layer of the neural network,
+it was a it was a 128,000 dimensional matrix because of a vector, because every element of that vector
+is the probability that that is the correct next token, and it's designed in such a way.
+It's the sort of process such that it all adds up to one, so that you have to be able to, to, to,
+uh, you can't you can't have 200 tokens.
+You have to it has to be organized such that the probabilities will all add up to one.
+And the model has made its prediction in a probabilistic way.
+And typically when we talk about the predicted next token, we're talking about the way that it samples
+the picks, one of these tokens from this probability distribution.
+And I realize we've covered this in prior lectures.
+You you probably know this already.
+Uh, sometimes you just pick the maximum, the token that got given the highest probability.
+And that's typically what happens if you set temperature to zero.
+So what you're saying you want um, sometimes as well, instead of that with a lower temperature you
+just sample from these probabilities.
+You pick the one that has the highest probability.
+So that's that's a that's how it actually works.
+And so when we say the predicted token is 99, what we mean is that got a 15% probability, say, and
+that was the highest probability.
+So that was the one that we picked.
+Okay.
+So then the loss calculation.
+So we came up with a next token of 99.
+And the actual next token was 89.
+How do we calculate the loss.
+What do we do between these two numbers.
+Well here's the thing that might be slightly surprising.
+If you don't know this, we actually don't consider that 99 token at all.
+It doesn't have any bearing in the loss calculation.
+You're like, what?
+Uh, we don't look at that, but rather.
+And this is the this is the aha moment.
+Rather we say what probability did the model give to the, to the token that we actually wanted?
+What probability did it give to the token for 89.
+It doesn't matter what it said for 99 because that wasn't the right answer.
+What did it say for 89?
+Um, and you know, because it can't because everything has to add up to one if it gave a 15% probability
+to 99, then it must be less than that.
+If that wasn't the max, it's got to be some smaller number for 89.
+So what probability did it give to 89?
+That's the next thing we look at.
+And basically if it gave an 100% probability to to 89 then it would be a perfect model.
+It said it is a 100% likely that the next token is the token for 89, and that that would mean that
+we would, uh, we would want the loss to be zero.
+If it had a any other number, we would want the loss to be higher.
+And the smaller the number, the higher the loss.
+And so they use a formula, uh, to, to get this.
+They want to have a formula where if the probabilities are 100 then the loss is zero.
+If the probability is smaller, we want the loss to be higher.
+And that formula which is just a bit of maths for you, they take the negative log of the probability
+you remember logs.
+Well you in case you don't remember, logs.
+The log of one is zero, so the negative log of one meaning 100% would be zero.
+So it certainly passes that test.
+And the negative log of a smaller number would be a higher number.
+So it passes both tests.
+So the negative log of the probability that the model gave the actual next token the one we were looking
+for 89.
+That is how the loss is calculated.
+And if you're wondering why, it's because that just sort of works out really nicely with the maths.
+It works out nicely when you're calculating this.
+The back prop, when you're doing back prop, using the negative log just just works out elegantly and
+makes things easy.
+And so it meets all the properties.
+It performs well.
+And so that's what we pick.
+And it means that trying to reduce that negative log of the probability, the actual next token does
+a great job of training neural networks and doing that.
+Uh, that combined with this idea of calculating probabilities that is known as the cross entropy loss.
+Cross entropy loss.
+That's what that calculation is all about.
+And you hear the expression cross entropy loss a lot.
+I've been saying it lots of times.
+And those loss numbers that we were seeing, both for the training loss and the validation loss, they
+were cross entropy loss.
+And maybe you're thinking, okay, but why?
+Why didn't we just take the difference between these two numbers or something like that?
+And that's because remember that these LMS, they're not really designed to be coming up with numbers.
+That's not what they do.
+They're really trying to predict tokens and natural language.
+It could be a price.
+It could be some English comment.
+It could be anything.
+So whilst taking the difference between the numbers might work okay, in our case it wouldn't generally
+work.
+You wouldn't be able to use that for any other case.
+The great thing about this cross-entropy loss calculation is that it works for anything, for anything
+you can imagine.
+Just saying.
+We wanted it to to come up with this recommendation, find out what probability it gave to that recommendation
+and take the negative log of that probability that works for everything.
+It's a standard way of calculating loss for for a classification problem.
+And what we've got here is really classifying.
+We're trying to classify the most likely next token.
+That's what's happening.
+That's why this works so well and why it is across the board used for for for LMS okay.
+That's the loss calculation.
+Uh, and uh yeah.
+So so we take the negative log of the probability of the true value, the negative log of the probability
+of $89 in this case.
+And if you take the negative log of one you get zero.
+So if you if you say it's 100% gonna be 89 and you're right, that's perfect.
+No loss.
+Otherwise the negative log, the smaller the number, the higher the loss.
+It works great.
+That is the loss.
+And then having calculated that loss, we do backprop.
+And then after that we do optimization.
+As before, we're doing a little step so that next time the probability of the true thing will hopefully
+be slightly higher.
+So that loss is slightly lower.
+It works perfectly.
+And so just to summarize all of that one more time then.
+So the output of a model, it's not just simply predicting the next token, it's the probability of
+all the possible next tokens.
+And yeah I said it's the output of the last layer which isn't quite right.
+The people who are were dying to correct me.
+I'll say it right now, you actually use a function called the softmax function, which turns the outputs
+of that last layer into probabilities.
+And then during when you're in inference, you can either just pick the token with the highest probability,
+or you can sample based on the probabilities.
+Lots of ways of doing it.
+Uh, and temperature.
+And there's other, other parameters you can pass in inference.
+Time to choose how you pluck out each of the tokens and the loss function.
+As I was saying, it's it's perfectly simple.
+What probability did the model assign to the true next token should have given 100%, but it didn't.
+It gave it a lower number.
+And so you take the negative log of that probability.
+And that just works really nice.
+And this approach of using the softmax function to come up with probabilities, and then using the negative
+log likelihood as the negative log of the probability that is known as cross entropy loss and is is
+super common.
+And and what we do with LMS so that that is the background that is now, now you should feel like you've
+got that, that theoretical foundation.
+Of course, there's so much more that can be said about all of this, and you can do a bit of research
+yourself if you've got more questions or of course, ask me, but but uh, yeah, hopefully now a different
+bits are coming together and you're thinking, all right, I've done it.
+I've put up with all of your slides.
+Now, is it not time for us to see some results?
+--- Lecture 3 ---
+Okay, without further ado, we are in the week seven day five Colab, which we will find linked of
+course in the repo under week seven, day five and I'm going to connect.
+I've just connected to a T4.
+Be sure that you're connected to a T4 and I'm going to run the pip installs.
+At the top one is the couple of Pip installs.
+And then also I am fetching our eval script and this time we will indeed use it.
+We're going to run some imports and then we're going to define some constants.
+Okay.
+Let me pause on this for a second.
+That is the base model that you know.
+Well this is the Pricer, uh, the project name.
+This is my hugging face username if you want to use my models, if you've done this yourself, of course,
+you put in your models like mode.
+Let's put light mode as true initially.
+We're going to run this in light mode first.
+So uh, what I've got then the data user, of course if you're using your data set change it to you.
+Otherwise keep mine load in the right data points okay.
+And then if we're in light mode we're going to use the saving of that I just showed you.
+That makes some progress.
+If we're not in light mode, we're going to use the hefty run that I showed you.
+And this.
+This is where I have pasted that revision number, that checkpoint ID, the hash that I took from hugging
+face from the repo for that was aligned with step.
+Was it 6200?
+I think step 6200 of the run.
+The best step we've got.
+And then we will put this together to a project, uh, and a hub name.
+And this is going to give us hopefully.
+So right now we're going to be looking at the light mode okay.
+Then we log in to hugging face.
+We load in the data sets.
+Um, and let's just quickly check the first test item.
+Remember the validation calculations we did was on a different data set.
+We've held out this test set to the very end.
+And of course the first item the test set is our favorite one our modulation pedal.
+We're going to do some quantization.
+And here we go.
+We're now going this is where the juice happens.
+So we we set a tokenizer.
+We set the base model so far exactly as before.
+This is the line that's different.
+This is where we say, um, the fine tuned model is the model is the parameter efficient fine tuning
+that is hugging face name for Laura.
+Uh, path model from pre-trained.
+And we give it the base model and we give it the name of the model on the hub that we want to collect.
+And it's just as simple as that.
+It will load in these, these Laura matrices.
+And it will make a new model called a model, which is ready to have that base model and these adapters
+on top of it.
+And if you want, you can specify a revision, which means that you want it to look for that particular
+checkpoint.
+So if a revision is set then it does that too.
+So this is what we are now running.
+This is our way of of loading in from disk.
+The uh the fine tuned model that we've got.
+And I will, uh, let, let this load in because it takes a minute.
+I'll see you in a sec.
+And so that ran nicely.
+And the memory footprint is two, two, seven, one megabytes, which makes sense.
+We saw this before.
+It's 2.2GB for the base model, plus about 70MB of adapters.
+Okay, let's actually print this model.
+Here it is.
+Uh, this this is the adapted llama model.
+You'll see that the self-attention layers, the Q, V, and O layers, they have been adapted with lora
+A and Lora B matrices.
+They have 32 inner dimensions.
+That's because R is 32.
+And if you keep going, you'll see that the MLP layers they have not got adapters because when we did
+the light training we only focused on the attention layers.
+So this is all as expected.
+It's now time for us to run inference and to run inference.
+We've got a version we've got we've got a model predict.
+This is another function which we're going to test against.
+It's responsible for taking an item and for returning the cost by calling an LM.
+And you may recognize this function because this is what we use to test the base model a couple of days
+ago.
+Same approach.
+We're using this now to test our fine tuned model.
+Starting with the light variation we're going to try and at least beat human level performance.
+Ed got $87.
+Uh, my my finest hour.
+Uh, and, uh, then we're going to to also see can we get close to GPT for one nano, which got 62.51.
+We've got two cracks at this.
+We've got the the light version and then we'll try with the full version.
+Let's see.
+Okay.
+Here we go.
+It's time to to run.
+Uh, so off it goes.
+It's running the evaluate algorithm right now.
+Well there's some nice green.
+There's some red though.
+Okay.
+This is exciting.
+This is this is like the moment of truth.
+This is what we've been waiting for for so long.
+Uh, it's it's slamming through them.
+It's got 200 to do.
+Uh, and, uh, I feel I feel anxious, um, and we're coming up to the quarter way point.
+I feel like I'm a commentator here.
+Uh, and, uh, probably I'm probably not going to.
+I'm not going to hang on in there.
+You're not going to watch me sweat.
+Uh, I'm going to, um, finish off and come back in just a second when this is complete.
+Well, I thought I'd let you watch the final, final ten countdown for me to to see what you see.
+Here we go.
+Here are the results.
+Bam!
+Okay, okay.
+There we go.
+So the final number is $65 and 40, 65 and 40.
+That means that it did better than Ed.
+And it got very close to GPT 41 nano.
+That's pretty impressive.
+This is a model.
+This is a model which is based on a simple llama 3.2.
+And it took like it was trained on a free T4 box.
+No, nothing spent at all.
+And we were able to get a very decent result.
+You look at this chart visually, it looks really impressive, really nice, a great outcome.
+That's so cool.
+Hopefully the least.
+I of course you could have just used this to to take intuition or you might have done this free training
+yourself and you should have the same result and you should be pretty pleased with that.
+You've just built a model which is basically competing competitive with the frontier performance from
+GPT 41 nano, and that is a fine, fine result.
+--- Lecture 4 ---
+Okay, but.
+But we've got one more thing to do.
+Haha.
+I haven't forgotten and I'm sure you haven't either.
+Let's do a run time restart session and clear all of our outputs.
+Get everything back to scratch again and it's restarting.
+We're still on a T4.
+We will run this, but the difference is light mode is false.
+We are going the whole hog here.
+We are going to test this model.
+We're going to pick this run name and this revision and see if we can't get a bit more competitive with
+GPT for one nano.
+Uh, okay.
+So again we go through we load in our data set.
+It's going to load in the full data set.
+We don't actually need all the all the training data.
+But but but whatever we'll load that in.
+We're then going to load in the base model again and see you in a second when everything is loaded and
+we're ready.
+Okay.
+It's loaded in the total model size is 3.753MB.
+And that, of course, is the 2.2MB of the base model.
+And then there's like a 1.5 or so gigabytes.
+So 2.2GB of base model, 1.56GB of the adapters.
+Okay.
+And uh, if I print out the fine tuned model, what you'll see here, of course, is that the Lora adapters
+are on all of the attention layers.
+And they've now got more dimensions, 256 dimensions because R was 256.
+But also if you scroll down to the MLP layers, you'll see that they're adapters there as well.
+Uh and look you'll see the 0.1 dropout in all other places as well for, for both of these models.
+Uh, so there they are.
+This is hopefully exactly what you're expecting.
+It's time again for us to run model predict.
+We know we should be able to beat the performance.
+That's not hard.
+Uh, but we're now hoping.
+I mean, we're going to be close to this.
+It would be nice if we could beat GPT four one nano.
+that would certainly be quite satisfying.
+Let's see what happens.
+Well, it hasn't started.
+Well.
+We've got a yellow and a red to start with.
+Well I will, I will see you closer to the time, closer to the big reveal.
+See you in a second.
+Okay, so we see some reds, yellows and greens.
+We're coming up to the end.
+Looks promising.
+There's a lot of greens there.
+Three more to go.
+Here we go, here we go, here we go, here come the results.
+And holy moly there we have the results 39 and 8539 .85.
+Let's write that down 39.85.
+What does that mean.
+That means that this model just outperformed every single other model that we have tested.
+This model just crushed not only not only did it do better than what I was driving for GPT four one
+nano, but it crushed every frontier model Gemini three.
+Nope.
+Claude 4.5 opus.
+Nope.
+G 5.1.
+Considered the strongest model on the planet as of.
+For me right now.
+Nope.
+We beat it.
+It scored.
+Uh, what was it, 44.74?
+And we crushed it with our own homegrown model.
+We just got a three handle and we got 39.85.
+We got it into the 30s.
+Wow.
+Wow.
+Now, you might be completely mind blown by this.
+How is it?
+How is it conceivable that a model with so few parameters, a four bit quantize llama 3.2 model that
+could fit on a mobile phone with with these these adapters that we've we've got that still just a fraction
+of the size.
+How could that have performed better than a frontier model that's had $100 million worth of training.
+Well, that's, uh, that's something for us to discuss.
+But but before we do that, let's just take a moment to just marvel and celebrate the success of this
+result.
+This is an astonishing result.
+We have just built a solution to our commercial problem that has beaten the frontier.
+This is the strongest model at predicting the price of goods according to our test set, the strongest
+model on the planet.
+And of course, to bring bring it back to to ground.
+Before I get too overexcited about this, you need to keep in mind what we've achieved here is we've
+been able to make an LLM be the strongest model on the planet at a very specific business task, with
+a lot of very specific data.
+So, you know, the the point is that fine tuning gives us this ability, given a concrete task, to
+do really, really well at it.
+In fact, better than a frontier model with hundreds of millions of dollars of training, because we've
+made it specifically better for that task.
+And that allows you to achieve superior performance to the top frontier models for your task.
+If you have data and that's that's where fine tuning really excels.
+It's at building a skill, a particular expertise that can generalize outside its training data.
+If you have enough of that proprietary data like we had here.
+So, you know, with that in mind, maybe it's not so shocking that we manage to do it.
+It's still really satisfying though, and it's great to have got this point of 39.85 beating frontier
+models at our task, and it only remains for me now to reveal the the chart that we like looking at.
+Here is the chart with our latest results in it.
+So what we see here of course is the original traditional ML then the disappointing end results and
+then the the traditional neural network and then not traditional, but like a modern neural network.
+And then the results from a series of different frontier models.
+The the GPT 4.1 nano fine tuned, which did a terrible job, then the deep neural network that did a
+really good job.
+Uh, and then the base llama, the fine tuned just with one hour of training, which did fine.
+It beats, uh, the fine tuned GPT four one nano.
+It beat editor, but it didn't do better than even even a simple vanilla neural network.
+But.
+But when we fine tuned a model based on all of our data for for many hours for two epochs, as it turns
+out, because at the end of the second epoch, the snapshot that we took, we were able to beat everything
+else on the board.
+We got into the 30s just we scraped into the 30s with this astounding result, and that is a really
+satisfying conclusion to week seven.
+And with that, that is a wrap on week seven.
+We've completed it.
+We beat the frontier, which is really what I set out to do.
+And we did it.
+And you may wonder, what is the assignment for you?
+Of course, there's an assignment for you.
+The assignment for you is to come in now and beat me.
+That 39 number you've got.
+I haven't done that much hyperparameter optimization.
+There is juice in there.
+There is room.
+I am waiting for you to beat me.
+Come in, run some runs, experiment and explore and see if you can't get it down into the lower in
+the 30s.
+I'm sure it's possible if I get there first.
+And of course I will.
+I will update the, uh, the materials to to boast about it.
+I'll probably put it in the, in the repo so you can see my latest.
+Um, and I'll keep sharing anything I do to get better.
+But the challenge for you do some hyperparameter optimization.
+Look for ways.
+Often the biggest use comes from manipulating the data in some way to be able to teach it better.
+So that's something.
+Something to keep in mind.
+All right.
+But now celebrating your success as we wrap up week seven, not only not only can you generate text
+and code, use tools, use assistants, not only can you build with Rag, follow a five step strategy
+to solving a business problem with LMS.
+Fine tune a frontier model.
+But now you can confidently carry out the process to fine tune an open source model so that it can perform
+well in a commercial task.
+And if you have enough data and if you have a clear enough objective, then guess what?
+You can beat frontier level performance.
+You can be better than GPT 5.1 at your task.
+Wow.
+Okay, so if you thought that this week was as good as it gets, if you thought this was just brilliant,
+I hope you did, I did.
+Then I have news for you.
+Next week is even better.
+I know that sounds hard to believe, but it is.
+Next week is when, first of all, we do some really interesting stuff about Productionizing.
+When we take this model we built, and we use the serverless AI platform to make it be up on the internet
+so that we can call it remotely from anywhere.
+We're also going to build a large scale Rag pipeline.
+We're going to go back to Rag for this specific the same problem.
+You get sick of this problem.
+But but we are going to use Rag because it's such a great use case for rag.
+And then finally we're going to build an agentic solution a genetic AI, all the rage.
+I have a separate course on genetic AI, but in this one we're going to build one from scratch and it's
+going to use our model.
+It's going to use a ton of stuff, and it's going to give you a fitting finale that will blow your mind.
+You need to get some sleep because it's a lot happened this week.
+You've got a lot done.
+Hopefully you beat my numbers as well.
+Get some some rest and recharge and come back ready to go for week eight.
+I'll see you then.

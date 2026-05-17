@@ -1,0 +1,777 @@
+--- Lecture 1 ---
+Welcome to week eight, day two a fiendishly big day.
+This is really everything coming together now as we head to the finish line.
+You can already, in addition to all the things you know that you can do, you can also now deploy Llms
+to production on models.com using the like an ephemeral approach and then a function based approach,
+and then that class approach with a persistent volume.
+Today, you're going to be able to build an advanced Rag solution with a lot of data without Lang chain
+and build it ensemble model and deliver production ready code that calls a number of models, all of
+that coming right up.
+And you hardly need me to remind you about the prices, right?
+And autonomous AI framework that is going to watch out for deals, find them, estimate how much they're
+actually worth, send a push notification for good opportunities.
+There's going to be seven different agents that are going to be collaborating, including the frontier
+beating, fine tuned model and also back to a frontier model using Rag.
+So we're comparing comparing training time techniques with inference time techniques with Rag.
+Okay a reminder of our genetic architecture with again that little footnote that it's important to come
+up with agent architectures in order to solve a business problem, not just because it sounds like you
+want you want steps like this.
+But with that caveat, this is the architecture we're using, which you can imagine we've come with
+because this best solves our problem at hand.
+I had mentioned yesterday that we're going to create a scanner agent that's going to be able to look
+for promising deals by looking at RSS feeds.
+Then we're going to have an ensemble agent that estimates the true value of things, and a agent that
+sends push notifications.
+So of course, what I didn't tell you yesterday, which I'm sure you guessed, is that that ensemble
+agent works by itself, coordinating with other agents with Subagents.
+And there are three of them.
+And let's show them.
+One of them, of course, is the specialist agent that we created yesterday.
+If you're wondering why we created that and it didn't even map to the diagram, that's why it belongs
+here.
+That's one of the ways that we figure out how much something costs.
+Another way is we're going to build a new kind of pricer a frontier agent.
+We're going to make a call to a frontier LM to figure out how much something costs.
+We already did that in week six, and we already know that it didn't it didn't fine tune well, and
+the original version of it was was not as good as our specialist agent.
+So why would we bring it back?
+Well, we'd do that because rather than fine tuning it, we're going to use inference time techniques
+in the form of rag in order to make it better.
+What we're going to do is we're going to say to GPT five one, hey, how much does this cost this thing?
+But by the way, I'm going to add in some context here.
+Here are five other things that might be similar.
+And here are their real prices.
+And this might help you to give a good estimate for what I'm asking.
+And that's essentially giving it context that is rag.
+The way we're going to find these similar products is we're going to do a vector lookup in a vector
+store to find similar products based on the description, so it is traditional Rag lookup relative relevant
+context.
+Shove it in the prompt, and that's going to help the frontier model to give a good accurate estimate.
+That is what we're going to build.
+We're also going to build a neural network agent.
+And this is going to use that that cool neural network that I unveiled at the end of week six.
+That's really very good.
+And it uses such a different technique that it's powerful to have then these three different models
+that have very different ways of estimating the price, because the ensemble agent will be able to to
+combine all three in some way to get you an even better number.
+And that that is how we're going to figure out how much something actually costs.
+And we will build all of that in the next two days, today and tomorrow.
+And then day four is when we build our planning agent to coordinate all of this.
+And day five is when we bring it together with an agent framework and a UI, and we tie a bow on it
+and we just settle back and get our deals and buy great TVs and everything like that.
+That is our project.
+That is the price is Right.
+Let's go to cursor.
+Let's build a rag.
+Pricer.
+Okay.
+So let's go into week eight.
+Day two.
+Here we have our rag day.
+Uh, the order of play we're going to to we've already done modalerts.com.
+And the specialist agent today is rag and the frontier agent and ensemble agent.
+And then tomorrow is the scanner and messenger.
+Okay.
+So we are going to build a rag based platform to estimate how much something costs.
+And we need a data set of, of similar items to look at.
+And well we have such a data set.
+We have all of our training data that we used before.
+The 800,000 scraped items from Amazon makes an ideal training data set.
+Uh, we've got that.
+We used it for training and we can now use it for inference time techniques in this case.
+So, uh, let's, let's let's give that a try.
+We're going to build a rag pipeline.
+So there's a bunch of imports we've got to do here and load in the environment variables.
+Got a context constant here for products vector store which is is right here which is where we are going
+to store all of our vectorized products.
+And now I'm going to sign into Hugging Face.
+Don't worry about that warning.
+And now you can choose.
+Remember choosing light mode.
+You can choose whether you want to have the full 800,000 data set, or just 20,000.
+If you'd rather keep it a little bit more tight, it's still going to do great even with 20, so you
+should feel free to use.
+Light mode is true should you wish.
+And as a reminder, today I'm going to go really fast.
+Today there's a ton to do.
+If this is too much for you, please, please don't worry.
+Use it to get intuition.
+Come back.
+Run it in your own time.
+Okay, so this is familiar code.
+I hope this is just the thing that loads in the data set.
+Uh, from using item, from hub, from the hugging face hub.
+So we're loading in the full data set.
+Now you might be loading in the full one, or just the partial one.
+So when we've done that, we're then going to create our chroma data store.
+Chroma of course the open source vector database.
+Such a such a great, such a wonderful way to, uh, to be able to work with vector data stores.
+Absolutely.
+For free.
+Um, on the Udemy Q&amp;A, there's lots of good, good questions about different types of vector data store.
+Do remember, the thing that makes all the difference is the encoder model.
+It's the encoder model that makes the vector.
+The data store is just where it gets stored.
+And I remember showing you talking about the different types of vector database you can choose.
+Picking different vector databases is about stuff like scalability, cost, uh, the speed of retrieval,
+but the vector itself is made by the encoder.
+So this is no longer long chain.
+This is just native, uh, which we did at the end of week five already.
+Chroma persistent client.
+This loads in, uh, vector database or it creates one if it doesn't already exist.
+For the encoder, we're going to use the sentence Transformers all mini Ml6 v2 that we did touch on
+briefly before.
+This is free open source model, so you can call encoder encode and have something like this bit of
+text here.
+A proficient AI engineer who's almost reached the finale of the AI Engineering core track, and we can
+print out that this is this is the vector.
+It has the all, all 384 dimensions in this vector, which is what all mini LLM, l6, v2 comes up with.
+That's what to it represents the meaning of this bit of text right here.
+Okay.
+With that background we are now going to take 800,000 products, turn them into vectors and put them
+in chroma, a big chroma database.
+And I'm going to run that and it's going to get going right now.
+Uh, and it it was immediate.
+It was instant.
+And you might think, wow, that's because creating vector data stores is really, really quick.
+But sadly that's not the case.
+It's because I've cheated here and I've got a little bit of code here to say if it already exists,
+don't do anything.
+Uh, this in fact takes like an hour or something.
+Uh, and that's only.
+I've got a GPU.
+It might take longer for you.
+It might.
+This might be an overnight business if you really want to do it for all of them.
+Yeah, it took 30 minutes when I, when I did it on my GPU.
+So.
+So you should see how it's going.
+You can also for sure you can just truncate train.
+You can say like like train equals train on 50,000 if you want 50 underscore uh oh, uh, you can you
+can make it a bit shorter.
+You can do whatever you feel like.
+But this, this is what, what goes into chroma, uh, and this is the thing that says if it's already
+there.
+So remove that line if you want this to run, run the old fashioned way.
+But when that's done, you will have a populated vector data store with perhaps all 800,000 items in
+there.
+--- Lecture 2 ---
+Okay, well, you spent the last seven weeks with me, and you know that I'm not someone that's happy
+with just saying.
+Oh, the data is all in there in Cromer.
+We've got to look at this.
+So next we're going to visualize, of course, the vectors in Cromer.
+And uh, if you try and visualize all of them, all 800,000, then that's a sure way to crash your computer.
+So I don't recommend doing that.
+I tried doing that last year with, with like 400,000.
+I just barely scraped by.
+So we're not going to do that.
+We're going to subselect 10,000 points, and then we're going to load in those 10,000 points, and we're
+going to use t-SNE again.
+T-distributed stochastic neighbor embedding to project down the 384 dimensions that the encoder came
+up with down to two dimensions, and display that in, in some sort of a diagram.
+Uh, and so let's do that now.
+Let's create the 2D plot and bam, here it is.
+And wow, isn't this cool?
+It reminds me of what we did in week five.
+Only just better.
+So this is 10,000 points shown visually in space.
+So we can understand what does it mean to take descriptions of products and put them in vectors.
+And again remember the same point as week five.
+The text that was given to the encoder did not include whereabouts in Amazon it was scraped from.
+We just gave it the text and it turned that into a vector point.
+And after the fact I've colored in these dots to represent what section in Amazon did this come from.
+But that information was not given to the encoder.
+So it's kind of cool that the different types of item are shown in different sections.
+Here it shows that the encoder model had some kind of an innate understanding of the different types
+of things.
+Now, you might notice a subtlety here that there is a category included in the text, because we actually
+when we did our pre-processing, we asked an LLM.
+In my case, I asked OSS 20 to come up with a way to turn just the vanilla text into something that
+had a category in it.
+Just keep in mind that didn't come from Amazon.
+That wasn't that wasn't information that got from which section of Amazon we went to.
+That was something that was put in there after the fact.
+So that's still something that's cool to see how that's allowed it to separate out different kinds of
+things.
+So for example, the stuff in blue here, this represents car parts, automotive stuff.
+And the stuff in red is toys and games.
+And maybe you're thinking, hang on a second, hang on, hang on.
+Hold your horses.
+I see that there are red items in the middle of the blue stuff.
+That doesn't sound good.
+Well, if you take a look at that, you will find that they are in fact car parts.
+That of toys, toy car parts.
+And the encoder model decided that this even though it turns out on Amazon, they were in a different
+section.
+The encoder things when it comes to the sort of meaning of things, it wants to put them around this
+territory, and that is up to the encoder.
+That's that's what it does, and that's how it's done it.
+And I have I take such great delight in exploring the data, in looking at what's ended up where and
+understanding it in terms of the content of the text.
+And so I do encourage you to do the same thing.
+Spend a while digging into this.
+Look at what's ended up where, get a sense for how the encoder is deciding, uh, what where to put
+things.
+All of this is, of course, stored in chroma, the the free open source vector data store.
+But the vectors were determined by our encoder model, the all mini lm6 L2 from hugging face.
+And you know me too well.
+You know I'm going to go and do a 3D plot next, obviously.
+Let's see how it looks in 3D.
+And just like in week five, you remember all the way back then.
+At first blush it looks like a bit of a of a mess here.
+We've got like tons of stuff, but again, we can zoom in, which is always a great experience.
+Here it is.
+And we can rotate it around and we can get this amazing sense of of how the reds and the blues for the
+toy car parts are intermingled here, and you just get this much more visual sense of everything.
+Uh, so I again, I do encourage you spend some time with it.
+Uh, this is this is a really interesting way to dig into the data.
+It gets me very overexcited, uh, because because it's, it's super interesting.
+And it's also really cool.
+A great way to get that first hand appreciation for.
+What does it mean to take some text and turn it into a vector?
+Okay, enough with our diagrams.
+I never have enough diagrams.
+Uh, let's just, uh, let's let's do some, uh, turning this now into into finding similar products
+into into a rag flow.
+Let's remind ourselves what is our first test item in our test data set.
+Do you remember the first test item in the first test dataset.
+Of course you do.
+It's the old blood noise distortion pedal, that guitar pedal that we all need.
+Uh, so we I'm going to start by giving you a function called vector, which takes an item and it turns
+it into a vector.
+And it does that by calling the encoder dot encode.
+Okay.
+That's easy enough.
+You get that.
+All right.
+Well just very easy as well is something called find similars.
+Given an item this is going to return some similar items and their prices.
+And it's it's super simple.
+We just make a vector out of items.
+So we call this function here vector.
+And then we say collection.
+This is our chroma collection dot query.
+And we pass in the vector.
+We've got something there fancy to turn like the uh the numpy array into a list.
+And we asked for five results back.
+We get the documents, we get the prices and we return it.
+Okay, so what do I get if I do find similars for the distortion pedal.
+What do I get?
+Okay, I get these.
+These five responses.
+We get something also from old blood noise.
+But it's not a distortion pedal.
+It's an endeavours procession reverb.
+So a similar kind of audio effect box coming from the same manufacturer but not the same one.
+We get a boss Md2 Mega Distortion.
+So this is like another kind of of, uh, of distortion pedal from a different manufacturer.
+We get another old blood noise, one that is a delay pedal, a different kind of effect, but from the
+same brand.
+And then a couple of other things.
+And here are the prices of those five things.
+So you can see immediately that we've got here similar products with their prices.
+This is working.
+It's all trivial.
+Basically we're just doing a vector lookup in a data store.
+And this is Rag at its core.
+This is saying I've got something.
+I want to look up similar information to it because I'm going to shove that in my prompt.
+And in fact, that is exactly what we do in this next function, make context given something similar
+and some prices.
+So I'm going to have a message for context.
+Here are some other items that might be similar to the item you need to estimate.
+And then I'm just going to say potentially related product and list it out okay.
+So just just to make that for you real for you, let's stick with our old blood noise distortion, whatever
+it is.
+Uh, let's first find the things that are similar to it and then call this make context and see what
+that prints.
+So here we go.
+It says for context.
+Here are some other items that might be similar potentially related old blood noise endeavours precession
+reverb potentially related product boss Mega distortion pedal.
+And I've got the prices coming at the end here.
+So this is clearly a useful context which a frontier model will be able to use to make a better price.
+So that that feels like we're onto something here.
+And this is of course, again at the heart of rag.
+Okay.
+And we can turn that into an open AI style messages, um, with role user content message.
+And the message will be estimate the price of this product, respond with the price.
+No explanation, the same as before.
+And then there is the item summary.
+And then we're going to add in relevant examples.
+Okay let's see this working.
+Estimate the price of the product.
+Uh let's let's again take, take the uh first test item and let's print the messages okay.
+We get role user content, estimate the price of this product, respond with the price, blah blah,
+blah, blah, blah.
+It's exactly what we were expecting.
+Let's, uh, instead of of this, let's let's take, um, take this and take the zeroth element of it
+and the, uh, content and print this so that we really see what what we're getting.
+I need to close my brackets here, I think, and delete that.
+Let's run this and this is what we get.
+Estimate the price of this product.
+Respond with the price.
+No explanation.
+And there is the product.
+For context, here are some other items that might be similar to the item we need to estimate.
+And we have it.
+This seems super clear and this is it.
+This is already our Rag pipeline.
+We can now have a function, GPT five one rag, where we simply take an item.
+Step one we find things that are similar to that item.
+Step two we call GPT five one.
+We pass in the messages that we build that looks just like this.
+And we don't need to do any reasoning.
+We're giving it all the information it needs.
+And that's it.
+That's that's all we need to do to be calling GPT five one in in rag mode.
+Uh, you might have thought this is going to be super complex, and it's really not.
+We've just built a full rag pipeline.
+The only thing that we remain to do is to try it out.
+Let's give it a shot.
+--- Lecture 3 ---
+So this is a moment of truth.
+There's going to be a lot of moment of truth moments this week, but I do hope that you still have to
+hand somewhere.
+The prop from last week, with all of your notes written down of where we got to in our price, we were
+able to get a three handle with 39.85, was our best price from our specialist model, and that that
+is what we are up against here.
+How does the strongest model on the planet equipped with a Rag knowledge base lookup, compare with
+a model that is more than a thousand times smaller and quantized down to four bit, but fine tuned.
+So this is definitely the battle of the Titans.
+This is the function.
+It's as simple as this.
+Let's first do a quick experiment.
+You remember that the price of that distortion pedal is $219.
+Let's do Ragnar.
+So when I run this one thing, it's going to it's going to first look up in chroma, find those similar
+items, and then it's going to make that call to GPT five one in the cloud to come up with an estimate,
+and it comes up with $229.
+So that one is $10 off.
+That would that's certainly very close.
+That is that is surprising.
+But what we don't know is, is whether this is going to whether this is going to be true across the
+board, whether they're going to be outliers.
+Let's find out.
+Let's run this off it goes.
+It's it's going off.
+There's already there's some greens and there's some reds.
+You can see it's moving nice and quickly.
+And I'm too this is too exciting that I'm not going to do the thing of putting you on pause and coming
+back because because we need to to live this moment together and be part of of all of this as it ticks
+up.
+Um, and, uh, yeah, I should say that even though we've set the seed here, I noticed that there
+is some a bit of randomness in here, so I don't know exactly what answer we're going to get.
+It's a bit different every time I run it.
+We are two thirds the way through.
+We're in the home stretch coming up 30 left to go, 20 left to do ten.
+The answer is about to appear, which is going to be better training versus inference.
+Here's the result visually.
+And there's the number 30.19 rag for the win.
+Wow.
+So, uh, shockingly and amazingly, uh, the frontier model plus rag has crushed even our fine tuned
+model.
+And this is a different result to this time last year, where last year the specialist fine tuned model
+was still stronger even than Rag.
+But not anymore.
+Now, the combination of having the frontier model with GPT five, one's power, with all of its worldly
+knowledge and all of its abilities, combined with the with the expert knowledge of being able to look
+up relevant content in a chroma database has allowed it to be really, really sharp.
+Be within $30.
+Uh, not within within $31 $30.19 is the error.
+This is really tremendous.
+The visual says it all.
+We have just built we have just surpassed all of our previous numbers.
+This is now the strongest model on the planet.
+Yes, I hear you talking me down the strongest model on the planet for this very specific task.
+And it's not really that.
+It's the model that's the strongest.
+It's that this workflow, the model plus the rag lookup together, has allowed us to be the strongest
+on the planet.
+So maybe I'm getting ahead of myself, but still, it's really awesome.
+It's a terrific result, but it turns out that we can do slightly better.
+You're like, what?
+Ha!
+How could we possibly do better than this?
+Only slightly better.
+But we can do slightly better.
+And it's because of this mysterious thing called an ensemble.
+If you have different models that come up with different answers, then you can often build another
+model, which is a combination of those models and have it beat all of their performance.
+Now, something about that might sound counterintuitive to you.
+You might say, hang on, how could that possibly work if all of these models are out by more than than,
+I don't know, let's say 100, then how could some combination of them get an error that's less than
+100?
+How could that possibly work?
+And that that is the magic of something called an ensemble.
+And and I mean, the data scientists amongst you for this is all old hat.
+But famously, ensembles really, really came into being with something called the Netflix prize, which
+is when Netflix famously won or offered $1 million to anyone that could could be the best, uh, beating
+the existing model they had to recommend what movie you might want to watch next.
+And the winners of the of the Netflix prize did it by building a big ensemble model.
+Um, but ensembles are things that data scientists love and build all the time.
+And in fact, the random forest model that we that we saw before is in itself an ensemble model.
+So how is it that bringing together multiple models is able to do better than any of the constituents?
+Well, one easy way to explain it is this supposing that we do have a model that is estimating prices,
+and suppose that actually the price of all of our goods are exactly $100.
+All of them $100 for every single product.
+And this model is always off by exactly $10.
+It's either $10 too much or $10 too little.
+So it always either guesses 110 or 90.
+Every single time, it's always off by ten.
+Then when we run this model, the total average error is ten because it's off by ten every single time.
+So the average is ten.
+And let's say we have another model and it has much the same properties.
+It's also always off by ten.
+And it's also always either gets it wrong by too much or too little.
+So both of these two models, model A and model B, both have an error of ten because they're both always
+guessing off by ten.
+Now let's suppose we combine these two models simply by taking the average.
+We just take this model plus this model divided by two, the average of those two models.
+What's going to be the error of the combined model?
+Well, if it's if we're most unlucky and every time model A guesses too much by $10, model B also guesses
+too much by $10.
+And every time A is down, B is down.
+Worst case.
+In that eventuality, we would always again be off by ten in the average, and so the combined error
+would be ten.
+But if there's ever a case that that they go in opposite directions, then immediately the average error
+would be less than ten.
+And that that hopefully I give you this example to give you some intuition.
+It sounds it sounds a bit counterintuitive, but but actually it makes sense.
+It's quite possible there'll be ways to combine different models that would iron out the noise between
+them, particularly if they use different methodologies, and it would allow the hole to be better than
+the sum of the parts in some way.
+And that's the sort of theory behind ensembles.
+And that that is what we're going to do right now.
+So let's start by going back to our our modal pricer our specialist.
+I got a little function here specialist that is going to to to call modal in the cloud and return a
+summary from modal.
+I've also got this little thing here.
+Get price that strips out a number when some of our models return text.
+Okay.
+Now there's another model that that that we're going to use as well, which is the neural network that
+I unveiled at the end of week six that you may have also trained yourself if you wish to.
+I've uploaded the weights to a file, deep neural networks, PyTorch, and it's up on the Google Drive
+right here that you can download those weights.
+And you should put it right here in this directory deep neural network.
+It's just over a gigabyte.
+So it might take a little bit of time to download.
+And I'm not going to put it in git because it's too big for GitHub, so you can download it and put
+it there.
+And then I've made a class deep neural network inference, which you can just load in.
+We don't actually need I don't think we need that.
+Uh, we can just load this in and then we can load in our weights.
+And that will give us another way to, uh, to to run this.
+This will give us a way to, to to run deep neural network.
+So now I've got a, a specialist model and a deep neural network model.
+And we can now have an ensemble model.
+And it's going to take the frontier rag as price one, the specialist model as price two and the deep
+neural network as price three.
+Now, what you're supposed to do in these things is now do a linear regression.
+Now run this over a ton of data points and run linear regression to say, okay, what weighted combination
+of these different models would give you the best outcome on some validation data.
+And in fact, that is what I did in this course last year.
+But it's a bit of a of a distraction.
+It takes some time to do.
+If you're interested in doing it, then I would I would very much encourage you to give that a try.
+It doesn't take long, but it's about half an hour of faffing around with a linear regression model.
+And I don't think it's important to illustrate the point because I could just quickly rough, rough
+strokes say, look, let's pick 80% of the first price, 10% of the second price, 10% of the third
+price.
+Combining these three prices, the 80% goes to our frontier model with Rag, 10% goes to our specialist
+model, 10% goes to the deep neural network.
+Let's just try combining them and see what happens.
+So what we can then do is simply run evaluate our usual test with the ensemble model with this test
+test data set and see how it performs.
+--- Lecture 4 ---
+Okay, so back to calling our favorite evaluate script with the ensemble function right here.
+And with our test data set I will kick it off.
+And this time it will take longer.
+Particularly the first one is going to take the whole 30s while while modal kicks into gear.
+But once it's got through the first the first one, it will then speed up.
+So I'm going to let this do its thing, and hopefully you will do the same because you're going to want
+to try this yourself.
+But I will say if for some of you that you might get technical problems running the deep neural network
+because it's quite, quite a hefty piece of machinery, if you want, you don't need to run this and
+are very easy.
+I mentioned before that there are some easy shortcuts.
+If you have any problems running the ensemble model, you can just replace the ensemble model by something
+that just makes simply the call to the specialist model only.
+There's no need to do this if you don't want.
+Anyway, it's off and running and I'm going to let it go through.
+You can see once it's once modal has woken up, it's then pretty quick to call modal repeatedly.
+So just in case it's not clear to you what we're doing, every time we come up with a price, we are
+calling the specialist model in modal.
+In the cloud, we're calling the we're calling our rag frontier model looking up in chroma, making
+that prompt to GPT five one.
+And then we are also calling a deep neural network and having it estimate as well.
+And we're more than halfway through.
+And I will see you in a second when it completes.
+And I should have said it's of course, of those three prices, it's taking 80% times the frontier,
+one plus 10% plus 10% that's being combined to this number.
+Let's reveal.
+Here you have it.
+We got a two handle.
+We only made a slight improvement on the frontier number.
+But we're down to 29.9.
+And here the R-squared is now at 87%.
+This visual looks beautiful.
+Absolutely beautiful.
+Look how close everything is this now?
+We really are.
+We're done with pricing.
+If you're fed up with these charts, this is the final, final one.
+I was so determined to get a two handle and I got there in the end.
+Write this down please.
+Your final 129 .90.
+That's that is success.
+Now I also I'm keenly aware of what you probably already thought, which is that these do all have a
+plus and minus.
+So overly fixating on the fact that it's 29 is perhaps silly because there is, of course, an error
+bar around it.
+But it feels good.
+You know, it feels nice to have got 29.9.
+But the thing is, this is just based on a quick, broad setting of these weights.
+If you have the time to build a proper ensemble model, you can do a lot better.
+And by the way, you can throw in more models in here.
+You could throw in other frontier models.
+You could put in the whole gamut of the different models that we came up with.
+Throw back in XGBoost, throw back in the random forest.
+I think I did the random forest last year instead of the neural network.
+So put in.
+The more that you put in, the better.
+The thing about using linear regression for your ensemble is that linear regression is smart, and if
+something doesn't add any signal, it's not going to it's not going to include it.
+It just won't get counted.
+So you can put in as many models as you want.
+And linear regression will figure out how can I take some combination of these different models to give
+you the best final outcome?
+So you should be able to beat me with this 29 and that of course, is the challenge for you.
+Use all of the techniques.
+Use everything we've done here to get even better.
+Get it, get it down into the 20s.
+Let's see what you could do.
+Last year, the best score that I got was 46 or something like that.
+It might have been 47.
+Uh, so this I mean, honestly, my, my, I'm blown away by this result.
+I'm so happy.
+I wanted to get to a three handle.
+That was that was my dream.
+And I got to a two handle 29.9 uh, really, really cool.
+Uh, so, uh, yeah, please take a moment to to to celebrate this success, wallow in the glory of
+our $29.9 error.
+And of course, it wouldn't be real if we weren't able to visualize that.
+So I have to do this.
+Here we go.
+Put it put it into this chart.
+And here is the final result, the prediction error from each model.
+Uh, we've got, uh, the original, the original, uh, machine learning stuff, the, the disastrous
+ad performance right here with 87.6.
+Crazy.
+Uh, this was the first, uh, neural network we did that was at 63.
+These were all the frontier models.
+The best was GPT five one at 44.74.
+Then that was the disappointing fine tuning results.
+This was our better deep neural network at 46, uh, and 46.49.
+Then that was the baseline, the worst of everything, all the way down to the fine tuned 39.85, which
+was our winner.
+Up until today.
+Now in comes GPT five one rag beating everything at 30.19, and then just coming in a hair lower is
+our ensemble at 29.9.
+Combining this plus this one plus this one.
+And as I say, there's definitely more mileage here.
+There's more juice and I, I can't wait to hear how you do it.
+And you must send me screenshots, post screenshots of that chart showing what what performance you're
+able to achieve.
+But for now, I'm going to be very, very happy with the 29.9.
+Okay.
+Uh, but then just to make me really happy, we have to put this into an agent.
+Uh, and, uh, so we're going to have a first of all, we're going to try a frontier agent, which
+is one that that is basically going to call this whole rag flow.
+Um, so let's just check it out again.
+It's in the agents directory.
+There is frontier Agent.
+Where are you?
+Um, there it is.
+And the frontier agent is It's just exactly the same now as we as we look to to turn notebooks into,
+uh, Python modules.
+And I always do recommend you start with a notebook, because it's just a great way to be in the experimental
+mindset and iterating on things.
+But there comes a point when it's time to put things into Python modules.
+And this is how I'm trying to show you.
+Like production ready code.
+It means that it has things like, you know, docstrings.
+So we've got, uh, good comments here.
+And I'm also using type hints.
+So I'm doing all the better practices that the data scientists in me has perhaps not, not been as careful
+with.
+But now we're into more of the engineering side of being an AI engineer.
+We're looking to be a bit more careful with this.
+You can see that the frontier agent is just following exactly the same code, though.
+Now we've experimented on it and perfected it, we can turn it into a nice module, a nice class frontier
+agent.
+It has the same thing making the contacts, getting the messages for finding similars.
+And then this is when it actually calls the price.
+And so with that background, we can now simply use this.
+We can call the Quadcast HyperX condenser Mic and find out how much it costs.
+And it predicts that it costs $140.
+And I think I mentioned before that it actually costs me $130.
+Uh, so this is a really very, very good pricing.
+And our specialist model got 90, which wasn't as good.
+Uh, so, uh, yeah.
+There there you have it.
+Now, uh, one, one thing that, uh, that.
+Oh, yeah.
+Let's try this as well.
+Let's try it.
+Pricing a Shure Mv7 plus.
+Uh, now you might ask what that is.
+That is the microphone that I'm speaking to you on right now.
+Uh, that that is my current microphone, and that costs me 2.99.
+Uh, so, uh, yeah, it's very close.
+Again, it's, uh, obviously really knows this stuff.
+Um, and we can also then, uh, have a neural network agent and this shows in purple.
+And so let's have a look at the neural network agent.
+Here it is.
+It's very short and simple.
+It just calls inference on our neural network.
+Uh, and after after loading it in and setting it up.
+So if we come back here, we can also do the same thing.
+And it doesn't do as well.
+It says 162.
+Um, but it's still in the general ballpark.
+And then finally we can start creating an ensemble agent to be using all three and combining them.
+So let's go ahead and have a look at the specialists, the ensemble agent right now.
+It's it's here in ensemble agent right there.
+So it's nice and short again.
+But there is one thing about this that maybe you were expecting.
+If you, if you spotted this, this thing that I, that I almost didn't mention.
+So what does this do?
+It creates a specialist agent, a frontier agent, and a neural network agent in its init method.
+It creates those three agents that it's delegating to, but it does also create the preprocessor.
+Remember, we still have to.
+If we're taking in some text from the internet, we still have to pre-process that to rewrite that in
+the same format that is going to be most suitable for our agents.
+So it's then going to take the, the, the, the, the text that comes in in this price function, take
+the text and first use the preprocessor to rewrite it.
+Then it will call the specialist.
+The frontier and the neural network are three prices those three agents to the right.
+And it combines them by combining by multiplying the frontier by 0.8, the specialist by 0.1, and the
+neural network by 0.1.
+And that is what it returns, and it logs that as well.
+If you're going to come in and improve the ensemble, this is where to do it.
+Of course, this is where you could use real weights that we come up with by looking at the data.
+Look at the val, the validation data set perhaps to come up with the best way to weight it.
+Also, if you have technical problems getting the neural network to work, or getting one of either
+the specialist or the frontier to work.
+This is a shortcut you can take.
+You can come into this ensemble agent, and you can just comment out whichever ones give you trouble.
+Just comment them out here, comment them out here and then down here.
+Comment them out and just return the number that you actually want.
+Let me uncomment it up so that that would allow you to simplify the ensemble agent to do whatever it
+is that you want.
+This is one place to go to, to really pare down what's happening.
+If you want to, to run a minimal version of this.
+Um, but but we'll, we'll have the maximum version of this.
+We'll, we'll, we'll be using this combined weighting.
+And you'll notice this is an example of really an agent workflow that we're just using Python code to
+orchestrate the three calls to three different agents.
+It's not like there's any autonomy at this point.
+It's just a fixed calling for three sub agents in order to combine those numbers and come up with the
+total estimated price of this item.
+--- Lecture 5 ---
+Okay.
+And so finally, it remains for me to now load in the ensemble agent.
+You can see that when the ensemble agent gets initialized, it starts by initializing all of the underlying
+agents, the frontier agent and the neural network agent.
+And then it says it's ready.
+And now I can ask our ensemble agent to price this Shure Mv7 plus podcaster microphone.
+Off it goes.
+And you can see you see how cool these log messages are.
+We can watch while everything happens.
+The ensemble agent is first pre-processing using grok because I've got that set in my env file as I
+as I showed you before.
+That's that's pre-processed.
+Now the specialist agent is calling the fine tuned model.
+And of course it's gone to sleep.
+So this is going to take 30s, which is, uh, always tiresome when it does it.
+I should have set that flag so that it stays awake.
+But when that's done, when modal has finished with its, uh, with its, it's warming up the server,
+it's then going to call modal.
+It's then going to to do the rag pricing.
+It's going to do the um the neural network pricing.
+And we will then have our Combined results.
+There we go.
+Finished with that.
+It predicted 2.99.
+That's interesting that that is exactly correct.
+So so it our this time our fine tuned model was spot on with the price of this.
+That's that's really interesting.
+Uh, so the frontier agent was off by $10.
+The ensemble was way off.
+The net result was close.
+Uh, we'd have done better this time just to have picked the specialist agent.
+And maybe when you build your ensemble, you'll have an ensemble that will.
+That will be able to do better than my ensemble.
+But there you have it.
+We just built an ensemble model and you can see all the different calls to LMS have happened.
+This is a call to an LM.
+And and then we we also had to vectorize.
+It's another call and then three more calls.
+So the four five LM calls participated in coming up with this result.
+And uh, that that then is the result of our ensemble agent live and ready for our product.
+And I said five LM calls there.
+But to be strictly accurate, I should say four LM calls and one neural network call.
+We we first of all, we we, are called the frontier agent that involves an encoder LM and the frontier
+LM.
+The specialist agent.
+That was our, uh, the fine tuned LM.
+That's our third LM call.
+Uh, the ensemble agent.
+In order to call all of these, had to call the pre-processor, which was an LM call.
+That's the fourth LM call.
+This was a neural network, not an LM.
+Uh, and so that that ends up being five models that were involved.
+Four of them are LMS and one of them are neural network.
+But still, what a lot of orchestration, a lot of stuff happening to come up with one price of a product.
+All of that happened and that's our ensemble agent built our architecture.
+It's coming along nicely.
+What a big day it was.
+I promise you a big day.
+It was a big day.
+We didn't take a huge amount of time over it.
+We made good time.
+But the the result was really, really terrific.
+I'm so happy we got the two handle.
+I didn't think we would.
+So that's that's really amazing.
+And maybe you've done even better.
+Okay.
+With that.
+We are 92.5% through this journey.
+This is home stretch territory.
+Wow.
+Of course you know, you can generate text and code with front end models, open source models, APIs,
+tools.
+The tools are going to make a comeback.
+Assistance.
+We built Rag now twice.
+You can follow a five step strategy.
+You can curate data, make a baseline model.
+You can carry out fine tuning of a model.
+And you can deploy models to production, including on modal.
+We can build a Rag workflow and deploy a build an ensemble model that combines multiple different models.
+Okay, so with that, next time we're going to work on our scanner agent mostly.
+And that's going to involve using structured outputs that we have.
+I've mentioned this many times and I kept saying we were going to come to it properly and we are going
+to come to it properly.
+We're going to come to it properly tomorrow.
+And it's like one final piece of really important core learning.
+Um, but but otherwise we're very much in the home stretch.
+It's all going to come together now.
+Uh, and I can't wait to show you the prices.
+Right.
+Uh, materializing.
+See you tomorrow.

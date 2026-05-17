@@ -1,0 +1,416 @@
+--- Lecture 1 ---
+And welcome to week four, day four.
+This is gonna be fun.
+This is about open source models.
+Now, taking the challenge we had last time and bringing it to open source.
+Last time we made sure that in addition to coding with frontier models and choosing the right LLM based
+on metrics, you were able to build Frontier Solutions using a model that we selected because it was
+good at generating code.
+So today it's going to be about assessing open source models, comparing them with a benchmark, building
+a solution so that open source models can generate code.
+And as a reminder this was the challenge we set our business person when we asked what is the problem
+you're trying to solve?
+They said, the problem is we've got some Python code.
+We want to translate it.
+We want to build port it to fast C++, go make that happen and we use some frontier models.
+Claude Sonnet 45 was able to achieve about 184 x speed up.
+GPT five got that to 2.33 times, then grok for more than a thousand times faster with some multithreading
+code, with a hard coded number of threads, and a few other things.
+Gemini 2.5 Pro.
+For the win, it rewrote the algebra.
+It restructured the code into threads and checked how many threads it could use for my system, and
+then built very fast C++ code, which compiled natively to give us that 1440 times.
+Speed up.
+Phenomenal.
+And how does open source compare?
+Well, let's go find out.
+Okay.
+But first we should go and look at some leaderboards to get some candidate open source models.
+That would make sense for us to start with.
+The first place to go is the Big Code Models leaderboard, which is a hugging face space that's very
+well known.
+And it shows you how various models have ranked in terms of their Python, Java, JavaScript, and indeed
+their C++ skills.
+And we might as well sort by C++ ability if we can.
+Let's do that.
+And we discover that according to this table, which I think is a few months out of date, I think they
+don't update this very often, but still it gives us some good pointers.
+When 2.5 Coder Instruct comes through as a top model, it's a bigger version than we'll be able to run,
+but it comes up there and then also the deep seq.
+This is a hybrid with other models, but I think we can see here the deep seat coder.
+And then if we look further down, we'll see various various models that are based on deep seq fi uh
+and and Quen from Alibaba Cloud.
+So the other place we can look is on my favorite one artificial analysis AI.
+And you'll remember that when you're on artificial analysis-i, you can select which models you're looking
+at.
+And you tend to look at the big ones.
+But you can come in here to the model selected and you can see I've gone through and I've searched and
+selected a few candidate models.
+We might want to look at a bit more and we can compare their coding skills.
+So I've taken some open source models that we'll be able to run.
+One of them is GPT OSS 20 B, and that is by far and away the highest performing one on the code bench.
+Coding skills.
+Compared to Deep Sea Coder, which comes in significantly lower and five for mini and 2.5 coder and
+then Gemma three at the bottom.
+And so here you see again a similar uh, similar arrangement.
+But no, now it's different.
+Sorry GPT Oasis comes first and then 2.5 coder comes next.
+That was in third place uh and then deep sea coder and then five four and then Gemma at the end.
+So if we were going to pick three, it would probably be GPT OSS, Quen 2.5 coder and deep seq coder.
+They seem like good candidate models.
+That's how you do it.
+You start with the leaderboards with an appropriate metric to pick your candidates, and then you go
+and try them out, which is what we'll get to next.
+Actually, no it's not.
+There's one more thing to do.
+First, I just occurred to me, I was thinking, we're going to be running these open source models
+using a llama, which limits me to two models that I can run locally.
+But that's not entirely true.
+There are other ways we can run models.
+We could use open router, and we could also use grok with a Q and not not Mr. Musks.
+And I think that's what we'll do.
+We'll try grok with a Q, because we can use that to access the bigger OSS.
+120 and you can see that that scores even higher, actually only slightly higher on the scientific coding,
+but significantly higher on the live code bench.
+So we will uh, we will give that one a try to via grok.
+So we'll use both techniques for open source models okay.
+With that.
+Now let's go do it okay.
+Here we are back in cursor.
+And we're going into week four into day four already.
+And just as a reminder we're going to be executing native C++ today.
+But you don't need to don't bother if that's going to, to uh be something that will be a hardcore.
+It will take you some, some learning.
+Instead.
+You can either just watch me do it and see the code being ported, or use the website that I showed
+you yesterday.
+And the other note is that we're going to be using some free models installed via Lama.
+Also, we're going to use some open source models, as I said, through grok.
+But also I just decided to add in open router as well.
+We will add one model from open router.
+This is all completely optional.
+These are open source models, but you still have to pay for these bigger ones because open router has
+to run them on the cloud.
+But you don't need to just skip them if you don't want to run them.
+That is the intro.
+We'll run some imports.
+I'm going to load in some environment keys.
+As always, it doesn't matter if you don't want to use any of these and simply delete that from this
+code.
+All right.
+And then as usual, we will connect to the client libraries in the normal way.
+And this next line is where I set up the models we will use.
+We're going to keep the the frontier closed source models in here.
+This list although I'm not going to actually use them.
+But here are the the frontier models.
+We'll use them tomorrow again.
+And then we're going to use the open source model Quen 2.5 coder deep seq coder v2 and GPT oss 20,
+and we're going to use all three of them through Olama running locally on our computers.
+If your machines can can take it, then that's what we'll run.
+Then we're going to run.
+I'm going to run at least Quen three coda 30 DB over open router, and I'm going to use OpenAI's massive
+120 DB variant over grok with a Q.
+Uh, and you can see in this bottom, I've just got a dictionary here in this bottom line.
+And uh, basically what I'm saying is for each of these models that I've listed out here, I'm saying
+which one of these client libraries will it use?
+So just a little quick mapping from model name to client library model name to client library model
+named client library.
+So that we can look that up in our code in a second.
+So you should just feel free to change these two lists to be whatever you would like.
+Keep it to the size and shape and cost of model that you're comfortable with.
+And of course, use the llama ones the first few for free, as long as your machine is big enough.
+If your machine is on the smaller size, then then go with like llama 3.2, llama 3.21 b, or just go
+and there's a code llama as well you could look at.
+Just go on to Alarm.com and take a look and pick the models that you want.
+And I should mention, once you've done that, once you've been to Alarm.com and gone to models, you
+would then want to bring up a cursor terminal in the usual way, and then you can see what I've done
+here.
+My last two commands were pull Queen 2.5, Koda and Olama, pull deep, set Koda v2.
+And you would have to pull whichever ones you want.
+And it did take a minute to download these.
+You can see they're reasonably large.
+Quan 2.5 Koda is a 7 billion parameter model, so it's big and deep.
+Sea Koda v2 is a 16 billion parameter model, so it's really big.
+But they both fit comfortably on my machine and they'll work fine.
+You may need to have 60GB of Ram, not eight gigabytes, but you should give it a try and see.
+But if in doubt, stick with the smaller llama 3.2 or other small ones.
+Okay, so when you've done that, you've updated your, your, uh, models and you've mapped them to
+the right clients here.
+Then run that cell.
+And then again we're just going to get the system information here.
+This is my machine.
+Your machine will be different.
+But this is telling me something I do I just noticed here it does say the number of cores that I've
+got.
+So when I realized now, when grok yesterday fixed the number of cores in the code it was making, that's
+fair enough, because it did know I told it the the architecture of the computer.
+So it was doing that intentionally.
+So that can't have been the way in which Gemini's code was superior.
+Uh, Gemini went and found out how many cores there were, but it didn't need to because we already
+had that in the prompt.
+All right.
+Anyways, these these here are the commands that we took from yesterday.
+So in yesterday's lab we had identified, uh, from, from the advice that from GPT five, what are
+the commands to use?
+Uh, you remember when we, uh.
+Hang on, where is it now when we asked GPT five?
+And this is this is it.
+We asked GPT five to tell us what commands to use.
+The first time I did it, actually, GPT five didn't give me the most efficient ones.
+I had to prompt it a couple of times, but in the end, I got there.
+This was the fastest and so you should do the same.
+You should find out the fast commands for your platform, and that is what you should put here.
+And then run that cell.
+And at that point we are ready to do some testing of models.
+--- Lecture 2 ---
+Okay, so the main task you will remember the system prompt about converting Python code.
+You remember the function user prompt for that generates a user prompt with a system information, the
+compile command and the Python code to port.
+So this is all old news for you.
+So as messages for old news write output you know well and port you know well as well.
+And this is again our code to calculate pi by doing 200 million times of this sequence.
+And now the run Python code, which actually we don't need to run.
+We already know the time that the Python code takes the compile and run.
+That will run it three times.
+But here's the new little piece I have for you.
+Let's give ourselves a little Gradio interface.
+So this is using the blocks approach that you'll remember is the one where you want to design your interface.
+This is going to have two rows to it.
+The first row will have a Python and a C++ text box, the Python code to enter and the C++ code that
+will be an output.
+Put and then this, this.
+After that we have a dropdown to select a model.
+And we have a convert button to convert the code.
+And this is where you say to Gradio, hey look, I want you to build a front end so that if the user
+clicks the convert button, I want you to call back my server.
+I want you to call the function that's called port.
+The inputs should be the model that's selected and the Python code.
+And with whatever that function returns, I want you to shove that in the C++ text box.
+So this line here is how we tell Gradio to hook up our UI to our callback function port.
+That's all it takes.
+And this will then launch our new user interface for porting code.
+All right so here we go.
+Bang up comes the user interface.
+Haha okay, so it's just as I said, two rows.
+The top row has Python code and C++ code.
+Lovely.
+So I can select a model and it allows me to choose any of the models in that models list.
+So if you change the models list, you should see your models here and we won't pick the frontier ones.
+We've used them already.
+We're going to start with Gwen 2.5 coda and I can come over here and press Convert Code.
+And when I press that button, it calls the callback port.
+It passes in the model and the Python code, and with whatever that callback method returns, it shoves
+that in this cell here.
+And that's where we have it right now.
+And it's also written it to a file.
+So what I can do now is go back for a moment to cursor, and I can just do the compile and run to.
+Now compile that code.
+It wrote it to Main.cpp.
+That will be the same code.
+And we can now compile that code and run it.
+And it doesn't run.
+2.5 Pro was not so code was not able to do this.
+It is a small model.
+It was not able to successfully convert from C++ from Python to C++.
+I think that it hadn't imported the right thing and so that didn't work.
+So that is a fail.
+The our first fail of all of these that we got from, uh, from from Gwen.
+Quinn.
+Okay, so that was Quinn coder.
+That did not succeed.
+We're now going to try another tiny model.
+We're going to try Deep Sea Coder v2.
+Not so tiny.
+It's a 16 billion parameter model.
+We'll see if it can port Python code to C++.
+Well, it's done something.
+Here we go.
+Looks like it has the same problem, but we will see.
+Okay, so, uh, it looks different though.
+Let's go back over here.
+Compile and run.
+Oh, no.
+No, it didn't have the problem that ran successfully.
+Well done, deep sea coder.
+Uh, that ran and we've got a perfectly respectable number.
+Uh, we will.
+I will keep note of this.
+Or maybe we should write it down here.
+So we'll make this into a markdown cell and we will say, uh, this is Quinn.
+Coder was a fail deep seek coder two.
+This was Quinn 2.5.
+Coder deep C coder v2.
+And let's pick the middle time.
+There it is
+0.1144050084.
+All right.
+Congratulations to Deepsea Coder.
+Let's go try the next one.
+Okay.
+The next one is GPT oss 20 B 20 billion parameter model again running locally on my computer right here.
+All right I'm going to press the convert code button.
+And now I know from bitter experience that we are in for a wait.
+Now uh, this is going to take my machine some time and I can see that my GPU is going flat out as this
+monstrous model is, uh, slaving away at this problem.
+Uh, so we will give it some time.
+I'm going to let it think for a while.
+And when I come back, we will see whether or not GPT oss 20 B is up for it.
+And when I say, is it up for it?
+I mean, of course, is it up for giving us an answer?
+And the answer is yes.
+It is up for giving us an answer.
+Here it is.
+It took about five minutes to get here, though, while I was hammering away.
+Uh, but we have an answer.
+Is it the right answer?
+It's not doing any multithreaded stuff that I can see, so it's not going to be super fast.
+But let's see what it does.
+Compile and run.
+Well, it works, and it is indeed faster than the ones that came before.
+This is, I think, our fastest so far.
+Let's come in here and we're going to say that this is open.
+OS the 20 billion parameter version of it.
+What is our medium sized one?
+This was A4805804.
+So this is the middle one right here.
+Paste that in there.
+There we have the performance from OpenAI's GPT OS.
+Very impressive indeed.
+Okay.
+Onwards.
+--- Lecture 3 ---
+All right.
+Next up we're going to use Kwan three quarter 30 billion which is a large Kwan model.
+And we're going to use it through open router.
+Uh, and the reason I picked this one, if we go to open routers website, they have a section where
+you can look at the different categories, the leaderboards by how much they are used.
+That's a different a different twist on leaderboards.
+And we'll pick the programming category to see which models are used the most for programming related
+challenges.
+And this varies.
+This bounces around a lot.
+It just bounces around while we were looking at it right there.
+But Kwan three right now is varies between second place and fourth place.
+Uh, but here it is.
+It's being used quite heavily.
+And, uh, it comes after Grock and Claude there.
+So this is the model we're picking for our next experiment.
+So and this is it in, in, in open router, the details of it, they show the different providers that
+you can use.
+So we are going to use that one.
+Uh here we go.
+Kwan three Koda.
+And going to press the convert code button.
+Remember it was Quinn's cousin that failed with a mistake.
+Stake here we have its code and there it looks.
+So let's go now and try and run this code and see what we get.
+So back we come over here, we compile and run code.
+And it turns out that the, uh, the, the cousin, the faster, bigger cousin is able to succeed with
+the challenge.
+But it's not our fastest.
+But let's put it down.
+So this is now question 30 B and it is we'll take the middle time here that switches this one right
+here.
+And so there we have it.
+There is when it is uh slower than open AI than OSS 20 B but it's faster than deep C code V2 running
+locally on my machine.
+Well done Gwen.
+Okay, last and hopefully not least, we are going to pick GPT oss 120 be the bigger cousin of the 20
+B1 and this is running on grok with a Q uh, which is, of course, the very fast inference platform
+and 120 but we know that OSS this is on high thinking, so it's going to take its time over this.
+But the fact that it's running on grok with a Q gives me some hope that maybe by the time I finish this
+sentence, it will finish, but maybe not.
+All right.
+I will, uh, be gone and be back in a second when GPT OS 120 be completes.
+Okay.
+And it finished a couple of seconds later.
+So it was pretty quick.
+And here is the results.
+Looks good to me.
+It hasn't done the super clever stuff with threads, but it looks looks good.
+It's done.
+Some try to give some hints to the compiler to make it run faster.
+We'll see how it fares.
+Back.
+We go to the code, we will run our compile and run again and see what happens.
+And oh no, it's it's, uh, quite a bit slower.
+Uh, there's a shock.
+That's an unexpected outcome.
+Uh, okay.
+Okay.
+So so again, C++ people will probably know what's going on here and why exactly that means that it
+didn't do so well.
+Uh, but, uh, open AI.
+OS 120 be it got.
+Let's pick the middle one to be consistent.
+Which would be this one here, right?
+Oh no, no it wouldn't.
+What am I saying?
+It would be this one here.
+Sorry.
+Uh, there we go.
+And that is the result.
+It is the worst of the bubble, not the very worst, because quantum 2.5 didn't didn't, uh, get the
+assignment at all, but it's not good.
+Let's just try running it again just to make sure it's not that like my computer was.
+Was busy at that time or something.
+Now look at that.
+Very consistent.
+Wow.
+There we have it.
+So strangely, OS 120 was beaten significantly healthily by 20.
+And you know, of course we're not being super scientific because we should really run the porting like
+ten times and be taking the average of actually reporting the code.
+But for what it's worth, we're doing it with a with one experiment and then multiple runs.
+And this is this is where it's ended up that GPT OSS 120 was beaten by its smaller cousin, 20 GB.
+And so to wrap up, here are the results of our rather unscientific experiment.
+You could run this multiple times to see if it holds out.
+Worst ninth place across our frontier and open source models was when 2.5 code that failed the assignment.
+Next up, surprisingly shockingly, was GPT OSS 120, which did a really bad job.
+In fact, it was worse than I realized when I was talking about it.
+I was I was sort of thinking that this was like 0.14, uh, a bit slower than everything else.
+But no, it was a lot slower.
+It was 1.4 seconds.
+I had to run it a few more times just to check that I hadn't made a mistake.
+I can't actually see what was wrong with it.
+C++ code, and I'm hoping maybe one of you C++ people will come back and tell me.
+I'm guessing maybe one of the pragmas was a really bad idea.
+I realize now that that unrolled one was it was telling the compiler that it's not allowed to do that,
+and I have no idea why it did that.
+It must have thought it was a great idea, and it turned out it was a lousy idea.
+So GPT oss 120 be disgraced itself.
+Deep Sea Coder v2 and Quinn three coder 30 be Basically tied at 168 times.
+Speed up.
+They both got very similar coin.
+Three quarter had the slight edge, but that might just be a you know, it's probably the same code
+or very similar.
+Just happened to be when I when I ran it.
+So there you have two successful open source models.
+Next up comes the frontier model Claude Sonet 4.5 with its 104 times speed up, followed by GPT five,
+top of the artificial analysis leaderboard.
+For us, it got a 233 speed up.
+And then the shocker, the surprise, the amazing GPT oss 120 just 20 B not 120 B a 238 times speed
+up, beating out GPT five and Claude Sonet 4.5.
+Fantastic.
+Uh, again, it may just have been lucky.
+It might have been the same code as those other frontier models just happened to run faster when I ran
+it, but whatever.
+That is what it is.
+It won that.
+And what's cool about it is that, of course, that porting was running on my computer.
+That was an a old farmer based model.
+A model running on my computer competed with the frontier and it seems slightly beat some of the frontier.
+Uh, but it didn't come first because both grok four and Gemini 2.5 Pro did better by putting in native
+like multithreading code with Gemini 2.5 Pro still the champion.
+Now, I do hope you're not fed up of this code generation stuff, because we've got one more, one more
+hard test to go.
+A really challenging one to put to all of these models to see who triumphs.
+We'll do that tomorrow.
+Along with generally talking about comparing performance of open source and frontier models and ranking
+them together, discussing evals, evaluations, such a critical topic that really puts a bow on this
+week about picking the right model for the commercial task.
+And we'll talk about how you build solutions to generate code and different kinds of related tasks,
+like really fun things like writing automatically, writing comments for your code, and automatically
+writing test cases for your code.
+All of that to come tomorrow.
+See you then.

@@ -1,0 +1,11 @@
+{
+  "pipeline": "hybrid",
+  "models": {
+    "bi_encoder": "sentence-transformers/all-MiniLM-L6-v2",
+    "cross_encoder": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+    "inference_llm": "gpt-5.4-mini"
+  },
+  "avg_mrr": 0.61,
+  "avg_ndcg": 0.618482968732187,
+  "avg_coverage": 0.7333333333333333
+}

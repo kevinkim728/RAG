@@ -1,6 +1,0 @@
-{
-  "pipeline": "cross_encoder",
-  "avg_mrr": 0.6796913580246913,
-  "avg_ndcg": 0.7126582087759336,
-  "avg_coverage": 0.8666666666666667
-}

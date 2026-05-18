@@ -3,6 +3,7 @@ from chromadb import PersistentClient
 from dotenv import load_dotenv
 from groq import Groq
 from pydantic import BaseModel
+from openai import OpenAI
 
 load_dotenv(override=True)
 
@@ -10,14 +11,19 @@ class Chunk(BaseModel):
     page_content: str
     metadata: dict
 
-embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+# embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+# embedder = SentenceTransformer("BAAI/bge-base-en-v1.5")
+# embedder = SentenceTransformer("Qwen/Qwen3-Embedding-0.6B", trust_remote_code=True)
+embedder = SentenceTransformer("nomic-ai/nomic-embed-text-v1.5", trust_remote_code=True)
 cross_encoder = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
 chroma = PersistentClient(path="./chroma_db")
 collection = chroma.get_or_create_collection("transcripts")
 
-# client = OpenAI()
-client = Groq()
-model = "openai/gpt-oss-120b"
+client = OpenAI()
+model = "gpt-5.4-mini"
+# client = Groq()
+# model = "openai/gpt-oss-120b"
+
 
 
 def generate_answer(query, chunks, history=[]):
@@ -79,7 +85,8 @@ def rerank(query, chunks):
         ],
     )
     order_str = response.choices[0].message.content.strip()
-    order = [int(x.strip()) for x in order_str.split(',') if x.strip().isdigit()] 
+    order = [int(x.strip()) for x in order_str.split(',') if x.strip().isdigit()]
+    order = [i for i in order if 1 <= i <= len(chunks)] # Filter out-of-range IDs the LLM may hallucinate
     print(f"Order returned by LLM: {order}")
     return [chunks[i - 1] for i in order] # Reorders chunks by using the ranked IDs from the LLM, converting from 1-indexed to 0-indexed
 

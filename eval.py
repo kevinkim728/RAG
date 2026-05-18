@@ -2,6 +2,7 @@ import json
 import math
 import sys
 import time
+from datetime import datetime
 from pathlib import Path
 from pydantic import BaseModel
 from answer import (
@@ -9,13 +10,19 @@ from answer import (
     fetch_context_hybrid, generate_answer, client, model
 )
 
+# BI_ENCODER = "sentence-transformers/all-MiniLM-L6-v2"
+# BI_ENCODER = "BAAI/bge-base-en-v1.5"
+# BI_ENCODER = "Qwen/Qwen3-Embedding-0.6B"
+BI_ENCODER = "nomic-ai/nomic-embed-text-v1.5"
+CROSS_ENCODER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+
 RESULTS_DIR = Path("results")
 
 PIPELINES = {
     "baseline":      (fetch_context_baseline, 0),
-    "llm_reranker":  (fetch_context, 60),
+    "llm_reranker":  (fetch_context, 0),
     "cross_encoder": (fetch_context_crossencoder, 0),
-    "hybrid":        (fetch_context_hybrid, 15),
+    "hybrid":        (fetch_context_hybrid, 0),
 }
 
 
@@ -114,12 +121,57 @@ SCORES: 4,3,5"""},
     return JudgeScore(feedback=feedback, accuracy=accuracy, completeness=completeness, relevance=relevance)
 
 
-def run_pipeline(name):
+def print_model_info():
+    print("\n--- Models ---")
+    print(f"  Bi-encoder:    {BI_ENCODER}")
+    print(f"  Cross-encoder: {CROSS_ENCODER_MODEL}")
+    print(f"  Inference LLM: {model}")
+    print()
+
+
+def debug_pipeline(name):
+    fetch_fn, _ = PIPELINES[name]
+    tests = load_tests()
+    print_model_info()
+    print(f"=== DEBUG: {name} ===\n")
+
+    for i, test in enumerate(tests):
+        print(f"[{i+1}/{len(tests)}] {test.question}")
+        chunks = fetch_fn(test.question)
+        mrr_scores = []
+        for kw in test.keywords:
+            rank = None
+            for j, chunk in enumerate(chunks):
+                if kw.lower() in chunk.page_content.lower():
+                    rank = j + 1
+                    break
+            if rank:
+                print(f"  \"{kw}\" → rank {rank}  (MRR: {1/rank:.3f})")
+                mrr_scores.append(1 / rank)
+            else:
+                print(f"  \"{kw}\" → NOT FOUND")
+                mrr_scores.append(0.0)
+        print(f"  Question MRR: {sum(mrr_scores)/len(mrr_scores):.3f}\n")
+
+
+def run_pipeline(name, overwrite=False):
     fetch_fn, sleep_secs = PIPELINES[name]
     tests = load_tests()
     RESULTS_DIR.mkdir(exist_ok=True)
 
-    print(f"\nRunning: {name} ({len(tests)} questions)")
+    bi_short = BI_ENCODER.split("/")[-1]
+    llm_short = model.split("/")[-1]
+    filename = RESULTS_DIR / f"{name}_{bi_short}_{llm_short}.json"
+
+    if filename.exists() and not overwrite:
+        answer = input(f"\n{filename.name} already exists. Replace it? (y/n): ").strip().lower()
+        if answer != "y":
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = RESULTS_DIR / f"{name}_{bi_short}_{llm_short}_{timestamp}.json"
+            print(f"Saving to {filename.name} instead.")
+
+    print_model_info()
+    print(f"Running: {name} ({len(tests)} questions)")
     if sleep_secs:
         print(f"Sleeping {sleep_secs}s between questions — est. {sleep_secs * (len(tests) - 1) // 60 + 1} min\n")
 
@@ -137,36 +189,47 @@ def run_pipeline(name):
 
     result = {
         "pipeline": name,
+        "models": {
+            "bi_encoder": BI_ENCODER,
+            "cross_encoder": CROSS_ENCODER_MODEL,
+            "inference_llm": model,
+        },
         "avg_mrr": sum(all_mrr) / len(all_mrr),
         "avg_ndcg": sum(all_ndcg) / len(all_ndcg),
         "avg_coverage": sum(coverage_scores) / len(coverage_scores),
     }
-    with open(RESULTS_DIR / f"{name}.json", "w") as f:
+    with open(filename, "w") as f:
         json.dump(result, f, indent=2)
-    print(f"\nSaved to results/{name}.json")
+    print(f"\nSaved to {filename.name}")
     print(f"MRR: {result['avg_mrr']:.3f} | nDCG: {result['avg_ndcg']:.3f} | Coverage: {result['avg_coverage']:.3f}")
 
 
 def compare():
-    print(f"\n{'Pipeline':<20} {'MRR':>6} {'nDCG':>7} {'Coverage':>10}")
-    print("-" * 48)
+    print(f"\n{'Pipeline':<20} {'MRR':>6} {'nDCG':>7} {'Coverage':>10}  {'File'}")
+    print("-" * 75)
     for name in PIPELINES:
-        path = RESULTS_DIR / f"{name}.json"
-        if path.exists():
-            r = json.loads(path.read_text())
-            print(f"{name:<20} {r['avg_mrr']:>6.3f} {r['avg_ndcg']:>7.3f} {r['avg_coverage']:>10.3f}")
+        matches = sorted(RESULTS_DIR.glob(f"{name}_*.json"))
+        if matches:
+            for path in matches:
+                r = json.loads(path.read_text())
+                print(f"{name:<20} {r['avg_mrr']:>6.3f} {r['avg_ndcg']:>7.3f} {r['avg_coverage']:>10.3f}  {path.name}")
         else:
             print(f"{name:<20} {'(not run yet)':>28}")
 
 
 if __name__ == "__main__":
-    valid = list(PIPELINES.keys()) + ["compare"]
-    if len(sys.argv) != 2 or sys.argv[1] not in valid:
-        print("Usage: uv run eval.py <pipeline|compare>")
+    args = sys.argv[1:]
+    overwrite = "-y" in args
+    args = [a for a in args if a != "-y"]
+    cmd = " ".join(args)
+
+    if cmd == "compare":
+        compare()
+    elif cmd.startswith("debug ") and cmd[6:] in PIPELINES:
+        debug_pipeline(cmd[6:])
+    elif cmd in PIPELINES:
+        run_pipeline(cmd, overwrite=overwrite)
+    else:
+        print("Usage: uv run eval.py <pipeline|compare|debug <pipeline>> [-y]")
         print(f"  Pipelines: {', '.join(PIPELINES.keys())}")
         sys.exit(1)
-
-    if sys.argv[1] == "compare":
-        compare()
-    else:
-        run_pipeline(sys.argv[1])

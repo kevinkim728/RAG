@@ -10,11 +10,8 @@ from answer import (
     fetch_context_hybrid, generate_answer, client, model
 )
 
-# BI_ENCODER = "sentence-transformers/all-MiniLM-L6-v2"
-# BI_ENCODER = "BAAI/bge-base-en-v1.5"
-# BI_ENCODER = "Qwen/Qwen3-Embedding-0.6B"
 BI_ENCODER = "nomic-ai/nomic-embed-text-v1.5"
-CROSS_ENCODER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+CROSS_ENCODER_MODEL = "BAAI/bge-reranker-large"
 
 RESULTS_DIR = Path("results")
 
@@ -160,14 +157,19 @@ def run_pipeline(name, overwrite=False):
     RESULTS_DIR.mkdir(exist_ok=True)
 
     bi_short = BI_ENCODER.split("/")[-1]
+    ce_short = CROSS_ENCODER_MODEL.split("/")[-1].replace("ms-marco-", "")
     llm_short = model.split("/")[-1]
-    filename = RESULTS_DIR / f"{name}_{bi_short}_{llm_short}.json"
+
+    if name in ("cross_encoder", "hybrid"):
+        filename = RESULTS_DIR / f"{name}_{bi_short}_{ce_short}_{llm_short}.json"
+    else:
+        filename = RESULTS_DIR / f"{name}_{bi_short}_{llm_short}.json"
 
     if filename.exists() and not overwrite:
         answer = input(f"\n{filename.name} already exists. Replace it? (y/n): ").strip().lower()
         if answer != "y":
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = RESULTS_DIR / f"{name}_{bi_short}_{llm_short}_{timestamp}.json"
+            filename = RESULTS_DIR / f"{filename.stem}_{timestamp}.json"
             print(f"Saving to {filename.name} instead.")
 
     print_model_info()

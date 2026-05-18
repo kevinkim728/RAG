@@ -11,20 +11,16 @@ class Chunk(BaseModel):
     page_content: str
     metadata: dict
 
-# embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-# embedder = SentenceTransformer("BAAI/bge-base-en-v1.5")
-# embedder = SentenceTransformer("Qwen/Qwen3-Embedding-0.6B")
+
 embedder = SentenceTransformer("nomic-ai/nomic-embed-text-v1.5", trust_remote_code=True)
-cross_encoder = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
+cross_encoder = CrossEncoder("BAAI/bge-reranker-large")
 chroma = PersistentClient(path="./chroma_db")
 collection = chroma.get_or_create_collection("transcripts")
 
-client = OpenAI()
-model = "gpt-5.4-mini"
-# client = Groq()
-# model = "openai/gpt-oss-120b"
-
-
+# client = OpenAI()
+# model = "gpt-5.4"
+client = Groq()
+model = "openai/gpt-oss-120b"
 
 def generate_answer(query, chunks, history=[]):
     context = "\n\n".join(chunk.page_content for chunk in chunks)
@@ -79,6 +75,7 @@ def rerank(query, chunks):
 
     response = client.chat.completions.create(
         model=model,
+        temperature=0,
         messages=[
             {"role": "system", "content": "You are a document re-ranker. Given a question and a list of chunks, return them ranked by relevance to the question, most relevant first. Return results as comma-separated integers only"},
             {"role": "user", "content": user_prompt}

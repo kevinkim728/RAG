@@ -1,0 +1,11 @@
+{
+  "pipeline": "llm_reranker",
+  "models": {
+    "bi_encoder": "nomic-ai/nomic-embed-text-v1.5",
+    "cross_encoder": "BAAI/bge-reranker-v2-m3",
+    "inference_llm": "gpt-5.4-mini"
+  },
+  "avg_mrr": 0.705,
+  "avg_ndcg": 0.7430518059341666,
+  "avg_coverage": 0.888888888888889
+}

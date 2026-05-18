@@ -1,0 +1,11 @@
+{
+  "pipeline": "cross_encoder",
+  "models": {
+    "bi_encoder": "nomic-ai/nomic-embed-text-v1.5",
+    "cross_encoder": "BAAI/bge-reranker-large",
+    "inference_llm": "gpt-5.4-mini"
+  },
+  "avg_mrr": 0.6929629629629629,
+  "avg_ndcg": 0.7129563538441785,
+  "avg_coverage": 0.8444444444444444
+}

@@ -1,0 +1,11 @@
+{
+  "pipeline": "llm_reranker",
+  "models": {
+    "bi_encoder": "text-embedding-3-large",
+    "cross_encoder": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+    "inference_llm": "gpt-5.4-mini"
+  },
+  "avg_mrr": 0.6822222222222222,
+  "avg_ndcg": 0.7114641325452781,
+  "avg_coverage": 0.8444444444444444
+}

@@ -1,0 +1,11 @@
+{
+  "pipeline": "hybrid",
+  "models": {
+    "bi_encoder": "nomic-ai/nomic-embed-text-v1.5",
+    "cross_encoder": "BAAI/bge-reranker-large",
+    "inference_llm": "gpt-5.4"
+  },
+  "avg_mrr": 0.7592592592592593,
+  "avg_ndcg": 0.7691667364013692,
+  "avg_coverage": 0.8444444444444444
+}

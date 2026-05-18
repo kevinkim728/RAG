@@ -5,9 +5,6 @@ from chromadb import PersistentClient
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pydantic import BaseModel
 
-# DEFAULT_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
-# DEFAULT_MODEL = "BAAI/bge-base-en-v1.5"
-# DEFAULT_MODEL = "Qwen/Qwen3-Embedding-0.6B"
 DEFAULT_MODEL = "nomic-ai/nomic-embed-text-v1.5"
 
 class Chunk(BaseModel):
@@ -84,7 +81,6 @@ def embed_and_store(chunks, embedder, collection):
     metadatas = [chunk.metadata for chunk in chunks] # Creates metadata for the week, day, and the source using dot notation
     ids = [f"{chunk.metadata['source']}_{i}" for i, chunk in enumerate(chunks)] # Names each chunk with the file name and an index
 
-    # Turns the chunks into vectors through .encode
     print("Embedding chunks...")
     embeddings = embedder.encode(texts, show_progress_bar=True).tolist()
 

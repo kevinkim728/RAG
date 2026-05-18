@@ -13,7 +13,7 @@ class Chunk(BaseModel):
 
 # embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 # embedder = SentenceTransformer("BAAI/bge-base-en-v1.5")
-# embedder = SentenceTransformer("Qwen/Qwen3-Embedding-0.6B", trust_remote_code=True)
+# embedder = SentenceTransformer("Qwen/Qwen3-Embedding-0.6B")
 embedder = SentenceTransformer("nomic-ai/nomic-embed-text-v1.5", trust_remote_code=True)
 cross_encoder = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
 chroma = PersistentClient(path="./chroma_db")
@@ -80,7 +80,7 @@ def rerank(query, chunks):
     response = client.chat.completions.create(
         model=model,
         messages=[
-            {"role": "system", "content": "You are a document re-ranker. Given a question and a list of chunks, return them ranked by relevance to the question, most relevant first. Respond in JSON format."},
+            {"role": "system", "content": "You are a document re-ranker. Given a question and a list of chunks, return them ranked by relevance to the question, most relevant first. Return results as comma-separated integers only"},
             {"role": "user", "content": user_prompt}
         ],
     )

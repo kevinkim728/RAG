@@ -652,7 +652,6 @@ Tokenizers are very simplistic bits of code, and the fact that you have to map t
 just something that you go through to to come up with numbers that can be the inputs into a model that
 is tokens.
 They are the inputs.
-Vectors are what comes out the other side after a model, an LLM has taken in these simplistic tokens.
 And it's it's got some some meaning from it.
 It's understood the relationship between these different words.
 It's understood what, what point you're trying to make, how to represent this information.

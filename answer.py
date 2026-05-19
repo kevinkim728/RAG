@@ -17,22 +17,11 @@ cross_encoder = CrossEncoder("BAAI/bge-reranker-large")
 chroma = PersistentClient(path="./chroma_db")
 collection = chroma.get_or_create_collection("transcripts")
 
-# client = OpenAI()
-# model = "gpt-5.4"
-client = Groq()
-model = "openai/gpt-oss-120b"
+client = OpenAI()
+model = "gpt-5.4"
+# client = Groq()
+# model = "openai/gpt-oss-120b"
 
-def generate_answer(query, chunks, history=[]):
-    context = "\n\n".join(chunk.page_content for chunk in chunks)
-    response = client.chat.completions.create(
-        model=model,
-        messages=[
-            {"role": "system", "content": f"""You are a helpful study assistant for an LLM engineering course. Answer the user's question using only the context provided. If the answer isn't in the context, say so. Context: {context}"""},
-      ] + history + [
-          {"role": "user", "content": query}
-        ]
-    )
-    return response.choices[0].message.content
 
 
 def rewrite_query(query, history=[]):
@@ -62,7 +51,7 @@ def merge_chunks(chunks1, chunks2):
     for chunk in chunks2:
         if chunk.page_content not in existing:
             merged.append(chunk)
-    return merged
+    return merged # Returns a list of Chunk objects
 
 
 def rerank(query, chunks):
@@ -88,66 +77,38 @@ def rerank(query, chunks):
     return [chunks[i - 1] for i in order] # Reorders chunks by using the ranked IDs from the LLM, converting from 1-indexed to 0-indexed
 
 
-def fetch_context(query, n_results=20, history=[], final_k=10):
+def fetch_context_hybrid(query, n_results=20, ce_k=15, final_k=10, history=[]):
     query_embedding = embedder.encode(query).tolist() # Convert the query into a vector and puts it in a list
     results = collection.query(query_embeddings=[query_embedding], n_results=n_results) # Uses the list of vectors from query_embedding and gives n_results of similar vectors
-    chunks1 = [Chunk(page_content=doc, metadata=meta) for doc, meta in zip(results["documents"][0], results["metadatas"][0])] # Converts the chunk's page_content and metadata which was in a list, back into a Chunk object
-
-    rewritten = rewrite_query(query, history) # Rewrites the query into a concise way
-    rewritten_embedding = embedder.encode(rewritten).tolist() # Converts the rewritten query into a vector and puts it in a list
-    results2 = collection.query(query_embeddings=[rewritten_embedding], n_results=n_results) # Uses the list of vectors from rewritten_embedding and gives n_results of similar vectors
-    chunks2 = [Chunk(page_content=doc, metadata=meta) for doc, meta in zip(results2["documents"][0], results2["metadatas"][0])] # Converts the chunk's page_content and metadata which was in a list, back into a Chunk object
-
-    merged = merge_chunks(chunks1, chunks2) # Eliminates duplicates from the chunks
-    reranked = rerank(query, merged) # Ranks them in order from best to worst
-    return reranked[:final_k] # Gives the final_k best chunks
-
-
-def fetch_context_baseline(query, n_results=10):
-    """
-    Baseline fetch_context to get a baseline score for evaluation
-    """
-    query_embedding = embedder.encode(query).tolist()
-    results = collection.query(query_embeddings=[query_embedding], n_results=n_results)
-    return [Chunk(page_content=doc, metadata=meta) for doc, meta in zip(results["documents"][0], results["metadatas"][0])]
-
-
-def fetch_context_crossencoder(query, n_results=20, final_k=10):
-    """
-    A fetch_context for a cross encoder technique
-    """
-    query_embedding = embedder.encode(query).tolist()
-    results = collection.query(query_embeddings=[query_embedding], n_results=n_results)
+    
+    # Creates a Chunk object from the results of the embedding results above
     chunks1 = [Chunk(page_content=doc, metadata=meta)
                for doc, meta in zip(results["documents"][0], results["metadatas"][0])]
 
-    rewritten = rewrite_query(query)
-    rewritten_embedding = embedder.encode(rewritten).tolist()
-    results2 = collection.query(query_embeddings=[rewritten_embedding], n_results=n_results)
-    chunks2 = [Chunk(page_content=doc, metadata=meta) for doc, meta in zip(results2["documents"][0], results2["metadatas"][0])]
-
-    merged = merge_chunks(chunks1, chunks2) # All the merged Chunk objects
-    pairs = [[query, chunk.page_content] for chunk in merged] # pairs the query and each chunks page_content in their own list
-    scores = cross_encoder.predict(pairs) # Uses cross encoder to predict the pairs. Returns a list of Tensor objects which will be a rank
-    ranked = sorted(zip(scores, merged), key=lambda x: x[0], reverse=True) # Zips the score with the chunk as a tuple and sorted from highest to lowest
-    return [chunk for _, chunk in ranked[:final_k]]  # Returns final_k number of Chunk objects in a list
-
-
-def fetch_context_hybrid(query, n_results=20, ce_k=15, final_k=10):
-    query_embedding = embedder.encode(query).tolist()
-    results = collection.query(query_embeddings=[query_embedding], n_results=n_results)
-    chunks1 = [Chunk(page_content=doc, metadata=meta)
-               for doc, meta in zip(results["documents"][0], results["metadatas"][0])]
-
-    rewritten = rewrite_query(query)
-    rewritten_embedding = embedder.encode(rewritten).tolist()
-    results2 = collection.query(query_embeddings=[rewritten_embedding], n_results=n_results)
+    rewritten = rewrite_query(query, history) # Rewrites the query in a clearer concise way
+    rewritten_embedding = embedder.encode(rewritten).tolist() # Encodes the rewritten prompt into vector embeddings and adds it to a list
+    results2 = collection.query(query_embeddings=[rewritten_embedding], n_results=n_results) # Uses the list of vectors from query_embedding and gives n_results of similar vectors
+    
+     # Creates a Chunk object from the results of the embedding results above
     chunks2 = [Chunk(page_content=doc, metadata=meta)
                for doc, meta in zip(results2["documents"][0], results2["metadatas"][0])]
 
     merged = merge_chunks(chunks1, chunks2) # All merged Chunk objects
     pairs = [[query, chunk.page_content] for chunk in merged] # pairs the query and each chunks page_content in their own list
-    scores = cross_encoder.predict(pairs) # Uses cross encoder to predict the pairs. Returns a list of Tensor objects which will be a rank
+    scores = cross_encoder.predict(pairs) # Uses predict method to the pairs. Returns a list of floats as scores which will be the ranking after scoring
     ranked = sorted(zip(scores, merged), key=lambda x: x[0], reverse=True) # Zips the score with the chunk as a tuple and sorted from highest to lowest
     ce_top = [chunk for _, chunk in ranked[:ce_k]]  # cross-encoder cuts pool to 15
     return rerank(query, ce_top)[:final_k]           # Returns final_k number of Chunk objects in a list
+
+
+def generate_answer(query, chunks, history=[]):
+    context = "\n\n".join(chunk.page_content for chunk in chunks)
+    response = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "system", "content": f"""You are a helpful study assistant for an LLM engineering course. Answer the user's question using only the context provided. If the answer isn't in the context, say so. Context: {context}"""},
+      ] + history + [
+          {"role": "user", "content": query}
+        ]
+    )
+    return response.choices[0].message.content

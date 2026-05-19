@@ -6,8 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from pydantic import BaseModel
 from answer import (
-    fetch_context_baseline, fetch_context, fetch_context_crossencoder,
-    fetch_context_hybrid, generate_answer, client, model
+    fetch_context_hybrid, client, model
 )
 
 BI_ENCODER = "nomic-ai/nomic-embed-text-v1.5"
@@ -16,9 +15,6 @@ CROSS_ENCODER_MODEL = "BAAI/bge-reranker-large"
 RESULTS_DIR = Path("results")
 
 PIPELINES = {
-    "baseline":      (fetch_context_baseline, 0),
-    "llm_reranker":  (fetch_context, 0),
-    "cross_encoder": (fetch_context_crossencoder, 0),
     "hybrid":        (fetch_context_hybrid, 0),
 }
 

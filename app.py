@@ -35,6 +35,19 @@ with gr.Blocks(title="RAG Study Assistant") as demo:
         with gr.Column(scale=3):
             chatbot = gr.Chatbot(label="Conversation", height=600)
             msg = gr.Textbox(placeholder="Ask a question about the LLM course...", show_label=False)
+            gr.Examples(
+                label="Example Questions",
+                examples_per_page=6,
+                examples=[
+                    "What is the rule of thumb for converting tokens to words?",
+                    "What is the key difference between RAG and fine-tuning?",
+                    "Why is Q LoRA used for fine tuning instead of building a model from scratch?",
+                    "What is an end point in the context of API calls?",
+                    "What is the five step strategy for solving a business problem with AI?",
+                    "Why are output tokens including reasoning more expensive to generate?",
+                ],
+                inputs=msg,
+            )
         with gr.Column(scale=2):
             chunks_display = gr.Markdown(label="Retrieved Chunks", value="*Retrieved chunks will appear here*", container=True, height=600)
             gr.ClearButton(value="Clear Context", components=[chatbot, chunks_display])

@@ -1,5 +1,7 @@
 # RAG Study Assistant
 
+**[Try the live demo on Hugging Face Spaces](https://huggingface.co/spaces/kevinkim728/RAG-study-assistant)**
+
 A Retrieval-Augmented Generation (RAG) pipeline built as a personal study assistant for an LLM engineering course. The project includes a full evaluation framework used to systematically compare retrieval strategies and find the best-performing pipeline configuration.
 
 ## Architecture

@@ -25,9 +25,6 @@ model = "gpt-5.4"
 
 
 def rewrite_query(query, history=[]):
-    """
-    Calls the LLM to rewrite the query in a more clear and concise way
-    """
     response = client.chat.completions.create(
         model=model,
         messages=[
@@ -44,20 +41,18 @@ def rewrite_query(query, history=[]):
 
 
 def merge_chunks(chunks1, chunks2):
-    merged = chunks1[:] # Everything from chunks1 which is a list of Chunk object
-    existing = [chunk.page_content for chunk in chunks1] # Put the page_content of each object into a list
+    merged = chunks1[:]
+    existing = [chunk.page_content for chunk in chunks1]
 
-    # Checks if any chunk from chunk2 exists within the existing chunks
     for chunk in chunks2:
         if chunk.page_content not in existing:
             merged.append(chunk)
-    return merged # Returns a list of Chunk objects
+    return merged
 
 
 def rerank(query, chunks):
     user_prompt = f"The user has asked the following question:\n\n{query}\n\nRank all chunks by relevance, most relevant first.\n\n"
 
-    # Enumerates the chunk with an ID and the page_content to prepare the LLM to choose
     for i, chunk in enumerate(chunks):
         user_prompt += f"# CHUNK ID: {i + 1}:\n\n{chunk.page_content}\n\n"
     user_prompt += "Reply with ONLY the chunk IDs as comma-separated integers, most relevant first. Example: 3,1,4,2,5..."
@@ -74,31 +69,27 @@ def rerank(query, chunks):
     order = [int(x.strip()) for x in order_str.split(',') if x.strip().isdigit()]
     order = [i for i in order if 1 <= i <= len(chunks)] # Filter out-of-range IDs the LLM may hallucinate
     print(f"Order returned by LLM: {order}")
-    return [chunks[i - 1] for i in order] # Reorders chunks by using the ranked IDs from the LLM, converting from 1-indexed to 0-indexed
+    return [chunks[i - 1] for i in order] # LLM returns 1-indexed IDs
 
 
 def fetch_context_hybrid(query, n_results=20, ce_k=15, final_k=10, history=[]):
-    query_embedding = embedder.encode(query).tolist() # Convert the query into a vector and puts it in a list
-    results = collection.query(query_embeddings=[query_embedding], n_results=n_results) # Uses the list of vectors from query_embedding and gives n_results of similar vectors
-    
-    # Creates a Chunk object from the results of the embedding results above
+    query_embedding = embedder.encode(query).tolist()
+    results = collection.query(query_embeddings=[query_embedding], n_results=n_results)
     chunks1 = [Chunk(page_content=doc, metadata=meta)
                for doc, meta in zip(results["documents"][0], results["metadatas"][0])]
 
-    rewritten = rewrite_query(query, history) # Rewrites the query in a clearer concise way
-    rewritten_embedding = embedder.encode(rewritten).tolist() # Encodes the rewritten prompt into vector embeddings and adds it to a list
-    results2 = collection.query(query_embeddings=[rewritten_embedding], n_results=n_results) # Uses the list of vectors from query_embedding and gives n_results of similar vectors
-    
-     # Creates a Chunk object from the results of the embedding results above
+    rewritten = rewrite_query(query, history)
+    rewritten_embedding = embedder.encode(rewritten).tolist()
+    results2 = collection.query(query_embeddings=[rewritten_embedding], n_results=n_results)
     chunks2 = [Chunk(page_content=doc, metadata=meta)
                for doc, meta in zip(results2["documents"][0], results2["metadatas"][0])]
 
-    merged = merge_chunks(chunks1, chunks2) # All merged Chunk objects
-    pairs = [[query, chunk.page_content] for chunk in merged] # pairs the query and each chunks page_content in their own list
-    scores = cross_encoder.predict(pairs) # Uses predict method to the pairs. Returns a list of floats as scores which will be the ranking after scoring
-    ranked = sorted(zip(scores, merged), key=lambda x: x[0], reverse=True) # Zips the score with the chunk as a tuple and sorted from highest to lowest
-    ce_top = [chunk for _, chunk in ranked[:ce_k]]  # cross-encoder cuts pool to 15
-    return rerank(query, ce_top)[:final_k]           # Returns final_k number of Chunk objects in a list
+    merged = merge_chunks(chunks1, chunks2)
+    pairs = [[query, chunk.page_content] for chunk in merged]
+    scores = cross_encoder.predict(pairs)
+    ranked = sorted(zip(scores, merged), key=lambda x: x[0], reverse=True)
+    ce_top = [chunk for _, chunk in ranked[:ce_k]]
+    return rerank(query, ce_top)[:final_k]
 
 
 def generate_answer(query, chunks, history=[]):

@@ -1,7 +1,6 @@
 import json
 import math
 import sys
-import time
 from datetime import datetime
 from pathlib import Path
 from pydantic import BaseModel
@@ -148,19 +147,16 @@ def run_pipeline(name, overwrite=False):
     for i, test in enumerate(tests):
         print(f"  [{i+1}/{len(tests)}] {test.question[:60]}...")
         chunks = fetch_fn(test.question)
-        time.sleep(15)
         mrr_per_kw = [calculate_mrr(kw, chunks) for kw in test.keywords]
         ndcg_per_kw = [calculate_ndcg(kw, chunks) for kw in test.keywords]
         all_mrr.append(sum(mrr_per_kw) / len(mrr_per_kw))
         all_ndcg.append(sum(ndcg_per_kw) / len(ndcg_per_kw))
         coverage_scores.append(keyword_coverage(chunks, test.keywords))
         pipeline_answer = generate_answer(test.question, chunks)
-        time.sleep(15)
         score = evaluate_answer(test.question, test.reference_answer, pipeline_answer)
         accuracy_scores.append(score.accuracy)
         completeness_scores.append(score.completeness)
         relevance_scores.append(score.relevance)
-        time.sleep(30)
 
     result = {
         "pipeline": name,

@@ -17,3 +17,6 @@ wheels/
 
 # Chroma vector database
 chroma_db/
+
+# Personal dev file
+CLAUDE.md

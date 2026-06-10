@@ -31,7 +31,6 @@ class TestQuestion(BaseModel):
 
 
 class JudgeScore(BaseModel):
-    feedback: str
     accuracy: float
     completeness: float
     relevance: float
@@ -89,24 +88,19 @@ Score the pipeline answer vs the reference on three dimensions (1-5):
 - completeness: how thoroughly does it cover all aspects (5 only if ALL reference info is included)
 - relevance: how directly does it answer without extra fluff (5 only if completely on-topic with no extra info)
 
-Reply with ONLY this format — feedback on one line, then scores:
-FEEDBACK: <one sentence evaluation>
+Reply with ONLY scores:
 SCORES: accuracy,completeness,relevance
 Example:
-FEEDBACK: Answer correctly explains MRR but omits the averaging step mentioned in the reference.
 SCORES: 4,3,5"""},
             {"role": "user", "content": f"Question: {question}\n\nReference: {reference_answer}\n\nPipeline answer: {pipeline_answer}"}
         ]
     )
     raw = response.choices[0].message.content.strip()
 
-    feedback = ""
     accuracy, completeness, relevance = 0.0, 0.0, 0.0
 
     for line in raw.splitlines():
-        if line.startswith("FEEDBACK:"):
-            feedback = line.replace("FEEDBACK:", "").strip()
-        elif line.startswith("SCORES:"):
+        if line.startswith("SCORES:"):
             scores_str = line.replace("SCORES:", "").strip()
             parts = [x.strip() for x in scores_str.split(',') if x.strip()]
             if len(parts) == 3:
@@ -115,7 +109,7 @@ SCORES: 4,3,5"""},
                 except ValueError:
                     pass
 
-    return JudgeScore(feedback=feedback, accuracy=accuracy, completeness=completeness, relevance=relevance)
+    return JudgeScore(accuracy=accuracy, completeness=completeness, relevance=relevance)
 
 
 def print_model_info():
